@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
- 
+
     "name": "Mopub-automation",
-    "version": "0.1",    
+    "version": "0.1",
     "icons": {
             "16": "images/empty_16.png",
             "32": "images/empty_32.png",
@@ -10,7 +10,7 @@
             "64": "images/empty_64.png",
             "128": "images/empty_128.png"
     },
- 
+
     "content_scripts": [
         {
             "matches": [ "https://app.mopub.com/*","http://app.mopub.com/*"],
@@ -18,7 +18,7 @@
             "run_at": "document_end"
         }
     ],
-    "permissions": ["http://*/","https://*/"],
+    "permissions": ["tabs", "https://app.mopub.com/*","http://app.mopub.com/*"],
     "browser_action": {
           "default_icon": {
             "16": "images/empty_16.png",
