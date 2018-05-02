@@ -4,7 +4,10 @@
   "description": "",
   "main": " ",
   "scripts": {
-    "bundle": "NODE_ENV=development ./node_modules/gulp/bin/gulp.js bundle"
+    "build": "NODE_ENV=development ./node_modules/gulp/bin/gulp.js build",
+    "watch": "NODE_ENV=development ./node_modules/gulp/bin/gulp.js watch",
+    "bundle": "NODE_ENV=development ./node_modules/gulp/bin/gulp.js bundle",
+    "clear": "./node_modules/gulp/bin/gulp.js clear"
   },
   "repository": {
     "type": "git",
@@ -21,6 +24,7 @@
     "browserify-incremental": "^3.1.1",
     "gulp": "github:gulpjs/gulp#4.0",
     "gulp-util": "^3.0.8",
+    "rimraf": "^2.6.2",
     "vinyl-source-stream": "^2.0.0"
   },
   "dependencies": {
