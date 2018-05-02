@@ -7,6 +7,6 @@ export function build(cb) {
 }
 
 function copyFiles() {
-    return gulp.src(['src/*', '!src/content_scripts'])
+    return gulp.src(['src/**/*', '!src/content_scripts'])
         .pipe(gulp.dest('./build'))
 }
