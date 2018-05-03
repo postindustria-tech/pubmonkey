@@ -7,7 +7,8 @@
     "build": "NODE_ENV=development ./node_modules/gulp/bin/gulp.js build",
     "watch": "NODE_ENV=development ./node_modules/gulp/bin/gulp.js watch",
     "bundle": "NODE_ENV=development ./node_modules/gulp/bin/gulp.js bundle",
-    "clear": "./node_modules/gulp/bin/gulp.js clear"
+    "clear": "./node_modules/gulp/bin/gulp.js clear",
+    "crx": "./node_modules/gulp/bin/gulp.js crx"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "browserify": "^16.2.0",
     "browserify-incremental": "^3.1.1",
     "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-crx-pack": "^1.0.2",
     "gulp-util": "^3.0.8",
     "rimraf": "^2.6.2",
     "vinyl-source-stream": "^2.0.0"
