@@ -5,8 +5,8 @@ const API_URL = 'https://app.mopub.com/web-client/api',
       fileinput = document.createElement('input')
 
 let DATA = {
-   "order-name":"TestOrder4",
-   "order-advertiser":"Test4",
+   "order-name":"TestOrder44",
+   "order-advertiser":"Test44",
    "order-description":"",
    "adgroup_type":"gtee",
    "priority":"6",
@@ -30,8 +30,10 @@ let DATA = {
    "form-MAX_NUM_FORMS":1000,
    "form-0-model_id":"sentinel",
    "form-0-weekdays":"Sat",
-   "form-0-start_time":"\n",
-   "form-0-end_time":"\n",
+   // "form-0-start_time":"12:00 AM",
+   // "form-0-end_time":"11:59 PM",
+   "form-0-start_time":'2018-04-27T05:04:35.645-07:00',
+   "form-0-end_time":null,
    "form-1-model_id":"sentinel",
    "form-1-start_time":"",
    "form-1-end_time":"",
@@ -109,6 +111,8 @@ fileinput.addEventListener('change', () => {
     }
 
 })
+
+axios.get(`${API_URL}/line-items/get?key=87f12adfdc2246b18ee9792783042d90`).then(({ data }) => console.log(data))
 
 
 chrome.runtime.onMessage.addListener(({ action }) => {
