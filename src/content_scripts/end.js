@@ -30,8 +30,8 @@ let DATA = {
    "form-MAX_NUM_FORMS":1000,
    "form-0-model_id":"sentinel",
    "form-0-weekdays":"Sat",
-   "form-0-start_time":"",
-   "form-0-end_time":"",
+   "form-0-start_time":"\n",
+   "form-0-end_time":"\n",
    "form-1-model_id":"sentinel",
    "form-1-start_time":"",
    "form-1-end_time":"",
@@ -44,7 +44,7 @@ let DATA = {
    "bid":0.05,
    "bid_strategy":"cpm",
    "budget_strategy":"allatonce",
-   "blind":false,
+   "blind": 'False',
    "send_keywords":"on",
    "adunits":772087,
    "accept_targeted_locations":1,
@@ -54,8 +54,8 @@ let DATA = {
    "target_iphone":"on",
    "target_ipod":"on",
    "target_ipad":"on",
-   "ios_version_min":2.0,
-   "ios_version_max":999,
+   "ios_version_min":'2.0',
+   "ios_version_max":'999',
    "target_android":"on",
    "android_version_min":1.5,
    "android_version_max":999,
@@ -83,7 +83,17 @@ fileinput.addEventListener('change', () => {
                 formData.append(key, DATA[key])
             })
 
-            axios.post(`${API_URL}/orders/new/`, formData).then(result => console.log(result))
+            // axios.post(`${API_URL}/orders/new/`, formData).then(result => console.log(result))
+            axios({
+                url: 'https://app.mopub.com/advertise/orders/new/',
+                method: 'post',
+                xsrfCookieName: 'csrftoken',
+                xsrfHeaderName: 'x-csrftoken',
+                headers: {
+                    'x-requested-with': 'XMLHttpRequest'
+                },
+                data: formData
+            }).then(result => console.log(result))
 
             // orders.forEach(order => {
                 // axios.post(`${API_URL}/orders/new/`, {
