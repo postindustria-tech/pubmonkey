@@ -134,7 +134,7 @@ chrome.runtime.onMessage.addListener(({ action }) => {
             ))
             // .then(result => console.log(result))
             .then(result => saveAs(new File(
-                [ JSON.stringify(result) ],
+                [ JSON.stringify(result, null, '  ') ],
                 'orders_backup.json',
                 { type: 'application/json;charset=utf-8' }
             )))
