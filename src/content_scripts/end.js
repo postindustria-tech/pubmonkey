@@ -1,6 +1,7 @@
 import axios from 'axios'
 import HTMLParser from 'fast-html-parser'
 import { saveAs } from 'file-saver'
+import moment from 'moment'
 
 const API_URL = 'https://app.mopub.com/web-client/api',
       fileinput = document.createElement('input')
@@ -14,11 +15,25 @@ fileinput.addEventListener('change', () => {
             reader = new FileReader
 
         reader.onload = e => {
-            let orders = JSON.parse(e.target.result),
-                formData = collectCreationData(orders[0].lineItems[0])
+            let order = JSON.parse(e.target.result)
 
-            createNewOrder(formData)
-                .then(result => console.log(result))
+            Promise.all(
+                order.lineItems.map(lineItem =>
+                    restoreLineItem({
+                        ...lineItem,
+                        'end_datetime_0': '',
+                        'end_datetime_1': '',
+                        'start_datetime_0': moment().format('MM/DD/YYYY'),
+                        'start_datetime_1': moment().add(10, 'minutes').format('h:mm A')
+                    }, order.key)
+                )
+            ).then(() => location.reload())
+
+            // let orders = JSON.parse(e.target.result),
+            //     formData = collectCreationData(orders[0].lineItems[0])
+            //
+            // createOrder(formData)
+            //     .then(result => console.log(result))
 
             fileinput.value = ''
         }
@@ -26,36 +41,6 @@ fileinput.addEventListener('change', () => {
         reader.readAsText(file)
     }
 })
-
-function createNewOrder(formData) {
-    return axios({
-        url: 'https://app.mopub.com/advertise/orders/new/',
-        method: 'post',
-        xsrfCookieName: 'csrftoken',
-        xsrfHeaderName: 'x-csrftoken',
-        headers: {
-            'x-requested-with': 'XMLHttpRequest'
-        },
-        data: formData
-    })
-}
-
-function collectCreationData(data) {
-    let formData = new FormData
-
-    Object.keys(data).forEach(key => {
-        if (
-            ['form-0-weekdays', 'adunits', 'targeted_countries'].includes(key)
-            && Array.isArray(data[key])
-        ) {
-            data[key].forEach(value => formData.append(key, value))
-        } else {
-            formData.append(key, data[key])
-        }
-    })
-
-    return formData
-}
 
 chrome.runtime.onMessage.addListener(({ action }, sender, sendResponse) => {
     // if (action === 'backup_orders') {
@@ -107,12 +92,12 @@ chrome.runtime.onMessage.addListener(({ action }, sender, sendResponse) => {
                         lineItems
                     }))
             })
-            // .then(result => console.log(result))
             .then(result => saveAs(new File(
                 [ JSON.stringify(result, null, '  ') ],
-                `backup.${key}.json`,
+                `${result.name}.backup.json`,
                 { type: 'application/json;charset=utf-8' }
             )))
+
     }
 
     if (action === 'get_order_id') {
@@ -124,6 +109,90 @@ chrome.runtime.onMessage.addListener(({ action }, sender, sendResponse) => {
     }
 })
 
+// checkIsLineItemExist('87f12adfdc2246b18ee9792783042d90')
+//     .then(isExist => console.log(isExist))
+
+function collectCreationData(data) {
+    let formData = new FormData
+
+    Object.keys(data).forEach(key => {
+        if (
+            ['form-0-weekdays', 'adunits', 'targeted_countries'].includes(key)
+            && Array.isArray(data[key])
+        ) {
+            data[key].forEach(value => formData.append(key, value))
+        } else {
+            formData.append(key, data[key])
+        }
+    })
+
+    return formData
+}
+
+function restoreLineItem(data, orderId) {
+    if (data.key != null) {
+        return updateLineItem(collectCreationData(data), data.key)
+    } else {
+        return checkIsLineItemExist(data.key)
+            .then(isExist => {
+                if (isExist) {
+                    return updateLineItem(collectCreationData(data), data.key)
+                } else {
+                    return createLineItem(collectCreationData(data), orderId)
+                }
+            })
+    }
+}
+
+function createLineItem(formData, orderId) {
+    return axios({
+        url: `https://app.mopub.com/advertise/orders/${orderId}/new_line_item/`,
+        method: 'post',
+        xsrfCookieName: 'csrftoken',
+        xsrfHeaderName: 'x-csrftoken',
+        headers: {
+            'x-requested-with': 'XMLHttpRequest'
+        },
+        data: formData
+    })
+}
+
+function updateLineItem(formData, lineItemId) {
+    return axios({
+        url: `https://app.mopub.com/advertise/line_items/${lineItemId}/edit/`,
+        method: 'post',
+        xsrfCookieName: 'csrftoken',
+        xsrfHeaderName: 'x-csrftoken',
+        headers: {
+            'x-requested-with': 'XMLHttpRequest'
+        },
+        data: formData
+    })
+}
+
+function createOrder(formData) {
+    return axios({
+        url: 'https://app.mopub.com/advertise/orders/new/',
+        method: 'post',
+        xsrfCookieName: 'csrftoken',
+        xsrfHeaderName: 'x-csrftoken',
+        headers: {
+            'x-requested-with': 'XMLHttpRequest'
+        },
+        data: formData
+    })
+}
+
+function checkIsLineItemExist(key) {
+    return new Promise(resolve => //@TODO add checking is line-item exist in current order
+        axios.get(`https://app.mopub.com/web-client/api/line-items/get?key=${key}`)
+            .then(
+                () => resolve(true),
+                () => resolve(false)
+            )
+    )
+}
+
 function serializeLineItem(id) {
     return axios.get(`https://app.mopub.com/advertise/line_items/${id}/edit/`)
         .then(({ data }) => {
@@ -131,7 +200,8 @@ function serializeLineItem(id) {
                 ...parseInputs(HTMLParser.parse(data).querySelectorAll('#order_and_line_item_form input')),
                 ...parseTextareas(HTMLParser.parse(data).querySelectorAll('#order_and_line_item_form textarea')),
                 ...parseSelects(HTMLParser.parse(data).querySelectorAll('#order_and_line_item_form select')),
-                impression_caps: data.match(/impression_caps\:.+"(.+)".+,/)[1]
+                impression_caps: data.match(/impression_caps\:.+"(.+)".+,/)[1],
+                key: id
             }
         })
 }
