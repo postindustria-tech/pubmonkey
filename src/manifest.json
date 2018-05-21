@@ -2,7 +2,7 @@
     "manifest_version": 2,
 
     "name": "Mopub-automation",
-    "version": "0.1",
+    "version": "0.2",
     "icons": {
             "16": "images/empty_16.png",
             "32": "images/empty_32.png",
