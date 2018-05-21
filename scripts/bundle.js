@@ -7,33 +7,62 @@ import source from 'vinyl-source-stream'
 
 const isDev = true
 
-var bundler
+var bundler = {}
 
-export function bundle() {
-    let bundler = getBundler()
+export function bundle(cb) {
+    gulp.series(
+        contentScriptsBundle,
+        backgroundScriptsBundle,
+        popupScriptsBundle,
+        pageScriptsBundle
+    )(cb)
+}
+
+export function contentScriptsBundle() {
+    return customBundle('content_scripts/end.js')
+}
+
+export function backgroundScriptsBundle() {
+    return customBundle('background/background.js')
+}
+
+export function popupScriptsBundle() {
+    return customBundle('popup/popup.js')
+}
+
+export function pageScriptsBundle() {
+    return customBundle('pages/main.js')
+}
+
+function customBundle(dest) {
+    let bundler = getBundler(dest)
 
     return bundler
         .bundle()
         .on('error', function (err) {
-            gutil.log(err.message);
-            this.emit('end');
+            gutil.log(err.message)
+            this.emit('end')
         })
-        .pipe(source('content_scripts/end.js'))
+        .pipe(source(dest))
         .pipe(gulp.dest('./build'))
 }
 
-function getBundler() {
-    if (bundler != null) {
-        return bundler
+function getBundler(dest) {
+    if (bundler[dest] != null) {
+        return bundler[dest]
     }
+
+    let fileName = dest.replace(/.+\/(.+).js$/, '$1')
 
     browserifyInc.args.debug = isDev
 
-    bundler = browserify(Object.assign(browserifyInc.args, {
-        entries: [ 'src/content_scripts/end.js' ]
+    bundler[dest] = browserify(Object.assign(browserifyInc.args, {
+        entries: [
+            `src/${dest}`
+        ]
     }))
 
-    bundler.transform(
+    bundler[dest].transform(
         babelify.configure({
             presets: ['stage-0', 'es2015'],
             extensions: ['.js']
@@ -41,10 +70,10 @@ function getBundler() {
     )
 
     if (isDev) {
-        browserifyInc(bundler, {
-            cacheFile: './scripts/temp/bundle.json'
+        browserifyInc(bundler[dest], {
+            cacheFile: `./scripts/temp/${fileName}.json`
         })
     }
 
-    return bundler
+    return bundler[dest]
 }

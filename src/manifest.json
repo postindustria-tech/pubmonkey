@@ -10,15 +10,24 @@
             "64": "images/empty_64.png",
             "128": "images/empty_128.png"
     },
-
+    "background": {
+        "scripts": [
+            "background/background.js"
+        ]
+    },
     "content_scripts": [
         {
-            "matches": [ "https://app.mopub.com/*","http://app.mopub.com/*"],
+            "matches": [ "https://app.mopub.com/*"],
             "js": [ "content_scripts/end.js"],
             "run_at": "document_end"
         }
     ],
-    "permissions": ["tabs", "https://app.mopub.com/*","http://app.mopub.com/*"],
+    "permissions": [
+        "tabs",
+        "storage",
+        "https://app.mopub.com/*",
+        "http://app.mopub.com/*"
+    ],
     "browser_action": {
           "default_icon": {
             "16": "images/empty_16.png",
