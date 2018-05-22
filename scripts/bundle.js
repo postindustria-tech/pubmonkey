@@ -64,7 +64,7 @@ function getBundler(dest) {
 
     bundler[dest].transform(
         babelify.configure({
-            presets: ['stage-0', 'es2015'],
+            plugins: ["transform-es2015-modules-commonjs"],
             extensions: ['.js']
         })
     )
