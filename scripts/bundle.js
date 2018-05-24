@@ -19,7 +19,7 @@ export function bundle(cb) {
 }
 
 export function contentScriptsBundle() {
-    return customBundle('content_scripts/end.js')
+    return customBundle('content/content.js')
 }
 
 export function backgroundScriptsBundle() {

@@ -18,16 +18,18 @@
     "content_scripts": [
         {
             "matches": [ "https://app.mopub.com/*"],
-            "js": [ "content_scripts/end.js"],
+            "js": [ "content/content.js"],
             "run_at": "document_end"
         }
     ],
     "permissions": [
         "tabs",
         "storage",
-        "https://app.mopub.com/*",
-        "http://app.mopub.com/*"
+        "*://app.mopub.com/*"
     ],
+    "externally_connectable": {
+        "matches": [ "https://app.mopub.com/*"]
+    },
     "browser_action": {
           "default_icon": {
             "16": "images/empty_16.png",

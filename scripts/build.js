@@ -10,7 +10,7 @@ function copyFiles() {
     return gulp.src([
             'src/**/*',
             '!src/**/*.old',
-            '!src/content_scripts/*.js',
+            '!src/content/*.js',
             '!src/popup/*.js',
             '!src/pages/*.js',
             '!src/background/*.js'

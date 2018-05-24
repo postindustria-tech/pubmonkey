@@ -24,8 +24,8 @@ const Controller = new class {
     }
 }
 
-chrome.runtime.onMessage.addListener(({ rpc, method, args }, sender, sendResponse) => {
-    if (rpc === true) {
+function RPCHandler({ rpc, method, args, action }, sender, sendResponse) {
+    if (rpc) {
         if (Controller[method]) {
             Promise.resolve(Controller[method](...args))
                 .then(result => sendResponse({ ok: true, result }))
@@ -35,16 +35,20 @@ chrome.runtime.onMessage.addListener(({ rpc, method, args }, sender, sendRespons
 
         return true
     }
+}
 
-    // chrome.tabs.query({
-    //     url: 'https://app.mopub.com/*'
-    // }, tabs => {
-    //     chrome.tabs.sendMessage(
-    //         tabs[0].id,
-    //         { action: 'action' }//,
-    //         // data => {
-    //         //     console.log(data)
-    //         // }
-    //     )
-    // })
-})
+chrome.runtime.onMessageExternal.addListener(RPCHandler)
+chrome.runtime.onMessage.addListener(RPCHandler)
+
+// chrome.tabs.query({
+//     url: '*://app.mopub.com/*'
+// }, tabs => {
+//     tabs.forEach(({ id }) => {
+//         let port = chrome.tabs.connect(id)
+//         port.postMessage({ aa: 22 })
+//     }
+//         // chrome.tabs.sendMessage(
+//         //     id, { action: 'init_extension', id: chrome.runtime.id }
+//         // )
+//     )
+// })
