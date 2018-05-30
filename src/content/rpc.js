@@ -1,10 +1,11 @@
-console.log('page script loaded!')
+let APP_ID = 'aogdgbbodibojfifcgehledmeemcelii'
 
-const RPCController = new Proxy({}, {
+export const RPCController = new Proxy({}, {
     get(target, method) {
         return (...args) =>
             new Promise((resolve, reject) =>
                 chrome.runtime.sendMessage(
+                    APP_ID,
                     { rpc: true, method, args },
                     ({ ok, result, error }) =>
                         ok ? resolve(result) : reject(error)
@@ -12,7 +13,3 @@ const RPCController = new Proxy({}, {
             )
     }
 })
-
-RPCController.abc()
-
-// RPCController.getLineItem('f297a06e85d84d2eb70cb26de591547d').then(result => console.log(11,result))

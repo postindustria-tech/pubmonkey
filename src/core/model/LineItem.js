@@ -29,11 +29,10 @@ export class LineItemModel {
     }
 
     fromHTML(html, key = '') {
-        html = HTMLParser.parse(html)
-
-        let inputs = parseInputs(html.querySelectorAll('#order_and_line_item_form input')),
-            selects = parseSelects(html.querySelectorAll('#order_and_line_item_form select')),
-            textareas = parseTextareas(html.querySelectorAll('#order_and_line_item_form textarea'))
+        let DOM = HTMLParser.parse(html),
+            inputs = parseInputs(DOM.querySelectorAll('#order_and_line_item_form input')),
+            selects = parseSelects(DOM.querySelectorAll('#order_and_line_item_form select')),
+            textareas = parseTextareas(DOM.querySelectorAll('#order_and_line_item_form textarea'))
 
         this.data = {
             ...inputs,

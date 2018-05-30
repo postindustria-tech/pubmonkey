@@ -1,34 +1,19 @@
 import axios from 'axios'
-import { LinteItemModel } from '../core'
-
-// axios.get(`https://app.mopub.com/web-client/api/line-items/get?key=f297a06e85d84d2eb70cb26de591547d`)
-//     .then(result => console.log(result))
+import { BackgroundController } from '../core'
 
 console.log('background script loaded!')
 
-let url = chrome.extension.getURL('pages/page.html')
-
-chrome.tabs.query({ url }, tabs => {
-  if (tabs.length) {
-      chrome.tabs.update(tabs[0].id, { url, active: true })
-  }
-  else {
-      chrome.tabs.create({ url })
-  }
+chrome.webRequest.onCompleted.addListener(({ tabId }) => {
+    chrome.tabs.sendMessage(tabId, { a: 22 })
+}, {
+    urls: [ 'https://app.mopub.com/web-client/api/orders/query' ]
 })
 
-const Controller = new class {
-    something(a, b) {
-        console.log(b, a)
-
-        return 42
-    }
-}
 
 function RPCHandler({ rpc, method, args, action }, sender, sendResponse) {
     if (rpc) {
-        if (Controller[method]) {
-            Promise.resolve(Controller[method](...args))
+        if (BackgroundController[method]) {
+            Promise.resolve(BackgroundController[method](...args))
                 .then(result => sendResponse({ ok: true, result }))
         } else {
             sendResponse({ ok: false, error: `no such method in controller: "${method}"` })
@@ -53,3 +38,14 @@ chrome.runtime.onMessage.addListener(RPCHandler)
 //         // )
 //     )
 // })
+
+let url = chrome.extension.getURL('pages/page.html')
+
+chrome.tabs.query({ url }, tabs => {
+  if (tabs.length) {
+      chrome.tabs.update(tabs[0].id, { url, active: true })
+  }
+  else {
+      chrome.tabs.create({ url })
+  }
+})
