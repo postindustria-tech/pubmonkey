@@ -9,7 +9,6 @@ import {
 import { build } from './build'
 
 export function watch(cb) {
-    // gulp.watch(['./src/**/*.js'], bundle)
     gulp.watch(['./src/content_scripts/*.js'], contentScriptsBundle)
     gulp.watch(['./src/background/*.js'], backgroundScriptsBundle)
     gulp.watch(['./src/popup/*.js'], popupScriptsBundle)

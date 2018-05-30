@@ -25,7 +25,7 @@
     "permissions": [
         "tabs",
         "storage",
-        "*://app.mopub.com/*"
+        "https://app.mopub.com/*"
     ],
     "externally_connectable": {
         "matches": [ "https://app.mopub.com/*"]

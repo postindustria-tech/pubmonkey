@@ -64,8 +64,12 @@ function getBundler(dest) {
 
     bundler[dest].transform(
         babelify.configure({
-            plugins: ["transform-es2015-modules-commonjs"],
-            extensions: ['.js']
+            plugins: [
+                'transform-es2015-modules-commonjs',
+                'transform-class-properties',
+                'syntax-object-rest-spread'
+            ],
+            extensions: [ '.js' ]
         })
     )
 

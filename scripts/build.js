@@ -3,17 +3,23 @@ import { bundle } from './bundle'
 import { clear } from './clear'
 
 export function build(cb) {
-    gulp.series(clear, copyFiles, bundle)(cb)
+    gulp.series(clear, bundle, copyFiles)(cb)
 }
 
 function copyFiles() {
-    return gulp.src([
-            'src/**/*',
-            '!src/**/*.old',
-            '!src/content/*.js',
-            '!src/popup/*.js',
-            '!src/pages/*.js',
-            '!src/background/*.js'
-        ])
+    copyFolder('pages')
+    copyFolder('popup')
+    copyFolder('images')
+
+    return gulp.src([ 'src/manifest.json' ])
         .pipe(gulp.dest('./build'))
+}
+
+function copyFolder(folder) {
+    return gulp.src([
+            `src/${folder}/**/*`,
+            `!src/${folder}/**/*.js`,
+            `!src/**/*.old`
+        ])
+        .pipe(gulp.dest(`./build/${folder}`))
 }
