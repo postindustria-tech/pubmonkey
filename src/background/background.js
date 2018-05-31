@@ -4,7 +4,7 @@ import { BackgroundController } from '../core'
 console.log('background script loaded!')
 
 chrome.webRequest.onCompleted.addListener(({ tabId }) => {
-    chrome.tabs.sendMessage(tabId, { a: 22 })
+    chrome.tabs.sendMessage(tabId, { action: 'line-items-loaded' })
 }, {
     urls: [ 'https://app.mopub.com/web-client/api/orders/query' ]
 })

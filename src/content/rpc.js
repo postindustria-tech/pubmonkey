@@ -1,4 +1,4 @@
-let APP_ID = 'aogdgbbodibojfifcgehledmeemcelii'
+const APP_ID = 'aogdgbbodibojfifcgehledmeemcelii'
 
 export const RPCController = new Proxy({}, {
     get(target, method) {
