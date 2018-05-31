@@ -11,7 +11,7 @@ function copyFiles() {
     copyFolder('popup')
     copyFolder('images')
 
-    return gulp.src([ 'src/manifest.json' ])
+    return gulp.src([ 'src/manifest.json', 'src/index.html' ])
         .pipe(gulp.dest('./build'))
 }
 

@@ -69,6 +69,9 @@ function getBundler(dest) {
                 'transform-class-properties',
                 'syntax-object-rest-spread'
             ],
+            presets: [
+                'react'
+            ],
             extensions: [ '.js' ]
         })
     )

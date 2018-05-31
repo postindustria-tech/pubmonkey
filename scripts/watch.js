@@ -14,7 +14,7 @@ export function watch(cb) {
     gulp.watch(['./src/popup/*.js'], popupScriptsBundle)
     gulp.watch(['./src/pages/*.js'], pageScriptsBundle)
     gulp.watch(['./src/popup/*.html'], updatePopupFiles)
-    gulp.watch(['./src/pages/*.html'], updatePagesFiles)
+    gulp.watch(['./src/index.html'], updateIndexFile)
     gulp.series(build)(cb)
 }
 
@@ -23,7 +23,7 @@ function updatePopupFiles() {
         .pipe(gulp.dest('./build/popup'))
 }
 
-function updatePagesFiles() {
-    return gulp.src(['src/pages/*'])
-        .pipe(gulp.dest('./build/pages'))
+function updateIndexFile() {
+    return gulp.src(['src/index.html'])
+        .pipe(gulp.dest('./build/'))
 }
