@@ -12,7 +12,7 @@ export function watch(cb) {
     gulp.watch(['./src/content/*.js'], contentScriptsBundle)
     gulp.watch(['./src/background/*.js'], backgroundScriptsBundle)
     gulp.watch(['./src/popup/*.js'], popupScriptsBundle)
-    gulp.watch(['./src/pages/*.js'], pageScriptsBundle)
+    gulp.watch(['./src/pages/**/*.js'], pageScriptsBundle)
     gulp.watch(['./src/popup/*.html'], updatePopupFiles)
     gulp.watch(['./src/index.html'], updateIndexFile)
     gulp.series(build)(cb)

@@ -1,18 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { HashRouter, Route, Switch } from 'react-router-dom'
+import { AppRouter } from './router'
 
-const HelloWorld = () => (<div>hello world</div>)
-const Test = () => (<div>test</div>)
-
-const AppRouter = () => (
-    <HashRouter>
-        <Switch>
-            <Route exact path="/" component={ HelloWorld } />
-            <Route path="/test" component={ Test } />
-        </Switch>
-    </HashRouter>
-)
 
 ReactDOM.render(
     <AppRouter/>,
