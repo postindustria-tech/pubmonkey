@@ -1,9 +1,10 @@
 import gulp from 'gulp'
 import { bundle } from './bundle'
+import { styles } from './styles'
 import { clear } from './clear'
 
 export function build(cb) {
-    gulp.series(clear, bundle, copyFiles)(cb)
+    gulp.series(clear, bundle, styles, copyFiles)(cb)
 }
 
 function copyFiles() {
@@ -19,7 +20,8 @@ function copyFolder(folder) {
     return gulp.src([
             `src/${folder}/**/*`,
             `!src/${folder}/**/*.js`,
-            `!src/**/*.old`
+            `!src/**/*.old`,
+            `!src/**/*.scss`
         ])
         .pipe(gulp.dest(`./build/${folder}`))
 }
