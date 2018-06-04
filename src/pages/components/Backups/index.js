@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Table, Button } from 'reactstrap'
+import { RPCController } from '../../services'
 
 export class Backups extends Component {
     state = {
@@ -13,6 +14,10 @@ export class Backups extends Component {
             <div className="backups-layout">
                 <div className="container">
                     <h2>Mopub backpack Backups</h2>
+                    <Button
+                        color="primary"
+                        onClick={ () => RPCController.addToStore({ backups: Math.random() }).then(result=>console.log(result)) }
+                    >2</Button>
                     <Table className="backups-table">
                         <thead>
                             <tr>

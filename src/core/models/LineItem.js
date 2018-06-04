@@ -1,5 +1,5 @@
 import HTMLParser from 'fast-html-parser'
-import { parseSelects, parseInputs, parseTextareas } from '../helper'
+import { parseSelects, parseInputs, parseTextareas } from '../helpers'
 
 export class LineItemModel {
     data = {}

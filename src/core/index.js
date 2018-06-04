@@ -1,3 +1,3 @@
-export * from './model'
-export * from './controller'
-export * from './service'
+export * from './models'
+export * from './controllers'
+export * from './services'
