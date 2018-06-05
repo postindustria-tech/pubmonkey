@@ -1,4 +1,4 @@
-import { HTTPService, StoreService } from '../services'
+import { HTTPService, StorageService } from '../services'
 import { LineItemModel } from '../models'
 
 const WEB_URL = 'https://app.mopub.com'
@@ -17,17 +17,59 @@ const BackgroundController = new class Background {
             .then(data => LineItemModel.createFromHTML(data, id).toJSON()) //@TODO maybe it's not necessary to create instances for parsing only
     }
 
-    getFromStore(...keys) {
-        return StoreService.get(...keys)
+    getBackups() {
+        return StorageService.get('backups')
+            .then(({ backups }) => backups)
     }
 
-    setToStore(data) {
-        return StoreService.set(data)
+    getBackupById(_id) {
+        return StorageService.get('backups')
+            .then(backups => {
+                if (backups == null) {
+                    throw 'no backups in store'
+                }
+
+                return backups.filter(({ id }) => id === _id)
+            })
     }
 
-    addToStore(data) {
-        return StoreService.add(data)
+    addBackup(data) {
+        return this.getBackups()
+            .then(backups => {
+                if (backups == null) {
+                    backups = []
+                }
+
+                backups.push(data)
+
+                return StorageService.set({ backups })
+            })
     }
+
+    removeBackup(_id) {
+        return StorageService.get('backups')
+            .then(backups => {
+                if (backups == null) {
+                    throw 'no backups in store'
+                }
+
+                backups = backups.filter(({ id }) => id !== _id)
+
+                return StorageService.set({ backups })
+            })
+    }
+
+    // getFromStore(...keys) {
+    //     return StorageService.get(...keys)
+    // }
+    //
+    // setToStore(data) {
+    //     return StorageService.set(data)
+    // }
+    //
+    // addToStore(data) {
+    //     return StorageService.add(data)
+    // }
 }
 
 export { BackgroundController }

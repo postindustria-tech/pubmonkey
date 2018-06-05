@@ -1,2 +1,2 @@
 export * from './http'
-export * from './syncStore'
+export * from './store'

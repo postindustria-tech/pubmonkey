@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Table, Button } from 'reactstrap'
 import moment from 'moment'
+import sha256 from 'sha256'
 import { FileService, RPCController } from '../../services'
 
 export class Orders extends Component {
@@ -68,7 +69,19 @@ export class Orders extends Component {
         return Promise.all(
             orders.filter(({ checked }) => checked)
                 .map(({ key }) => this.collectOrderData(key))
-        ).then(result => FileService.saveFile(result, 'backup-' + moment().format('MM-DD-YYYY')))
+            )
+            .then(data => RPCController.addBackup({
+                name: 'backup-' + moment().format('MM-DD-YYYY hh:mm'),
+                id: sha256(Date.now()),
+                date: Date.now(),
+                ordersCount: 0,
+                lineItemsCount: 0,
+                data
+            }))
+            .then(() => this.props.history.push('/backups'))
+            // .then(result =>
+            //     FileService.saveFile(result, 'backup-' + moment().format('MM-DD-YYYY'))
+            // )
     }
 
     collectOrderData(id) {

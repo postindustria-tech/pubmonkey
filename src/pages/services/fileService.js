@@ -26,9 +26,25 @@ class File {
     openFile() {
         this.fileinput.click()
 
-        return new Promise(resolve =>
-            this.resolver = resolve
-        )
+        return (new Promise(resolve =>
+                this.resolver = resolve
+            )).then(result => {
+                let file = result[0],
+                    reader = new FileReader
+
+                if (file == null) {
+                    return null
+                }
+
+                return new Promise(resolve => {
+                    reader.onload = ({ target: { result }}) => {
+                        resolve(result)
+                        this.fileinput.value = ''
+                    }
+
+                    reader.readAsText(file)
+                })
+            })
     }
 
     clickHandler() {
