@@ -119,16 +119,6 @@ export class OrdersList extends Component {
             .then(() => {
                 this.toggleModal()
             })
-            // .then(data =>
-            //     RPCController.addBackup({
-            //         name: this.refs.name.value,
-            //         date: Date.now(),
-            //         ordersCount: 0,
-            //         lineItemCount: 0,
-            //         data
-            //     })
-            // )
-            // .then(() => this.props.history.push('/backups'))
     }
 
     collectOrderData(id) {

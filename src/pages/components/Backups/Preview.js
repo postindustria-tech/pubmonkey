@@ -48,6 +48,12 @@ export class BackupPreview extends Component {
                     onClick={ () => this.restoreSelected() }
                 >
                     restore selected
+                </Button>{ '  ' }
+                <Button
+                    color="secondary"
+                    onClick={ () => this.saveBackup() }
+                >
+                    save to backpack
                 </Button>
                 <OrdersTable
                     orders={ orders }
@@ -60,6 +66,13 @@ export class BackupPreview extends Component {
 
     restoreSelected() {
         console.log('restore')
+    }
+
+    saveBackup() {
+        RPCController.addBackup(this.state.backup)
+            .then(() =>
+                this.props.history.push('/backups')
+            )
     }
 
     onOrdersListUpdate(orders) {
