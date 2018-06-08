@@ -1,5 +1,6 @@
 class File {
     resolver = null
+    lastLoaded = null
 
     constructor() {
         let fileinput = this.fileinput = document.createElement('input'),
@@ -44,6 +45,7 @@ class File {
 
                     reader.readAsText(file)
                 })
+                .then(result => this.lastLoaded = result)
             })
     }
 

@@ -1,8 +1,4 @@
-.backups-layout {
-    h2 {
-        text-align: center;
-    }
-
+.backups-list-layout {
     .backups-table {
         td {
             position: relative;
@@ -14,4 +10,8 @@
             cursor: pointer;
         }
     }
+}
+
+.backup-preview-layout {
+    
 }
