@@ -15,7 +15,7 @@ class File {
 
     saveFile(data, name = '') {
         let blob = new Blob(
-            [ JSON.stringify(data, null, '  ') ],
+            [ data ],
             { type: 'application/json;charset=utf-8' }
         )
 

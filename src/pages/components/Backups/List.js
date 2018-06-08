@@ -10,11 +10,16 @@ export class BackupsList extends Component {
         backups: []
     }
 
+    constructor() {
+        super()
+
+        this.uploadFile = this.uploadFile.bind(this)
+    }
+
     componentDidMount() {
         RPCController.getBackups()
             .then((backups = []) => this.setState({ backups }))
     }
-
 
     render() {
         let { backups } = this.state
@@ -25,18 +30,18 @@ export class BackupsList extends Component {
             >
                 <h2>Backups List</h2>
                 <Button
-                    color="primary"
-                    onClick={ this.uploadBackup }
+                    color="success"
+                    onClick={ this.uploadFile }
                 >
                     <i className="fa fa-cloud-upload"/>&nbsp;
                     upload file
-                </Button>
-                <Button
+                </Button>{ '  ' }
+                {/* <Button
                     color="primary"
                     onClick={ this.toggleModal }
                 >
                     show
-                </Button>
+                </Button> */}
                 <Table className="backups-table">
                     <thead>
                         <tr>
@@ -49,19 +54,24 @@ export class BackupsList extends Component {
                     </thead>
                     <tbody>
                         {
-                            backups.map(({ name, date, ordersCount, lineItemsCount }) => (
+                            backups.map(({ name, date, orderCount, lineItemCount }) => (
                                 <tr key={ date }>
                                     <td>
                                         <Link to={ `/backup/${date}` }>{ name }</Link>
                                     </td>
                                     <td>{ moment(date).format('MM/DD/YYYY hh:mm') }</td>
-                                    <td>{ ordersCount }</td>
-                                    <td>{ lineItemsCount }</td>
+                                    <td>{ orderCount }</td>
+                                    <td>{ lineItemCount }</td>
                                     <td>
                                         <i className="fa fa-arrow-circle-up"/>
                                         <i className="fa fa-cloud-download"/>
                                         <i className="fa fa-pencil"/>
-                                        <i className="fa fa-remove"/>
+                                        <i className="fa fa-remove"
+                                            onClick={ () =>
+                                                RPCController.removeBackup(date)
+                                                    .then(() => this.forceUpdate())
+                                            }
+                                        />
                                     </td>
                                 </tr>
                             ))
@@ -72,9 +82,15 @@ export class BackupsList extends Component {
         )
     }
 
-    uploadBackup() {
+    uploadFile() {
         FileService.openFile()
-            .then(JSON.parse)
-            .then(console.log)
+            .then(result => {
+                if (result) {
+                    RPCController.keepInDraft(result)
+                        .then(() =>
+                            this.props.history.push('/backup/preview')
+                        )
+                }
+            })
     }
 }

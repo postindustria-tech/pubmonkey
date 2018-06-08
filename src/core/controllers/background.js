@@ -4,6 +4,8 @@ import { LineItemModel } from '../models'
 const WEB_URL = 'https://app.mopub.com'
 
 const BackgroundController = new class Background {
+    draft = []
+
     getAllOrders() {
         return HTTPService.GET(`${WEB_URL}/web-client/api/orders/query`)
     }
@@ -22,14 +24,14 @@ const BackgroundController = new class Background {
             .then(({ backups }) => backups)
     }
 
-    getBackupById(_id) {
+    getBackupByDate(_date) {
         return StorageService.get('backups')
-            .then(backups => {
+            .then(({ backups }) => {
                 if (backups == null) {
                     throw 'no backups in store'
                 }
 
-                return backups.filter(({ id }) => id === _id)
+                return backups.filter(({ date }) => date === Number(_date))
             })
     }
 
@@ -46,30 +48,30 @@ const BackgroundController = new class Background {
             })
     }
 
-    removeBackup(_id) {
+    removeBackup(_date) {
         return StorageService.get('backups')
-            .then(backups => {
+            .then(({ backups }) => {
                 if (backups == null) {
                     throw 'no backups in store'
                 }
 
-                backups = backups.filter(({ id }) => id !== _id)
+                backups = backups.filter(({ date }) => date !== _date)
 
                 return StorageService.set({ backups })
             })
     }
 
-    // getFromStore(...keys) {
-    //     return StorageService.get(...keys)
-    // }
-    //
-    // setToStore(data) {
-    //     return StorageService.set(data)
-    // }
-    //
-    // addToStore(data) {
-    //     return StorageService.add(data)
-    // }
+    getDraft() {
+        return this.draft
+    }
+
+    keepInDraft(data) {
+        this.draft.push(data)
+    }
+
+    clearDraft() {
+        this.draft = []
+    }
 }
 
 export { BackgroundController }

@@ -9,7 +9,7 @@ import { FileService, RPCController } from '../../services'
 export class OrdersList extends Component {
     state = {
         orders: [],
-        isModalVisible: false,
+        // isModalVisible: false,
         progress: 0,
         inProgress: false,
         selected: [],
@@ -21,7 +21,6 @@ export class OrdersList extends Component {
         super()
         this.backupSelected = this.backupSelected.bind(this)
         this.toggleModal = this.toggleModal.bind(this)
-        this.uploadFile = this.uploadFile.bind(this)
         this.onOrdersListUpdate = this.onOrdersListUpdate.bind(this)
     }
 
@@ -40,16 +39,11 @@ export class OrdersList extends Component {
                 <h2>Orders List</h2>
                 <Button
                     color="primary"
-                    onClick={ this.toggleModal }
+                    onClick={ this.backupSelected }
+                    disabled={ !orderCount }
                 >
-                    backup selected
+                    download
                 </Button>{ '  ' }
-                <Button
-                    color="secondary"
-                    onClick={ this.uploadFile }
-                >
-                    upload
-                </Button>
 
                 <OrdersTable
                     orders={ orders }
@@ -58,52 +52,31 @@ export class OrdersList extends Component {
 
                 <Modal
                     className={this.props.className}
-                    toggle={ this.toggleModal }
-                    isOpen={ this.state.isModalVisible }
+                    // toggle={ this.toggleModal }
+                    isOpen={ this.state.inProgress }
                 >
-                    <ModalHeader toggle={ this.toggleModal }>Backup orders</ModalHeader>
+                    {/* <ModalHeader toggle={ this.toggleModal }>Backup orders</ModalHeader> */}
+                    <ModalHeader>Progress</ModalHeader>
                     <ModalBody>
-                        { inProgress ? <Progress value={ progress }/>
-                          : <div>
-                                <label>name:
-                                    <input type="text"
-                                        className="form-control"
-                                        ref="name"
-                                        defaultValue="default name"
-                                    />
-                                </label>
-                                <div>
-                                    orders: { orderCount }
-                                </div>
-                                <div>
-                                    line items: { lineItemCount }
-                                </div>
-                            </div>
-                        }
+                        <Progress value={ progress }/>
                     </ModalBody>
-                    { !inProgress && <ModalFooter>
-                        <Button color="primary" onClick={ this.backupSelected }>Backup</Button>{' '}
-                        <Button color="secondary" onClick={ this.toggleModal }>Cancel</Button>
-                    </ModalFooter>}
+                    <ModalFooter>
+                        <Button color="secondary" disabled onClick={ this.toggleModal }>Cancel</Button>
+                    </ModalFooter>
                 </Modal>
             </BaseLayout>
         )
     }
 
-    uploadFile() {
-        FileService.openFile()
-            .then(() =>
-                this.props.history.push('/backup/preview')
-            )
-    }
-
     backupSelected() {
-        let { orderCount, lineItemCount } = this.state,
-            name = this.refs.name.value,
+        let { orderCount, lineItemCount, selected } = this.state,
+            name = 'default name',
             date = Date.now()
 
+        this.toggleModal()
+
         return Promise.all(
-                this.state.selected
+                selected
                     .map(({ key }) => this.collectOrderData(key))
             )
             .then(orders => ({
@@ -113,11 +86,13 @@ export class OrdersList extends Component {
                 date,
                 orders
             }))
-            .then(result =>
-                FileService.saveFile(result, 'backup-' + moment().format('MM-DD-YYYY-hh-mm'))
-            )
-            .then(() => {
+            // .then(result =>
+            //     FileService.saveFile(result, 'backup-' + moment().format('MM-DD-YYYY-hh-mm'))
+            // )
+            .then(result => {
+                RPCController.keepInDraft(JSON.stringify(result)) //JSON.stringify(result, null, '  ')
                 this.toggleModal()
+                this.props.history.push('/backup/preview')
             })
     }
 
@@ -164,9 +139,8 @@ export class OrdersList extends Component {
 
     toggleModal() {
         this.setState({
-            isModalVisible: !this.state.isModalVisible,
             progress: 0,
-            inProgress: false
+            inProgress: !this.state.inProgress
         })
     }
 }

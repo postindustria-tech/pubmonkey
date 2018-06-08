@@ -6,23 +6,51 @@ import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
 import { FileService, RPCController } from '../../services'
 
-export class BackupPreview extends Component {
+export class BackupView extends Component {
     state = {
         backup: null,
         orders: []
     }
 
     componentDidMount() {
-        if (FileService.lastLoaded) {
-            let backup = JSON.parse(FileService.lastLoaded),
-                { orders } = backup
+        let { history } = this.props,
+            { location: { pathname } } = history
 
-            this.setState({
-                backup, orders
-            })
-        } else {
-            this.props.history.push('/orders')
+        if (pathname === '/backup/preview') {
+            RPCController.getDraft()
+                .then(draft => {
+                    if (draft.length) {
+                        let backup = JSON.parse(draft.pop()),
+                            { orders } = backup
+
+                        this.setState({ backup, orders })
+                    } else {
+                        history.push('/orders')
+                    }
+                })
+
+            return
         }
+
+        if (pathname.slice(0, 8) === '/backup/') {
+            let { params: { date } } = this.props.match
+
+            RPCController.getBackupByDate(date)
+                .then(result => {
+                    if (result.length) {
+                        let backup = result[0],
+                            { orders } = backup
+
+                        this.setState({ backup, orders })
+                    } else {
+                        history.push('/backups')
+                    }
+                })
+        }
+    }
+
+    componentWillUnmount() {
+        RPCController.clearDraft()
     }
 
     render() {
@@ -36,10 +64,10 @@ export class BackupPreview extends Component {
 
         return (
             <BaseLayout
-                className="backup-preview-layout"
+                className="backup-view-layout"
             >
-                <h2>Backup Preview</h2>
-                <div>name: { name }</div>
+                <h2>Backup View</h2>
+                <div>name: <input type="text" ref="name" defaultValue={ name }/></div>
                 <div>date: { moment(date).format('MM/DD/YYYY hh:mm') }</div>
                 <div>orders: { orderCount }</div>
                 <div>line-items: { lineItemCount }</div>
@@ -69,7 +97,11 @@ export class BackupPreview extends Component {
     }
 
     saveBackup() {
-        RPCController.addBackup(this.state.backup)
+        let { backup } = this.state
+
+        backup.name = this.refs.name.value
+
+        RPCController.addBackup(backup)
             .then(() =>
                 this.props.history.push('/backups')
             )
