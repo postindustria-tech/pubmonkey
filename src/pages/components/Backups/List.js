@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import moment from 'moment'
 import { BackupsTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { RPCController, FileService } from '../../services'
@@ -18,6 +19,10 @@ export class BackupsList extends Component {
     }
 
     componentDidMount() {
+        this.loadBackups()
+    }
+
+    loadBackups() {
         RPCController.getAllBackups()
             .then((backups = []) => this.setState({ backups }))
     }
@@ -64,10 +69,17 @@ export class BackupsList extends Component {
     }
 
     removeBackup(id) {
-        console.log('remove', id)
+        RPCController.deleteBackup(id)
+            .then(() => this.loadBackups())
     }
 
     downloadBackup(id) {
-        console.log('download', id)
+        RPCController.getBackupById(id)
+            .then(backup => {
+                FileService.saveFile(
+                    JSON.stringify(backup, null, '  '),
+                    backup.name.replace(/\s/g, '-') + moment().format('-MM-DD-YYYY-hh-mm')
+                )
+            })
     }
 }

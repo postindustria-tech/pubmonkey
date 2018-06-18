@@ -9,7 +9,8 @@ import { FileService, RPCController } from '../../services'
 export class BackupView extends Component {
     state = {
         backup: null,
-        isExist: null,
+        isExist: false,
+        isDirty: false,
         orders: []
     }
 
@@ -36,8 +37,12 @@ export class BackupView extends Component {
         if (pathname.slice(0, 8) === '/backup/') {
             let { params: { id } } = this.props.match
 
-            RPCController.getBackupById(id)
+            RPCController.getBackupById(Number(id))
                 .then(backup => {
+                    if (backup == null) {
+                        throw 'no backup with id ' + id
+                    }
+
                     let { orders } = backup
 
                     this.setState({ backup, orders, isExist: true })
@@ -50,7 +55,7 @@ export class BackupView extends Component {
     }
 
     render() {
-        let { backup, orders } = this.state
+        let { backup, orders, isExist, isDirty } = this.state
 
         if (backup == null) {
             return false
@@ -63,7 +68,14 @@ export class BackupView extends Component {
                 className="backup-view-layout"
             >
                 <h2>Backup View</h2>
-                <div>name: <input type="text" ref="name" defaultValue={ name }/></div>
+                <div>name:
+                    <input
+                        type="text"
+                        ref="name"
+                        defaultValue={ name }
+                        onChange={ e => this.updateBackup({ name: e.target.value })}
+                    />
+                </div>
                 <div>date: { moment(date).format('MM/DD/YYYY hh:mm') }</div>
                 <div>orders: { orderCount }</div>
                 <div>line-items: { lineItemCount }</div>
@@ -79,6 +91,7 @@ export class BackupView extends Component {
                 </Button>&nbsp;
                 <Button
                     onClick={ () => this.saveBackup() }
+                    disabled={ !(!isExist || isDirty) }
                 >
                     <i className="fa fa-save"/>&nbsp;Save
                 </Button>
@@ -91,6 +104,19 @@ export class BackupView extends Component {
         )
     }
 
+    updateBackup(data) {
+        let { backup } = this.state
+
+        Object.keys(data).forEach(key =>
+            backup[key] = data[key]
+        )
+
+        this.setState({
+            backup,
+            isDirty: true
+        })
+    }
+
     restoreSelected() {
         console.log('restore')
     }
@@ -98,18 +124,22 @@ export class BackupView extends Component {
     saveBackup() {
         let { backup, isExist } = this.state
 
-        backup.name = this.refs.name.value
-
         if (isExist) {
-            console.log('update', backup)
+            RPCController.updateBackup(backup)
+                .then(() =>
+                    this.setState({
+                        isDirty: false
+                    })
+                )
         } else {
-            console.log('create', backup)
+            RPCController.createBackup(backup)
+                .then(() =>
+                    this.setState({
+                        isExist: true,
+                        isDirty: false
+                    })
+                )
         }
-
-        // RPCController.addBackup(backup)
-        //     .then(() =>
-        //         this.props.history.push('/backups')
-        //     )
     }
 
     downloadBackup() {

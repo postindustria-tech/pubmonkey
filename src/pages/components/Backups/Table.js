@@ -21,27 +21,23 @@ export class BackupsTable extends Component {
                 </thead>
                 <tbody>
                     {
-                        backups.map(({ name, date, updated, orderCount, lineItemCount }) => (
-                            <tr key={ date }>
+                        backups.map(({ name, date, id, updated, orderCount, lineItemCount }) => (
+                            <tr key={ id }>
                                 <td>
-                                    <Link to={ `/backup/${date}` }>{ name }</Link>
+                                    <Link to={ `/backup/${id}` }>{ name }</Link>
                                 </td>
                                 <td>{ orderCount }</td>
                                 <td>{ lineItemCount }</td>
                                 <td>{ moment(date).format('MM/DD/YYYY hh:mm') }</td>
-                                <td>{ updated && moment(updated).format('MM/DD/YYYY hh:mm') }</td>
+                                <td>{ updated ? moment(updated).format('MM/DD/YYYY hh:mm') : 'never' }</td>
                                 <td>
                                     {/* <i className="fa fa-arrow-circle-up"/> */}
                                     <i className="fa fa-cloud-download"
-                                        onClick={ () => downloadBackup(date) }
+                                        onClick={ () => downloadBackup(id) }
                                     />
                                     {/* <i className="fa fa-pencil"/> */}
                                     <i className="fa fa-remove"
-                                        onClick={ () => removeBackup(date) }
-                                        // onClick={ () =>
-                                        //     RPCController.removeBackup(date)
-                                        //         .then(() => this.forceUpdate())//use onUpdate
-                                        // }
+                                        onClick={ () => removeBackup(id) }
                                     />
                                 </td>
                             </tr>
