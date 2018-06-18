@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 import { Table } from 'reactstrap'
 
 export class OrdersTable extends Component {
@@ -13,7 +14,7 @@ export class OrdersTable extends Component {
     }
 
     render() {
-        let { orders = [] } = this.props,
+        let { orders = [], removeOrder } = this.props,
             { allSelected } = this.state
 
         return (
@@ -30,6 +31,9 @@ export class OrdersTable extends Component {
                         <th>name</th>
                         <th>advertiser</th>
                         <th>line items</th>
+                        {
+                            removeOrder && <th>actions</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -42,9 +46,12 @@ export class OrdersTable extends Component {
                                     onChange={ () => this.toggleItem(key) }
                                 />
                             </td>
-                            <td>{ name }</td>
+                            <td><Link to={ `${location.hash.slice(1)}/order/${key}` }>{ name }</Link></td>
                             <td>{ advertiser }</td>
                             <td>{ lineItemCount }</td>
+                            { removeOrder &&
+                                <td className="action"><i className="fa fa-remove"/></td>
+                            }
                         </tr>
                     )) }
                 </tbody>

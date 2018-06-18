@@ -75,7 +75,7 @@ const BackgroundController = new class Background {
                             updated: Date.now()
                         }
 
-                        return updated 
+                        return updated
                     } else {
                         return backup
                     }
@@ -120,7 +120,8 @@ const BackgroundController = new class Background {
     }
 
     keepInDraft(data) {
-        this.draft.push(data)
+        this.draft = data
+        // this.draft.push(data)
     }
 
     clearDraft() {

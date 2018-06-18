@@ -10,6 +10,7 @@ export const AppRouter = () => (
             <Route path="/backups" component={ BackupsList } />
             <Route path="/backup/preview" exact component={ BackupView } />
             <Route path="/backup/:id" component={ BackupView } />
+            <Route path="/backup/:id/order/:key" component={ BackupView } />
         </Switch>
     </HashRouter>
 )

@@ -30,7 +30,7 @@ export class BackupsTable extends Component {
                                 <td>{ lineItemCount }</td>
                                 <td>{ moment(created).format('MM/DD/YYYY hh:mm') }</td>
                                 <td>{ updated ? moment(updated).format('MM/DD/YYYY hh:mm') : 'never' }</td>
-                                <td>
+                                <td className="action">
                                     {/* <i className="fa fa-arrow-circle-up"/> */}
                                     <i className="fa fa-cloud-download"
                                         onClick={ () => downloadBackup(id) }

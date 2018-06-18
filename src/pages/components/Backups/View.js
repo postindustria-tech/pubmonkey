@@ -35,7 +35,9 @@ export class BackupView extends Component {
         }
 
         if (pathname.slice(0, 8) === '/backup/') {
-            let { params: { id } } = this.props.match
+            let { params: { id, key } } = this.props.match
+
+            console.log(id, key)
 
             RPCController.getBackupById(Number(id))
                 .then(backup => {
@@ -50,9 +52,9 @@ export class BackupView extends Component {
         }
     }
 
-    componentWillUnmount() {
-        RPCController.clearDraft()
-    }
+    // componentWillUnmount() {
+    //     RPCController.clearDraft()
+    // }
 
     render() {
         let { backup, orders, isExist, isDirty } = this.state
@@ -99,6 +101,7 @@ export class BackupView extends Component {
                 <OrdersTable
                     orders={ orders }
                     allSelected={ true }
+                    removeOrder={ true }
                     onUpdate={ orders => this.onOrdersListUpdate(orders) }
                 />
             </BaseLayout>

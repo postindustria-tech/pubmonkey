@@ -1,7 +1,9 @@
 .orders-list-layout {
-    .orders-table {
-        tr .select input {
-            cursor: pointer;
-        }
+
+}
+
+.orders-table {
+    tr .select input, td.action i {
+        cursor: pointer;
     }
 }
