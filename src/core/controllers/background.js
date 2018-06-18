@@ -51,7 +51,10 @@ const BackgroundController = new class Background {
 
         return this.getAllBackups()
             .then(backups => backups.concat(data))
-            .then(backups => StorageService.set({ backups }))
+            .then(backups => {
+                return StorageService.set({ backups })
+                    .then(() => data)
+            })
     }
 
     updateBackup(data) {
@@ -66,12 +69,13 @@ const BackgroundController = new class Background {
             .then(backups =>
                 backups.map(backup => {
                     if (backup.id === id) {
-                        updated = true
-                        return {
+                        updated = {
                             ...backup,
                             ...data,
                             updated: Date.now()
                         }
+
+                        return updated 
                     } else {
                         return backup
                     }
@@ -80,6 +84,7 @@ const BackgroundController = new class Background {
             .then(backups => {
                 if (updated) {
                     return StorageService.set({ backups })
+                        .then(() => updated)
                 } else {
                     throw 'can\'t find backup with id ' + id
                 }
@@ -109,81 +114,6 @@ const BackgroundController = new class Background {
                 }
             })
     }
-
-    // getBackupById(_id) {
-    //     return this.getBackups()
-    //         .then(backups => {
-    //             let result = backups.filter(({ id }) => id === _id)//@TODO is it necessary?
-    //
-    //             if (result.length === 0) {
-    //                 throw 'can\'t find backup ' + _id
-    //             }
-    //
-    //             return result[0]
-    //         })
-    // }
-
-    // updateBackup(data) {
-    //     if (data.id == null) {
-    //         throw 'backup must have id!'
-    //     }
-    //
-    //     return this.getBackups()
-    //         .then(backups => {
-    //             let updated = false,
-    //                 result = backups.map(backup => {
-    //                     if (backup.id === data.id) {
-    //                         updated = true
-    //                         return {
-    //                             ...backup,
-    //                             ...data,
-    //                             updated: Date.now()
-    //                         }
-    //                     } else {
-    //                         return backup
-    //                     }
-    //                 })
-    //
-    //             if (updated) {
-    //                 return StorageService.set({ backups: result })
-    //             } else {
-    //                 throw 'backup ' + data.id + ' does\'nt exist'
-    //             }
-    //         })
-    // }
-
-    // createBackup(data) {
-    //     return this.addBackup({
-    //             ...data,
-    //             id: Date.now()
-    //         })
-    // }
-    //
-    // addBackup(data) {
-    //     return this.getBackups()
-    //         .then(backups => {
-    //             if (backups == null) {
-    //                 backups = []
-    //             }
-    //
-    //             backups.push(data)
-    //
-    //             return StorageService.set({ backups })
-    //         })
-    // }
-    //
-    // removeBackup(_date) {
-    //     return StorageService.get('backups')
-    //         .then(({ backups }) => {
-    //             if (backups == null) {
-    //                 throw 'no backups in store'
-    //             }
-    //
-    //             backups = backups.filter(({ date }) => date !== _date)
-    //
-    //             return StorageService.set({ backups })
-    //         })
-    // }
 
     getDraft() {
         return this.draft

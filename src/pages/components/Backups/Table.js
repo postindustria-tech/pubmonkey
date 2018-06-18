@@ -21,14 +21,14 @@ export class BackupsTable extends Component {
                 </thead>
                 <tbody>
                     {
-                        backups.map(({ name, date, id, updated, orderCount, lineItemCount }) => (
+                        backups.map(({ name, created, id, updated, orderCount, lineItemCount }) => (
                             <tr key={ id }>
                                 <td>
                                     <Link to={ `/backup/${id}` }>{ name }</Link>
                                 </td>
                                 <td>{ orderCount }</td>
                                 <td>{ lineItemCount }</td>
-                                <td>{ moment(date).format('MM/DD/YYYY hh:mm') }</td>
+                                <td>{ moment(created).format('MM/DD/YYYY hh:mm') }</td>
                                 <td>{ updated ? moment(updated).format('MM/DD/YYYY hh:mm') : 'never' }</td>
                                 <td>
                                     {/* <i className="fa fa-arrow-circle-up"/> */}

@@ -61,7 +61,7 @@ export class BackupView extends Component {
             return false
         }
 
-        let { orderCount, lineItemCount, name, date } = backup
+        let { orderCount, lineItemCount, name, created, updated } = backup
 
         return (
             <BaseLayout
@@ -70,13 +70,14 @@ export class BackupView extends Component {
                 <h2>Backup View</h2>
                 <div>name:
                     <input
+                        className="form-control"
                         type="text"
-                        ref="name"
                         defaultValue={ name }
                         onChange={ e => this.updateBackup({ name: e.target.value })}
                     />
                 </div>
-                <div>date: { moment(date).format('MM/DD/YYYY hh:mm') }</div>
+                <div>created: { moment(created).format('MM/DD/YYYY hh:mm:ss') }</div>
+                <div>updated: { moment(updated).format('MM/DD/YYYY hh:mm:ss') }</div>
                 <div>orders: { orderCount }</div>
                 <div>line-items: { lineItemCount }</div>
                 <Button
@@ -114,7 +115,7 @@ export class BackupView extends Component {
         this.setState({
             backup,
             isDirty: true
-        })
+        }, () => this.forceUpdate())
     }
 
     restoreSelected() {
@@ -126,8 +127,9 @@ export class BackupView extends Component {
 
         if (isExist) {
             RPCController.updateBackup(backup)
-                .then(() =>
+                .then(backup =>
                     this.setState({
+                        backup,
                         isDirty: false
                     })
                 )
@@ -144,8 +146,6 @@ export class BackupView extends Component {
 
     downloadBackup() {
         let { backup } = this.state
-
-        backup.name = this.refs.name.value
 
         FileService.saveFile(
             JSON.stringify(backup, null, '  '),

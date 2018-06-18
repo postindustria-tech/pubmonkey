@@ -9,7 +9,6 @@ import { FileService, RPCController } from '../../services'
 export class OrdersList extends Component {
     state = {
         orders: [],
-        // isModalVisible: false,
         progress: 0,
         inProgress: false,
         selected: [],
@@ -71,26 +70,23 @@ export class OrdersList extends Component {
     backupSelected() {
         let { orderCount, lineItemCount, selected } = this.state,
             name = 'default name',
-            date = Date.now()
+            created = Date.now()
 
         this.toggleModal()
 
         return Promise.all(
-                selected
-                    .map(({ key }) => this.collectOrderData(key))
+                selected.map(({ key }) => this.collectOrderData(key))
             )
             .then(orders => ({
                 name,
                 orderCount,
                 lineItemCount,
-                date,
-                orders
+                created,
+                orders,
+                updated: null
             }))
-            // .then(result =>
-            //     FileService.saveFile(result, 'backup-' + moment().format('MM-DD-YYYY-hh-mm'))
-            // )
             .then(result => {
-                RPCController.keepInDraft(JSON.stringify(result)) //JSON.stringify(result, null, '  ')
+                RPCController.keepInDraft(JSON.stringify(result))
                 this.toggleModal()
                 this.props.history.push('/backup/preview')
             })
