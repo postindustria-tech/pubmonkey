@@ -42,7 +42,7 @@ export class OrdersList extends Component {
                     onClick={ this.backupSelected }
                     disabled={ !orderCount }
                 >
-                    download
+                    Create Backup
                 </Button>{ '  ' }
 
                 <OrdersTable

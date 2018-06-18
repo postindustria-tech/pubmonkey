@@ -9,7 +9,7 @@ export const AppRouter = () => (
             <Route path="/orders" component={ OrdersList } />
             <Route path="/backups" component={ BackupsList } />
             <Route path="/backup/preview" exact component={ BackupView } />
-            <Route path="/backup/:date" component={ BackupView } />
+            <Route path="/backup/:id" component={ BackupView } />
         </Switch>
     </HashRouter>
 )

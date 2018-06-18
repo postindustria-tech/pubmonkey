@@ -9,6 +9,7 @@ import { FileService, RPCController } from '../../services'
 export class BackupView extends Component {
     state = {
         backup: null,
+        isExist: null,
         orders: []
     }
 
@@ -23,7 +24,7 @@ export class BackupView extends Component {
                         let backup = JSON.parse(draft.pop()),
                             { orders } = backup
 
-                        this.setState({ backup, orders })
+                        this.setState({ backup, orders, isExist: false })
                     } else {
                         history.push('/orders')
                     }
@@ -33,18 +34,13 @@ export class BackupView extends Component {
         }
 
         if (pathname.slice(0, 8) === '/backup/') {
-            let { params: { date } } = this.props.match
+            let { params: { id } } = this.props.match
 
-            RPCController.getBackupByDate(date)
-                .then(result => {
-                    if (result.length) {
-                        let backup = result[0],
-                            { orders } = backup
+            RPCController.getBackupById(id)
+                .then(backup => {
+                    let { orders } = backup
 
-                        this.setState({ backup, orders })
-                    } else {
-                        history.push('/backups')
-                    }
+                    this.setState({ backup, orders, isExist: true })
                 })
         }
     }
@@ -72,16 +68,19 @@ export class BackupView extends Component {
                 <div>orders: { orderCount }</div>
                 <div>line-items: { lineItemCount }</div>
                 <Button
-                    color="primary"
+                    onClick={ () => this.downloadBackup() }
+                >
+                    <i className="fa fa-cloud-download"/>
+                </Button>&nbsp;
+                <Button
                     onClick={ () => this.restoreSelected() }
                 >
-                    restore selected
-                </Button>{ '  ' }
+                    <i className="fa fa-arrow-circle-up"/>&nbsp;Restore
+                </Button>&nbsp;
                 <Button
-                    color="secondary"
                     onClick={ () => this.saveBackup() }
                 >
-                    save to backpack
+                    <i className="fa fa-save"/>&nbsp;Save
                 </Button>
                 <OrdersTable
                     orders={ orders }
@@ -97,14 +96,31 @@ export class BackupView extends Component {
     }
 
     saveBackup() {
+        let { backup, isExist } = this.state
+
+        backup.name = this.refs.name.value
+
+        if (isExist) {
+            console.log('update', backup)
+        } else {
+            console.log('create', backup)
+        }
+
+        // RPCController.addBackup(backup)
+        //     .then(() =>
+        //         this.props.history.push('/backups')
+        //     )
+    }
+
+    downloadBackup() {
         let { backup } = this.state
 
         backup.name = this.refs.name.value
 
-        RPCController.addBackup(backup)
-            .then(() =>
-                this.props.history.push('/backups')
-            )
+        FileService.saveFile(
+            JSON.stringify(backup, null, '  '),
+            backup.name.replace(/\s/g, '-') + moment().format('-MM-DD-YYYY-hh-mm')
+        )
     }
 
     onOrdersListUpdate(orders) {

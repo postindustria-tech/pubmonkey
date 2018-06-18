@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import { Table } from 'reactstrap'
 
 export class OrdersTable extends Component {
+    state = {
+        allSelected: false
+    }
+
     componentDidMount() {
         if (this.props.allSelected) {
             this.toggleAll(true)
@@ -9,7 +13,8 @@ export class OrdersTable extends Component {
     }
 
     render() {
-        let { allSelected, orders = [] } = this.props
+        let { orders = [] } = this.props,
+            { allSelected } = this.state
 
         return (
             <Table className="orders-table">
@@ -34,7 +39,7 @@ export class OrdersTable extends Component {
                                 <input
                                     type="checkbox"
                                     checked={ checked }
-                                    onClick={ () => this.toggleItem(key) }
+                                    onChange={ () => this.toggleItem(key) }
                                 />
                             </td>
                             <td>{ name }</td>
@@ -49,6 +54,10 @@ export class OrdersTable extends Component {
 
     toggleAll(checked) {
         let { orders, onUpdate } = this.props
+
+        this.setState({
+            allSelected: checked
+        })
 
         onUpdate(
             orders.map(order => {

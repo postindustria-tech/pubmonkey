@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
-import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
-import moment from 'moment'
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import { BackupsTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { RPCController, FileService } from '../../services'
 
@@ -14,10 +13,12 @@ export class BackupsList extends Component {
         super()
 
         this.uploadFile = this.uploadFile.bind(this)
+        this.removeBackup = this.removeBackup.bind(this)
+        this.downloadBackup = this.downloadBackup.bind(this)
     }
 
     componentDidMount() {
-        RPCController.getBackups()
+        RPCController.getAllBackups()
             .then((backups = []) => this.setState({ backups }))
     }
 
@@ -30,54 +31,22 @@ export class BackupsList extends Component {
             >
                 <h2>Backups List</h2>
                 <Button
+                    color="primary"
+                    disabled
+                >
+                    <i className="fa fa-file"/>&nbsp;New
+                </Button>&nbsp;
+                <Button
                     color="success"
                     onClick={ this.uploadFile }
                 >
-                    <i className="fa fa-cloud-upload"/>&nbsp;
-                    upload file
-                </Button>{ '  ' }
-                {/* <Button
-                    color="primary"
-                    onClick={ this.toggleModal }
-                >
-                    show
-                </Button> */}
-                <Table className="backups-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Orders count</th>
-                            <th>Line Items count</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            backups.map(({ name, date, orderCount, lineItemCount }) => (
-                                <tr key={ date }>
-                                    <td>
-                                        <Link to={ `/backup/${date}` }>{ name }</Link>
-                                    </td>
-                                    <td>{ moment(date).format('MM/DD/YYYY hh:mm') }</td>
-                                    <td>{ orderCount }</td>
-                                    <td>{ lineItemCount }</td>
-                                    <td>
-                                        <i className="fa fa-arrow-circle-up"/>
-                                        <i className="fa fa-cloud-download"/>
-                                        <i className="fa fa-pencil"/>
-                                        <i className="fa fa-remove"
-                                            onClick={ () =>
-                                                RPCController.removeBackup(date)
-                                                    .then(() => this.forceUpdate())
-                                            }
-                                        />
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
-                </Table>
+                    <i className="fa fa-cloud-upload"/>&nbsp;Load
+                </Button>&nbsp;
+                <BackupsTable
+                    backups={ backups }
+                    removeBackup={ this.removeBackup }
+                    downloadBackup={ this.downloadBackup }
+                />
             </BaseLayout>
         )
     }
@@ -92,5 +61,13 @@ export class BackupsList extends Component {
                         )
                 }
             })
+    }
+
+    removeBackup(id) {
+        console.log('remove', id)
+    }
+
+    downloadBackup(id) {
+        console.log('download', id)
     }
 }
