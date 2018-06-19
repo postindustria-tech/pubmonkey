@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { HTTPService, StorageService } from '../services'
 import { LineItemModel } from '../models'
 
@@ -16,7 +17,37 @@ const BackgroundController = new class Background {
 
     getLineItem(id) {
         return HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`)
-            .then(data => LineItemModel.createFromHTML(data, id).toJSON()) //@TODO maybe it's not necessary to create instances for parsing only
+            .then(data =>
+                LineItemModel.createFromHTML(data, id).toJSON()
+            ) //@TODO maybe it's not necessary to create instances for parsing only
+    }
+
+    createOrder(data) {
+        return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data)
+    }
+
+    createLineItem(data, orderId) {
+        return HTTPService.POST(`${WEB_URL}/advertise/orders/${orderId}/new_line_item/`, data)
+    }
+
+    restoreOrder(data) {
+        data['start_datetime_0'] = moment().format('MM/DD/YYYY')
+        data['start_datetime_1'] = moment().add(1, 'h').format('hh:mm A')
+        data['end_datetime_0'] = ''
+        data['end_datetime_1'] = ''
+
+        let formData = LineItemModel.createFromJSON(data).toFormData()
+        return this.createOrder(formData)
+    }
+
+    restoreLineItem(data, orderId) {
+        data['start_datetime_0'] = moment().format('MM/DD/YYYY')
+        data['start_datetime_1'] = moment().add(1, 'h').format('hh:mm A')
+        data['end_datetime_0'] = ''
+        data['end_datetime_1'] = ''
+
+        let formData = LineItemModel.createFromJSON(data).toFormData()
+        return this.createLineItem(formData, orderId)
     }
 
     getAllBackups() {

@@ -25,6 +25,7 @@
     "permissions": [
         "tabs",
         "webRequest",
+        "cookies",
         "storage",
         "unlimitedStorage",
         "https://app.mopub.com/*"

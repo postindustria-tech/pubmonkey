@@ -122,7 +122,26 @@ export class BackupView extends Component {
     }
 
     restoreSelected() {
-        console.log('restore')
+        let { backup: { orders } } = this.state
+
+        orders.forEach(order => {
+            let lineItem = order.lineItems[0]
+
+            RPCController.restoreOrder(lineItem)
+                .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
+                .then(orderId => {
+                    if (order.lineItems.length > 1) {
+                        return Promise.all(
+                            order.lineItems.slice(1).map(lineItem =>
+                                RPCController.restoreLineItem(lineItem, orderId)
+                            )
+                        )
+                    }
+                })
+                .then(console.log)
+        })
+        //start_datetime_1
+        // RPCController.restoreOrder(backup.orders[0].lineItems[0])
     }
 
     saveBackup() {
