@@ -129,11 +129,12 @@ export class BackupView extends Component {
 
             RPCController.restoreOrder(lineItem)
                 .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
-                .then(orderId => {
+                .then(lineItemId => RPCController.getLineItemInfo(lineItemId))
+                .then(({ orderKey }) => {
                     if (order.lineItems.length > 1) {
                         return Promise.all(
                             order.lineItems.slice(1).map(lineItem =>
-                                RPCController.restoreLineItem(lineItem, orderId)
+                                RPCController.restoreLineItem(lineItem, orderKey)
                             )
                         )
                     }

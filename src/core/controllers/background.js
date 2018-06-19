@@ -22,11 +22,17 @@ const BackgroundController = new class Background {
             ) //@TODO maybe it's not necessary to create instances for parsing only
     }
 
+    getLineItemInfo(id) {
+        return HTTPService.GET(`${WEB_URL}/web-client/api/line-items/get?key=${id}`)
+    }
+
     createOrder(data) {
+        // console.log(data)
         return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data)
     }
 
     createLineItem(data, orderId) {
+        // console.log(data, orderId)
         return HTTPService.POST(`${WEB_URL}/advertise/orders/${orderId}/new_line_item/`, data)
     }
 
@@ -45,7 +51,7 @@ const BackgroundController = new class Background {
         data['start_datetime_1'] = moment().add(1, 'h').format('hh:mm A')
         data['end_datetime_0'] = ''
         data['end_datetime_1'] = ''
-
+// console.log(data, orderId)
         let formData = LineItemModel.createFromJSON(data).toFormData()
         return this.createLineItem(formData, orderId)
     }
