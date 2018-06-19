@@ -1,0 +1,15 @@
+<!DOCTYPE>
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <script src="popup.js"></script>
+  <title></title>
+  </head>
+  <body style="width:170px">
+    <button id="backup_current_order">Export (download) Order</button>
+    <button id="restore_backup">Import (upload) Order</button>
+    <!--button id="backup_orders">backup orders</button>
+    <button id="restore_orders">restore orders</button-->
+    <!-- <input type="file" id="backup_file" accept="application/json" style="position: absolute;visibility: hidden;"> -->
+  </body>
+</html>
