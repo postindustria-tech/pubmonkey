@@ -39,13 +39,13 @@ chrome.runtime.onMessage.addListener(RPCHandler)
 //     )
 // })
 
-let url = chrome.extension.getURL('index.html')
-
-chrome.tabs.query({ url }, tabs => {
-  if (tabs.length) {
-      chrome.tabs.update(tabs[0].id, { url, active: true })
-  }
-  else {
-      chrome.tabs.create({ url })
-  }
-})
+// let url = chrome.extension.getURL('index.html')
+//
+// chrome.tabs.query({ url }, tabs => {
+//   if (tabs.length) {
+//       chrome.tabs.update(tabs[0].id, { url, active: true })
+//   }
+//   else {
+//       chrome.tabs.create({ url })
+//   }
+// })

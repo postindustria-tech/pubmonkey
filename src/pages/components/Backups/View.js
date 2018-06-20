@@ -22,7 +22,7 @@ export class BackupView extends Component {
             RPCController.getDraft()
                 .then(draft => {
                     if (draft.length) {
-                        let backup = JSON.parse(draft.pop()),
+                        let backup = JSON.parse(draft),
                             { orders } = backup
 
                         this.setState({ backup, orders, isExist: false })
@@ -86,12 +86,12 @@ export class BackupView extends Component {
                     onClick={ () => this.downloadBackup() }
                 >
                     <i className="fa fa-cloud-download"/>
-                </Button>&nbsp;
+                </Button>
                 <Button
                     onClick={ () => this.restoreSelected() }
                 >
                     <i className="fa fa-arrow-circle-up"/>&nbsp;Restore
-                </Button>&nbsp;
+                </Button>
                 <Button
                     onClick={ () => this.saveBackup() }
                     disabled={ !(!isExist || isDirty) }
