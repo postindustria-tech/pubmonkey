@@ -14,7 +14,7 @@ export class OrdersTable extends Component {
     }
 
     render() {
-        let { orders = [], removeOrder } = this.props,
+        let { orders = [], removeOrder, filter = () => true } = this.props,
             { allSelected } = this.state
 
         return (
@@ -37,7 +37,9 @@ export class OrdersTable extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    { orders.map(({ name, advertiser, lineItemCount, key, checked = false }) => (
+                    { orders
+                        .filter(filter)
+                        .map(({ name, advertiser, lineItemCount, key, checked = false }) => (
                         <tr key={ key } className="order">
                             <td className="select">
                                 <input
