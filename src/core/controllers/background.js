@@ -22,6 +22,10 @@ const BackgroundController = new class Background {
             ) //@TODO maybe it's not necessary to create instances for parsing only
     }
 
+    copyLineItem(data) { // { order:str, line_item:str, copy_creatives:bool }
+        return HTTPService.POST(`${WEB_URL}/advertise/line_item_copy/`, data)
+    }
+
     getLineItemInfo(id) {
         return HTTPService.GET(`${WEB_URL}/web-client/api/line-items/get?key=${id}`)
     }
@@ -35,9 +39,14 @@ const BackgroundController = new class Background {
         return HTTPService.POST(`${WEB_URL}/advertise/orders/${id}/new_line_item/`, data)
     }
 
-    updateOrder(data, id) {
-        return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, data)
+    updateOrderStatus(status, id) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, { status })
     }
+
+    updateOrder(data, id) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-order?key=${id}`, data)
+    }
+
 
     updateLineItem(data, id) {
         return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/update?key=${id}`, data)

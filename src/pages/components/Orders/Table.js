@@ -40,23 +40,23 @@ export class OrdersTable extends Component {
                     { orders
                         .filter(filter)
                         .map(({ name, advertiser, lineItemCount, key, checked = false }) => (
-                        <tr key={ key } className="order">
-                            <td className="select">
-                                <input
-                                    type="checkbox"
-                                    checked={ checked }
-                                    onChange={ () => this.toggleItem(key) }
-                                />
-                            </td>
-                            <td>{ name }</td>
-                            {/* <td><Link to={ `${location.hash.slice(1)}/order/${key}` }>{ name }</Link></td> */}
-                            <td>{ advertiser }</td>
-                            <td>{ lineItemCount }</td>
-                            { removeOrder &&
-                                <td className="action"><i className="fa fa-remove"/></td>
-                            }
-                        </tr>
-                    )) }
+                            <tr key={ key } className="order">
+                                <td className="select">
+                                    <input
+                                        type="checkbox"
+                                        checked={ checked }
+                                        onChange={ () => this.toggleItem(key) }
+                                    />
+                                </td>
+                                <td><Link to={ `/order/${key}` }>{ name }</Link></td>
+                                {/* <td><Link to={ `${location.hash.slice(1)}/order/${key}` }>{ name }</Link></td> */}
+                                <td>{ advertiser }</td>
+                                <td>{ lineItemCount }</td>
+                                { removeOrder &&
+                                    <td className="action"><i className="fa fa-remove"/></td>
+                                }
+                            </tr>
+                        )) }
                 </tbody>
             </Table>
         )
