@@ -65,7 +65,7 @@ export class OrdersList extends Component {
                     Archive/Unarchive
                 </Button>
 
-                <div>
+                <div className="list-filter">
                     show:<Select
                         multi={ false }
                         clearable={ false }
