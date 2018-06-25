@@ -1,35 +1,49 @@
 import React, { Component } from 'react'
-import { Button, Progress, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import { Button } from 'reactstrap'
+import Select from 'react-select'
 import moment from 'moment'
+import Promise from 'bluebird'
 import sha256 from 'sha256'
 import { OrdersTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { FileService, RPCController } from '../../services'
+import { ProgressModal } from '../Popups'
+
+const DELAY = 0,
+      FILTER_FN = [
+          () => true,
+          ({ status }) => status === 'running',
+          ({ status }) => status === 'archived'
+      ]
 
 export class OrdersList extends Component {
     state = {
         orders: [],
         progress: 0,
-        inProgress: false,
+        backupInProgress: false,
         selected: [],
         orderCount: 0,
-        lineItemCount: 0
+        lineItemCount: 0,
+        filter: 1,
+        filterFn: FILTER_FN[1]
     }
 
     constructor() {
         super()
         this.backupSelected = this.backupSelected.bind(this)
+        this.archiveSelected = this.archiveSelected.bind(this)
+        this.onFilterChange = this.onFilterChange.bind(this)
+        this.loadOrders = this.loadOrders.bind(this)
         this.toggleModal = this.toggleModal.bind(this)
         this.onOrdersListUpdate = this.onOrdersListUpdate.bind(this)
     }
 
     componentDidMount() {
-        RPCController.getAllOrders()
-            .then((orders = []) => this.setState({ orders }))
+        this.loadOrders()
     }
 
     render() {
-        let { orders, progress, inProgress, orderCount, lineItemCount } = this.state
+        let { orders, progress, backupInProgress, orderCount, lineItemCount, filter, filterFn } = this.state
 
         return (
             <BaseLayout
@@ -42,29 +56,64 @@ export class OrdersList extends Component {
                     disabled={ !orderCount }
                 >
                     Create Backup
-                </Button>{ '  ' }
+                </Button>
+                <Button
+                    color="primary"
+                    onClick={ this.archiveSelected }
+                    disabled={ !orderCount }
+                >
+                    Archive/Unarchive
+                </Button>
+
+                <div>
+                    show:<Select
+                        multi={ false }
+                        clearable={ false }
+                        value={ filter }
+                        options={ [
+                            { value: 0, label: 'all' },
+                            { value: 1, label: 'running' },
+                            { value: 2, label: 'archived' }
+                        ] }
+                        onChange={ this.onFilterChange }
+                    />
+                </div>
 
                 <OrdersTable
                     orders={ orders }
+                    filter={ filterFn }
                     onUpdate={ this.onOrdersListUpdate }
                 />
 
-                <Modal
-                    className={this.props.className}
-                    // toggle={ this.toggleModal }
-                    isOpen={ this.state.inProgress }
-                >
-                    {/* <ModalHeader toggle={ this.toggleModal }>Backup orders</ModalHeader> */}
-                    <ModalHeader>Progress</ModalHeader>
-                    <ModalBody>
-                        <Progress value={ progress }/>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="secondary" disabled onClick={ this.toggleModal }>Cancel</Button>
-                    </ModalFooter>
-                </Modal>
+                <ProgressModal
+                    isOpen={ backupInProgress }
+                    progress={ progress }
+                    toggleModal={ this.toggleModal }
+                />
             </BaseLayout>
         )
+    }
+
+    loadOrders() {
+        RPCController.getAllOrders()
+            .then((orders = []) => this.setState({ orders }))
+    }
+
+    archiveSelected() {
+        let { selected } = this.state,
+            step = 100 / selected.length
+
+        this.toggleModal()
+
+        Promise.mapSeries(selected, ({ key, status }) =>
+                RPCController.updateOrder({
+                    status: status === 'archived' ? 'running' : 'archived'
+                }, key).then(() => {
+                    this.setState({ progress: this.state.progress + step })
+                })
+            )
+            .then(this.toggleModal)
+            .then(this.loadOrders)
     }
 
     backupSelected() {
@@ -74,8 +123,8 @@ export class OrdersList extends Component {
 
         this.toggleModal()
 
-        return Promise.all(
-                selected.map(({ key }) => this.collectOrderData(key))
+        Promise.mapSeries(selected, ({ key }) =>
+                Promise.delay(DELAY, this.collectOrderData(key))
             )
             .then(orders => ({
                 name,
@@ -93,25 +142,18 @@ export class OrdersList extends Component {
     }
 
     collectOrderData(id) {
-        let total = this.state.lineItemCount,
-            step = 100 / total
-
-        this.setState({
-            inProgress: true,
-            progress: 0
-        })
+        let step = 100 / this.state.lineItemCount
 
         return RPCController.getOrder(id)
-            .then((order) => {
+            .then(order => {
                 let { lineItems } = order
 
-                return Promise.all(
-                        lineItems.map(({ key }) =>
-                            RPCController.getLineItem(key)
-                                .then(result => {
-                                    this.setState({ progress: this.state.progress + step })
-                                    return result
-                                })
+                return Promise.mapSeries(lineItems, ({ key }) =>
+                        Promise.delay(DELAY, RPCController.getLineItem(key)
+                            .then(result => {
+                                this.setState({ progress: this.state.progress + step })
+                                return result
+                            })
                         )
                     ).then(lineItems => ({ ...order, lineItems }))
             })
@@ -133,10 +175,17 @@ export class OrdersList extends Component {
         })
     }
 
+    onFilterChange({ value: filter }) {
+        this.setState({
+            filter,
+            filterFn: FILTER_FN[filter]
+         })
+    }
+
     toggleModal() {
         this.setState({
             progress: 0,
-            inProgress: !this.state.inProgress
+            backupInProgress: !this.state.backupInProgress
         })
     }
 }

@@ -31,9 +31,16 @@ const BackgroundController = new class Background {
         return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data)
     }
 
-    createLineItem(data, orderId) {
-        // console.log(data, orderId)
-        return HTTPService.POST(`${WEB_URL}/advertise/orders/${orderId}/new_line_item/`, data)
+    createLineItem(data, id) {
+        return HTTPService.POST(`${WEB_URL}/advertise/orders/${id}/new_line_item/`, data)
+    }
+
+    updateOrder(data, id) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, data)
+    }
+
+    updateLineItem(data, id) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/update?key=${id}`, data)
     }
 
     restoreOrder(data) {

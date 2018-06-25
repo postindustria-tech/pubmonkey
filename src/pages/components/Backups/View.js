@@ -2,16 +2,27 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 import { Button } from 'reactstrap'
 import moment from 'moment'
+import Promise from 'bluebird'
 import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
 import { FileService, RPCController } from '../../services'
+import { ProgressModal } from '../Popups'
 
 export class BackupView extends Component {
     state = {
         backup: null,
         isExist: false,
         isDirty: false,
-        orders: []
+        orders: [],
+        restoringInProgress: false,
+        progress: 0
+    }
+
+
+    constructor() {
+        super()
+
+        this.toggleModal = this.toggleModal.bind(this)
     }
 
     componentDidMount() {
@@ -22,7 +33,7 @@ export class BackupView extends Component {
             RPCController.getDraft()
                 .then(draft => {
                     if (draft.length) {
-                        let backup = JSON.parse(draft.pop()),
+                        let backup = JSON.parse(draft),
                             { orders } = backup
 
                         this.setState({ backup, orders, isExist: false })
@@ -52,12 +63,12 @@ export class BackupView extends Component {
         }
     }
 
-    // componentWillUnmount() {
-    //     RPCController.clearDraft()
-    // }
+    componentWillUnmount() {
+        RPCController.clearDraft()
+    }
 
     render() {
-        let { backup, orders, isExist, isDirty } = this.state
+        let { backup, orders, isExist, isDirty, restoringInProgress, progress } = this.state
 
         if (backup == null) {
             return false
@@ -86,12 +97,12 @@ export class BackupView extends Component {
                     onClick={ () => this.downloadBackup() }
                 >
                     <i className="fa fa-cloud-download"/>
-                </Button>&nbsp;
+                </Button>
                 <Button
                     onClick={ () => this.restoreSelected() }
                 >
                     <i className="fa fa-arrow-circle-up"/>&nbsp;Restore
-                </Button>&nbsp;
+                </Button>
                 <Button
                     onClick={ () => this.saveBackup() }
                     disabled={ !(!isExist || isDirty) }
@@ -103,6 +114,11 @@ export class BackupView extends Component {
                     allSelected={ true }
                     removeOrder={ true }
                     onUpdate={ orders => this.onOrdersListUpdate(orders) }
+                />
+                <ProgressModal
+                    isOpen={ restoringInProgress }
+                    progress={ progress }
+                    toggleModal={ this.toggleModal }
                 />
             </BaseLayout>
         )
@@ -122,27 +138,35 @@ export class BackupView extends Component {
     }
 
     restoreSelected() {
-        let { backup: { orders } } = this.state
+        let { backup: { orders } } = this.state,
+            step = 100 / this.state.backup.lineItemCount
 
-        orders.forEach(order => {
+        this.toggleModal()
+
+        Promise.mapSeries(orders, order => {
             let lineItem = order.lineItems[0]
 
-            RPCController.restoreOrder(lineItem)
+            return RPCController.restoreOrder(lineItem)
+                .then(result => {
+                    this.setState({ progress: this.state.progress + step })
+                    return result
+                })
                 .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
                 .then(lineItemId => RPCController.getLineItemInfo(lineItemId))
                 .then(({ orderKey }) => {
                     if (order.lineItems.length > 1) {
-                        return Promise.all(
-                            order.lineItems.slice(1).map(lineItem =>
-                                RPCController.restoreLineItem(lineItem, orderKey)
-                            )
+                        return Promise.mapSeries(order.lineItems.slice(1), lineItem =>
+                            RPCController.restoreLineItem(lineItem, orderKey)
+                                .then(result => {
+                                    this.setState({ progress: this.state.progress + step })
+                                    return result
+                                })
                         )
                     }
                 })
-                .then(console.log)
         })
-        //start_datetime_1
-        // RPCController.restoreOrder(backup.orders[0].lineItems[0])
+        // .then(console.log)
+        .then(() => this.toggleModal())
     }
 
     saveBackup() {
@@ -179,6 +203,13 @@ export class BackupView extends Component {
     onOrdersListUpdate(orders) {
         this.setState({
             orders
+        })
+    }
+
+    toggleModal() {
+        this.setState({
+            progress: 0,
+            restoringInProgress: !this.state.restoringInProgress
         })
     }
 }

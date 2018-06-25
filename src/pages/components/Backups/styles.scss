@@ -1,5 +1,11 @@
 .backups-list-layout {
+    .btn {
+        margin: 0 6px;
+    }
+
     .backups-table {
+        margin-top: 22px;
+
         td {
             position: relative;
         }
@@ -13,5 +19,11 @@
 }
 
 .backup-view-layout {
+    .container>div {
+        margin: 18px 0;
+    }
 
+    .btn {
+        margin: 0 6px;
+    }
 }

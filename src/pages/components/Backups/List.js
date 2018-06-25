@@ -40,13 +40,13 @@ export class BackupsList extends Component {
                     disabled
                 >
                     <i className="fa fa-file"/>&nbsp;New
-                </Button>&nbsp;
+                </Button>
                 <Button
                     color="success"
                     onClick={ this.uploadFile }
                 >
                     <i className="fa fa-cloud-upload"/>&nbsp;Load
-                </Button>&nbsp;
+                </Button>
                 <BackupsTable
                     backups={ backups }
                     removeBackup={ this.removeBackup }
