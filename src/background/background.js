@@ -7,13 +7,12 @@ var extensionTabId = null
 
 chrome.webRequest.onCompleted.addListener(({ tabId }) => {
     let url = chrome.extension.getURL('index.html')
-console.log('dashboard', extensionTabId)
+
     if (extensionTabId) {
         if (tabId === extensionTabId) {
             chrome.tabs.update(extensionTabId, { url, active: true }, console.log)
         }
     } else {
-        console.log('create')
         chrome.tabs.create({ url }, ({ id }) => extensionTabId = id)
     }
 }, {
@@ -23,13 +22,11 @@ console.log('dashboard', extensionTabId)
 
 chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
     if (statusCode === 302) {
-        console.log(302)
         let url = 'https://app.mopub.com/account/login/'
         chrome.tabs.query({ url: chrome.extension.getURL('index.html') }, tabs => {
             if (tabs.length) {
                 extensionTabId = tabs[0].id
                 chrome.tabs.update(extensionTabId, { url, active: true })
-                console.log('onHeadersReceived', extensionTabId)
             } else {
                 chrome.tabs.create({ url }, ({ id }) => extensionTabId = id)
             }
