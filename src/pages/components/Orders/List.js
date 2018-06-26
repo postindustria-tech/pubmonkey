@@ -65,7 +65,7 @@ export class OrdersList extends Component {
                     Archive/Unarchive
                 </Button>
 
-                <div>
+                <div className="list-filter">
                     show:<Select
                         multi={ false }
                         clearable={ false }
@@ -106,9 +106,9 @@ export class OrdersList extends Component {
         this.toggleModal()
 
         Promise.mapSeries(selected, ({ key, status }) =>
-                RPCController.updateOrder({
-                    status: status === 'archived' ? 'running' : 'archived'
-                }, key).then(() => {
+                RPCController.updateOrderStatus(
+                    status === 'archived' ? 'running' : 'archived'
+                , key).then(() => {
                     this.setState({ progress: this.state.progress + step })
                 })
             )

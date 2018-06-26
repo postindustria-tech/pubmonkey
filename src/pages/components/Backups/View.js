@@ -23,6 +23,8 @@ export class BackupView extends Component {
         super()
 
         this.toggleModal = this.toggleModal.bind(this)
+        this.saveBackup = this.saveBackup.bind(this)
+        this.onOrdersListUpdate = this.onOrdersListUpdate.bind(this)
     }
 
     componentDidMount() {
@@ -47,8 +49,6 @@ export class BackupView extends Component {
 
         if (pathname.slice(0, 8) === '/backup/') {
             let { params: { id, key } } = this.props.match
-
-            console.log(id, key)
 
             RPCController.getBackupById(Number(id))
                 .then(backup => {
@@ -104,17 +104,19 @@ export class BackupView extends Component {
                     <i className="fa fa-arrow-circle-up"/>&nbsp;Restore
                 </Button>
                 <Button
-                    onClick={ () => this.saveBackup() }
+                    onClick={ this.saveBackup }
                     disabled={ !(!isExist || isDirty) }
                 >
                     <i className="fa fa-save"/>&nbsp;Save
                 </Button>
+
                 <OrdersTable
                     orders={ orders }
                     allSelected={ true }
                     removeOrder={ true }
-                    onUpdate={ orders => this.onOrdersListUpdate(orders) }
+                    onUpdate={ this.onOrdersListUpdate }
                 />
+
                 <ProgressModal
                     isOpen={ restoringInProgress }
                     progress={ progress }
