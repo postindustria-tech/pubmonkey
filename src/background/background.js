@@ -3,38 +3,40 @@ import { BackgroundController } from '../core'
 
 console.log('background script loaded!')
 
+var extensionTabId = null
+
 chrome.webRequest.onCompleted.addListener(({ tabId }) => {
     let url = chrome.extension.getURL('index.html')
-
-    chrome.tabs.query({ url }, tabs => {
-      if (tabs.length) {
-          chrome.tabs.update(tabs[0].id, { url, active: true })
-      }
-      else {
-          chrome.tabs.create({ url })
-      }
-    })
-
+console.log('dashboard', extensionTabId)
+    if (extensionTabId) {
+        if (tabId === extensionTabId) {
+            chrome.tabs.update(extensionTabId, { url, active: true }, console.log)
+        }
+    } else {
+        console.log('create')
+        chrome.tabs.create({ url }, ({ id }) => extensionTabId = id)
+    }
 }, {
-    urls: [ 'https://app.mopub.com/dashboard/*' ]
+    urls: [ 'https://app.mopub.com/dashboard/' ],
+    tabId: extensionTabId
 })
 
 chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
     if (statusCode === 302) {
+        console.log(302)
         let url = 'https://app.mopub.com/account/login/'
-
-        chrome.tabs.query({ url }, tabs => {
-          if (tabs.length) {
-              chrome.tabs.update(tabs[0].id, { url, active: true })
-          }
-          else {
-              chrome.tabs.create({ url })
-          }
+        chrome.tabs.query({ url: chrome.extension.getURL('index.html') }, tabs => {
+            if (tabs.length) {
+                extensionTabId = tabs[0].id
+                chrome.tabs.update(extensionTabId, { url, active: true })
+                console.log('onHeadersReceived', extensionTabId)
+            } else {
+                chrome.tabs.create({ url }, ({ id }) => extensionTabId = id)
+            }
         })
     }
 }, { urls: [ 'https://app.mopub.com/web-client/api/orders/query' ]})
 
-// BackgroundController.getAllOrders().catch(console.log)
 
 function RPCHandler({ rpc, method, args, action }, sender, sendResponse) {
     if (rpc) {
