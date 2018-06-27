@@ -1,4 +1,4 @@
-chrome.runtime.sendMessage({ action: 'popup_opened' })
+// chrome.runtime.sendMessage({ action: 'popup_opened' })
 
 let url = chrome.extension.getURL('index.html')
 
