@@ -7,7 +7,6 @@ import sha256 from 'sha256'
 import { OrdersTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { FileService, RPCController } from '../../services'
-import { MainController } from '../../controllers'
 import { ProgressModal } from '../Popups'
 
 const DELAY = 0,
@@ -96,7 +95,7 @@ export class OrdersList extends Component {
     }
 
     loadOrders() {
-        MainController.getAllOrders()
+        RPCController.getAllOrders()
             .then((orders = []) => this.setState({ orders }))
     }
 
@@ -107,7 +106,7 @@ export class OrdersList extends Component {
         this.toggleModal()
 
         Promise.mapSeries(selected, ({ key, status }) =>
-                MainController.updateOrderStatus(
+                RPCController.updateOrderStatus(
                     status === 'archived' ? 'running' : 'archived'
                 , key).then(() => {
                     this.setState({ progress: this.state.progress + step })
@@ -136,7 +135,7 @@ export class OrdersList extends Component {
                 updated: null
             }))
             .then(result => {
-                MainController.keepInDraft(JSON.stringify(result))
+                RPCController.keepInDraft(JSON.stringify(result))
                 this.toggleModal()
                 this.props.history.push('/backup/preview')
             })
@@ -145,12 +144,12 @@ export class OrdersList extends Component {
     collectOrderData(id) {
         let step = 100 / this.state.lineItemCount
 
-        return MainController.getOrder(id)
+        return RPCController.getOrder(id)
             .then(order => {
                 let { lineItems } = order
 
                 return Promise.mapSeries(lineItems, ({ key }) =>
-                        Promise.delay(DELAY, MainController.getLineItem(key)
+                        Promise.delay(DELAY, RPCController.getLineItem(key)
                             .then(result => {
                                 this.setState({ progress: this.state.progress + step })
                                 return result

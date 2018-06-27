@@ -6,7 +6,6 @@ import Promise from 'bluebird'
 import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
 import { FileService, RPCController } from '../../services'
-import { MainController } from '../../controllers'
 import { ProgressModal } from '../Popups'
 
 export class BackupView extends Component {
@@ -33,7 +32,7 @@ export class BackupView extends Component {
             { location: { pathname } } = history
 
         if (pathname === '/backup/preview') {
-            MainController.getDraft()
+            RPCController.getDraft()
                 .then(draft => {
                     if (draft.length) {
                         let backup = JSON.parse(draft),
@@ -51,7 +50,7 @@ export class BackupView extends Component {
         if (pathname.slice(0, 8) === '/backup/') {
             let { params: { id, key } } = this.props.match
 
-            MainController.getBackupById(Number(id))
+            RPCController.getBackupById(Number(id))
                 .then(backup => {
                     if (backup == null) {
                         throw 'no backup with id ' + id
@@ -65,7 +64,7 @@ export class BackupView extends Component {
     }
 
     componentWillUnmount() {
-        MainController.clearDraft()
+        RPCController.clearDraft()
     }
 
     render() {
@@ -149,17 +148,17 @@ export class BackupView extends Component {
         Promise.mapSeries(orders, order => {
             let lineItem = order.lineItems[0]
 
-            return MainController.restoreOrder(lineItem)
+            return RPCController.restoreOrder(lineItem)
                 .then(result => {
                     this.setState({ progress: this.state.progress + step })
                     return result
                 })
                 .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
-                .then(lineItemId => MainController.getLineItemInfo(lineItemId))
+                .then(lineItemId => RPCController.getLineItemInfo(lineItemId))
                 .then(({ orderKey }) => {
                     if (order.lineItems.length > 1) {
                         return Promise.mapSeries(order.lineItems.slice(1), lineItem =>
-                            MainController.restoreLineItem(lineItem, orderKey)
+                            RPCController.restoreLineItem(lineItem, orderKey)
                                 .then(result => {
                                     this.setState({ progress: this.state.progress + step })
                                     return result
@@ -176,7 +175,7 @@ export class BackupView extends Component {
         let { backup, isExist } = this.state
 
         if (isExist) {
-            MainController.updateBackup(backup)
+            RPCController.updateBackup(backup)
                 .then(backup =>
                     this.setState({
                         backup,
@@ -184,7 +183,7 @@ export class BackupView extends Component {
                     })
                 )
         } else {
-            MainController.createBackup(backup)
+            RPCController.createBackup(backup)
                 .then(() =>
                     this.setState({
                         isExist: true,
