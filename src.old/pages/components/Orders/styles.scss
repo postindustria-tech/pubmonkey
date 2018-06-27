@@ -1,0 +1,18 @@
+.orders-list-layout {
+    .btn {
+        margin: 0 6px;
+    }
+
+    .list-filter {
+        padding:6px;
+        width: 140px;
+    }
+}
+
+.orders-table {
+    margin-top: 22px;
+
+    tr .select input, td.action i {
+        cursor: pointer;
+    }
+}
