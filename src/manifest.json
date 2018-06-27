@@ -11,9 +11,7 @@
             "128": "images/empty_128.png"
     },
     "background": {
-        "scripts": [
-            "background/background.js"
-        ]
+        "page": "index.html"
     },
     "content_scripts": [
         {
