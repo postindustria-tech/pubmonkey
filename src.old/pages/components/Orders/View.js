@@ -3,7 +3,6 @@ import { Button } from 'reactstrap'
 import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
 import { FileService, RPCController } from '../../services'
-import { MainController } from '../../controllers'
 
 export class OrderView extends Component {
     state = {
@@ -23,7 +22,7 @@ export class OrderView extends Component {
     componentDidMount() {
         let { params: { key } } = this.props.match
 
-        MainController.getOrder(key)
+        RPCController.getOrder(key)
             .then(order => this.setState({ order, lineItems: order.lineItems }))
     }
 
@@ -95,7 +94,7 @@ export class OrderView extends Component {
     saveOrder() {
         let { order: { name, advertiser, description, key } } = this.state
 
-        MainController.updateOrder({
+        RPCController.updateOrder({
                 name, advertiser, description
             }, key).then(() =>
                 this.setState({

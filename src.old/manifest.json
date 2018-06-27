@@ -10,6 +10,9 @@
             "64": "images/empty_64.png",
             "128": "images/empty_128.png"
     },
+    "background": {
+        "page": "index.html"
+    },
     "content_scripts": [
         {
             "matches": [ "https://app.mopub.com/*"],

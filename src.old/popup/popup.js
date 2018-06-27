@@ -1,3 +1,5 @@
+// chrome.runtime.sendMessage({ action: 'popup_opened' })
+
 let url = chrome.extension.getURL('index.html')
 
 chrome.tabs.query({ url }, tabs => {

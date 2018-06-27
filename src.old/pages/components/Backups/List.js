@@ -4,7 +4,6 @@ import moment from 'moment'
 import { BackupsTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { RPCController, FileService } from '../../services'
-import { MainController } from '../../controllers'
 
 export class BackupsList extends Component {
     state = {
@@ -24,7 +23,7 @@ export class BackupsList extends Component {
     }
 
     loadBackups() {
-        MainController.getAllBackups()
+        RPCController.getAllBackups()
             .then((backups = []) => this.setState({ backups }))
     }
 
@@ -61,7 +60,7 @@ export class BackupsList extends Component {
         FileService.openFile()
             .then(result => {
                 if (result) {
-                    MainController.keepInDraft(result)
+                    RPCController.keepInDraft(result)
                         .then(() =>
                             this.props.history.push('/backup/preview')
                         )
@@ -70,12 +69,12 @@ export class BackupsList extends Component {
     }
 
     removeBackup(id) {
-        MainController.deleteBackup(id)
+        RPCController.deleteBackup(id)
             .then(() => this.loadBackups())
     }
 
     downloadBackup(id) {
-        MainController.getBackupById(id)
+        RPCController.getBackupById(id)
             .then(backup => {
                 FileService.saveFile(
                     JSON.stringify(backup, null, '  '),
