@@ -6,7 +6,7 @@ import Promise from 'bluebird'
 import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
 import { FileService, RPCController } from '../../services'
-import { MainController } from '../../controllers'
+import { MainController, OrderController } from '../../controllers'
 import { ProgressModal } from '../Popups'
 
 export class BackupView extends Component {
@@ -16,7 +16,7 @@ export class BackupView extends Component {
         isDirty: false,
         orders: [],
         restoringInProgress: false,
-        progress: 0
+        progress: []
     }
 
 
@@ -149,17 +149,17 @@ export class BackupView extends Component {
         Promise.mapSeries(orders, order => {
             let lineItem = order.lineItems[0]
 
-            return MainController.restoreOrder(lineItem)
+            return OrderController.restoreOrder(lineItem)
                 .then(result => {
                     this.setState({ progress: this.state.progress + step })
                     return result
                 })
                 .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
-                .then(lineItemId => MainController.getLineItemInfo(lineItemId))
+                .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
                 .then(({ orderKey }) => {
                     if (order.lineItems.length > 1) {
                         return Promise.mapSeries(order.lineItems.slice(1), lineItem =>
-                            MainController.restoreLineItem(lineItem, orderKey)
+                            OrderController.restoreLineItem(lineItem, orderKey)
                                 .then(result => {
                                     this.setState({ progress: this.state.progress + step })
                                     return result
@@ -211,7 +211,7 @@ export class BackupView extends Component {
 
     toggleModal() {
         this.setState({
-            progress: 0,
+            progress: [],
             restoringInProgress: !this.state.restoringInProgress
         })
     }

@@ -3,12 +3,17 @@ import { Button } from 'reactstrap'
 import Select from 'react-select'
 import moment from 'moment'
 import Promise from 'bluebird'
+import axios from 'axios'
 import sha256 from 'sha256'
 import { OrdersTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { FileService, RPCController } from '../../services'
-import { MainController } from '../../controllers'
+import { MainController, OrderController } from '../../controllers'
 import { ProgressModal } from '../Popups'
+
+Promise.config({
+    cancellation: true
+})
 
 const DELAY = 0,
       FILTER_FN = [
@@ -20,7 +25,7 @@ const DELAY = 0,
 export class OrdersList extends Component {
     state = {
         orders: [],
-        progress: 0,
+        progress: [],
         backupInProgress: false,
         selected: [],
         orderCount: 0,
@@ -28,6 +33,8 @@ export class OrdersList extends Component {
         filter: 1,
         filterFn: FILTER_FN[1]
     }
+
+    cancelToken = null
 
     constructor() {
         super()
@@ -90,13 +97,14 @@ export class OrdersList extends Component {
                     isOpen={ backupInProgress }
                     progress={ progress }
                     toggleModal={ this.toggleModal }
+                    onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
                 />
             </BaseLayout>
         )
     }
 
     loadOrders() {
-        MainController.getAllOrders()
+        OrderController.getAllOrders()
             .then((orders = []) => this.setState({ orders }))
     }
 
@@ -106,11 +114,18 @@ export class OrdersList extends Component {
 
         this.toggleModal()
 
+        this.setState({
+            progress: []
+        })
+
         Promise.mapSeries(selected, ({ key, status }) =>
-                MainController.updateOrderStatus(
+                OrderController.updateOrderStatus(
                     status === 'archived' ? 'running' : 'archived'
                 , key).then(() => {
-                    this.setState({ progress: this.state.progress + step })
+                    this.setState({ progress: [{
+                        title: 'orders',
+                        progress: { value: this.state.progress + step }
+                    }] })
                 })
             )
             .then(this.toggleModal)
@@ -124,9 +139,32 @@ export class OrdersList extends Component {
 
         this.toggleModal()
 
-        Promise.mapSeries(selected, ({ key }) =>
-                Promise.delay(DELAY, this.collectOrderData(key))
+        this.setState({
+            progress: [{
+                title: 'ordres:',
+                progress: { value: 0 }
+            }, {
+                title: 'line items:',
+                progress: { value: 0 }
+            }]
+        })
+
+        let promise = OrderController.collectOrderDataFromSet(selected,
+            ({ lineItemCount, lineItemsDone, orderCount, ordersDone }) =>
+                this.setState({
+                    progress: [{
+                        title: `ordres: ${ordersDone}/${orderCount}`,
+                        progress: { value: ordersDone / orderCount * 100 }
+                    }, {
+                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                        progress: { value: lineItemsDone / lineItemCount * 100 }
+                    }]
+                })
             )
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
+
+        promise
             .then(orders => ({
                 name,
                 orderCount,
@@ -140,23 +178,10 @@ export class OrdersList extends Component {
                 this.toggleModal()
                 this.props.history.push('/backup/preview')
             })
-    }
-
-    collectOrderData(id) {
-        let step = 100 / this.state.lineItemCount
-
-        return MainController.getOrder(id)
-            .then(order => {
-                let { lineItems } = order
-
-                return Promise.mapSeries(lineItems, ({ key }) =>
-                        Promise.delay(DELAY, MainController.getLineItem(key)
-                            .then(result => {
-                                this.setState({ progress: this.state.progress + step })
-                                return result
-                            })
-                        )
-                    ).then(lineItems => ({ ...order, lineItems }))
+            .catch(thrown => {
+                // if (axios.isCancel(thrown)) {
+                    this.toggleModal()
+                // }
             })
     }
 
@@ -185,7 +210,7 @@ export class OrdersList extends Component {
 
     toggleModal() {
         this.setState({
-            progress: 0,
+            progress: [],
             backupInProgress: !this.state.backupInProgress
         })
     }
