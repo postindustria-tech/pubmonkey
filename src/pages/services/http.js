@@ -32,7 +32,8 @@ const HTTPService = new class HTTP {
                 headers: {
                     'x-requested-with': 'XMLHttpRequest',
                     'x-csrftoken': csrftoken
-                }
+                },
+                cancelToken: source.token
             }).then(({ data }) => data)
 
         promise.cancel = msg => source.cancel(msg)

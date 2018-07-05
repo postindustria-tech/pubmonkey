@@ -161,8 +161,6 @@ export class OrdersList extends Component {
 
                 n++
 
-                console.log()
-
                 this.setState({
                     progress: [{
                         title: `ordres: ${ordersDone}/${orderCount}`,

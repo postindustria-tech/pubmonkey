@@ -122,6 +122,7 @@ export class BackupView extends Component {
                     isOpen={ restoringInProgress }
                     progress={ progress }
                     toggleModal={ this.toggleModal }
+                    onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
                 />
             </BaseLayout>
         )
@@ -141,35 +142,80 @@ export class BackupView extends Component {
     }
 
     restoreSelected() {
-        let { backup: { orders } } = this.state,
-            step = 100 / this.state.backup.lineItemCount
+        let { backup: { orders, lineItemCount: total } } = this.state,
+            n = 0,
+            average
 
         this.toggleModal()
 
-        Promise.mapSeries(orders, order => {
-            let lineItem = order.lineItems[0]
+        this.setState({
+            progress: [{
+                title: 'ordres:',
+                progress: { value: 0 }
+            }, {
+                title: 'line items:',
+                progress: { value: 0 }
+            }]
+        })
 
-            return OrderController.restoreOrder(lineItem)
-                .then(result => {
-                    this.setState({ progress: this.state.progress + step })
-                    return result
-                })
-                .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
-                .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
-                .then(({ orderKey }) => {
-                    if (order.lineItems.length > 1) {
-                        return Promise.mapSeries(order.lineItems.slice(1), lineItem =>
-                            OrderController.restoreLineItem(lineItem, orderKey)
-                                .then(result => {
-                                    this.setState({ progress: this.state.progress + step })
-                                    return result
-                                })
-                        )
-                    }
+        let promise = OrderController.restoreOrdersWithLineItems(orders,
+            ({ lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp }) => {
+                if (average == null) {
+                    average = timestamp
+                } else {
+                    average = (average + timestamp) / 2
+                }
+
+                n++
+
+                this.setState({
+                    progress: [{
+                        title: `ordres: ${ordersDone}/${orderCount}`,
+                        progress: { value: ordersDone / orderCount * 100 }
+                    }, {
+                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                        progress: { value: lineItemsDone / lineItemCount * 100 }
+                    }, {
+                       title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
+                    }]
                 })
         })
-        // .then(console.log)
-        .then(() => this.toggleModal())
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
+
+        promise
+            .then(() => this.toggleModal())
+            .catch(thrown => {
+                console.log(thrown)
+                // if (axios.isCancel(thrown)) {
+                    this.toggleModal()
+                // }
+            })
+
+        // Promise.mapSeries(orders, order => {
+        //     let lineItem = order.lineItems[0]
+        //
+        //     return OrderController.restoreOrder(lineItem)
+        //         .then(result => {
+        //             this.setState({ progress: this.state.progress + step })
+        //             return result
+        //         })
+        //         .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
+        //         .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
+        //         .then(({ orderKey }) => {
+        //             if (order.lineItems.length > 1) {
+        //                 return Promise.mapSeries(order.lineItems.slice(1), lineItem =>
+        //                     OrderController.restoreLineItem(lineItem, orderKey)
+        //                         .then(result => {
+        //                             this.setState({ progress: this.state.progress + step })
+        //                             return result
+        //                         })
+        //                 )
+        //             }
+        //         })
+        // })
+        // // .then(console.log)
+        // .then(() => this.toggleModal())
     }
 
     saveBackup() {

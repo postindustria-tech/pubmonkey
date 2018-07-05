@@ -1,4 +1,5 @@
 import Promise from 'bluebird'
+import moment from 'moment'
 import { HTTPService, StorageService } from '../services'
 import { LineItemModel } from '../models'
 
@@ -124,6 +125,61 @@ export const OrderController = new class Order {
                                 return result
                             })
                         }).then(lineItems => ({ ...order, lineItems }))
+            })
+
+        promise.cancel = msg => cancel(msg)
+
+        return promise
+    }
+
+    restoreOrdersWithLineItems(orders, progressCallback) {
+        let cancel,
+            promise = Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
+                let timestamp = Date.now(),
+                    promise = OrderController.restoreOrder(order.lineItems[0])
+
+                cancel = promise.cancel
+
+                return promise.then(result => {
+                        timestamp = Date.now() - timestamp
+
+                        progressCallback({
+                            ordersDone: orderIdx + 1,
+                            orderCount,
+                            lineItemsDone: 1,
+                            lineItemCount: order.lineItems.length,
+                            timestamp
+                        })
+
+                        return result
+                    })
+                    .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
+                    .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
+                    .then(({ orderKey }) => {
+                        if (order.lineItems.length > 1) {
+                            return Promise.mapSeries(order.lineItems.slice(1), (lineItem, lineItemIdx, lineItemCount) => {
+                                timestamp = Date.now()
+
+                                let promise = OrderController.restoreLineItem(lineItem, orderKey)
+
+                                cancel = promise.cancel
+
+                                return promise.then(result => {
+                                    timestamp = Date.now() - timestamp
+
+                                    progressCallback({
+                                        ordersDone: orderIdx + 1,
+                                        orderCount,
+                                        lineItemCount: lineItemCount + 1,
+                                        lineItemsDone: lineItemIdx + 2,
+                                        timestamp
+                                    })
+
+                                    return result
+                                })
+                            })
+                        }
+                    })
             })
 
         promise.cancel = msg => cancel(msg)
