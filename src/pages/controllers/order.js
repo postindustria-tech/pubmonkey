@@ -105,14 +105,18 @@ export const OrderController = new class Order {
                 let { lineItems } = order
 
                 return Promise.mapSeries(lineItems, ({ key }, idx, lineItemCount) => {
-                            let promise = this.getLineItem(key)
+                            let timestamp = Date.now(),
+                                promise = this.getLineItem(key)
 
                             cancel = promise.cancel
 
                             return promise.then(result => {
+                                timestamp = Date.now() - timestamp
+
                                 if (progressCallback) {
                                     progressCallback({
                                         lineItemCount,
+                                        timestamp,
                                         lineItemsDone: idx + 1
                                     })
                                 }

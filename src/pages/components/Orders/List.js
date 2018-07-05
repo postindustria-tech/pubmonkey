@@ -133,9 +133,11 @@ export class OrdersList extends Component {
     }
 
     backupSelected() {
-        let { orderCount, lineItemCount, selected } = this.state,
+        let { orderCount, lineItemCount: total, selected } = this.state,
             name = 'default name',
-            created = Date.now()
+            created = Date.now(),
+            n = 0,
+            average
 
         this.toggleModal()
 
@@ -150,7 +152,17 @@ export class OrdersList extends Component {
         })
 
         let promise = OrderController.collectOrderDataFromSet(selected,
-            ({ lineItemCount, lineItemsDone, orderCount, ordersDone }) =>
+            ({ lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp }) => {
+                if (average == null) {
+                    average = timestamp
+                } else {
+                    average = (average + timestamp) / 2
+                }
+
+                n++
+
+                console.log()
+
                 this.setState({
                     progress: [{
                         title: `ordres: ${ordersDone}/${orderCount}`,
@@ -158,8 +170,11 @@ export class OrdersList extends Component {
                     }, {
                         title: `line items: ${lineItemsDone}/${lineItemCount}`,
                         progress: { value: lineItemsDone / lineItemCount * 100 }
+                    }, {
+                        title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
                     }]
                 })
+            }
             )
 
         this.onProgressCancel = () => promise.cancel('canceled by user')
@@ -168,7 +183,7 @@ export class OrdersList extends Component {
             .then(orders => ({
                 name,
                 orderCount,
-                lineItemCount,
+                lineItemCount: total,
                 created,
                 orders,
                 updated: null
@@ -179,6 +194,7 @@ export class OrdersList extends Component {
                 this.props.history.push('/backup/preview')
             })
             .catch(thrown => {
+                console.log(thrown)
                 // if (axios.isCancel(thrown)) {
                     this.toggleModal()
                 // }

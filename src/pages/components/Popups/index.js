@@ -22,7 +22,7 @@ export class ProgressModal extends Component {
                     { progress.map && progress.map(({ title, progress }, idx) => (
                         <div key={ idx }>
                             { title }
-                            <Progress { ...progress }/>
+                            { progress && <Progress { ...progress }/> }
                         </div>
                     ))}
                 </ModalBody>
