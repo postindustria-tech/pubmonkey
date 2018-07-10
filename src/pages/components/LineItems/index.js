@@ -29,6 +29,7 @@ export class LineItemsTable extends Component {
                         </th>
                         <th>name</th>
                         <th>rate</th>
+                        <th>enabled</th>
                         {/* {
                             removeLineItem && <th>actions</th>
                         } */}
@@ -37,7 +38,7 @@ export class LineItemsTable extends Component {
                 <tbody>
                     { lineItems
                         .filter(filter)
-                        .map(({ name, bid, key, checked }) => {
+                        .map(({ name, bid, key, active, status, checked }) => {
                             return (
                                 <tr key={ key }>
                                     <td className="select">
@@ -49,6 +50,14 @@ export class LineItemsTable extends Component {
                                     </td>
                                     <td>{ name }</td>
                                     <td>{ bid }</td>
+                                    <td>
+                                        <i className="fa fa-power-off"
+                                            style={{ color: active ? '#0f0' : '#f00' }}
+                                        />
+                                        { status === 'archived' ? 'archived' :
+                                          status === 'paused' ? 'paused' : ''
+                                        }
+                                    </td>
                                 </tr>
                             )
                         })

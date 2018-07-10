@@ -78,18 +78,20 @@ export class OrdersTable extends Component {
     }
 
     toggleItem(_key) {
-        let { orders, onUpdate } = this.props
+        let { orders, onUpdate, filter = () => true } = this.props
 
         onUpdate(
-            orders.map(order => {
-                let { checked, key } = order
+            orders
+                .filter(filter)
+                .map(order => {
+                    let { checked, key } = order
 
-                if (key === _key) {
-                    order.checked = !order.checked
-                }
+                    if (key === _key) {
+                        order.checked = !order.checked
+                    }
 
-                return order
-            })
+                    return order
+                })
         )
     }
 }

@@ -15,7 +15,6 @@ export class BackupView extends Component {
         isExist: false,
         isDirty: false,
         orders: [],
-        restoringInProgress: false,
         progress: []
     }
 
@@ -69,7 +68,7 @@ export class BackupView extends Component {
     }
 
     render() {
-        let { backup, orders, isExist, isDirty, restoringInProgress, progress } = this.state
+        let { backup, orders, isExist, isDirty, progress } = this.state
 
         if (backup == null) {
             return false
@@ -119,7 +118,7 @@ export class BackupView extends Component {
                 />
 
                 <ProgressModal
-                    isOpen={ restoringInProgress }
+                    isOpen={ !!progress.length }
                     progress={ progress }
                     toggleModal={ this.toggleModal }
                     onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
@@ -191,31 +190,6 @@ export class BackupView extends Component {
                     this.toggleModal()
                 // }
             })
-
-        // Promise.mapSeries(orders, order => {
-        //     let lineItem = order.lineItems[0]
-        //
-        //     return OrderController.restoreOrder(lineItem)
-        //         .then(result => {
-        //             this.setState({ progress: this.state.progress + step })
-        //             return result
-        //         })
-        //         .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
-        //         .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
-        //         .then(({ orderKey }) => {
-        //             if (order.lineItems.length > 1) {
-        //                 return Promise.mapSeries(order.lineItems.slice(1), lineItem =>
-        //                     OrderController.restoreLineItem(lineItem, orderKey)
-        //                         .then(result => {
-        //                             this.setState({ progress: this.state.progress + step })
-        //                             return result
-        //                         })
-        //                 )
-        //             }
-        //         })
-        // })
-        // // .then(console.log)
-        // .then(() => this.toggleModal())
     }
 
     saveBackup() {
@@ -257,8 +231,7 @@ export class BackupView extends Component {
 
     toggleModal() {
         this.setState({
-            progress: [],
-            restoringInProgress: !this.state.restoringInProgress
+            progress: []
         })
     }
 }

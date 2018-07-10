@@ -49,13 +49,33 @@ export const OrderController = new class Order {
         return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, { status })
     }
 
+    updateOrderStatusInSet(orders, status, progressCallback) {
+        return wrapSeries(orders, ({ key }) => this.updateOrderStatus(status, key), progressCallback)
+    }
+
     updateOrder(data, id) {
         return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-order?key=${id}`, data)
     }
 
-
     updateLineItem(data, id) {
         return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/update?key=${id}`, data)
+    }
+
+    updateLineItemStatus(status, id) {
+        let formData = new FormData
+
+        formData.append('ad_sources[]', id)
+        formData.append('status', status)
+
+        return HTTPService.POST(`${WEB_URL}/advertise/ad_source/status/`, formData)
+    }
+
+    updateLineItemStatusInSet(lineItems, status, progressCallback) {
+        return wrapSeries(lineItems, ({ key }) => this.updateLineItemStatus(status, key), progressCallback)
+    }
+
+    updateLineItems(lineItems, data, progressCallback) {
+        return wrapSeries(lineItems, ({ key }) => this.updateLineItem(data, key), progressCallback)
     }
 
     restoreOrder(data) {
@@ -186,4 +206,26 @@ export const OrderController = new class Order {
 
         return promise
     }
+}
+
+function wrapSeries(collection, method, step) {
+    let cancel,
+        promise = Promise.mapSeries(collection, (item, idx, count) => {
+            let promise = method(item)
+
+            cancel = promise.cancel
+
+            return promise.then(result => {
+                step({
+                    done: idx,
+                    count
+                })
+
+                return result
+            })
+        })
+
+    promise.cancel = msg => cancel(msg)
+
+    return promise
 }
