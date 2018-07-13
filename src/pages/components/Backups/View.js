@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 import { Button } from 'reactstrap'
 import moment from 'moment'
-import Promise from 'bluebird'
+import bind from 'bind-decorator'
 import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
 import { FileService, RPCController } from '../../services'
@@ -18,16 +18,11 @@ export class BackupView extends Component {
         progress: []
     }
 
-
-    constructor() {
-        super()
-
-        this.toggleModal = this.toggleModal.bind(this)
-        this.saveBackup = this.saveBackup.bind(this)
-        this.onOrdersListUpdate = this.onOrdersListUpdate.bind(this)
+    componentDidMount() {
+        this.loadBackup()
     }
 
-    componentDidMount() {
+    loadBackup() {
         let { history } = this.props,
             { location: { pathname } } = history
 
@@ -38,7 +33,12 @@ export class BackupView extends Component {
                         let backup = JSON.parse(draft),
                             { orders } = backup
 
-                        this.setState({ backup, orders, isExist: false })
+                        this.setState({
+                            backup,
+                            orders,
+                            isExist: false
+                        }, () => this.calcSelected())
+
                     } else {
                         history.push('/orders')
                     }
@@ -58,7 +58,11 @@ export class BackupView extends Component {
 
                     let { orders } = backup
 
-                    this.setState({ backup, orders, isExist: true })
+                    this.setState({
+                        backup,
+                        orders,
+                        isExist: true
+                    }, () => this.calcSelected())
                 })
         }
     }
@@ -120,7 +124,7 @@ export class BackupView extends Component {
                 <ProgressModal
                     isOpen={ !!progress.length }
                     progress={ progress }
-                    toggleModal={ this.toggleModal }
+                    toggleModal={ this.hideModal }
                     onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
                 />
             </BaseLayout>
@@ -145,7 +149,7 @@ export class BackupView extends Component {
             n = 0,
             average
 
-        this.toggleModal()
+        this.hideModal()
 
         this.setState({
             progress: [{
@@ -183,15 +187,16 @@ export class BackupView extends Component {
         this.onProgressCancel = () => promise.cancel('canceled by user')
 
         promise
-            .then(() => this.toggleModal())
+            .then(() => this.hideModal())
             .catch(thrown => {
                 console.log(thrown)
                 // if (axios.isCancel(thrown)) {
-                    this.toggleModal()
+                    this.hideModal()
                 // }
             })
     }
 
+    @bind
     saveBackup() {
         let { backup, isExist } = this.state
 
@@ -215,21 +220,32 @@ export class BackupView extends Component {
     }
 
     downloadBackup() {
-        let { backup } = this.state
+        let { backup } = this.state,
+            data = JSON.stringify(backup, null, '  '),
+            name = backup.name.replace(/\s/g, '-') + moment().format('-MM-DD-YYYY-hh-mm')
 
-        FileService.saveFile(
-            JSON.stringify(backup, null, '  '),
-            backup.name.replace(/\s/g, '-') + moment().format('-MM-DD-YYYY-hh-mm')
-        )
+        FileService.saveFile(data, name)
     }
 
+    @bind
     onOrdersListUpdate(orders) {
         this.setState({
             orders
+        }, () => this.calcSelected())
+    }
+
+    calcSelected() {
+        let { orders } = this.state,
+            selected = orders
+                .filter(({ checked }) => checked)
+
+        this.setState({
+            selected
         })
     }
 
-    toggleModal() {
+    @bind
+    hideModal() {
         this.setState({
             progress: []
         })

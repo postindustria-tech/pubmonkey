@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button } from 'reactstrap'
 import Select from 'react-select'
+import bind from 'bind-decorator'
 import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
 import { FileService, RPCController } from '../../services'
@@ -33,31 +34,21 @@ export class OrderView extends Component {
         progress: []
     }
 
-    constructor() {
-        super()
-
-        this.saveOrder = this.saveOrder.bind(this)
-        this.updateOrder = this.updateOrder.bind(this)
-        this.onLineItemsListUpdate = this.onLineItemsListUpdate.bind(this)
-        this.onFilterChange = this.onFilterChange.bind(this)
-        this.archiveSelected = this.archiveSelected.bind(this)
-        // this.enableSelected = this.enableSelected.bind(this)
-        this.toggleModal = this.toggleModal.bind(this)
-    }
-
     componentDidMount() {
         this.loadOrder()
-        // let { params: { key } } = this.props.match
-        //
-        // MainController.getOrder(key)
-        //     .then(order => this.setState({ order, lineItems: order.lineItems }))
     }
 
+    @bind
     loadOrder() {
         let { params: { key } } = this.props.match
 
         OrderController.getOrder(key)
-            .then(order => this.setState({ order, lineItems: order.lineItems }))
+            .then(order =>
+                this.setState({
+                    order,
+                    lineItems: order.lineItems.map(item => ({ ...item, checked: true }))
+                }, () => this.calcSelected())
+            )
     }
 
     render() {
@@ -123,6 +114,12 @@ export class OrderView extends Component {
                     onClick={ this.archiveSelected }
                 >
                     Archive/Unarchive
+                </Button>&nbsp;
+                <Button
+                    disabled={ !selected.length }
+                    onClick={ this.cloneSelected }
+                >
+                    Clone
                 </Button>
                 <div className="list-filter">
                     show:<Select
@@ -144,13 +141,14 @@ export class OrderView extends Component {
                 <ProgressModal
                     isOpen={ !!progress.length }
                     progress={ progress }
-                    toggleModal={ this.toggleModal }
+                    toggleModal={ this.hideModal }
                     onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
                 />
             </BaseLayout>
         )
     }
 
+    @bind
     updateOrder(data) {
         let { order } = this.state
 
@@ -164,10 +162,11 @@ export class OrderView extends Component {
         }, () => this.forceUpdate())
     }
 
+    @bind
     saveOrder() {
         let { order: { name, advertiser, description, key } } = this.state
 
-        MainController.updateOrder({
+        OrderController.updateOrder({
                 name, advertiser, description
             }, key).then(() =>
                 this.setState({
@@ -176,12 +175,11 @@ export class OrderView extends Component {
             )
     }
 
+    @bind
     enableSelected(enabled) {
-        let { selected, filterFn } = this.state
+        let { selected } = this.state
 
-        selected = selected.filter(filterFn)
-
-        this.toggleModal()
+        this.hideModal()
 
         this.setState({
             progress: [{
@@ -202,24 +200,23 @@ export class OrderView extends Component {
         this.onProgressCancel = () => promise.cancel('canceled by user')
 
         promise
-            .then(this.toggleModal)
+            .then(this.hideModal)
             .then(this.loadOrder)
             .catch(thrown => {
                 console.log(thrown)
                 // if (axios.isCancel(thrown)) {
-                    this.toggleModal()
+                    this.hideModal()
                     this.loadOrder()
                 // }
             })
     }
 
+    @bind
     archiveSelected() {
-        let { selected, filterFn, filter } = this.state,
+        let { selected, filter } = this.state,
             status = filter === 4 ? 'play' : 'archive'
 
-        selected = selected.filter(filterFn)
-
-        this.toggleModal()
+        this.hideModal()
 
         this.setState({
             progress: [{
@@ -232,7 +229,7 @@ export class OrderView extends Component {
                 this.setState({
                     progress: [{
                         title: `line items: ${done}/${count}`,
-                        progress: { value: done / count *  100 }
+                        progress: { value: done / count * 100 }
                     }]
                 })
             })
@@ -240,17 +237,24 @@ export class OrderView extends Component {
         this.onProgressCancel = () => promise.cancel('canceled by user')
 
         promise
-            .then(this.toggleModal)
+            .then(this.hideModal)
             .then(this.loadOrder)
             .catch(thrown => {
                 console.log(thrown)
                 // if (axios.isCancel(thrown)) {
-                    this.toggleModal()
+                    this.hideModal()
                     this.loadOrder()
                 // }
             })
     }
 
+    @bind
+    cloneSelected() {
+        let { selected } = this.state
+        console.log(selected)
+    }
+
+    @bind
     onLineItemsListUpdate(lineItems) {
         this.setState({
             lineItems
@@ -258,13 +262,17 @@ export class OrderView extends Component {
     }
 
     calcSelected() {
-        let selected = this.state.lineItems.filter(({ checked }) => checked)
+        let { filterFn, lineItems } = this.state,
+            selected = lineItems
+                .filter(filterFn)
+                .filter(({ checked }) => checked)
 
         this.setState({
             selected
         })
     }
 
+    @bind
     onFilterChange({ value: filter }) {
         this.setState({
             filter,
@@ -272,7 +280,8 @@ export class OrderView extends Component {
          })
     }
 
-    toggleModal() {
+    @bind
+    hideModal() {
         this.setState({
             progress: []
         })

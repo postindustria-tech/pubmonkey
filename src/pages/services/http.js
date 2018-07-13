@@ -1,4 +1,11 @@
-import axios, { CancelToken} from 'axios'
+import axios, { CancelToken} from 'ex-axios'
+import Promise from 'bluebird'
+
+Promise.config({
+    cancellation: true
+})
+
+// axios.Promise = Promise
 
 var csrftoken
 
@@ -6,11 +13,12 @@ chrome.cookies.get({ url: 'https://app.mopub.com', name: 'csrftoken' }, ({ value
     csrftoken = value
 )
 
-const HTTPService = new class HTTP {
-    GET(url) {
+export const HTTPService = new class {
+    GET(url, config = {}) {
         let source = CancelToken.source(),
             promise = axios.get(url, {
-                cancelToken: source.token
+                cancelToken: source.token,
+                ...config
             }).then(({ data }) => data)
 
         promise.cancel = msg => source.cancel(msg)
@@ -21,7 +29,7 @@ const HTTPService = new class HTTP {
         // }).then(({ data }) => data)
     }
 
-    POST(url, data) {
+    POST(url, data, config = {}) {
         let source = CancelToken.source(),
             promise = axios({
                 url,
@@ -33,7 +41,8 @@ const HTTPService = new class HTTP {
                     'x-requested-with': 'XMLHttpRequest',
                     'x-csrftoken': csrftoken
                 },
-                cancelToken: source.token
+                cancelToken: source.token,
+                ...config
             }).then(({ data }) => data)
 
         promise.cancel = msg => source.cancel(msg)
@@ -41,5 +50,3 @@ const HTTPService = new class HTTP {
         return promise
     }
 }
-
-export { HTTPService }

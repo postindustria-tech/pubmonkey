@@ -15,7 +15,7 @@ export const OrderController = new class Order {
     }
 
     getLineItem(id) {
-        let promise = HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`),
+        let promise = HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`, { responseType: 'text' }),
             { cancel } = promise
 
         promise = promise

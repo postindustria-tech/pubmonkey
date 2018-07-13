@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import moment from 'moment'
+import bind from 'bind-decorator'
 import { BackupsTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { RPCController, FileService } from '../../services'
@@ -9,14 +10,6 @@ import { MainController } from '../../controllers'
 export class BackupsList extends Component {
     state = {
         backups: []
-    }
-
-    constructor() {
-        super()
-
-        this.uploadFile = this.uploadFile.bind(this)
-        this.removeBackup = this.removeBackup.bind(this)
-        this.downloadBackup = this.downloadBackup.bind(this)
     }
 
     componentDidMount() {
@@ -57,6 +50,7 @@ export class BackupsList extends Component {
         )
     }
 
+    @bind
     uploadFile() {
         FileService.openFile()
             .then(result => {
@@ -69,11 +63,13 @@ export class BackupsList extends Component {
             })
     }
 
+    @bind
     removeBackup(id) {
         MainController.deleteBackup(id)
             .then(() => this.loadBackups())
     }
 
+    @bind
     downloadBackup(id) {
         MainController.getBackupById(id)
             .then(backup => {

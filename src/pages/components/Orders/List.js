@@ -2,18 +2,13 @@ import React, { Component } from 'react'
 import { Button } from 'reactstrap'
 import Select from 'react-select'
 import moment from 'moment'
-import Promise from 'bluebird'
-import axios from 'axios'
+import bind from 'bind-decorator'
 import sha256 from 'sha256'
 import { OrdersTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { FileService, RPCController } from '../../services'
 import { MainController, OrderController } from '../../controllers'
 import { ProgressModal } from '../Popups'
-
-Promise.config({
-    cancellation: true
-})
 
 const
       FILTER_FN = [
@@ -39,16 +34,6 @@ export class OrdersList extends Component {
     }
 
     cancelToken = null
-
-    constructor() {
-        super()
-        this.backupSelected = this.backupSelected.bind(this)
-        this.archiveSelected = this.archiveSelected.bind(this)
-        this.onFilterChange = this.onFilterChange.bind(this)
-        this.loadOrders = this.loadOrders.bind(this)
-        this.toggleModal = this.toggleModal.bind(this)
-        this.onOrdersListUpdate = this.onOrdersListUpdate.bind(this)
-    }
 
     componentDidMount() {
         this.loadOrders()
@@ -103,11 +88,13 @@ export class OrdersList extends Component {
         )
     }
 
+    @bind
     loadOrders() {
         OrderController.getAllOrders()
             .then((orders = []) => this.setState({ orders }))
     }
 
+    @bind
     archiveSelected() {
         let { selected, filter, filterFn } = this.state,
             status = filter === 2 ? 'running' : 'archived'
@@ -146,6 +133,7 @@ export class OrdersList extends Component {
             })
     }
 
+    @bind
     backupSelected() {
         let { orderCount, lineItemCount: total, selected } = this.state,
             name = 'default name',
@@ -213,6 +201,7 @@ export class OrdersList extends Component {
             })
     }
 
+    @bind
     onOrdersListUpdate(orders) {
         this.setState({
             orders
@@ -229,6 +218,7 @@ export class OrdersList extends Component {
         })
     }
 
+    @bind
     onFilterChange({ value: filter }) {
         this.setState({
             filter,
@@ -236,6 +226,7 @@ export class OrdersList extends Component {
          })
     }
 
+    @bind
     toggleModal() {
         this.setState({
             progress: []
