@@ -81,7 +81,7 @@ export class OrdersList extends Component {
                 <ProgressModal
                     isOpen={ !!progress.length }
                     progress={ progress }
-                    toggleModal={ this.toggleModal }
+                    toggleModal={ this.hideModal }
                     onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
                 />
             </BaseLayout>
@@ -101,7 +101,7 @@ export class OrdersList extends Component {
 
         selected = selected.filter(filterFn)
 
-        this.toggleModal()
+        this.hideModal()
 
         this.setState({
             progress: [{
@@ -122,14 +122,9 @@ export class OrdersList extends Component {
         this.onProgressCancel = () => promise.cancel('canceled by user')
 
         promise
-            .then(this.toggleModal)
-            .then(this.loadOrders)
-            .catch(thrown => {
-                console.log(thrown)
-                // if (axios.isCancel(thrown)) {
-                    this.toggleModal()
-                    this.loadOrders()
-                // }
+            .finally(() => {
+                this.hideModal()
+                this.loadOrders()
             })
     }
 
@@ -141,7 +136,7 @@ export class OrdersList extends Component {
             n = 0,
             average
 
-        this.toggleModal()
+        this.hideModal()
 
         this.setState({
             progress: [{
@@ -174,12 +169,7 @@ export class OrdersList extends Component {
                         title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
                     }]
                 })
-            }
-            )
-
-        this.onProgressCancel = () => promise.cancel('canceled by user')
-
-        promise
+            })
             .then(orders => ({
                 name,
                 orderCount,
@@ -190,15 +180,10 @@ export class OrdersList extends Component {
             }))
             .then(result => {
                 MainController.keepInDraft(JSON.stringify(result))
-                this.toggleModal()
                 this.props.history.push('/backup/preview')
             })
-            .catch(thrown => {
-                console.log(thrown)
-                // if (axios.isCancel(thrown)) {
-                    this.toggleModal()
-                // }
-            })
+            this.onProgressCancel = () => promise.cancel('canceled by user')
+            // .finally(this.hideModal)
     }
 
     @bind
@@ -227,7 +212,7 @@ export class OrdersList extends Component {
     }
 
     @bind
-    toggleModal() {
+    hideModal() {
         this.setState({
             progress: []
         })

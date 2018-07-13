@@ -103,7 +103,7 @@ export class BackupView extends Component {
                     <i className="fa fa-cloud-download"/>
                 </Button>
                 <Button
-                    onClick={ () => this.restoreSelected() }
+                    onClick={ this.restoreSelected }
                 >
                     <i className="fa fa-arrow-circle-up"/>&nbsp;Restore
                 </Button>
@@ -131,6 +131,7 @@ export class BackupView extends Component {
         )
     }
 
+    @bind
     updateBackup(data) {
         let { backup } = this.state
 
@@ -141,9 +142,10 @@ export class BackupView extends Component {
         this.setState({
             backup,
             isDirty: true
-        }, () => this.forceUpdate())
+        })
     }
 
+    @bind
     restoreSelected() {
         let { backup: { orders, lineItemCount: total } } = this.state,
             n = 0,
@@ -182,18 +184,9 @@ export class BackupView extends Component {
                        title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
                     }]
                 })
-        })
+        }).finally(this.hideModal)
 
         this.onProgressCancel = () => promise.cancel('canceled by user')
-
-        promise
-            .then(() => this.hideModal())
-            .catch(thrown => {
-                console.log(thrown)
-                // if (axios.isCancel(thrown)) {
-                    this.hideModal()
-                // }
-            })
     }
 
     @bind
@@ -219,6 +212,7 @@ export class BackupView extends Component {
         }
     }
 
+    @bind
     downloadBackup() {
         let { backup } = this.state,
             data = JSON.stringify(backup, null, '  '),

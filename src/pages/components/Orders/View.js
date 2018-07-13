@@ -179,6 +179,8 @@ export class OrderView extends Component {
     enableSelected(enabled) {
         let { selected } = this.state
 
+        selected = selected.filter(({ active }) => enabled !== active)
+
         this.hideModal()
 
         this.setState({
@@ -196,19 +198,12 @@ export class OrderView extends Component {
                     }]
                 })
             })
+            .finally(() => {
+                this.hideModal()
+                this.loadOrder()
+            })
 
         this.onProgressCancel = () => promise.cancel('canceled by user')
-
-        promise
-            .then(this.hideModal)
-            .then(this.loadOrder)
-            .catch(thrown => {
-                console.log(thrown)
-                // if (axios.isCancel(thrown)) {
-                    this.hideModal()
-                    this.loadOrder()
-                // }
-            })
     }
 
     @bind
@@ -225,33 +220,50 @@ export class OrderView extends Component {
             }]
         })
 
-        let promise = OrderController.updateLineItemStatusInSet(selected, status, ({ done, count }) => {
+        let promise = OrderController.updateLineItemStatusInSet(selected, status, ({ done, count }) =>
                 this.setState({
                     progress: [{
                         title: `line items: ${done}/${count}`,
                         progress: { value: done / count * 100 }
                     }]
                 })
+            )
+            .finally(() => {
+                this.hideModal()
+                this.loadOrder()
             })
 
         this.onProgressCancel = () => promise.cancel('canceled by user')
-
-        promise
-            .then(this.hideModal)
-            .then(this.loadOrder)
-            .catch(thrown => {
-                console.log(thrown)
-                // if (axios.isCancel(thrown)) {
-                    this.hideModal()
-                    this.loadOrder()
-                // }
-            })
     }
 
     @bind
     cloneSelected() {
-        let { selected } = this.state
-        console.log(selected)
+        let { selected } = this.state,
+            promise
+
+        this.hideModal()
+
+        this.setState({
+            progress: [{
+                title: `line items: ${selected.length}`,
+                progress: { value: 0 }
+            }]
+        })
+
+        promise = OrderController.cloneLineItems(selected, ({ done, count }) =>
+                this.setState({
+                    progress: [{
+                        title: `line items: ${done}/${count}`,
+                        progress: { value: done / count * 100 }
+                    }]
+                })
+            )
+            .finally(() => {
+                this.hideModal()
+                this.loadOrder()
+            })
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
     }
 
     @bind
