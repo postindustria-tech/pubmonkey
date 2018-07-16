@@ -6,7 +6,7 @@ import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
 import { FileService, RPCController } from '../../services'
 import { MainController, OrderController } from '../../controllers'
-import { ProgressModal } from '../Popups'
+import { ProgressModal, LineItemEditModal } from '../Popups'
 
 const
       FILTER_FN = [
@@ -31,7 +31,8 @@ export class OrderView extends Component {
         isDirty: false,
         filter: 1,
         filterFn: FILTER_FN[1],
-        progress: []
+        progress: [],
+        updates: []
     }
 
     componentDidMount() {
@@ -52,7 +53,7 @@ export class OrderView extends Component {
     }
 
     render() {
-        let { order, isDirty, lineItems, filter, filterFn, progress } = this.state
+        let { order, isDirty, lineItems, filter, filterFn, progress, updates } = this.state
 
         if (order == null) {
             return false
@@ -120,6 +121,12 @@ export class OrderView extends Component {
                     onClick={ this.cloneSelected }
                 >
                     Clone
+                </Button>&nbsp;
+                <Button
+                    disabled={ !selected.length }
+                    onClick={ () => this.setState({ updates: [true] }) }
+                >
+                    Edit
                 </Button>
                 <div className="list-filter">
                     show:<Select
@@ -141,8 +148,14 @@ export class OrderView extends Component {
                 <ProgressModal
                     isOpen={ !!progress.length }
                     progress={ progress }
-                    toggleModal={ this.hideModal }
+                    toggleModal={ this.hideProgressModal }
                     onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
+                />
+
+                <LineItemEditModal
+                    isOpen={ !!updates.length }
+                    onUpdate={ this.onEditUpdate }
+                    onCancel={ this.hideUpdateModal }
                 />
             </BaseLayout>
         )
@@ -181,7 +194,7 @@ export class OrderView extends Component {
 
         selected = selected.filter(({ active }) => enabled !== active)
 
-        this.hideModal()
+        this.hideProgressModal()
 
         this.setState({
             progress: [{
@@ -199,7 +212,7 @@ export class OrderView extends Component {
                 })
             })
             .finally(() => {
-                this.hideModal()
+                this.hideProgressModal()
                 this.loadOrder()
             })
 
@@ -211,7 +224,7 @@ export class OrderView extends Component {
         let { selected, filter } = this.state,
             status = filter === 4 ? 'play' : 'archive'
 
-        this.hideModal()
+        this.hideProgressModal()
 
         this.setState({
             progress: [{
@@ -229,7 +242,7 @@ export class OrderView extends Component {
                 })
             )
             .finally(() => {
-                this.hideModal()
+                this.hideProgressModal()
                 this.loadOrder()
             })
 
@@ -241,7 +254,7 @@ export class OrderView extends Component {
         let { selected } = this.state,
             promise
 
-        this.hideModal()
+        this.hideProgressModal()
 
         this.setState({
             progress: [{
@@ -259,7 +272,7 @@ export class OrderView extends Component {
                 })
             )
             .finally(() => {
-                this.hideModal()
+                this.hideProgressModal()
                 this.loadOrder()
             })
 
@@ -267,10 +280,33 @@ export class OrderView extends Component {
     }
 
     @bind
-    onLineItemsListUpdate(lineItems) {
+    editSelected(updates) {
+        let { selected } = this.state,
+            promise
+
         this.setState({
-            lineItems
-        }, () => this.calcSelected())
+            progress: [{
+                title: `line items: ${selected.length}`,
+                progress: { value: 0 }
+            }]
+        })
+
+        promise = OrderController.updateLineItems(selected, { 
+                    [updates.field]: updates.value.single
+                }, ({ done, count }) =>
+                    this.setState({
+                        progress: [{
+                            title: `line items: ${done}/${count}`,
+                            progress: { value: done / count * 100 }
+                        }]
+                    })
+                )
+                .finally(() => {
+                    this.hideProgressModal()
+                    this.loadOrder()
+                })
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
     }
 
     calcSelected() {
@@ -285,6 +321,19 @@ export class OrderView extends Component {
     }
 
     @bind
+    onEditUpdate(updates) {
+        this.hideUpdateModal()
+        this.editSelected(updates)
+    }
+
+    @bind
+    onLineItemsListUpdate(lineItems) {
+        this.setState({
+            lineItems
+        }, () => this.calcSelected())
+    }
+
+    @bind
     onFilterChange({ value: filter }) {
         this.setState({
             filter,
@@ -293,9 +342,16 @@ export class OrderView extends Component {
     }
 
     @bind
-    hideModal() {
+    hideProgressModal() {
         this.setState({
             progress: []
+        })
+    }
+
+    @bind
+    hideUpdateModal() {
+        this.setState({
+            updates: []
         })
     }
 }
