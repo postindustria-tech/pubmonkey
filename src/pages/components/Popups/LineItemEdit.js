@@ -14,7 +14,7 @@ export class LineItemEditModal extends Component {
     }
 
     render() {
-        let { fields = FIELDS, isOpen, onUpdate, onCancel } = this.props,
+        let { fields = FIELDS, isOpen, onUpdate, onCancel, updates } = this.props,
             { field, valueType } = this.state
 
         return (
@@ -37,10 +37,14 @@ export class LineItemEditModal extends Component {
                                 onChange={ this.onValueTypeChange }
                                 checked={ valueType === 'type-single'}
                             />
-                            <CustomInput type="radio" name="valueType" id="type-range" label="range"
+                            <CustomInput type="radio" name="valueType" id="type-step" label="step"
+                                onChange={ this.onValueTypeChange }
+                                checked={ valueType === 'type-step'}
+                            />
+                            {/* <CustomInput type="radio" name="valueType" id="type-range" label="range"
                                 onChange={ this.onValueTypeChange }
                                 checked={ valueType === 'type-range'}
-                            />
+                            /> */}
                         </FormGroup>
                         <FormGroup>
                             {
@@ -50,11 +54,11 @@ export class LineItemEditModal extends Component {
                                     </div>
                             }
                             {
-                                valueType === 'type-range' &&
+                                valueType === 'type-step' &&
                                     <div>
                                         start<Input name="start" onChange={ this.onValueChange }/>
-                                        end<Input name="end" onChange={ this.onValueChange }/>
                                         step<Input name="step" onChange={ this.onValueChange }/>
+                                        { `on ${updates[0]} line items, up to ${Number(this.state.value.start) + updates[0] * this.state.value.step}` }
                                     </div>
                             }
                         </FormGroup>

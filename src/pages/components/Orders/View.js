@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button } from 'reactstrap'
 import Select from 'react-select'
 import bind from 'bind-decorator'
+import Promise from 'bluebird'
 import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
 import { FileService, RPCController } from '../../services'
@@ -124,7 +125,7 @@ export class OrderView extends Component {
                 </Button>&nbsp;
                 <Button
                     disabled={ !selected.length }
-                    onClick={ () => this.setState({ updates: [true] }) }
+                    onClick={ () => this.setState({ updates: [ selected.length ] }) }
                 >
                     Edit
                 </Button>
@@ -156,6 +157,7 @@ export class OrderView extends Component {
                     isOpen={ !!updates.length }
                     onUpdate={ this.onEditUpdate }
                     onCancel={ this.hideUpdateModal }
+                    updates={ updates }
                 />
             </BaseLayout>
         )
@@ -291,20 +293,44 @@ export class OrderView extends Component {
             }]
         })
 
-        promise = OrderController.updateLineItems(selected, { 
-                    [updates.field]: updates.value.single
-                }, ({ done, count }) =>
-                    this.setState({
-                        progress: [{
-                            title: `line items: ${done}/${count}`,
-                            progress: { value: done / count * 100 }
-                        }]
-                    })
+        if (updates.valueType === 'type-single') {
+            promise = OrderController.updateLineItems(selected, {
+                [updates.field]: updates.value.single
+            }, ({ done, count }) =>
+                this.setState({
+                    progress: [{
+                        title: `line items: ${done}/${count}`,
+                        progress: { value: done / count * 100 }
+                    }]
+                })
+            )
+            .finally(() => {
+                this.hideProgressModal()
+                this.loadOrder()
+            })
+        }
+
+        if (updates.valueType === 'type-step') {
+            let current = Number(updates.value.start),
+                step = Number(updates.value.step)
+
+            promise = Promise.mapSeries(selected, ({ key }, done, count) =>
+                    OrderController.updateLineItem({ [updates.field]: current += step }, key)
+                        .then(() =>
+                            this.setState({
+                                progress: [{
+                                    title: `line items: ${done + 1}/${count}`,
+                                    progress: { value: (done + 1) / count * 100 }
+                                }]
+                            })
+                        )
                 )
                 .finally(() => {
                     this.hideProgressModal()
                     this.loadOrder()
                 })
+        }
+
 
         this.onProgressCancel = () => promise.cancel('canceled by user')
     }
