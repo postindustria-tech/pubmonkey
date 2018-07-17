@@ -1,13 +1,8 @@
 import React, { Component } from 'react'
+import bind from 'bind-decorator'
 import { Button, Progress, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 
 export class ProgressModal extends Component {
-    constructor() {
-        super()
-
-        this.onCancel = this.onCancel.bind(this)
-    }
-
     render() {
         let { toggleModal, isOpen, progress, onCancel } = this.props
 
@@ -33,6 +28,7 @@ export class ProgressModal extends Component {
         )
     }
 
+    @bind
     onCancel() {
         let { onCancel } = this.props
 

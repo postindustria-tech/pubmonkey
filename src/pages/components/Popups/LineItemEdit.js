@@ -23,6 +23,7 @@ export class LineItemEditModal extends Component {
             >
                 <ModalHeader>Edit</ModalHeader>
                 <ModalBody>
+                    { `${updates[0]} line items` }
                     <Form>
                         <FormGroup>
                             <Select
@@ -58,7 +59,6 @@ export class LineItemEditModal extends Component {
                                     <div>
                                         start<Input name="start" onChange={ this.onValueChange }/>
                                         step<Input name="step" onChange={ this.onValueChange }/>
-                                        { `on ${updates[0]} line items, up to ${Number(this.state.value.start) + updates[0] * this.state.value.step}` }
                                     </div>
                             }
                         </FormGroup>

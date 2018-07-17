@@ -41,8 +41,8 @@ export const OrderController = new class Order {
         return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, { status })
     }
 
-    updateOrderStatusInSet(orders, status, progressCallback) {
-        return wrapSeries(orders, ({ key }) => this.updateOrderStatus(status, key), progressCallback)
+    updateOrderStatusInSet(orders, status, step) {
+        return wrapSeries(orders, ({ key }) => this.updateOrderStatus(status, key), step)
     }
 
     updateOrder(data, id) {
@@ -62,12 +62,12 @@ export const OrderController = new class Order {
         return HTTPService.POST(`${WEB_URL}/advertise/ad_source/status/`, formData)
     }
 
-    updateLineItemStatusInSet(lineItems, status, progressCallback) {
-        return wrapSeries(lineItems, ({ key }) => this.updateLineItemStatus(status, key), progressCallback)
+    updateLineItemStatusInSet(lineItems, status, step) {
+        return wrapSeries(lineItems, ({ key }) => this.updateLineItemStatus(status, key), step)
     }
 
-    updateLineItems(lineItems, data, progressCallback) {
-        return wrapSeries(lineItems, ({ key }) => this.updateLineItem(data, key), progressCallback)
+    updateLineItems(lineItems, data, step) {
+        return wrapSeries(lineItems, ({ key }) => this.updateLineItem(data, key), step)
     }
 
     restoreOrder(data) {
@@ -90,18 +90,18 @@ export const OrderController = new class Order {
         return this.createLineItem(formData, orderId)
     }
 
-    cloneLineItems(lineItems, progressCallback) {
+    cloneLineItems(lineItems, times, step) {
         return wrapSeries(lineItems, ({ key, orderKey }) =>
             this.getLineItem(key)
                 .then(lineItem =>
                     this.restoreLineItem(lineItem, orderKey)
                 )
-        , progressCallback)
+        , step, times)
     }
 
-    collectOrderDataFromSet(orders, progressCallback) {
+    collectOrderDataFromSet(orders, step) {
         return Promise.mapSeries(orders, ({ key },  idx, orderCount) =>
-                    this.collectOrderData(key, progress => progressCallback({
+                    this.collectOrderData(key, progress => step({
                         ...progress,
                         ordersDone: idx + 1,
                         orderCount
@@ -109,7 +109,7 @@ export const OrderController = new class Order {
                )
     }
 
-    collectOrderData(id, progressCallback) {
+    collectOrderData(id, step) {
         return this.getOrder(id)
             .then(order => {
                 let { lineItems } = order
@@ -120,8 +120,8 @@ export const OrderController = new class Order {
                             return this.getLineItem(key).then(result => {
                                 timestamp = Date.now() - timestamp
 
-                                if (progressCallback) {
-                                    progressCallback({
+                                if (step) {
+                                    step({
                                         lineItemCount,
                                         timestamp,
                                         lineItemsDone: idx + 1
@@ -134,14 +134,14 @@ export const OrderController = new class Order {
             })
     }
 
-    restoreOrdersWithLineItems(orders, progressCallback) {
+    restoreOrdersWithLineItems(orders, step) {
         return Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
                 let timestamp = Date.now()
 
                 return OrderController.restoreOrder(order.lineItems[0]).then(result => {
                         timestamp = Date.now() - timestamp
 
-                        progressCallback({
+                        step({
                             ordersDone: orderIdx + 1,
                             orderCount,
                             lineItemsDone: 1,
@@ -162,7 +162,7 @@ export const OrderController = new class Order {
                                     .then(result => {
                                         timestamp = Date.now() - timestamp
 
-                                        progressCallback({
+                                        step({
                                             ordersDone: orderIdx + 1,
                                             orderCount,
                                             lineItemCount: lineItemCount + 1,
@@ -179,15 +179,17 @@ export const OrderController = new class Order {
     }
 }
 
-function wrapSeries(collection, method, step) {
+function wrapSeries(collection, method, step, times = 1) {
     return Promise.mapSeries(collection, (item, idx, count) =>
-        method(item).then(result => {
-            step({
-                done: idx,
-                count
-            })
+        Promise.mapSeries(Array(times), (_, i) =>
+            method(item).then(result => {
+                step({
+                    done: idx * times + i + 1,
+                    count: count * times
+                })
 
-            return result
-        })
+                return result
+            })
+        )
     )
 }

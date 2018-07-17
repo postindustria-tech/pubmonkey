@@ -3,11 +3,12 @@ import { Button } from 'reactstrap'
 import Select from 'react-select'
 import bind from 'bind-decorator'
 import Promise from 'bluebird'
+import moment from 'moment'
 import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
 import { FileService, RPCController } from '../../services'
 import { MainController, OrderController } from '../../controllers'
-import { ProgressModal, LineItemEditModal } from '../Popups'
+import { ProgressModal, LineItemEditModal, CloneModal } from '../Popups'
 
 const
       FILTER_FN = [
@@ -33,7 +34,8 @@ export class OrderView extends Component {
         filter: 1,
         filterFn: FILTER_FN[1],
         progress: [],
-        updates: []
+        updates: [],
+        clones: []
     }
 
     componentDidMount() {
@@ -54,7 +56,7 @@ export class OrderView extends Component {
     }
 
     render() {
-        let { order, isDirty, lineItems, filter, filterFn, progress, updates } = this.state
+        let { order, isDirty, lineItems, filter, filterFn, progress, updates, clones } = this.state
 
         if (order == null) {
             return false
@@ -119,7 +121,7 @@ export class OrderView extends Component {
                 </Button>&nbsp;
                 <Button
                     disabled={ !selected.length }
-                    onClick={ this.cloneSelected }
+                    onClick={ () => this.setState({ clones: [ selected.length ] }) }
                 >
                     Clone
                 </Button>&nbsp;
@@ -158,6 +160,13 @@ export class OrderView extends Component {
                     onUpdate={ this.onEditUpdate }
                     onCancel={ this.hideUpdateModal }
                     updates={ updates }
+                />
+
+                <CloneModal
+                    isOpen={ !!clones.length }
+                    onClone={ this.onClone }
+                    onCancel={ this.hideCloneModal }
+                    clones={ clones }
                 />
             </BaseLayout>
         )
@@ -252,27 +261,39 @@ export class OrderView extends Component {
     }
 
     @bind
-    cloneSelected() {
+    cloneSelected(number) {
         let { selected } = this.state,
+            timestamp = Date.now(),
+            average,
             promise
 
         this.hideProgressModal()
 
         this.setState({
             progress: [{
-                title: `line items: ${selected.length}`,
+                title: `line items: ${selected.length * number}`,
                 progress: { value: 0 }
             }]
         })
 
-        promise = OrderController.cloneLineItems(selected, ({ done, count }) =>
+        promise = OrderController.cloneLineItems(selected, number, ({ done, count }) => {
+                if (average) {
+                    average = (average + (Date.now() - timestamp)) / 2
+                } else {
+                    average = Date.now() - timestamp
+                }
+
+                timestamp = Date.now()
+
                 this.setState({
                     progress: [{
                         title: `line items: ${done}/${count}`,
                         progress: { value: done / count * 100 }
+                    }, {
+                        title: `time remaining: ${moment(average * (count - done)).format('mm:ss')}`
                     }]
                 })
-            )
+            })
             .finally(() => {
                 this.hideProgressModal()
                 this.loadOrder()
@@ -312,18 +333,21 @@ export class OrderView extends Component {
 
         if (updates.valueType === 'type-step') {
             let current = Number(updates.value.start),
-                step = Number(updates.value.step)
+                step = Number(updates.value.step),
+                next = current
 
             promise = Promise.mapSeries(selected, ({ key }, done, count) =>
-                    OrderController.updateLineItem({ [updates.field]: current += step }, key)
-                        .then(() =>
+                    OrderController.updateLineItem({ [updates.field]: next }, key)
+                        .then(() => {
+                            next += step
+
                             this.setState({
                                 progress: [{
                                     title: `line items: ${done + 1}/${count}`,
                                     progress: { value: (done + 1) / count * 100 }
                                 }]
                             })
-                        )
+                        })
                 )
                 .finally(() => {
                     this.hideProgressModal()
@@ -353,6 +377,12 @@ export class OrderView extends Component {
     }
 
     @bind
+    onClone(number) {
+        this.hideCloneModal()
+        this.cloneSelected(number)
+    }
+
+    @bind
     onLineItemsListUpdate(lineItems) {
         this.setState({
             lineItems
@@ -378,6 +408,13 @@ export class OrderView extends Component {
     hideUpdateModal() {
         this.setState({
             updates: []
+        })
+    }
+
+    @bind
+    hideCloneModal() {
+        this.setState({
+            clones: []
         })
     }
 }
