@@ -15,17 +15,10 @@ export const OrderController = new class Order {
     }
 
     getLineItem(id) {
-        let promise = HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`),
-            { cancel } = promise
-
-        promise = promise
+        return HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`, { responseType: 'text' })
             .then(data =>
                 LineItemModel.createFromHTML(data, id).toJSON()
             ) //@TODO maybe it's not necessary to create instances for parsing only
-
-        promise.cancel = cancel
-
-        return promise
     }
 
     copyLineItem(data) { // { order:str, line_item:str, copy_creatives:bool }
@@ -37,7 +30,6 @@ export const OrderController = new class Order {
     }
 
     createOrder(data) {
-        // console.log(data)
         return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data)
     }
 
@@ -49,13 +41,33 @@ export const OrderController = new class Order {
         return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, { status })
     }
 
+    updateOrderStatusInSet(orders, status, step) {
+        return wrapSeries(orders, ({ key }) => this.updateOrderStatus(status, key), step)
+    }
+
     updateOrder(data, id) {
         return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-order?key=${id}`, data)
     }
 
-
     updateLineItem(data, id) {
         return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/update?key=${id}`, data)
+    }
+
+    updateLineItemStatus(status, id) {
+        let formData = new FormData
+
+        formData.append('ad_sources[]', id)
+        formData.append('status', status)
+
+        return HTTPService.POST(`${WEB_URL}/advertise/ad_source/status/`, formData)
+    }
+
+    updateLineItemStatusInSet(lineItems, status, step) {
+        return wrapSeries(lineItems, ({ key }) => this.updateLineItemStatus(status, key), step)
+    }
+
+    updateLineItems(lineItems, data, step) {
+        return wrapSeries(lineItems, ({ key }) => this.updateLineItem(data, key), step)
     }
 
     restoreOrder(data) {
@@ -78,44 +90,38 @@ export const OrderController = new class Order {
         return this.createLineItem(formData, orderId)
     }
 
-    collectOrderDataFromSet(orders, progressCallback) {
-        let cancel,
-            promise = Promise.mapSeries(orders, ({ key },  idx, orderCount) => {
-                    let promise = this.collectOrderData(key, progress => progressCallback({
+    cloneLineItems(lineItems, times, step) {
+        return wrapSeries(lineItems, ({ key, orderKey }) =>
+            this.getLineItem(key)
+                .then(lineItem =>
+                    this.restoreLineItem(lineItem, orderKey)
+                )
+        , step, times)
+    }
+
+    collectOrderDataFromSet(orders, step) {
+        return Promise.mapSeries(orders, ({ key },  idx, orderCount) =>
+                    this.collectOrderData(key, progress => step({
                         ...progress,
                         ordersDone: idx + 1,
                         orderCount
                     }))
-
-                    cancel = promise.cancel
-
-                    return promise
-               })
-
-        promise.cancel = msg => cancel(msg)
-
-        return promise
+               )
     }
 
-    collectOrderData(id, progressCallback) {
-        let promise = this.getOrder(id),
-            { cancel } = promise
-
-        promise = promise
+    collectOrderData(id, step) {
+        return this.getOrder(id)
             .then(order => {
                 let { lineItems } = order
 
                 return Promise.mapSeries(lineItems, ({ key }, idx, lineItemCount) => {
-                            let timestamp = Date.now(),
-                                promise = this.getLineItem(key)
+                            let timestamp = Date.now()
 
-                            cancel = promise.cancel
-
-                            return promise.then(result => {
+                            return this.getLineItem(key).then(result => {
                                 timestamp = Date.now() - timestamp
 
-                                if (progressCallback) {
-                                    progressCallback({
+                                if (step) {
+                                    step({
                                         lineItemCount,
                                         timestamp,
                                         lineItemsDone: idx + 1
@@ -126,24 +132,16 @@ export const OrderController = new class Order {
                             })
                         }).then(lineItems => ({ ...order, lineItems }))
             })
-
-        promise.cancel = msg => cancel(msg)
-
-        return promise
     }
 
-    restoreOrdersWithLineItems(orders, progressCallback) {
-        let cancel,
-            promise = Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
-                let timestamp = Date.now(),
-                    promise = OrderController.restoreOrder(order.lineItems[0])
+    restoreOrdersWithLineItems(orders, step) {
+        return Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
+                let timestamp = Date.now()
 
-                cancel = promise.cancel
-
-                return promise.then(result => {
+                return OrderController.restoreOrder(order.lineItems[0]).then(result => {
                         timestamp = Date.now() - timestamp
 
-                        progressCallback({
+                        step({
                             ordersDone: orderIdx + 1,
                             orderCount,
                             lineItemsDone: 1,
@@ -160,30 +158,38 @@ export const OrderController = new class Order {
                             return Promise.mapSeries(order.lineItems.slice(1), (lineItem, lineItemIdx, lineItemCount) => {
                                 timestamp = Date.now()
 
-                                let promise = OrderController.restoreLineItem(lineItem, orderKey)
+                                return OrderController.restoreLineItem(lineItem, orderKey)
+                                    .then(result => {
+                                        timestamp = Date.now() - timestamp
 
-                                cancel = promise.cancel
+                                        step({
+                                            ordersDone: orderIdx + 1,
+                                            orderCount,
+                                            lineItemCount: lineItemCount + 1,
+                                            lineItemsDone: lineItemIdx + 2,
+                                            timestamp
+                                        })
 
-                                return promise.then(result => {
-                                    timestamp = Date.now() - timestamp
-
-                                    progressCallback({
-                                        ordersDone: orderIdx + 1,
-                                        orderCount,
-                                        lineItemCount: lineItemCount + 1,
-                                        lineItemsDone: lineItemIdx + 2,
-                                        timestamp
+                                        return result
                                     })
-
-                                    return result
-                                })
                             })
                         }
                     })
             })
-
-        promise.cancel = msg => cancel(msg)
-
-        return promise
     }
+}
+
+function wrapSeries(collection, method, step, times = 1) {
+    return Promise.mapSeries(collection, (item, idx, count) =>
+        Promise.mapSeries(Array(times), (_, i) =>
+            method(item).then(result => {
+                step({
+                    done: idx * times + i + 1,
+                    count: count * times
+                })
+
+                return result
+            })
+        )
+    )
 }

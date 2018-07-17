@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { Button } from 'reactstrap'
 import Select from 'react-select'
 import moment from 'moment'
-import Promise from 'bluebird'
-import axios from 'axios'
+import bind from 'bind-decorator'
 import sha256 from 'sha256'
 import { OrdersTable } from './Table'
 import { BaseLayout } from '../layouts'
@@ -11,22 +10,22 @@ import { FileService, RPCController } from '../../services'
 import { MainController, OrderController } from '../../controllers'
 import { ProgressModal } from '../Popups'
 
-Promise.config({
-    cancellation: true
-})
-
-const DELAY = 0,
+const
       FILTER_FN = [
           () => true,
           ({ status }) => status === 'running',
           ({ status }) => status === 'archived'
+      ],
+      STATUS_OPTIONS = [
+          { value: 0, label: 'all' },
+          { value: 1, label: 'running' },
+          { value: 2, label: 'archived' }
       ]
 
 export class OrdersList extends Component {
     state = {
         orders: [],
         progress: [],
-        backupInProgress: false,
         selected: [],
         orderCount: 0,
         lineItemCount: 0,
@@ -36,22 +35,12 @@ export class OrdersList extends Component {
 
     cancelToken = null
 
-    constructor() {
-        super()
-        this.backupSelected = this.backupSelected.bind(this)
-        this.archiveSelected = this.archiveSelected.bind(this)
-        this.onFilterChange = this.onFilterChange.bind(this)
-        this.loadOrders = this.loadOrders.bind(this)
-        this.toggleModal = this.toggleModal.bind(this)
-        this.onOrdersListUpdate = this.onOrdersListUpdate.bind(this)
-    }
-
     componentDidMount() {
         this.loadOrders()
     }
 
     render() {
-        let { orders, progress, backupInProgress, orderCount, lineItemCount, filter, filterFn } = this.state
+        let { orders, progress, orderCount, lineItemCount, filter, filterFn } = this.state
 
         return (
             <BaseLayout
@@ -78,11 +67,7 @@ export class OrdersList extends Component {
                         multi={ false }
                         clearable={ false }
                         value={ filter }
-                        options={ [
-                            { value: 0, label: 'all' },
-                            { value: 1, label: 'running' },
-                            { value: 2, label: 'archived' }
-                        ] }
+                        options={ STATUS_OPTIONS }
                         onChange={ this.onFilterChange }
                     />
                 </div>
@@ -94,44 +79,56 @@ export class OrdersList extends Component {
                 />
 
                 <ProgressModal
-                    isOpen={ backupInProgress }
+                    isOpen={ !!progress.length }
                     progress={ progress }
-                    toggleModal={ this.toggleModal }
+                    toggleModal={ this.hideModal }
                     onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
                 />
             </BaseLayout>
         )
     }
 
+    @bind
     loadOrders() {
         OrderController.getAllOrders()
             .then((orders = []) => this.setState({ orders }))
     }
 
+    @bind
     archiveSelected() {
-        let { selected } = this.state,
-            step = 100 / selected.length
+        let { selected, filter, filterFn } = this.state,
+            status = filter === 2 ? 'running' : 'archived'
 
-        this.toggleModal()
+        selected = selected.filter(filterFn)
+
+        this.hideModal()
 
         this.setState({
-            progress: []
+            progress: [{
+                title: `orders: ${selected.length}`,
+                progress: { value: 0 }
+            }]
         })
 
-        Promise.mapSeries(selected, ({ key, status }) =>
-                OrderController.updateOrderStatus(
-                    status === 'archived' ? 'running' : 'archived'
-                , key).then(() => {
-                    this.setState({ progress: [{
-                        title: 'orders',
-                        progress: { value: this.state.progress + step }
-                    }] })
+        let promise = OrderController.updateOrderStatusInSet(selected, status, ({ count, done }) => {
+                this.setState({
+                    progress: [{
+                        title: `orders: ${done}/${count}`,
+                        progress: { value: done / count * 100}
+                    }]
                 })
-            )
-            .then(this.toggleModal)
-            .then(this.loadOrders)
+            })
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
+
+        promise
+            .finally(() => {
+                this.hideModal()
+                this.loadOrders()
+            })
     }
 
+    @bind
     backupSelected() {
         let { orderCount, lineItemCount: total, selected } = this.state,
             name = 'default name',
@@ -139,7 +136,7 @@ export class OrdersList extends Component {
             n = 0,
             average
 
-        this.toggleModal()
+        this.hideModal()
 
         this.setState({
             progress: [{
@@ -172,12 +169,7 @@ export class OrdersList extends Component {
                         title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
                     }]
                 })
-            }
-            )
-
-        this.onProgressCancel = () => promise.cancel('canceled by user')
-
-        promise
+            })
             .then(orders => ({
                 name,
                 orderCount,
@@ -188,17 +180,13 @@ export class OrdersList extends Component {
             }))
             .then(result => {
                 MainController.keepInDraft(JSON.stringify(result))
-                this.toggleModal()
                 this.props.history.push('/backup/preview')
             })
-            .catch(thrown => {
-                console.log(thrown)
-                // if (axios.isCancel(thrown)) {
-                    this.toggleModal()
-                // }
-            })
+            this.onProgressCancel = () => promise.cancel('canceled by user')
+            // .finally(this.hideModal)
     }
 
+    @bind
     onOrdersListUpdate(orders) {
         this.setState({
             orders
@@ -215,6 +203,7 @@ export class OrdersList extends Component {
         })
     }
 
+    @bind
     onFilterChange({ value: filter }) {
         this.setState({
             filter,
@@ -222,10 +211,10 @@ export class OrdersList extends Component {
          })
     }
 
-    toggleModal() {
+    @bind
+    hideModal() {
         this.setState({
-            progress: [],
-            backupInProgress: !this.state.backupInProgress
+            progress: []
         })
     }
 }

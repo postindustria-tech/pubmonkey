@@ -67,6 +67,7 @@ function getBundler(dest) {
             plugins: [
                 'transform-es2015-modules-commonjs',
                 'transform-class-properties',
+                'transform-decorators-legacy',
                 'syntax-object-rest-spread'
             ],
             presets: [

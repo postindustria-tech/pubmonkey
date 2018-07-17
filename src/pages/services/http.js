@@ -1,4 +1,11 @@
-import axios, { CancelToken} from 'axios'
+import axios from 'ex-axios'
+import Promise from 'bluebird'
+
+Promise.config({
+    cancellation: true
+})
+
+axios.Promise = Promise
 
 var csrftoken
 
@@ -6,40 +13,25 @@ chrome.cookies.get({ url: 'https://app.mopub.com', name: 'csrftoken' }, ({ value
     csrftoken = value
 )
 
-const HTTPService = new class HTTP {
-    GET(url) {
-        let source = CancelToken.source(),
-            promise = axios.get(url, {
-                cancelToken: source.token
-            }).then(({ data }) => data)
-
-        promise.cancel = msg => source.cancel(msg)
-
-        return promise
-        // return axios.get(url, {
-        //     cancelToken: source.token
-        // }).then(({ data }) => data)
+export const HTTPService = new class {
+    GET(url, config = {}) {
+        return axios.get(url, {
+            ...config
+        }).then(({ data }) => data)
     }
 
-    POST(url, data) {
-        let source = CancelToken.source(),
-            promise = axios({
-                url,
-                data,
-                method: 'post',
-                // xsrfCookieName: 'csrftoken',
-                // xsrfHeaderName: 'x-csrftoken',
-                headers: {
-                    'x-requested-with': 'XMLHttpRequest',
-                    'x-csrftoken': csrftoken
-                },
-                cancelToken: source.token
-            }).then(({ data }) => data)
-
-        promise.cancel = msg => source.cancel(msg)
-
-        return promise
+    POST(url, data, config = {}) {
+        return axios({
+            url,
+            data,
+            method: 'post',
+            // xsrfCookieName: 'csrftoken',
+            // xsrfHeaderName: 'x-csrftoken',
+            headers: {
+                'x-requested-with': 'XMLHttpRequest',
+                'x-csrftoken': csrftoken
+            },
+            ...config
+        }).then(({ data }) => data)
     }
 }
-
-export { HTTPService }

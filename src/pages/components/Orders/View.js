@@ -1,44 +1,79 @@
 import React, { Component } from 'react'
 import { Button } from 'reactstrap'
+import Select from 'react-select'
+import bind from 'bind-decorator'
+import Promise from 'bluebird'
+import moment from 'moment'
 import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
 import { FileService, RPCController } from '../../services'
-import { MainController } from '../../controllers'
+import { MainController, OrderController } from '../../controllers'
+import { ProgressModal, LineItemEditModal, CloneModal } from '../Popups'
+
+const
+      FILTER_FN = [
+          () => true,
+          ({ status }) => status !== 'archived',
+          ({ active }) => active,
+          ({ status }) => status === 'paused',
+          ({ status }) => status === 'archived'
+      ],
+      STATUS_OPTIONS = [
+          { value: 0, label: 'all' },
+          { value: 1, label: 'all except archived' },
+          { value: 2, label: 'enabled' },
+          { value: 3, label: 'paused' },
+          { value: 4, label: 'archived' }
+      ]
 
 export class OrderView extends Component {
     state = {
         order: null,
         lineItems: [],
-        isDirty: false
-    }
-
-    constructor() {
-        super()
-
-        this.saveOrder = this.saveOrder.bind(this)
-        this.updateOrder = this.updateOrder.bind(this)
-        this.onLineItemsListUpdate = this.onLineItemsListUpdate.bind(this)
+        isDirty: false,
+        filter: 1,
+        filterFn: FILTER_FN[1],
+        progress: [],
+        updates: [],
+        clones: []
     }
 
     componentDidMount() {
+        this.loadOrder()
+    }
+
+    @bind
+    loadOrder() {
         let { params: { key } } = this.props.match
 
-        MainController.getOrder(key)
-            .then(order => this.setState({ order, lineItems: order.lineItems }))
+        OrderController.getOrder(key)
+            .then(order =>
+                this.setState({
+                    order,
+                    lineItems: order.lineItems.map(item => ({ ...item, checked: true }))
+                }, () => this.calcSelected())
+            )
     }
 
     render() {
-        let { order, isDirty, lineItems } = this.state
+        let { order, isDirty, lineItems, filter, filterFn, progress, updates, clones } = this.state
 
         if (order == null) {
             return false
         }
 
-        let { name, advertiser, description } = order
+        let { name, advertiser, description } = order,
+            selected = lineItems.filter(({ checked }) => checked)
 
         return (
             <BaseLayout className="order-view-layout">
                 <h2>Order View</h2>
+                <Button
+                    onClick={ this.saveOrder }
+                    disabled={ !isDirty }
+                >
+                    <i className="fa fa-save"/>&nbsp;Save
+                </Button>
                 <div>name:
                     <input
                         className="form-control"
@@ -63,22 +98,81 @@ export class OrderView extends Component {
                         onChange={ e => this.updateOrder({ description: e.target.value })}
                     />
                 </div>
+
+                <hr/>
+
                 <Button
-                    onClick={ this.saveOrder }
-                    disabled={ !isDirty }
+                    disabled={ !selected.length }
+                    onClick={ () => this.enableSelected(true) }
                 >
-                    <i className="fa fa-save"/>&nbsp;Save
+                    Enable
+                </Button>&nbsp;
+                <Button
+                    disabled={ !selected.length }
+                    onClick={ () => this.enableSelected(false) }
+                >
+                    Disable
+                </Button>&nbsp;
+                <Button
+                    disabled={ !selected.length }
+                    onClick={ this.archiveSelected }
+                >
+                    Archive/Unarchive
+                </Button>&nbsp;
+                <Button
+                    disabled={ !selected.length }
+                    onClick={ () => this.setState({ clones: [ selected.length ] }) }
+                >
+                    Clone
+                </Button>&nbsp;
+                <Button
+                    disabled={ !selected.length }
+                    onClick={ () => this.setState({ updates: [ selected.length ] }) }
+                >
+                    Edit
                 </Button>
+                <div className="list-filter">
+                    show:<Select
+                        multi={ false }
+                        clearable={ false }
+                        value={ filter }
+                        options={ STATUS_OPTIONS }
+                        onChange={ this.onFilterChange }
+                    />
+                </div>
 
                 <LineItemsTable
                     lineItems={ lineItems }
                     allSelected={ true }
+                    filter={ filterFn }
                     onUpdate={ this.onLineItemsListUpdate }
+                />
+
+                <ProgressModal
+                    isOpen={ !!progress.length }
+                    progress={ progress }
+                    toggleModal={ this.hideProgressModal }
+                    onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
+                />
+
+                <LineItemEditModal
+                    isOpen={ !!updates.length }
+                    onUpdate={ this.onEditUpdate }
+                    onCancel={ this.hideUpdateModal }
+                    updates={ updates }
+                />
+
+                <CloneModal
+                    isOpen={ !!clones.length }
+                    onClone={ this.onClone }
+                    onCancel={ this.hideCloneModal }
+                    clones={ clones }
                 />
             </BaseLayout>
         )
     }
 
+    @bind
     updateOrder(data) {
         let { order } = this.state
 
@@ -92,10 +186,11 @@ export class OrderView extends Component {
         }, () => this.forceUpdate())
     }
 
+    @bind
     saveOrder() {
         let { order: { name, advertiser, description, key } } = this.state
 
-        MainController.updateOrder({
+        OrderController.updateOrder({
                 name, advertiser, description
             }, key).then(() =>
                 this.setState({
@@ -104,9 +199,222 @@ export class OrderView extends Component {
             )
     }
 
+    @bind
+    enableSelected(enabled) {
+        let { selected } = this.state
+
+        selected = selected.filter(({ active }) => enabled !== active)
+
+        this.hideProgressModal()
+
+        this.setState({
+            progress: [{
+                title: `line items: ${selected.length}`,
+                progress: { value: 0 }
+            }]
+        })
+
+        let promise = OrderController.updateLineItems(selected, { enabled }, ({ done, count }) => {
+                this.setState({
+                    progress: [{
+                        title: `line items: ${done}/${count}`,
+                        progress: { value: done / count *  100 }
+                    }]
+                })
+            })
+            .finally(() => {
+                this.hideProgressModal()
+                this.loadOrder()
+            })
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
+    }
+
+    @bind
+    archiveSelected() {
+        let { selected, filter } = this.state,
+            status = filter === 4 ? 'play' : 'archive'
+
+        this.hideProgressModal()
+
+        this.setState({
+            progress: [{
+                title: `line items: ${selected.length}`,
+                progress: { value: 0 }
+            }]
+        })
+
+        let promise = OrderController.updateLineItemStatusInSet(selected, status, ({ done, count }) =>
+                this.setState({
+                    progress: [{
+                        title: `line items: ${done}/${count}`,
+                        progress: { value: done / count * 100 }
+                    }]
+                })
+            )
+            .finally(() => {
+                this.hideProgressModal()
+                this.loadOrder()
+            })
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
+    }
+
+    @bind
+    cloneSelected(number) {
+        let { selected } = this.state,
+            timestamp = Date.now(),
+            average,
+            promise
+
+        this.hideProgressModal()
+
+        this.setState({
+            progress: [{
+                title: `line items: ${selected.length * number}`,
+                progress: { value: 0 }
+            }]
+        })
+
+        promise = OrderController.cloneLineItems(selected, number, ({ done, count }) => {
+                if (average) {
+                    average = (average + (Date.now() - timestamp)) / 2
+                } else {
+                    average = Date.now() - timestamp
+                }
+
+                timestamp = Date.now()
+
+                this.setState({
+                    progress: [{
+                        title: `line items: ${done}/${count}`,
+                        progress: { value: done / count * 100 }
+                    }, {
+                        title: `time remaining: ${moment(average * (count - done)).format('mm:ss')}`
+                    }]
+                })
+            })
+            .finally(() => {
+                this.hideProgressModal()
+                this.loadOrder()
+            })
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
+    }
+
+    @bind
+    editSelected(updates) {
+        let { selected } = this.state,
+            promise
+
+        this.setState({
+            progress: [{
+                title: `line items: ${selected.length}`,
+                progress: { value: 0 }
+            }]
+        })
+
+        if (updates.valueType === 'type-single') {
+            promise = OrderController.updateLineItems(selected, {
+                [updates.field]: updates.value.single
+            }, ({ done, count }) =>
+                this.setState({
+                    progress: [{
+                        title: `line items: ${done}/${count}`,
+                        progress: { value: done / count * 100 }
+                    }]
+                })
+            )
+            .finally(() => {
+                this.hideProgressModal()
+                this.loadOrder()
+            })
+        }
+
+        if (updates.valueType === 'type-step') {
+            let current = Number(updates.value.start),
+                step = Number(updates.value.step),
+                next = current
+
+            promise = Promise.mapSeries(selected, ({ key }, done, count) =>
+                    OrderController.updateLineItem({ [updates.field]: next }, key)
+                        .then(() => {
+                            next += step
+
+                            this.setState({
+                                progress: [{
+                                    title: `line items: ${done + 1}/${count}`,
+                                    progress: { value: (done + 1) / count * 100 }
+                                }]
+                            })
+                        })
+                )
+                .finally(() => {
+                    this.hideProgressModal()
+                    this.loadOrder()
+                })
+        }
+
+
+        this.onProgressCancel = () => promise.cancel('canceled by user')
+    }
+
+    calcSelected() {
+        let { filterFn, lineItems } = this.state,
+            selected = lineItems
+                .filter(filterFn)
+                .filter(({ checked }) => checked)
+
+        this.setState({
+            selected
+        })
+    }
+
+    @bind
+    onEditUpdate(updates) {
+        this.hideUpdateModal()
+        this.editSelected(updates)
+    }
+
+    @bind
+    onClone(number) {
+        this.hideCloneModal()
+        this.cloneSelected(number)
+    }
+
+    @bind
     onLineItemsListUpdate(lineItems) {
         this.setState({
             lineItems
+        }, () => this.calcSelected())
+    }
+
+    @bind
+    onFilterChange({ value: filter }) {
+        this.setState({
+            filter,
+            filterFn: FILTER_FN[filter]
+         })
+    }
+
+    @bind
+    hideProgressModal() {
+        this.setState({
+            progress: []
+        })
+    }
+
+    @bind
+    hideUpdateModal() {
+        this.setState({
+            updates: []
+        })
+    }
+
+    @bind
+    hideCloneModal() {
+        this.setState({
+            clones: []
         })
     }
 }
