@@ -1,3 +1,5 @@
+import axios from 'ex-axios'
+
 chrome.tabs.query({
     url: chrome.extension.getURL('index.html')
 }, tabs => tabs.forEach(({ active, id }) => !active && chrome.tabs.remove(id)))
@@ -22,3 +24,13 @@ chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
 }, {
     urls: [ 'https://app.mopub.com/web-client/api/orders/query' ]
 })
+
+parseUserName()
+
+function parseUserName() {
+    window._mopub_acc_name = axios.get('https://app.mopub.com/dashboard/', { responseType: 'text' })
+        .then(({ data }) => data)
+        .then(data =>
+            data.slice(data.indexOf('#account-menu') + 15).match(/[^<]+/)[0].replace(/\s+([^\s]+)\s+/g, '$1')
+        )
+}
