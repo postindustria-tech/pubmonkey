@@ -140,7 +140,7 @@ export class OrdersList extends Component {
 
         this.setState({
             progress: [{
-                title: 'ordres:',
+                title: 'orders:',
                 progress: { value: 0 }
             }, {
                 title: 'line items:',
@@ -160,7 +160,7 @@ export class OrdersList extends Component {
 
                 this.setState({
                     progress: [{
-                        title: `ordres: ${ordersDone}/${orderCount}`,
+                        title: `orders: ${ordersDone}/${orderCount}`,
                         progress: { value: ordersDone / orderCount * 100 }
                     }, {
                         title: `line items: ${lineItemsDone}/${lineItemCount}`,
