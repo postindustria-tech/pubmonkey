@@ -9,7 +9,7 @@ export class BaseLayout extends Component {
     }
 
     componentDidMount() {
-        window._mopub_acc_name
+        window.MopubAutomation.username
             .then(username => this.setState({ username }))
     }
 
@@ -23,6 +23,9 @@ export class BaseLayout extends Component {
                     <NavbarBrand>Mopub extension</NavbarBrand>
                     <Nav>
                         <div className="username">{ username }</div>
+                        <NavItem>
+                            <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">AdUnits</NavLink>
+                        </NavItem>
                         <NavItem>
                             <NavLink tag={ RRNavLink } activeClassName="active" to="/orders">Orders</NavLink>
                         </NavItem>
