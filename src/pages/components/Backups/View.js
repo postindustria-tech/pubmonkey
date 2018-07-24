@@ -5,9 +5,9 @@ import moment from 'moment'
 import bind from 'bind-decorator'
 import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
-import { FileService, RPCController } from '../../services'
+import { FileService, RPCController, ModalWindowService } from '../../services'
 import { MainController, OrderController } from '../../controllers'
-import { ProgressModal } from '../Popups'
+import { ProgressModal, ErrorPopup } from '../Popups'
 
 export class BackupView extends Component {
     state = {
@@ -184,7 +184,16 @@ export class BackupView extends Component {
                        title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
                     }]
                 })
-        }).finally(this.hideModal)
+        })
+        .catch(err => {
+            let { errors } = err.response.data,
+                fields = Object.keys(errors)
+
+            ModalWindowService.ErrorPopup.showMessage(
+                fields.map((field, idx) => (<div key={ idx }><strong>{ field }:</strong>{ errors[field] }</div>))
+            )
+        })
+        .finally(this.hideModal)
 
         this.onProgressCancel = () => promise.cancel('canceled by user')
     }
