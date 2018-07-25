@@ -6,9 +6,9 @@ import Promise from 'bluebird'
 import moment from 'moment'
 import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
-import { FileService, RPCController } from '../../services'
+import { FileService, RPCController, ModalWindowService } from '../../services'
 import { MainController, OrderController } from '../../controllers'
-import { ProgressModal, LineItemEditModal, CloneModal } from '../Popups'
+import { LineItemEditModal, CloneModal } from '../Popups'
 
 const
       FILTER_FN = [
@@ -33,7 +33,6 @@ export class OrderView extends Component {
         isDirty: false,
         filter: 1,
         filterFn: FILTER_FN[1],
-        progress: [],
         updates: [],
         clones: []
     }
@@ -56,7 +55,7 @@ export class OrderView extends Component {
     }
 
     render() {
-        let { order, isDirty, lineItems, filter, filterFn, progress, updates, clones } = this.state
+        let { order, isDirty, lineItems, filter, filterFn, updates, clones } = this.state
 
         if (order == null) {
             return false
@@ -148,13 +147,6 @@ export class OrderView extends Component {
                     onUpdate={ this.onLineItemsListUpdate }
                 />
 
-                <ProgressModal
-                    isOpen={ !!progress.length }
-                    progress={ progress }
-                    toggleModal={ this.hideProgressModal }
-                    onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
-                />
-
                 <LineItemEditModal
                     isOpen={ !!updates.length }
                     onUpdate={ this.onEditUpdate }
@@ -205,29 +197,36 @@ export class OrderView extends Component {
 
         selected = selected.filter(({ active }) => enabled !== active)
 
-        this.hideProgressModal()
-
-        this.setState({
-            progress: [{
+        ModalWindowService.ProgressModal.setProgress([
+            {
                 title: `line items: ${selected.length}`,
                 progress: { value: 0 }
-            }]
-        })
+            }
+        ])
 
         let promise = OrderController.updateLineItems(selected, { enabled }, ({ done, count }) => {
-                this.setState({
-                    progress: [{
+                ModalWindowService.ProgressModal.setProgress([
+                    {
                         title: `line items: ${done}/${count}`,
                         progress: { value: done / count *  100 }
-                    }]
-                })
+                    }
+                ])
+            })
+            .catch(err => {
+                let { errors } = err.response.data
+
+                ModalWindowService.ErrorPopup.showMessage(
+                    errors.map(({ field, message }, idx) => (
+                        <div key={ idx }><strong>{ field }:</strong>&nbsp;{ message }</div>
+                    ))
+                )
             })
             .finally(() => {
-                this.hideProgressModal()
+                ModalWindowService.ProgressModal.hideModal()
                 this.loadOrder()
             })
 
-        this.onProgressCancel = () => promise.cancel('canceled by user')
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
     }
 
     @bind
@@ -235,29 +234,27 @@ export class OrderView extends Component {
         let { selected, filter } = this.state,
             status = filter === 4 ? 'play' : 'archive'
 
-        this.hideProgressModal()
-
-        this.setState({
-            progress: [{
+        ModalWindowService.ProgressModal.setProgress([
+            {
                 title: `line items: ${selected.length}`,
                 progress: { value: 0 }
-            }]
-        })
+            }
+        ])
 
         let promise = OrderController.updateLineItemStatusInSet(selected, status, ({ done, count }) =>
-                this.setState({
-                    progress: [{
+                ModalWindowService.ProgressModal.setProgress([
+                    {
                         title: `line items: ${done}/${count}`,
                         progress: { value: done / count * 100 }
-                    }]
-                })
+                    }
+                ])
             )
             .finally(() => {
-                this.hideProgressModal()
+                ModalWindowService.ProgressModal.hideModal()
                 this.loadOrder()
             })
 
-        this.onProgressCancel = () => promise.cancel('canceled by user')
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
     }
 
     @bind
@@ -267,14 +264,12 @@ export class OrderView extends Component {
             average,
             promise
 
-        this.hideProgressModal()
-
-        this.setState({
-            progress: [{
-                title: `line items: ${selected.length * number}`,
+        ModalWindowService.ProgressModal.setProgress([
+            {
+                title: `line items: ${selected.length}`,
                 progress: { value: 0 }
-            }]
-        })
+            }
+        ])
 
         promise = OrderController.cloneLineItems(selected, number, ({ done, count }) => {
                 if (average) {
@@ -285,21 +280,21 @@ export class OrderView extends Component {
 
                 timestamp = Date.now()
 
-                this.setState({
-                    progress: [{
+                ModalWindowService.ProgressModal.setProgress([
+                    {
                         title: `line items: ${done}/${count}`,
                         progress: { value: done / count * 100 }
                     }, {
                         title: `time remaining: ${moment(average * (count - done)).format('mm:ss')}`
-                    }]
-                })
+                    }
+                ])
             })
             .finally(() => {
-                this.hideProgressModal()
+                ModalWindowService.ProgressModal.hideModal()
                 this.loadOrder()
             })
 
-        this.onProgressCancel = () => promise.cancel('canceled by user')
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
     }
 
     @bind
@@ -307,26 +302,26 @@ export class OrderView extends Component {
         let { selected } = this.state,
             promise
 
-        this.setState({
-            progress: [{
+        ModalWindowService.ProgressModal.setProgress([
+            {
                 title: `line items: ${selected.length}`,
                 progress: { value: 0 }
-            }]
-        })
+            }
+        ])
 
         if (updates.valueType === 'type-single') {
             promise = OrderController.updateLineItems(selected, {
                 [updates.field]: updates.value.single
             }, ({ done, count }) =>
-                this.setState({
-                    progress: [{
+                ModalWindowService.ProgressModal.setProgress([
+                    {
                         title: `line items: ${done}/${count}`,
                         progress: { value: done / count * 100 }
-                    }]
-                })
+                    }
+                ])
             )
             .finally(() => {
-                this.hideProgressModal()
+                ModalWindowService.ProgressModal.hideModal()
                 this.loadOrder()
             })
         }
@@ -341,22 +336,22 @@ export class OrderView extends Component {
                         .then(() => {
                             next += step
 
-                            this.setState({
-                                progress: [{
+                            ModalWindowService.ProgressModal.setProgress([
+                                {
                                     title: `line items: ${done + 1}/${count}`,
                                     progress: { value: (done + 1) / count * 100 }
-                                }]
-                            })
+                                }
+                            ])
                         })
                 )
                 .finally(() => {
-                    this.hideProgressModal()
+                    ModalWindowService.ProgressModal.hideModal()
                     this.loadOrder()
                 })
         }
 
 
-        this.onProgressCancel = () => promise.cancel('canceled by user')
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
     }
 
     calcSelected() {
@@ -395,13 +390,6 @@ export class OrderView extends Component {
             filter,
             filterFn: FILTER_FN[filter]
          })
-    }
-
-    @bind
-    hideProgressModal() {
-        this.setState({
-            progress: []
-        })
     }
 
     @bind

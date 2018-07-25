@@ -5,3 +5,21 @@
         transition: unset;
     }
 }
+
+.error-popup {
+    .modal-body {
+        dt {
+            float: left;
+            padding: 6px 12px;
+        }
+
+        dd {
+            overflow: hidden;
+        }
+
+        i.fa {
+            color: #f00;
+            font-size: 42px;
+        }
+    }
+}
