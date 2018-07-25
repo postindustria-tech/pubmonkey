@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Navbar, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap'
 import { NavLink as RRNavLink } from 'react-router-dom'
 import classnames from 'classnames'
-import { ErrorPopup } from '../Popups'
+import { ProgressModal, ErrorPopup } from '../Popups'
 import { ModalWindowService } from '../../services'
 
 
@@ -15,11 +15,11 @@ export class BaseLayout extends Component {
         window.MopubAutomation.username
             .then(username => this.setState({ username }))
 
-        ModalWindowService.ErrorPopup.onUpdate = () => this.forceUpdate()
+        ModalWindowService.onUpdate = () => this.forceUpdate()
     }
 
     componentWillUnmount() {
-        ModalWindowService.ErrorPopup.onUpdate = null
+        ModalWindowService.onUpdate = null
     }
 
     render() {
@@ -51,6 +51,13 @@ export class BaseLayout extends Component {
                     isOpen={ ModalWindowService.ErrorPopup.isOpen }
                     message={ ModalWindowService.ErrorPopup.message }
                     toggleModal={ ModalWindowService.ErrorPopup.hideModal }
+                />
+
+                <ProgressModal
+                    isOpen={ ModalWindowService.ProgressModal.isOpen }
+                    progress={ ModalWindowService.ProgressModal.progress }
+                    toggleModal={ ModalWindowService.ProgressModal.hideModal }
+                    onCancel={ ModalWindowService.ProgressModal.cancel }
                 />
             </div>
         )

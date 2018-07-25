@@ -7,15 +7,13 @@ import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
 import { FileService, RPCController, ModalWindowService } from '../../services'
 import { MainController, OrderController } from '../../controllers'
-import { ProgressModal, ErrorPopup } from '../Popups'
 
 export class BackupView extends Component {
     state = {
         backup: null,
         isExist: false,
         isDirty: false,
-        orders: [],
-        progress: []
+        orders: []
     }
 
     componentDidMount() {
@@ -72,7 +70,7 @@ export class BackupView extends Component {
     }
 
     render() {
-        let { backup, orders, isExist, isDirty, progress } = this.state
+        let { backup, orders, isExist, isDirty } = this.state
 
         if (backup == null) {
             return false
@@ -120,13 +118,6 @@ export class BackupView extends Component {
                     removeOrder={ true }
                     onUpdate={ this.onOrdersListUpdate }
                 />
-
-                <ProgressModal
-                    isOpen={ !!progress.length }
-                    progress={ progress }
-                    toggleModal={ this.hideModal }
-                    onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
-                />
             </BaseLayout>
         )
     }
@@ -151,17 +142,14 @@ export class BackupView extends Component {
             n = 0,
             average
 
-        this.hideModal()
-
-        this.setState({
-            progress: [{
+        ModalWindowService.ProgressModal.setProgress([{
                 title: 'orders:',
                 progress: { value: 0 }
             }, {
                 title: 'line items:',
                 progress: { value: 0 }
-            }]
-        })
+            }
+        ])
 
         let promise = OrderController.restoreOrdersWithLineItems(orders,
             ({ lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp }) => {
@@ -173,8 +161,8 @@ export class BackupView extends Component {
 
                 n++
 
-                this.setState({
-                    progress: [{
+                ModalWindowService.ProgressModal.setProgress([
+                    {
                         title: `orders: ${ordersDone}/${orderCount}`,
                         progress: { value: ordersDone / orderCount * 100 }
                     }, {
@@ -182,8 +170,8 @@ export class BackupView extends Component {
                         progress: { value: lineItemsDone / lineItemCount * 100 }
                     }, {
                        title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
-                    }]
-                })
+                    }
+                ])
         })
         .catch(err => {
             let { errors } = err.response.data,
@@ -193,9 +181,9 @@ export class BackupView extends Component {
                 fields.map((field, idx) => (<div key={ idx }><strong>{ field }:</strong>{ errors[field] }</div>))
             )
         })
-        .finally(this.hideModal)
+        .finally(ModalWindowService.ProgressModal.hideModal)
 
-        this.onProgressCancel = () => promise.cancel('canceled by user')
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
     }
 
     @bind
@@ -244,13 +232,6 @@ export class BackupView extends Component {
 
         this.setState({
             selected
-        })
-    }
-
-    @bind
-    hideModal() {
-        this.setState({
-            progress: []
         })
     }
 }
