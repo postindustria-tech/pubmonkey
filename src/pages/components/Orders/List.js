@@ -6,9 +6,8 @@ import bind from 'bind-decorator'
 import sha256 from 'sha256'
 import { OrdersTable } from './Table'
 import { BaseLayout } from '../layouts'
-import { FileService, RPCController } from '../../services'
+import { FileService, RPCController, ModalWindowService } from '../../services'
 import { MainController, OrderController } from '../../controllers'
-import { ProgressModal } from '../Popups'
 
 const
       FILTER_FN = [
@@ -25,7 +24,6 @@ const
 export class OrdersList extends Component {
     state = {
         orders: [],
-        progress: [],
         selected: [],
         orderCount: 0,
         lineItemCount: 0,
@@ -77,13 +75,6 @@ export class OrdersList extends Component {
                     filter={ filterFn }
                     onUpdate={ this.onOrdersListUpdate }
                 />
-
-                <ProgressModal
-                    isOpen={ !!progress.length }
-                    progress={ progress }
-                    toggleModal={ this.hideModal }
-                    onCancel={ () => this.onProgressCancel && this.onProgressCancel() }
-                />
             </BaseLayout>
         )
     }
@@ -101,29 +92,23 @@ export class OrdersList extends Component {
 
         selected = selected.filter(filterFn)
 
-        this.hideModal()
-
-        this.setState({
-            progress: [{
-                title: `orders: ${selected.length}`,
-                progress: { value: 0 }
-            }]
-        })
+        ModalWindowService.ProgressModal.setProgress([{
+            title: `orders: ${selected.length}`,
+            progress: { value: 0 }
+        }])
 
         let promise = OrderController.updateOrderStatusInSet(selected, status, ({ count, done }) => {
-                this.setState({
-                    progress: [{
-                        title: `orders: ${done}/${count}`,
-                        progress: { value: done / count * 100}
-                    }]
-                })
+                ModalWindowService.ProgressModal.setProgress([{
+                    title: `orders: ${done}/${count}`,
+                    progress: { value: done / count * 100}
+                }])
             })
 
-        this.onProgressCancel = () => promise.cancel('canceled by user')
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
 
         promise
             .finally(() => {
-                this.hideModal()
+                ModalWindowService.ProgressModal.hideModal()
                 this.loadOrders()
             })
     }
@@ -136,17 +121,17 @@ export class OrdersList extends Component {
             n = 0,
             average
 
-        this.hideModal()
+        // this.hideModal()
 
-        this.setState({
-            progress: [{
+        ModalWindowService.ProgressModal.setProgress([
+            {
                 title: 'orders:',
                 progress: { value: 0 }
             }, {
                 title: 'line items:',
                 progress: { value: 0 }
-            }]
-        })
+            }
+        ])
 
         let promise = OrderController.collectOrderDataFromSet(selected,
             ({ lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp }) => {
@@ -158,8 +143,8 @@ export class OrdersList extends Component {
 
                 n++
 
-                this.setState({
-                    progress: [{
+                ModalWindowService.ProgressModal.setProgress([
+                    {
                         title: `orders: ${ordersDone}/${orderCount}`,
                         progress: { value: ordersDone / orderCount * 100 }
                     }, {
@@ -167,8 +152,8 @@ export class OrdersList extends Component {
                         progress: { value: lineItemsDone / lineItemCount * 100 }
                     }, {
                         title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
-                    }]
-                })
+                    }
+                ])
             })
             .then(orders => ({
                 name,
@@ -182,8 +167,9 @@ export class OrdersList extends Component {
                 MainController.keepInDraft(JSON.stringify(result))
                 this.props.history.push('/backup/preview')
             })
-            this.onProgressCancel = () => promise.cancel('canceled by user')
-            // .finally(this.hideModal)
+            .finally(ModalWindowService.ProgressModal.hideModal)
+
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
     }
 
     @bind
@@ -209,12 +195,5 @@ export class OrdersList extends Component {
             filter,
             filterFn: FILTER_FN[filter]
          })
-    }
-
-    @bind
-    hideModal() {
-        this.setState({
-            progress: []
-        })
     }
 }
