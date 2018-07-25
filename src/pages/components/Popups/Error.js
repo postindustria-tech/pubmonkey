@@ -15,8 +15,15 @@ export class ErrorPopup extends Component {
             >
                 <ModalHeader>Something went wrong</ModalHeader>
                 <ModalBody>
-                    <i className="fa fa-exclamation-triangle"></i>&nbsp;
-                    { message }
+                    <dl>
+                        <dt>
+                            <i className="fa fa-exclamation-triangle"></i>&nbsp;
+                        </dt>
+                        <dd>
+                            { message }
+                        </dd>
+                    </dl>
+
                 </ModalBody>
                 <ModalFooter>
                     <Button color="secondary" onClick={ toggleModal }>Ok</Button>

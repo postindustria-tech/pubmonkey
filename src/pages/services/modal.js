@@ -1,12 +1,10 @@
 import bind from 'bind-decorator'
 
-const ProgressModal = new class {
+class ModalBase {
     isOpen = false
-    progress = []
 
     @bind
-    setProgress(progress) {
-        this.progress = progress
+    showModal() {
         this.isOpen = true
 
         onUpdate()
@@ -15,9 +13,25 @@ const ProgressModal = new class {
     @bind
     hideModal() {
         this.isOpen = false
-        this.progress = []
 
         onUpdate()
+    }
+}
+
+const ProgressModal = new class extends ModalBase {
+    progress = []
+
+    @bind
+    setProgress(progress) {
+        this.progress = progress
+        this.showModal()
+    }
+
+    @bind
+    hideModal() {
+        this.progress = []
+
+        super.hideModal()
     }
 
     @bind
@@ -33,8 +47,7 @@ const ProgressModal = new class {
     }
 }
 
-const CloneModal = new class {
-    isOpen = false
+const CloneModal = new class extends ModalBase {
     itemCount = 0
 
     clone(itemCount) {
@@ -45,23 +58,14 @@ const CloneModal = new class {
     }
 }
 
-const ErrorPopup = new class {
-    isOpen = false
+const ErrorPopup = new class extends ModalBase {
     message = ''
 
     @bind
     showMessage(message) {
         this.message = message
-        this.isOpen = true
 
-        onUpdate()
-    }
-
-    @bind
-    hideModal() {
-        this.isOpen = false
-
-        onUpdate()
+        this.showModal()
     }
 }
 

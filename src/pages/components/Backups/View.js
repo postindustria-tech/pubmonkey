@@ -178,7 +178,7 @@ export class BackupView extends Component {
                 fields = Object.keys(errors)
 
             ModalWindowService.ErrorPopup.showMessage(
-                fields.map((field, idx) => (<div key={ idx }><strong>{ field }:</strong>{ errors[field] }</div>))
+                fields.map((field, idx) => (<div key={ idx }><strong>{ field }:</strong>&nbsp;{ errors[field] }</div>))
             )
         })
         .finally(ModalWindowService.ProgressModal.hideModal)
