@@ -38,9 +38,9 @@ export class BaseLayout extends Component {
                         <NavItem>
                             <NavLink tag={ RRNavLink } activeClassName="active" to="/orders">Orders</NavLink>
                         </NavItem>
-                        <NavItem>
+                        {/* <NavItem>
                             <NavLink tag={ RRNavLink } activeClassName="active" to="/backups">Backups</NavLink>
-                        </NavItem>
+                        </NavItem> */}
                     </Nav>
                 </Navbar>
                 <div className="container">

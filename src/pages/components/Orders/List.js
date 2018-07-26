@@ -47,18 +47,34 @@ export class OrdersList extends Component {
                 <h2>Orders List</h2>
                 <Button
                     color="primary"
+                    onClick={ this.exportSelected }
+                    // onClick={ this.backupSelected }
+                    disabled={ !orderCount }
+                >
+                    <i className="fa fa-cloud-download"></i>&nbsp;
+                    Export
+                </Button>
+                <Button
+                    color="primary"
+                    onClick={ this.importSelected }
+                >
+                    <i className="fa fa-cloud-upload"></i>&nbsp;
+                    Import
+                </Button>
+                {/* <Button
+                    color="primary"
                     onClick={ this.backupSelected }
                     disabled={ !orderCount }
                 >
                     Create Backup
-                </Button>
-                <Button
+                </Button> */}
+                {/* <Button
                     color="primary"
                     onClick={ this.archiveSelected }
                     disabled={ !orderCount }
                 >
                     Archive/Unarchive
-                </Button>
+                </Button> */}
 
                 <div className="list-filter">
                     show:<Select
@@ -77,6 +93,123 @@ export class OrdersList extends Component {
                 />
             </BaseLayout>
         )
+    }
+
+    @bind
+    importSelected() {
+        FileService.openFile()
+            .then(result => {
+                if (result) {
+                    let { orders, lineItemCount: total } = JSON.parse(result),
+                        n = 0,
+                        average
+
+                    ModalWindowService.ProgressModal.setProgress([{
+                            title: 'orders:',
+                            progress: { value: 0 }
+                        }, {
+                            title: 'line items:',
+                            progress: { value: 0 }
+                        }
+                    ])
+
+                    let promise = OrderController.restoreOrdersWithLineItems(orders,
+                        ({ lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp }) => {
+                            if (average == null) {
+                                average = timestamp
+                            } else {
+                                average = (average + timestamp) / 2
+                            }
+
+                            n++
+
+                            ModalWindowService.ProgressModal.setProgress([
+                                {
+                                    title: `orders: ${ordersDone}/${orderCount}`,
+                                    progress: { value: ordersDone / orderCount * 100 }
+                                }, {
+                                    title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                                    progress: { value: lineItemsDone / lineItemCount * 100 }
+                                }, {
+                                   title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
+                                }
+                            ])
+                    })
+                    .catch(err => {
+                        let { errors } = err.response.data,
+                            fields = Object.keys(errors)
+
+                        ModalWindowService.ErrorPopup.showMessage(
+                            fields.map((field, idx) => (<div key={ idx }><strong>{ field }:</strong>&nbsp;{ errors[field] }</div>))
+                        )
+                    })
+                    .finally(() => {
+                        this.loadOrders()
+                        ModalWindowService.ProgressModal.hideModal()
+                    })
+
+                    ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
+                }
+            })
+    }
+
+    @bind
+    exportSelected() {
+        let { orderCount, lineItemCount: total, selected } = this.state,
+            name = 'default name',
+            created = Date.now(),
+            n = 0,
+            average
+
+        ModalWindowService.ProgressModal.setProgress([
+            {
+                title: 'orders:',
+                progress: { value: 0 }
+            }, {
+                title: 'line items:',
+                progress: { value: 0 }
+            }
+        ])
+
+        let promise = OrderController.collectOrderDataFromSet(selected,
+            ({ lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp }) => {
+                if (average == null) {
+                    average = timestamp
+                } else {
+                    average = (average + timestamp) / 2
+                }
+
+                n++
+
+                ModalWindowService.ProgressModal.setProgress([
+                    {
+                        title: `orders: ${ordersDone}/${orderCount}`,
+                        progress: { value: ordersDone / orderCount * 100 }
+                    }, {
+                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                        progress: { value: lineItemsDone / lineItemCount * 100 }
+                    }, {
+                        title: `time remaining: ${moment(average * (total - n)).format('mm:ss')}`
+                    }
+                ])
+            })
+            .then(orders => ({
+                name,
+                orderCount,
+                lineItemCount: total,
+                created,
+                orders,
+                updated: null
+            }))
+            .then(result => {
+                let data = JSON.stringify(result, null, '  '),
+                    name = result.name
+
+                FileService.saveFile(data, name)
+            })
+            .finally(ModalWindowService.ProgressModal.hideModal)
+
+        ModalWindowService.ProgressModal.onCancel(() => promise.cancel('canceled by user'))
     }
 
     @bind

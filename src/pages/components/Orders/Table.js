@@ -48,8 +48,8 @@ export class OrdersTable extends Component {
                                         onChange={ () => this.toggleItem(key) }
                                     />
                                 </td>
-                                <td><Link to={ `/order/${key}` }>{ name }</Link></td>
-                                {/* <td><Link to={ `${location.hash.slice(1)}/order/${key}` }>{ name }</Link></td> */}
+                                <td>{ name }</td>
+                                {/* <td><Link to={ `/order/${key}` }>{ name }</Link></td> */}
                                 <td>{ advertiser }</td>
                                 <td>{ lineItemCount }</td>
                                 { removeOrder &&
