@@ -16,7 +16,7 @@ export class AdUnitsList extends Component {
             <BaseLayout
                 className="adunits-list-layout"
             >
-                <h2>AdUnits List</h2>
+                <h2>Ad Units</h2>
                 <Table className="adunits-table">
                     <thead>
                         <tr>
