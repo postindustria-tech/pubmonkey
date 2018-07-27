@@ -44,7 +44,7 @@ export class OrdersList extends Component {
             <BaseLayout
                  className="orders-list-layout"
             >
-                <h2>Orders List</h2>
+                <h2>Orders</h2>
                 <Button
                     color="primary"
                     onClick={ this.exportSelected }

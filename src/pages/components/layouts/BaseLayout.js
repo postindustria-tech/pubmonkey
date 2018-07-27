@@ -29,11 +29,11 @@ export class BaseLayout extends Component {
         return (
             <div className={ classnames('base-layout', className) }>
                 <Navbar className="header">
-                    <NavbarBrand>Mopub extension</NavbarBrand>
+                    <NavbarBrand>MoPorter</NavbarBrand>
                     <Nav>
                         <div className="username">{ username }</div>
                         <NavItem>
-                            <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">AdUnits</NavLink>
+                            <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">Ad Units</NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink tag={ RRNavLink } activeClassName="active" to="/orders">Orders</NavLink>
