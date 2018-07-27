@@ -10,6 +10,9 @@
             "64": "images/image.png",
             "128": "images/image.png"
     },
+    "background": {
+        "scripts": [ "background/index.js" ]
+    },
     "content_scripts": [
         {
             "matches": [ "https://app.mopub.com/*"],
@@ -37,7 +40,6 @@
             "64": "images/image.png",
             "128": "images/image.png"
           },
-          "default_title": "Mopub-automation",
-          "default_popup": "popup/popup.html"
+          "default_title": "MoPorter"
     }
 }

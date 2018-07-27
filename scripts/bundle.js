@@ -12,7 +12,7 @@ var bundler = {}
 export function bundle(cb) {
     gulp.series(
         contentScriptsBundle,
-        // backgroundScriptsBundle,
+        backgroundScriptsBundle,
         popupScriptsBundle,
         pageScriptsBundle
     )(cb)
@@ -22,9 +22,9 @@ export function contentScriptsBundle() {
     return customBundle('content/content.js')
 }
 
-// export function backgroundScriptsBundle() {
-//     return customBundle('background/background.js')
-// }
+export function backgroundScriptsBundle() {
+    return customBundle('background/index.js')
+}
 
 export function popupScriptsBundle() {
     return customBundle('popup/popup.js')

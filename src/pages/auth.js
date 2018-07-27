@@ -1,8 +1,10 @@
 import axios from 'ex-axios'
 import HTMLParser from 'fast-html-parser'
 
+const EXTENSION_URL = chrome.extension.getURL('index.html')
+
 chrome.tabs.query({
-    url: chrome.extension.getURL('index.html')
+    url: EXTENSION_URL
 }, tabs => tabs.forEach(({ active, id }) => !active && chrome.tabs.remove(id)))
 
 chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
@@ -13,7 +15,7 @@ chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
                     chrome.tabs.remove(id)
                     chrome.tabs.onUpdated.removeListener(handler)
 
-                    let url = chrome.extension.getURL('index.html')
+                    let url = EXTENSION_URL
 
                     chrome.tabs.query({ url }, tabs =>
                         chrome.tabs.update(tabs[0].id, { url, active: true })
