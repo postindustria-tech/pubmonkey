@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Table } from 'reactstrap'
+import { OrderController } from '../../controllers'
 
 export class OrdersTable extends Component {
     state = {
@@ -14,7 +15,7 @@ export class OrdersTable extends Component {
     }
 
     render() {
-        let { orders = [], removeOrder, filter = () => true } = this.props,
+        let { orders = [], filter = () => true } = this.props,
             { allSelected } = this.state
 
         return (
@@ -31,15 +32,14 @@ export class OrdersTable extends Component {
                         <th>name</th>
                         <th>advertiser</th>
                         <th>line items</th>
-                        {
-                            removeOrder && <th>actions</th>
-                        }
+                        <th>status</th>
+                        <th>actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     { orders
                         .filter(filter)
-                        .map(({ name, advertiser, lineItemCount, key, checked = false }) => (
+                        .map(({ name, status, advertiser, lineItemCount, key, checked = false }) => (
                             <tr key={ key } className="order">
                                 <td className="select">
                                     <input
@@ -48,18 +48,41 @@ export class OrdersTable extends Component {
                                         onChange={ () => this.toggleItem(key) }
                                     />
                                 </td>
-                                <td>{ name }</td>
+                                <td><a target="_blank" href={ `https://app.mopub.com/order?key=${key}` }>{ name }</a></td>
                                 {/* <td><Link to={ `/order/${key}` }>{ name }</Link></td> */}
                                 <td>{ advertiser }</td>
                                 <td>{ lineItemCount }</td>
-                                { removeOrder &&
-                                    <td className="action"><i className="fa fa-remove"/></td>
-                                }
+                                <td>{ status }</td>
+                                <td className="actions">
+                                    <i className="fa fa-archive"
+                                        title={ status === 'archived' ? 'Unarchive' : 'Archive'}
+                                        style={{ color: status === 'archived' ? '#ffad1f' : '#ccc' }}
+                                        onClick={ () => this.archive(status, key) }
+                                    ></i>
+                                </td>
                             </tr>
                         )) }
                 </tbody>
             </Table>
         )
+    }
+
+    archive(status, key) {
+        let { onUpdate, orders } = this.props
+
+        status = status === 'archived' ? 'running' : 'archived'
+
+        OrderController.updateOrderStatus(status, key)
+            .then(() => {
+                onUpdate(
+                    orders.map(order => {
+                        if (order.key === key) {
+                            order.status = status
+                        }
+                        return order
+                    })
+                )
+            })
     }
 
     toggleAll(checked) {
