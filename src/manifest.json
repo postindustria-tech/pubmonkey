@@ -4,11 +4,11 @@
     "name": "MoPorter",
     "version": "1.0.56",
     "icons": {
-            "16": "images/empty_16.png",
-            "32": "images/empty_32.png",
-            "48": "images/empty_48.png",
-            "64": "images/empty_64.png",
-            "128": "images/empty_128.png"
+            "16": "images/image.png",
+            "32": "images/image.png",
+            "48": "images/image.png",
+            "64": "images/image.png",
+            "128": "images/image.png"
     },
     "content_scripts": [
         {
@@ -31,11 +31,11 @@
     },
     "browser_action": {
           "default_icon": {
-            "16": "images/empty_16.png",
-            "32": "images/empty_32.png",
-            "48": "images/empty_48.png",
-            "64": "images/empty_64.png",
-            "128": "images/empty_128.png"
+            "16": "images/image.png",
+            "32": "images/image.png",
+            "48": "images/image.png",
+            "64": "images/image.png",
+            "128": "images/image.png"
           },
           "default_title": "Mopub-automation",
           "default_popup": "popup/popup.html"
