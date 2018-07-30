@@ -8,12 +8,16 @@ import { ModalWindowService } from '../../services'
 
 export class BaseLayout extends Component {
     state = {
-        username: ''
+        username: '',
+        loggedIn: null
     }
 
     componentDidMount() {
         window.MopubAutomation.username
             .then(username => this.setState({ username }))
+
+        window.MopubAutomation.loggedIn
+            .then(loggedIn => this.setState({ loggedIn }))
 
         ModalWindowService.onUpdate = () => this.forceUpdate()
     }
@@ -24,14 +28,16 @@ export class BaseLayout extends Component {
 
     render() {
         let { className, children } = this.props,
-            { username } = this.state
+            { username, loggedIn } = this.state
 
         return (
             <div className={ classnames('base-layout', className) }>
                 <Navbar className="header">
                     <NavbarBrand>MoPorter</NavbarBrand>
                     <Nav>
-                        <div className="username">{ username }</div>
+                        <div className="username">
+                            { loggedIn == null ? 'wait' : loggedIn ? username : (<div>Not logged in. <a href="#" onClick={ window.MopubAutomation.openLoginPage }>Log in.</a></div>) }
+                        </div>
                         <NavItem>
                             <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">Ad Units</NavLink>
                         </NavItem>

@@ -1,34 +1,46 @@
 import axios from 'ex-axios'
 import HTMLParser from 'fast-html-parser'
 
-const EXTENSION_URL = chrome.extension.getURL('index.html')
+const CJ = window.MopubAutomation = {},
+      EXTENSION_URL = chrome.extension.getURL('index.html')
 
 chrome.tabs.query({
     url: EXTENSION_URL
-}, tabs => tabs.forEach(({ active, id }) => !active && chrome.tabs.remove(id)))
+}, tabs =>
+    tabs.forEach(({ active, id }) =>
+        !active && chrome.tabs.remove(id)
+    )
+)
+
+var resolveLoggedIn
+CJ.loggedIn = new Promise(resolve => resolveLoggedIn = resolve)
 
 chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
     if (statusCode === 302) {
-        chrome.tabs.create({ url: 'https://app.mopub.com/account/login/' }, ({ id }) => {
-            chrome.tabs.onUpdated.addListener(function handler(tabId, { status, url }) {
-                if (tabId === id && status === 'loading' && (url === 'https://app.mopub.com/dashboard/' || url === 'https://app.mopub.com/new-app')) {
-                    chrome.tabs.remove(id)
-                    chrome.tabs.onUpdated.removeListener(handler)
-
-                    let url = EXTENSION_URL
-
-                    chrome.tabs.query({ url }, tabs =>
-                        chrome.tabs.update(tabs[0].id, { url, active: true })
-                    )
-                }
-            })
-        })
+        resolveLoggedIn(false)
+    } else {
+        resolveLoggedIn(true)
     }
 }, {
     urls: [ 'https://app.mopub.com/web-client/api/orders/query' ]
 })
 
-const CJ = window.MopubAutomation = {}
+CJ.openLoginPage = function() {
+    chrome.tabs.create({ url: 'https://app.mopub.com/account/login/' }, ({ id }) => {
+        chrome.tabs.onUpdated.addListener(function handler(tabId, { status, url }) {
+            if (tabId === id && status === 'loading' && (url === 'https://app.mopub.com/dashboard/' || url === 'https://app.mopub.com/new-app')) {
+                chrome.tabs.remove(id)
+                chrome.tabs.onUpdated.removeListener(handler)
+
+                let url = EXTENSION_URL
+
+                chrome.tabs.query({ url }, tabs =>
+                    chrome.tabs.update(tabs[0].id, { url, active: true })
+                )
+            }
+        })
+    })
+}
 
 parseUserName()
 
@@ -66,10 +78,6 @@ function parseUserName() {
                         }
                     }))
                 })
-
-            // resolveAdUnits(
-            //
-            // )
 
             resolveName(name)
         })
