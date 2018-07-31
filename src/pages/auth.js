@@ -22,7 +22,7 @@ chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
         resolveLoggedIn(true)
     }
 }, {
-    urls: [ 'https://app.mopub.com/web-client/api/orders/query' ]
+    urls: [ 'https://app.mopub.com/web-client/api/orders/query', 'https://app.mopub.com/advertise/orders/new/' ]
 })
 
 CJ.openLoginPage = function() {

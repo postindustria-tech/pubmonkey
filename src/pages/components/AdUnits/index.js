@@ -1,9 +1,12 @@
 import React, { Component } from 'react'
+import { Redirect } from 'react-router'
 import { Table } from 'reactstrap'
 import { BaseLayout } from '../layouts'
 
 export class AdUnitsList extends Component {
-    state = { adunits: [] }
+    state = {
+        adunits: []
+    }
 
     componentDidMount() {
         window.MopubAutomation.adunits.then(adunits => this.setState({ adunits }))
