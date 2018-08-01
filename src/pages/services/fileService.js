@@ -55,7 +55,7 @@ class File {
 
     changeHandler() {
         document.body.onfocus = null
-        this.resolver(this.fileinput.files)
+        setTimeout(() => this.resolver(this.fileinput.files), 100)
     }
 }
 
