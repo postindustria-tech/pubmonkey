@@ -74,7 +74,7 @@
           "custom_native-custom_event_class_data": "\r\n{\"pn_zone_id\": \"AD_ZONE_ID\"}",
           "pmp-notes": "\r\n",
           "targeted_zip_codes": "\r\n",
-          "keywords": "\r\npn_bid:{bid}0\npn_bid:{bid}1\npn_bid:{bid}2\npn_bid:{bid}3\npn_bid:{bid}4\npn_bid:{bid}5\npn_bid:{bid}6\npn_bid:{bid}7\npn_bid:{bid}8\npn_bid:{bid}9",
+          "keywords": "pn_bid:{special}\n",
           "adgroup_type": "network",
           "priority": "12",
           "blind": "False",
