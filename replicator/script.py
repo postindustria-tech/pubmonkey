@@ -34,15 +34,19 @@ etalon_keyword = etalon['keywords'].replace('{special}', '{}')
 fields_with_macros = [key for key, value in etalon.items() if type(value) == unicode and value.find('{bid}') != -1]
 
 output = []
+last_idx = len(data) - 1
 
-for bid in data:
+for idx, bid in enumerate(data):
     item = etalon.copy()
 
     for key in fields_with_macros:
         item[key] = item[key].replace('{bid}', str(bid))
 
-    # item.keywords = [etalon_keyword.format(x) for x in [sformat(x) for x in frange(bid, next, step)]]
-    # @TODO define next value
+    if idx == last_idx:
+        item['keywords'] = etalon_keyword.format(sformat(bid))
+    else:
+        next = data[idx + 1]
+        item['keywords'] = ''.join([etalon_keyword.format(x) for x in [sformat(x) for x in frange(bid, next, step)]])
 
     output.append(item)
 
