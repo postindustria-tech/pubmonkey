@@ -36,7 +36,15 @@ export class BaseLayout extends Component {
                     <NavbarBrand>MoPorter</NavbarBrand>
                     <Nav>
                         <div className="username">
-                            { loggedIn == null ? 'wait' : loggedIn ? username : (<div>Not logged in. <a href="#" onClick={ window.MopubAutomation.openLoginPage }>Log in.</a></div>) }
+                            { loggedIn != null
+                                && loggedIn
+                                    ? (<a href="https://app.mopub.com/dashboard/" target="_blank">{ username }</a>)
+                                    : (
+                                        <div>Not logged in.
+                                            <a href="#" onClick={ window.MopubAutomation.openLoginPage }>Log in.</a>
+                                        </div>
+                                    )
+                            }
                         </div>
                         <NavItem>
                             <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">Ad Units</NavLink>
