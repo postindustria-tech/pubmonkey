@@ -100,7 +100,8 @@ export class OrdersList extends Component {
         FileService.openFile()
             .then(result => {
                 if (result) {
-                    let { orders, lineItemCount: total } = JSON.parse(result),
+                    let { orders } = JSON.parse(result),
+                        total = orders.reduce((sum, { lineItems }) => sum + lineItems.length, 0),
                         n = 0,
                         average
 
