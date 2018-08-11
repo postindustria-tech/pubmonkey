@@ -23,12 +23,14 @@ def sformat(value):
 
 template = json.load(open(args.template[0]))
 data = ''
+data_file = args.data[0]
 step = 0.001
 
-if args.data[0][-5:] == '.json':
-    data = json.load(open(sys.argv[2]))
-elif args.data[0][-4:] == '.csv':
-    data = [float(x) for x in open(sys.argv[2], 'rU').readlines()]
+
+if data_file[-5:] == '.json':
+    data = json.load(open(data_file))
+elif data_file[-4:] == '.csv':
+    data = [float(x) for x in open(data_file, 'rU').readlines()]
 else:
     print 'unsupported format of data file. only json and csv are allowed'
     sys.exit()
