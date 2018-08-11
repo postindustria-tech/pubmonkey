@@ -40,7 +40,7 @@ export class BaseLayout extends Component {
                                 && loggedIn
                                     ? (<a href="https://app.mopub.com/dashboard/" target="_blank">{ username }</a>)
                                     : (
-                                        <div>Not logged in.
+                                        <div class="login-link">Not logged in.&nbsp;
                                             <a href="#" onClick={ window.MopubAutomation.openLoginPage }>Log in.</a>
                                         </div>
                                     )
