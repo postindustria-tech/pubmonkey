@@ -164,6 +164,10 @@ export class OrdersList extends Component {
             n = 0,
             average
 
+        if (selected.length === 1) {
+            name = selected[0].name
+        }
+
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: 'orders:',
