@@ -11,14 +11,16 @@ import { MainController, OrderController } from '../../controllers'
 
 const
       FILTER_FN = [
-          () => true,
+          ({ status }) => status !== 'archived',
           ({ status }) => status === 'running',
+          ({ status }) => status === 'paused',
           ({ status }) => status === 'archived'
       ],
       STATUS_OPTIONS = [
-          { value: 0, label: 'all' },
+          { value: 0, label: 'all except archived' },
           { value: 1, label: 'running' },
-          { value: 2, label: 'archived' }
+          { value: 2, label: 'paused' },
+          { value: 3, label: 'archived' }
       ]
 
 export class OrdersList extends Component {
@@ -27,8 +29,8 @@ export class OrdersList extends Component {
         selected: [],
         orderCount: 0,
         lineItemCount: 0,
-        filter: 1,
-        filterFn: FILTER_FN[1]
+        filter: 0,
+        filterFn: FILTER_FN[0]
     }
 
     cancelToken = null
