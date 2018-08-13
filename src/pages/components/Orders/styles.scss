@@ -17,6 +17,12 @@
     margin-top: 22px;
 
     tr .select input, td.actions i {
+        color: #999;
+        margin: 0 4px;
         cursor: pointer;
+
+        &.fa-archive.archived {
+            color: #ffad1f;
+        }
     }
 }

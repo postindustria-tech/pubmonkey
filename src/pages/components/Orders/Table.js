@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import classnames from 'classnames'
 import { Link } from 'react-router-dom'
 import { Table } from 'reactstrap'
 import { OrderController } from '../../controllers'
@@ -45,19 +46,21 @@ export class OrdersTable extends Component {
                                     <input
                                         type="checkbox"
                                         checked={ checked }
-                                        onChange={ () => this.toggleItem(key) }
+                                        onChange={ () => this.toggleSelected(key) }
                                     />
                                 </td>
                                 <td><a target="_blank" href={ `https://app.mopub.com/order?key=${key}` }>{ name }</a></td>
-                                {/* <td><Link to={ `/order/${key}` }>{ name }</Link></td> */}
                                 <td>{ advertiser }</td>
                                 <td>{ lineItemCount }</td>
                                 <td>{ status }</td>
                                 <td className="actions">
-                                    <i className="fa fa-archive"
+                                    <i className={ classnames('fa', 'fa-archive', { archived: status === 'archived' })}
                                         title={ status === 'archived' ? 'Unarchive' : 'Archive'}
-                                        style={{ color: status === 'archived' ? '#ffad1f' : '#ccc' }}
-                                        onClick={ () => this.archive(status, key) }
+                                        onClick={ () => this.toggleArchive(status, key) }
+                                    ></i>
+                                    <i className={ classnames('fa', { 'fa-pause': status === 'running', 'fa-play': status === 'paused' })}
+                                        title={ status === 'running' ? 'Disable' : 'Enable' }
+                                        onClick={ () => this.togglePause(status, key) }
                                     ></i>
                                 </td>
                             </tr>
@@ -67,10 +70,20 @@ export class OrdersTable extends Component {
         )
     }
 
-    archive(status, key) {
-        let { onUpdate, orders } = this.props
+    togglePause(status, key) {
+        status = status === 'running' ? 'paused' : 'running'
 
+        this.updateStatus(status, key)
+    }
+
+    toggleArchive(status, key) {
         status = status === 'archived' ? 'running' : 'archived'
+
+        this.updateStatus(status, key)
+    }
+
+    updateStatus(status, key) {
+        let { orders, onUpdate } = this.props
 
         OrderController.updateOrderStatus(status, key)
             .then(() => {
@@ -100,7 +113,7 @@ export class OrdersTable extends Component {
         )
     }
 
-    toggleItem(_key) {
+    toggleSelected(_key) {
         let { orders, onUpdate, filter = () => true } = this.props
 
         onUpdate(
