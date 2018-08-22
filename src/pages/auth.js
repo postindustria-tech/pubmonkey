@@ -54,24 +54,30 @@ function parseUserName() {
         .then(({ data }) => {
             let DOM = HTMLParser.parse(data),
                 name = DOM.querySelectorAll('#account-menu')[0].childNodes[1].childNodes[0].rawText.replace(/^\s*(.+)\s*$/, '$1'),
-                mapping = DOM.querySelectorAll('.adunit')
-                    .map(({ childNodes }) => {
-                        let id = getAttr(childNodes
-                            .filter(({ tagName }) =>
-                                tagName === 'input'
-                            )[0].rawAttrs, 'value')
+                mapping = DOM.querySelectorAll('tr.app')
+                    .map(root => {
+                        let appName = parseEscaped(root.querySelector('strong').firstChild.rawText)
 
-                        let name = childNodes
-                            .filter(({ classNames }) => classNames && classNames.indexOf('adunit-name') !== -1)
-                            .map(({ childNodes }) => childNodes[0].rawText)[0]
+                        return root.querySelectorAll('.adunit')
+                            .map(({ childNodes }) => {
+                                let id = getAttr(childNodes
+                                    .filter(({ tagName }) =>
+                                        tagName === 'input'
+                                    )[0].rawAttrs, 'value')
 
-                        return { id, name }
+                                let name = childNodes
+                                    .filter(({ classNames }) => classNames && classNames.indexOf('adunit-name') !== -1)
+                                    .map(({ childNodes }) => childNodes[0].rawText)[0]
+
+                                return { id, name, appName }
+                            })
                     })
+                    .reduce((acc, curr) => acc.concat(curr), [])
 
             axios.get('https://app.mopub.com/web-client/api/ad-units/query')
                 .then(({ data }) => {
                     resolveAdUnits(data.map(adunit => {
-                        let { id } = mapping.filter(({ name, id }) => name === adunit.name)[0]
+                        let { id } = mapping.filter(({ name, id, appName }) => name === adunit.name && appName === adunit.appName)[0]
                         return {
                             ...adunit,
                             id
@@ -100,4 +106,14 @@ function getAttr(rawAttrs, name) {
     } else {
         return ''
     }
+}
+
+function parseEscaped(string) {
+    let { parser } = parseEscaped
+
+    if (parser == null) {
+        parser = parseEscaped.parser = new DOMParser
+    }
+
+    return parser.parseFromString(string,'text/html').body.textContent
 }
