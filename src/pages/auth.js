@@ -53,7 +53,7 @@ function parseUserName() {
     axios.get('https://app.mopub.com/advertise/orders/new/', { responseType: 'text' })
         .then(({ data }) => {
             let DOM = HTMLParser.parse(data),
-                name = DOM.querySelectorAll('#account-menu')[0].childNodes[1].childNodes[0].rawText.replace(/^\s*(.+)\s*$/, '$1'),
+                name = DOM.querySelector('#account-menu').childNodes[1].firstChild.rawText.replace(/^\s*(.+)\s*$/, '$1'),
                 mapping = DOM.querySelectorAll('tr.app')
                     .map(root => {
                         let appName = parseEscaped(root.querySelector('strong').firstChild.rawText)
@@ -76,13 +76,26 @@ function parseUserName() {
 
             axios.get('https://app.mopub.com/web-client/api/ad-units/query')
                 .then(({ data }) => {
-                    resolveAdUnits(data.map(adunit => {
-                        let { id } = mapping.filter(({ name, id, appName }) => name === adunit.name && appName === adunit.appName)[0]
-                        return {
-                            ...adunit,
-                            id
-                        }
-                    }))
+                    resolveAdUnits(
+                        data.map(adunit => {
+                            let { id } = mapping.filter(({ name, id, appName }) => name === adunit.name && appName === adunit.appName)[0]
+                            return {
+                                ...adunit,
+                                id
+                            }
+                        })
+                        .sort((a, b) => {
+                            if (a.appName > b.appName) {
+                                return 1
+                            }
+
+                            if (a.appName < b.appName) {
+                                return -1
+                            }
+
+                            return 0
+                        })
+                    )
                 })
 
             resolveName(name)
