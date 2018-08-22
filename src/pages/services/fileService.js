@@ -1,6 +1,6 @@
 class File {
     resolver = null
-    lastLoaded = null
+    // lastLoaded = null
 
     constructor() {
         let fileinput = this.fileinput = document.createElement('input'),
@@ -45,7 +45,7 @@ class File {
 
                     reader.readAsText(file)
                 })
-                .then(result => this.lastLoaded = result)
+                // .then(result => this.lastLoaded = result)
             })
     }
 
@@ -55,7 +55,7 @@ class File {
 
     changeHandler() {
         document.body.onfocus = null
-        setTimeout(() => this.resolver(this.fileinput.files), 100)
+        setTimeout(() => this.resolver(this.fileinput.files), 300)
     }
 }
 
