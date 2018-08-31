@@ -71,8 +71,8 @@ export const OrderController = new class Order {
     }
 
     restoreOrder(data) {
-        data['start_datetime_0'] = moment().format('MM/DD/YYYY')
-        data['start_datetime_1'] = moment().add(1, 'm').format('hh:mm A')
+        data['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
+        data['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
         data['end_datetime_0'] = ''
         data['end_datetime_1'] = ''
 
@@ -81,8 +81,8 @@ export const OrderController = new class Order {
     }
 
     restoreLineItem(data, orderId) {
-        data['start_datetime_0'] = moment().format('MM/DD/YYYY')
-        data['start_datetime_1'] = moment().add(1, 'm').format('hh:mm A')
+        data['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
+        data['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
         data['end_datetime_0'] = ''
         data['end_datetime_1'] = ''
 // console.log(data, orderId)
