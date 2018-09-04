@@ -9,22 +9,28 @@ export function build(cb) {
 
 function copyFiles(cb) {
     gulp.series(
-        copyFolder('images'),
-        copyFolder('pages'),
-        copyFolder('popup'),
+        // copyFolder('images'),
+        // copyFolder('pages'),
+        // copyFolder('popup'),
+        () => gulp.src([ 'src/images/*' ])
+            .pipe(gulp.dest('./build/images')),
+        () => gulp.src([ 'src/pages/fonts/*' ])
+            .pipe(gulp.dest('./build/pages/fonts')),
+        () => gulp.src([ 'src/background/index.js' ])
+            .pipe(gulp.dest('./build/background')),
         () => gulp.src([ 'src/manifest.json', 'src/index.html' ])
             .pipe(gulp.dest('./build'))
     )(cb)
 }
 
-function copyFolder(folder) {
-    return function() {
-        return gulp.src([
-                `src/${folder}/**/*`,
-                `!src/${folder}/**/*.js`,
-                `!src/**/*.old`,
-                `!src/**/*.scss`
-            ])
-            .pipe(gulp.dest(`./build/${folder}`))
-    }
-}
+// function copyFolder(folder) {
+//     return function() {
+//         return gulp.src([
+//                 `src/${folder}/**/*`,
+//                 `!src/${folder}/**/*.js`,
+//                 `!src/**/*.old`,
+//                 `!src/**/*.scss`
+//             ])
+//             .pipe(gulp.dest(`./build/${folder}`))
+//     }
+// }

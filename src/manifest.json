@@ -13,13 +13,6 @@
     "background": {
         "scripts": [ "background/index.js" ]
     },
-    "content_scripts": [
-        {
-            "matches": [ "https://app.mopub.com/*"],
-            "js": [ "content/content.js"],
-            "run_at": "document_end"
-        }
-    ],
     "permissions": [
         "tabs",
         "webRequest",

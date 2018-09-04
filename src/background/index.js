@@ -6,8 +6,7 @@ chrome.browserAction.onClicked.addListener(() => {
     chrome.tabs.query({ url }, tabs => {
       if (tabs.length) {
           chrome.tabs.update(tabs[0].id, { active: true })
-      }
-      else {
+      } else {
           chrome.tabs.create({ url })
       }
     })

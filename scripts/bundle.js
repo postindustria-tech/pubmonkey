@@ -11,9 +11,9 @@ var bundler = {}
 
 export function bundle(cb) {
     gulp.series(
-        contentScriptsBundle,
-        backgroundScriptsBundle,
-        popupScriptsBundle,
+        // contentScriptsBundle,
+        // backgroundScriptsBundle,
+        // popupScriptsBundle,
         pageScriptsBundle
     )(cb)
 }
