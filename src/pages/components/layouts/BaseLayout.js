@@ -4,7 +4,7 @@ import { NavLink as RRNavLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { ProgressModal, ErrorPopup } from '../Popups'
 import { ModalWindowService } from '../../services'
-
+import { version } from '../../../misc.json'
 
 export class BaseLayout extends Component {
     state = {
@@ -33,7 +33,7 @@ export class BaseLayout extends Component {
         return (
             <div className={ classnames('base-layout', className) }>
                 <Navbar className="header">
-                    <NavbarBrand>MoPorter</NavbarBrand>
+                    <NavbarBrand>MoPorter <small>v. { version }</small></NavbarBrand>
                     <Nav>
                         <div className="username">
                             { loggedIn != null
@@ -60,6 +60,10 @@ export class BaseLayout extends Component {
                 <div className="container">
                     { children }
                 </div>
+
+                <footer>
+                    Made by <a target="_blank" href="https://postindustria.com">Postindustria</a> &copy; 2018
+                </footer>
 
                 <ErrorPopup
                     isOpen={ ModalWindowService.ErrorPopup.isOpen }
