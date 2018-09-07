@@ -5,7 +5,7 @@ import browserifyInc from 'browserify-incremental'
 import babelify from 'babelify'
 import source from 'vinyl-source-stream'
 
-const isDev = true
+const isDev = process.env.NODE_ENV === 'development'
 
 var bundler = {}
 
@@ -77,11 +77,32 @@ function getBundler(dest) {
         })
     )
 
+    // if (isDev) {
+    //     browserifyInc(bundler[dest], {
+    //         cacheFile: `./scripts/temp/${fileName}.json`
+    //     })
+    // }
     if (isDev) {
         browserifyInc(bundler[dest], {
             cacheFile: `./scripts/temp/${fileName}.json`
         })
+
+        bundler[dest]
+            .transform({
+                NODE_ENV: 'development'
+            }, 'envify')
+    } else {
+        bundler[dest]
+            .transform({
+                NODE_ENV: 'production'
+            }, 'envify')
+
+        bundler[dest]
+            .transform({
+                global: true
+            }, 'uglifyify')
     }
+
 
     return bundler[dest]
 }
