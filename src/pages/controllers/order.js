@@ -151,7 +151,7 @@ export const OrderController = new class Order {
 
                         return result
                     })
-                    .then(({ redirect }) => redirect.replace(/.+\/(.+)\//,'$1'))
+                    .then(({ redirect }) => redirect.replace(/.*key=(.+)$/g, '$1'))
                     .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
                     .then(({ orderKey }) => {
                         if (order.lineItems.length > 1) {
