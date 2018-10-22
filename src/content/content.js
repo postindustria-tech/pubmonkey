@@ -1,1 +1,3 @@
-console.log('content script loaded')
+const isLoadedByFrame = window.self !== window.top
+
+console.log(22, isLoadedByFrame)

@@ -25,6 +25,18 @@ chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
     urls: [ 'https://app.mopub.com/web-client/api/orders/query', 'https://app.mopub.com/advertise/orders/new/' ]
 })
 
+chrome.webRequest.onHeadersReceived.addListener(
+    ({ responseHeaders }) => ({
+        responseHeaders: responseHeaders.filter(({ name }) =>
+            name !== 'x-frame-options'
+    ) }),
+    {
+     urls: [ 'https://app.mopub.com/*' ],
+     types: [ 'sub_frame' ]
+    },
+    [ 'blocking', 'responseHeaders' ]
+)
+
 CJ.openLoginPage = function() {
     chrome.tabs.create({ url: 'https://app.mopub.com/account/login/' }, ({ id }) => {
         chrome.tabs.onUpdated.addListener(function handler(tabId, { status, url }) {
@@ -42,8 +54,10 @@ CJ.openLoginPage = function() {
     })
 }
 
-parseUserName()
-
+// parseUserName()
+let resolveName, resolveAdUnits
+CJ.username = new Promise(resolve => resolveName = resolve)
+CJ.adunits = new Promise(resolve => resolveAdUnits = resolve)
 function parseUserName() {
     let resolveName, resolveAdUnits
 

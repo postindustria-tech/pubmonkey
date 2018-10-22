@@ -28,8 +28,10 @@ export const HTTPService = new class {
             // xsrfCookieName: 'csrftoken',
             // xsrfHeaderName: 'x-csrftoken',
             headers: {
-                'x-requested-with': 'XMLHttpRequest',
-                'x-csrftoken': csrftoken
+                // 'x-requested-with': 'XMLHttpRequest',
+                // referer: 'https://app.mopub.com/orders',
+                // origin: 'https://app.mopub.com',
+                // 'x-csrftoken': csrftoken
             },
             ...config
         }).then(({ data }) => data)
