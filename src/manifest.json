@@ -2,7 +2,7 @@
     "manifest_version": 2,
 
     "name": "MoPorter",
-    "version": "1.0.69",
+    "version": "1.0.70",
     "icons": {
             "16": "images/image.png",
             "32": "images/image.png",
