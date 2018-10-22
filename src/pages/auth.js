@@ -4,6 +4,11 @@ import HTMLParser from 'fast-html-parser'
 const CJ = window.MopubAutomation = {},
       EXTENSION_URL = chrome.extension.getURL('index.html')
 
+var resolveName, resolveAdUnits
+
+CJ.username = new Promise(resolve => resolveName = resolve)
+CJ.adunits = new Promise(resolve => resolveAdUnits = resolve)
+
 chrome.tabs.query({
     url: EXTENSION_URL
 }, tabs =>
@@ -11,6 +16,28 @@ chrome.tabs.query({
         !active && chrome.tabs.remove(id)
     )
 )
+
+chrome.webRequest.onHeadersReceived.addListener(
+    ({ frameId, tabId }) => {
+        if (frameId) {
+            CJ.request = { frameId, tabId }
+
+             chrome.tabs.sendMessage(tabId, { action: 'init' }, { frameId }, data => {
+                 if (!data) {
+                     return
+                 }
+
+                 let { name } = data
+
+                 resolveName(name)
+             })
+        }
+
+        // resolveName('lolka')
+    },
+    { urls: ['https://app.mopub.com/*'] }
+)
+
 
 var resolveLoggedIn
 CJ.loggedIn = new Promise(resolve => resolveLoggedIn = resolve)
@@ -24,6 +51,18 @@ chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
 }, {
     urls: [ 'https://app.mopub.com/web-client/api/orders/query', 'https://app.mopub.com/advertise/orders/new/' ]
 })
+
+chrome.webRequest.onHeadersReceived.addListener(
+    ({ responseHeaders }) => ({
+        responseHeaders: responseHeaders.filter(({ name }) =>
+            name !== 'x-frame-options'
+    ) }),
+    {
+     urls: [ 'https://app.mopub.com/*' ],
+     types: [ 'sub_frame' ]
+    },
+    [ 'blocking', 'responseHeaders' ]
+)
 
 CJ.openLoginPage = function() {
     chrome.tabs.create({ url: 'https://app.mopub.com/account/login/' }, ({ id }) => {
@@ -42,18 +81,12 @@ CJ.openLoginPage = function() {
     })
 }
 
-parseUserName()
+parseAdUnits()
 
-function parseUserName() {
-    let resolveName, resolveAdUnits
-
-    CJ.username = new Promise(resolve => resolveName = resolve)
-    CJ.adunits = new Promise(resolve => resolveAdUnits = resolve)
-
+function parseAdUnits() {
     axios.get('https://app.mopub.com/advertise/orders/new/', { responseType: 'text' })
         .then(({ data }) => {
             let DOM = HTMLParser.parse(data),
-                name = DOM.querySelector('#account-menu').childNodes[1].firstChild.rawText.replace(/^\s*(.+)\s*$/, '$1'),
                 mapping = DOM.querySelectorAll('tr.app')
                     .map(root => {
                         let appName = parseEscaped(root.querySelector('strong').firstChild.rawText)
@@ -97,8 +130,6 @@ function parseUserName() {
                         })
                     )
                 })
-
-            resolveName(name)
         })
 }
 

@@ -30,11 +30,11 @@ export const OrderController = new class Order {
     }
 
     createOrder(data) {
-        return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data)
+        return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data, {}, true)
     }
 
     createLineItem(data, id) {
-        return HTTPService.POST(`${WEB_URL}/advertise/orders/${id}/new_line_item/`, data)
+        return HTTPService.POST(`${WEB_URL}/advertise/orders/${id}/new_line_item/`, data, {}, true)
     }
 
     updateOrderStatus(status, id) {
@@ -76,8 +76,8 @@ export const OrderController = new class Order {
         data['end_datetime_0'] = ''
         data['end_datetime_1'] = ''
 
-        let formData = LineItemModel.createFromJSON(data).toFormData()
-        return this.createOrder(formData)
+        // let formData = LineItemModel.createFromJSON(data).toFormData()
+        return this.createOrder(data)
     }
 
     restoreLineItem(data, orderId) {
@@ -86,8 +86,8 @@ export const OrderController = new class Order {
         data['end_datetime_0'] = ''
         data['end_datetime_1'] = ''
 // console.log(data, orderId)
-        let formData = LineItemModel.createFromJSON(data).toFormData()
-        return this.createLineItem(formData, orderId)
+        // let formData = LineItemModel.createFromJSON(data).toFormData()
+        return this.createLineItem(data, orderId)
     }
 
     cloneLineItems(lineItems, times, step) {
@@ -138,7 +138,8 @@ export const OrderController = new class Order {
         return Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
                 let timestamp = Date.now()
 
-                return OrderController.restoreOrder(order.lineItems[0]).then(result => {
+                return OrderController.restoreOrder(order.lineItems[0])
+                    .then(result => {
                         timestamp = Date.now() - timestamp
 
                         step({
