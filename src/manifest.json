@@ -17,6 +17,7 @@
         "tabs",
         "webRequest",
         "webRequestBlocking",
+        "webNavigation",
         "cookies",
         "storage",
         "unlimitedStorage",

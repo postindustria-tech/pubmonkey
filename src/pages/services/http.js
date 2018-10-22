@@ -20,20 +20,31 @@ export const HTTPService = new class {
         }).then(({ data }) => data)
     }
 
-    POST(url, data, config = {}) {
-        return axios({
-            url,
-            data,
-            method: 'post',
-            // xsrfCookieName: 'csrftoken',
-            // xsrfHeaderName: 'x-csrftoken',
-            headers: {
-                // 'x-requested-with': 'XMLHttpRequest',
-                // referer: 'https://app.mopub.com/orders',
-                // origin: 'https://app.mopub.com',
-                // 'x-csrftoken': csrftoken
-            },
-            ...config
-        }).then(({ data }) => data)
+    POST(url, data = {}, config = {}, isFormData) {
+        if (!window.MopubAutomation.request) {
+            return
+        }
+
+        let { tabId, frameId } = window.MopubAutomation.request,
+            payload = {
+                isFormData,
+                url,
+                data,
+                method: 'post',
+                // xsrfCookieName: 'csrftoken',
+                // xsrfHeaderName: 'x-csrftoken',
+                headers: {
+                    'x-requested-with': 'XMLHttpRequest',
+                    // referer: 'https://app.mopub.com/orders',
+                    // origin: 'https://app.mopub.com',
+                    'x-csrftoken': csrftoken
+                },
+                ...config
+            }
+
+
+        return new Promise(resolve => chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, resolve))
+
+        // return axios(data).then(({ data }) => data)
     }
 }
