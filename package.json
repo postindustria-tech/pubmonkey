@@ -33,7 +33,7 @@
     "browserify-incremental": "^3.1.1",
     "cssnano": "^4.1.0",
     "envify": "^4.1.0",
-    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp": "^4.0.0",
     "gulp-concat-css": "^3.1.0",
     "gulp-crx-pack": "^1.0.2",
     "gulp-postcss": "^8.0.0",
