@@ -71,7 +71,7 @@
           "advance_bidding_enabled": "False",
           "order-description": "\r\nheader bidding solution",
           "custom-html_data": "\r\n",
-          "custom_native-custom_event_class_data": "\r\n{\"pn_zone_id\": \"1\"}",
+          "custom_native-custom_event_class_data": "\r\n{\"pn_app_token\": \"a005850d951c43a290c8de2863af0d49\", \"pn_zone_id\": \"1\"}",
           "pmp-notes": "\r\n",
           "targeted_zip_codes": "\r\n",
           "keywords": "pn_bid:{special}\n",
