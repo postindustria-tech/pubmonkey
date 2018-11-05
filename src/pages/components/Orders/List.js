@@ -138,10 +138,8 @@ export class OrdersList extends Component {
                                 }
                             ])
                     })
-                    .catch(err => {
-                        let { errors } = err.response.data,
-                            fields = Object.keys(errors)
-
+                    .catch(({ data: { errors } }) => {
+                        let fields = Object.keys(errors)
                         ModalWindowService.ErrorPopup.showMessage(
                             fields.map((field, idx) => (<div key={ idx }><strong>{ field }:</strong>&nbsp;{ errors[field] }</div>))
                         )

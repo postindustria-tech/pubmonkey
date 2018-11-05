@@ -43,7 +43,19 @@ export const HTTPService = new class {
             }
 
 
-        return new Promise(resolve => chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, resolve))
+        return new Promise((resolve, reject) =>
+            chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, ({ ok, data, error }) => {
+                if (ok) {
+                    resolve(data)
+                } else {
+                    let err = new Error
+
+                    err.data = error
+
+                    reject(err)
+                }
+        })
+    )
 
         // return axios(data).then(({ data }) => data)
     }

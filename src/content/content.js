@@ -35,7 +35,10 @@ if(isLoadedByFrame) {
 
             axios(payload)
                 .then(({ data }) => data)
-                .then(sendResponse)
+                .then(data => sendResponse({ ok: true, data }))
+                .catch(error =>
+                    sendResponse({ ok: false, error: error.response.data })
+                )
 
             return true
         }
