@@ -19,6 +19,21 @@ export const OrderController = new class Order {
             .then(data =>
                 LineItemModel.createFromHTML(data, id).toJSON()
             ) //@TODO maybe it's not necessary to create instances for parsing only
+            .then(data => {
+                return this.getCreatives(data.key)
+                    .then(creatives => ({
+                        creatives,
+                        ...data
+                    }))
+            })
+    }
+
+    getCreatives(lineItemId) {
+        return HTTPService.GET(`${WEB_URL}/web-client/api/creatives/query?lineItemKey=${lineItemId}`)
+    }
+
+    createCreatives(data) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/creatives/create`, data)
     }
 
     copyLineItem(data) { // { order:str, line_item:str, copy_creatives:bool }
