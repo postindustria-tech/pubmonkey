@@ -86,23 +86,55 @@ export const OrderController = new class Order {
     }
 
     restoreOrder(data) {
-        data['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
-        data['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
-        data['end_datetime_0'] = ''
-        data['end_datetime_1'] = ''
+        let { creatives, ...rest } = data
+
+        rest['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
+        rest['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
+        rest['end_datetime_0'] = ''
+        rest['end_datetime_1'] = ''
 
         // let formData = LineItemModel.createFromJSON(data).toFormData()
-        return this.createOrder(data)
+        return this.createOrder(rest)
+            .then(result => {
+                if (creatives) {
+                    let lineItemKey = result.redirect.replace(/.*key=(.+)$/g, '$1')
+
+                    return Promise.mapSeries(creatives,
+                        ({ extended, name, adType, format, trackingUrl, images: imageKeys }) =>
+                            this.createCreatives({
+                                extended, name, adType, format, trackingUrl, lineItemKey, imageKeys
+                        }))
+                        .then(() => result)
+                }
+
+                return result
+            })
     }
 
     restoreLineItem(data, orderId) {
-        data['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
-        data['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
-        data['end_datetime_0'] = ''
-        data['end_datetime_1'] = ''
+        let { creatives, ...rest } = data
+
+        rest['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
+        rest['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
+        rest['end_datetime_0'] = ''
+        rest['end_datetime_1'] = ''
 // console.log(data, orderId)
         // let formData = LineItemModel.createFromJSON(data).toFormData()
-        return this.createLineItem(data, orderId)
+        return this.createLineItem(rest, orderId)
+            .then(result => {
+                if (creatives) {
+                    let lineItemKey = result.redirect.replace(/.*key=(.+)$/g, '$1')
+
+                    return Promise.mapSeries(creatives,
+                        ({ extended, name, adType, format, trackingUrl, images: imageKeys }) =>
+                            this.createCreatives({
+                                extended, name, adType, format, trackingUrl, lineItemKey, imageKeys
+                        }))
+                        .then(() => result)
+                }
+
+                return result
+            })
     }
 
     cloneLineItems(lineItems, times, step) {

@@ -6,6 +6,7 @@ let APP_ID
 
 if(isLoadedByFrame) {
     chrome.runtime.onMessage.addListener(({ action, payload }, { id }, sendResponse) => {
+    try {
         if (action === 'init') {
             APP_ID = id
 
@@ -30,17 +31,28 @@ if(isLoadedByFrame) {
                     }
                 })
 
+                delete payload.isFormData
                 payload.data = formData
             }
 
+            let response = (...args) => {
+                // console.log(args)
+                sendResponse(...args)
+            }
+
+
             axios(payload)
                 .then(({ data }) => data)
-                .then(data => sendResponse({ ok: true, data }))
-                .catch(error =>
-                    sendResponse({ ok: false, error: error.response.data })
-                )
+                .then(data => response({ ok: true, data }))
+                .catch(error => {
+                    response({ ok: false, error: error.response.data })
+                })
+
 
             return true
         }
+    } catch(err) {
+        sendResponse({ ok: false, error: err })
+    }
     })
 }
