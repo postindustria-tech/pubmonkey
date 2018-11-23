@@ -32,8 +32,6 @@ chrome.webRequest.onHeadersReceived.addListener(
                  resolveName(name)
              })
         }
-
-        // resolveName('lolka')
     },
     { urls: ['https://app.mopub.com/*'] }
 )

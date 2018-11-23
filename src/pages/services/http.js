@@ -44,11 +44,15 @@ export const HTTPService = new class {
 
 
         return new Promise((resolve, reject) =>
-            chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, ({ ok, data, error }) => {
+            chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, (result = {}) => {
+                // console.log('payload: ', payload)
+                let { ok, data, error } = result
                 if (ok) {
                     resolve(data)
                 } else {
-                    let err = new Error
+                    error = error || { errors: ['PANIC!']}
+
+                    let err = new Error(error.errors)
 
                     err.data = error
 
