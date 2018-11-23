@@ -1,17 +1,17 @@
 import axios from 'ex-axios'
 import Promise from 'bluebird'
 
-Promise.config({
-    cancellation: true
-})
+// Promise.config({
+//     cancellation: true
+// })
 
-axios.Promise = Promise
+// axios.Promise = Promise
 
-var csrftoken
+// var csrftoken
 
-chrome.cookies.get({ url: 'https://app.mopub.com', name: 'csrftoken' }, ({ value }) =>
-    csrftoken = value
-)
+// chrome.cookies.get({ url: 'https://app.mopub.com', name: 'csrftoken' }, ({ value }) =>
+//     csrftoken = value
+// )
 
 export const HTTPService = new class {
     GET(url, config = {}) {
@@ -33,12 +33,12 @@ export const HTTPService = new class {
                 method: 'post',
                 // xsrfCookieName: 'csrftoken',
                 // xsrfHeaderName: 'x-csrftoken',
-                headers: {
-                    'x-requested-with': 'XMLHttpRequest',
-                    // referer: 'https://app.mopub.com/orders',
-                    // origin: 'https://app.mopub.com',
-                    'x-csrftoken': csrftoken
-                },
+                // headers: {
+                //     'x-requested-with': 'XMLHttpRequest',
+                //     // referer: 'https://app.mopub.com/orders',
+                //     // origin: 'https://app.mopub.com',
+                //     'x-csrftoken': csrftoken
+                // },
                 ...config
             }
 

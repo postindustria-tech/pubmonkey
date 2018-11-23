@@ -2,14 +2,15 @@ import axios from 'axios'
 
 const isLoadedByFrame = window.self !== window.top
 
-let APP_ID
+let headers = {
+    'x-requested-with': 'XMLHttpRequest',
+    'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;.*/g, '$1')
+}
 
 if(isLoadedByFrame) {
     chrome.runtime.onMessage.addListener(({ action, payload }, { id }, sendResponse) => {
     try {
         if (action === 'init') {
-            APP_ID = id
-
             sendResponse({
                 name: document.querySelectorAll('#account-menu a.user-nav-top')[0].innerText.trim()
             })
@@ -40,6 +41,7 @@ if(isLoadedByFrame) {
                 sendResponse(...args)
             }
 
+            payload.headers = headers
 
             axios(payload)
                 .then(({ data }) => data)

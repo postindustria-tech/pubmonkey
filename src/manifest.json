@@ -17,10 +17,6 @@
         "tabs",
         "webRequest",
         "webRequestBlocking",
-        "webNavigation",
-        "cookies",
-        "storage",
-        "unlimitedStorage",
         "https://app.mopub.com/*"
     ],
     "content_scripts": [{
