@@ -17,7 +17,10 @@ export const HTTPService = new class {
     GET(url, config = {}) {
         return axios.get(url, {
             ...config
-        }).then(({ data }) => data)
+        }).then(({ data }) => data).catch((error) => {
+            ModalWindowService.ErrorPopup.showMessage('Network error')
+        })
+    
     }
 
     POST(url, data = {}, config = {}, isFormData) {

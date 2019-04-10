@@ -128,6 +128,8 @@ function parseAdUnits() {
                         })
                     )
                 })
+        }).catch((error) => {
+            ModalWindowService.ErrorPopup.showMessage('Network error')
         })
 }
 
