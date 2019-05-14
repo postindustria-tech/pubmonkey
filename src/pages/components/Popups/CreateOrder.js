@@ -456,7 +456,7 @@ export class CreateOrderModal extends Component {
         for (bid = rangeFrom; bid <= rangeTo; bid += step) {
             bid = this.toValidUI(bid);
             let keywords = [];
-            for (let i = bid; i <= bid + step; i += keywordStep) {
+            for (let i = bid; i < bid + step; i += keywordStep) {
                 i = this.toValidUI(i);
                 // depends on advert
                 const keyword = "pn_bid:" + i;
