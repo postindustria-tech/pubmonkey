@@ -27,18 +27,16 @@ export class AdUnitsList extends Component {
                             <th>AdUnit Name</th>
                             <th>Format</th>
                             <th>Key</th>
-                            <th>Internal Id</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            adunits.map(({ name, format, id, key, appName}) =>(
-                                <tr key={ id }>
+                            adunits.map(({ name, format, key, appName}) =>(
+                                <tr key={ key }>
                                     <td>{ appName }</td>
                                     <td>{ name }</td>
                                     <td>{ format }</td>
                                     <td>{ key }</td>
-                                    <td>{ id }</td>
                                 </tr>
                             ))
                         }

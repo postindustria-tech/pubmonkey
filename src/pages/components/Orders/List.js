@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button } from 'reactstrap'
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import Select from 'react-select'
 import moment from 'moment'
 import bind from 'bind-decorator'
@@ -8,6 +8,7 @@ import { OrdersTable } from './Table'
 import { BaseLayout } from '../layouts'
 import { FileService, RPCController, ModalWindowService } from '../../services'
 import { MainController, OrderController } from '../../controllers'
+import { CreateOrderModal } from '../Popups/CreateOrder';
 
 const
       FILTER_FN = [
@@ -63,6 +64,7 @@ export class OrdersList extends Component {
                     <i className="fa fa-cloud-upload"></i>&nbsp;
                     Import
                 </Button>
+                <CreateOrderModal />
                 {/* <Button
                     color="primary"
                     onClick={ this.backupSelected }
