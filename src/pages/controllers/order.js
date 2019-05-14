@@ -15,17 +15,27 @@ export const OrderController = new class Order {
     }
 
     getLineItem(id) {
-        return HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`, { responseType: 'text' })
-            .then(data =>
-                LineItemModel.createFromHTML(data, id).toJSON()
-            ) //@TODO maybe it's not necessary to create instances for parsing only
+
+        return this.getLineItemInfo(id)
             .then(data => {
                 return this.getCreatives(data.key)
                     .then(creatives => ({
                         creatives,
                         ...data
                     }))
-            })
+            });
+
+        // return HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`, { responseType: 'text' })
+        //     .then(data =>
+        //         LineItemModel.createFromHTML(data, id).toJSON()
+        //     ) //@TODO maybe it's not necessary to create instances for parsing only
+        //     .then(data => {
+        //         return this.getCreatives(data.key)
+        //             .then(creatives => ({
+        //                 creatives,
+        //                 ...data
+        //             }))
+        //     })
     }
 
     getCreatives(lineItemId) {
@@ -50,6 +60,18 @@ export const OrderController = new class Order {
 
     createLineItem(data, id) {
         return HTTPService.POST(`${WEB_URL}/advertise/orders/${id}/new_line_item/`, data, {}, true)
+    }
+
+    createOrderNew(data) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/orders/create`, data)
+    }
+
+    createLineItemsNew(data, callback) {
+        return Promise.mapSeries(data.map(this.createLineItemNew), callback)
+    }
+
+    createLineItemNew(data) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/create`, data)
     }
 
     updateOrderStatus(status, id) {

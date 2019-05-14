@@ -31,8 +31,8 @@ export const MainController = new class Main {
     }
 
     createOrder(data) {
-        // console.log(data)
-        return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data)
+        console.log(data)
+        // return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data)
     }
 
     createLineItem(data, id) {

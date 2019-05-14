@@ -47,7 +47,7 @@ chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
         resolveLoggedIn(true)
     }
 }, {
-    urls: [ 'https://app.mopub.com/web-client/api/orders/query', 'https://app.mopub.com/advertise/orders/new/' ]
+    urls: [ 'https://app.mopub.com/web-client/api/orders/query', 'https://app.mopub.com/account/' ]
 })
 
 chrome.webRequest.onHeadersReceived.addListener(
@@ -82,37 +82,38 @@ CJ.openLoginPage = function() {
 parseAdUnits()
 
 function parseAdUnits() {
-    axios.get('https://app.mopub.com/advertise/orders/new/', { responseType: 'text' })
+
+    axios.get('https://app.mopub.com/account/', { responseType: 'text' })
         .then(({ data }) => {
-            let DOM = HTMLParser.parse(data),
-                mapping = DOM.querySelectorAll('tr.app')
-                    .map(root => {
-                        let appName = parseEscaped(root.querySelector('strong').firstChild.rawText)
-
-                        return root.querySelectorAll('.adunit')
-                            .map(({ childNodes }) => {
-                                let id = getAttr(childNodes
-                                    .filter(({ tagName }) =>
-                                        tagName === 'input'
-                                    )[0].rawAttrs, 'value')
-
-                                let name = childNodes
-                                    .filter(({ classNames }) => classNames && classNames.indexOf('adunit-name') !== -1)
-                                    .map(({ childNodes }) => childNodes[0].rawText)[0]
-
-                                return { id, name, appName }
-                            })
-                    })
-                    .reduce((acc, curr) => acc.concat(curr), [])
+            // let DOM = HTMLParser.parse(data),
+            //     mapping = DOM.querySelectorAll('tr.app')
+            //         .map(root => {
+            //             let appName = parseEscaped(root.querySelector('strong').firstChild.rawText)
+            //
+            //             return root.querySelectorAll('.adunit')
+            //                 .map(({ childNodes }) => {
+            //                     let id = getAttr(childNodes
+            //                         .filter(({ tagName }) =>
+            //                             tagName === 'input'
+            //                         )[0].rawAttrs, 'value')
+            //
+            //                     let name = childNodes
+            //                         .filter(({ classNames }) => classNames && classNames.indexOf('adunit-name') !== -1)
+            //                         .map(({ childNodes }) => childNodes[0].rawText)[0]
+            //
+            //                     return { id, name, appName }
+            //                 })
+            //         })
+            //         .reduce((acc, curr) => acc.concat(curr), [])
 
             axios.get('https://app.mopub.com/web-client/api/ad-units/query')
                 .then(({ data }) => {
                     resolveAdUnits(
                         data.map(adunit => {
-                            let { id } = mapping.filter(({ name, id, appName }) => name === adunit.name && appName === adunit.appName)[0]
+                            // let { id } = mapping.filter(({ name, id, appName }) => name === adunit.name && appName === adunit.appName)[0]
                             return {
                                 ...adunit,
-                                id
+                                // id
                             }
                         })
                         .sort((a, b) => {

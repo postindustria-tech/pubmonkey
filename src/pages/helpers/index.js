@@ -3,9 +3,9 @@ export function parseSelects(selects) {
 
     selects.forEach(select => {
         let value = select.childNodes
-                .filter(({ tagName }) => tagName === 'option')
-                .filter(({ rawAttrs }) => rawAttrs.indexOf('selected') !== -1)
-                .map(({ rawAttrs }) => getAttr(rawAttrs, 'value')),
+            .filter(({ tagName }) => tagName === 'option')
+            .filter(({ rawAttrs }) => rawAttrs.indexOf('selected') !== -1)
+            .map(({ rawAttrs }) => getAttr(rawAttrs, 'value')),
             name = getAttr(select.rawAttrs, 'name')
 
         if (name && value.length) {
@@ -96,4 +96,22 @@ function getAttr(rawAttrs, name) {
     } else {
         return ''
     }
+}
+
+
+export function isEmpty(value) {
+   
+    if (value === null || value === undefined) return true
+
+    const type = typeof (value)
+    if (Array.isArray(value) || type === 'string') {
+        return !value.length
+    }
+
+    if (type === 'object') {
+        return !Object.values(value).length
+    }
+
+    if (type === 'number') return false
+    return true
 }
