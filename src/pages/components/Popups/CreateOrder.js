@@ -28,22 +28,55 @@ import FormErrors from "../FormErrors";
 import {ProgressModal} from "./";
 import {isEmpty} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
+import _ from 'underscore';
 
 const delay = ms => new Promise(res => setTimeout(() => res(ms), ms));
 
 export class CreateOrderModal extends Component {
     static defaultProps = {
         onClose: () => {
-        }
+        },
+        withButton: true
     };
 
     state = {
+        title: "Create New Order",
         isOpen: false,
         backdrop: true,
         adunits: [],
         adunitsSelected: [],
         order: {},
         orderName: "",
+        defaultFields: [],
+        lineItemInfo: {
+            allocationPercentage: 100,
+            bidStrategy: "cpm",
+            budget: null,
+            budgetStrategy: "allatonce",
+            budgetType: "unlimited",
+            dayPartTargeting: "alltime",
+            deviceTargeting: false,
+            end: null,
+            frequencyCapsEnabled: false,
+            includeConnectivityTargeting: "all",
+            includeGeoTargeting: "all",
+            maxAndroidVersion: "999",
+            maxIosVersion: "999",
+            minAndroidVersion: "1.5",
+            minIosVersion: "2.0",
+            priority: 12,
+            refreshInterval: 0,
+            start: "2019-05-01T00:00:00.000Z",
+            startImmediately: true,
+            targetAndroid: false,
+            targetIOS: "unchecked",
+            targetIpad: false,
+            targetIphone: false,
+            targetIpod: false,
+            type: "promo",
+            userAppsTargeting: "include",
+            userAppsTargetingList: []
+        },
         lineItemsNaming: "",
         step: 0.1,
         keywordStep: 0.01,
@@ -82,7 +115,7 @@ export class CreateOrderModal extends Component {
 
     componentWillUnmount() {
         ModalWindowService.onUpdate = null;
-    }
+    };
 
     static getDerivedStateFromProps = (props, state) => {
         if (props.isOpen !== undefined) {
@@ -98,20 +131,24 @@ export class CreateOrderModal extends Component {
         this.confirmModal.toggle();
     };
 
+    setCheckedStatus(key) {
+        return this.state.adunitsSelected.indexOf(key) !== -1;
+    };
+
     render() {
         return (
             <React.Fragment>
-                <Button color="primary" onClick={this.open}>
+                {this.props.withButton ? <Button color="primary" onClick={this.open}>
                     <i className="fa fa-plus-circle"/>
                     &nbsp; Create
-                </Button>
+                </Button> : null}
                 <Modal
                     isOpen={this.state.isOpen}
                     toggle={this.toggle}
                     size="lg"
                     backdrop={this.state.backdrop}
                 >
-                    <ModalHeader>Create New Order</ModalHeader>
+                    <ModalHeader>{this.state.title}</ModalHeader>
 
                     <ModalBody>
                         <div className="panel panel-default">
@@ -131,6 +168,7 @@ export class CreateOrderModal extends Component {
                                     name={"orderName"}
                                     id="orderName"
                                     onChange={this.handleInputChange}
+                                    value={this.state.orderName}
                                 />
                             </FormGroup>
                             <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
@@ -231,8 +269,7 @@ export class CreateOrderModal extends Component {
                                     className={"form-control"}
                                 />
                                 <FormText color="muted">
-                                    "bid" macro above is replaced to the bid value corresponding
-                                    to the line item
+                                    "bid" macro above is replaced to the bid value corresponding to the line item
                                 </FormText>
                             </Col>
                         </Row>
@@ -263,18 +300,15 @@ export class CreateOrderModal extends Component {
                                                                     onChange={this.handleAdunitsCheckboxChange}
                                                                     className="custom-control-input"
                                                                     id={`adUnit${key}`}
+                                                                    checked={this.setCheckedStatus(key)}
                                                                 />
                                                                 <label
                                                                     className="custom-control-label"
                                                                     htmlFor={`adUnit${key}`}
-                                                                >
-                                                                    &nbsp;
-                                                                </label>
+                                                                >&nbsp;</label>
                                                             </div>
                                                         </td>
-                                                        <td style={{wordBreak: "break-all"}}>
-                                                            {appName}
-                                                        </td>
+                                                        <td style={{wordBreak: "break-all"}}>{appName}</td>
                                                         <td style={{wordBreak: "break-all"}}>{name}</td>
                                                         <td>{format}</td>
                                                         <td>{key}</td>
@@ -287,9 +321,21 @@ export class CreateOrderModal extends Component {
                                 </Card>
                             </Col>
                         </Row>
+                        <Row hidden={isEmpty(this.state.defaultFields)}>
+                            <Col className={"col-sm-12"}>
+                                <h4>Fields with default value:</h4>
+                                <ul>
+                                    {this.state.defaultFields.map(
+                                        (field) => (
+                                            <li key={_.uniqueId('defaultField')}>{field}</li>
+                                        )
+                                    )}
+                                </ul>
+                            </Col>
+                        </Row>
                     </ModalBody>
                     <ModalFooter>
-                        <Button onClick={this.cancel} color="secondary">
+                        <Button onClick={this.close} color="secondary">
                             Cancel
                         </Button>
                         <Button onClick={this.preOrder} color="primary">
@@ -357,7 +403,12 @@ export class CreateOrderModal extends Component {
 
     @bind
     open() {
-        this.setState({isOpen: true});
+        this.setState({ isOpen: true });
+    }
+
+    @bind
+    close() {
+        this.setState({ isOpen: false });
     }
 
     @bind
@@ -433,6 +484,7 @@ export class CreateOrderModal extends Component {
             keywordStep,
             rangeFrom,
             orderName,
+            lineItemInfo,
             lineItemsNaming,
             rangeTo
         } = this.state;
@@ -463,43 +515,14 @@ export class CreateOrderModal extends Component {
                 keywords.push(keyword);
             }
             requests.push({
-                // ...response,
                 adUnitKeys: adunits,
                 bid: bid,
                 name: lineItemsNaming.replace("{bid}", bid),
                 orderKey: responseOrder.key,
-
-                allocationPercentage: 100,
-                bidStrategy: "cpm",
-                budget: null,
-                budgetStrategy: "allatonce",
-                budgetType: "unlimited",
-                dayPartTargeting: "alltime",
-                deviceTargeting: false,
-                end: null,
-                frequencyCapsEnabled: false,
-                includeConnectivityTargeting: "all",
-                includeGeoTargeting: "all",
                 keywords: keywords,
-                maxAndroidVersion: "999",
-                maxIosVersion: "999",
-                minAndroidVersion: "1.5",
-                minIosVersion: "2.0",
-                priority: 12,
-                refreshInterval: 0,
-                start: "2019-05-01T00:00:00.000Z",
-                startImmediately: true,
-                targetAndroid: false,
-                targetIOS: "unchecked",
-                targetIpad: false,
-                targetIphone: false,
-                targetIpod: false,
-                type: "promo",
-                userAppsTargeting: "include",
-                userAppsTargetingList: []
+                ...lineItemInfo
             });
         }
-        // console.log(requests);
 
         ModalWindowService.ProgressModal.setProgress([
             {
@@ -534,16 +557,76 @@ export class CreateOrderModal extends Component {
         ModalWindowService.ProgressModal.hideModal();
 
         // Hide modal after create
-        this.setState({isOpen: false});
+        this.close();
     }
 
     @bind
-    toggle() {
-        this.setState(state => ({isOpen: !state.isOpen}));
-    }
+    toggle(event, orderKey = null) {
+        if (orderKey) {
+            OrderController.getOrder(orderKey)
+                .then(order => {
+                    let { lineItemInfo, rangeFrom, rangeTo } = this.state,
+                        adUnitKeys = [],
+                        defaultLineItemInfo = lineItemInfo,
+                        values = {},
+                        defaultFields = [];
+                    if (!isEmpty(order.lineItems)) {
 
-    @bind
-    cancel() {
-        this.setState({isOpen: false});
+                        for (let key in defaultLineItemInfo) {
+                            values[key] = [];
+                        }
+
+                        order.lineItems.forEach(lineItem => {
+                            for (let key in defaultLineItemInfo) {
+                                if (!lineItem.hasOwnProperty(key)) {
+                                    continue;
+                                }
+                                let value = lineItem[key];
+                                if (values[key].indexOf(value) === -1) {
+                                    values[key].push(value);
+                                }
+                            }
+                        });
+
+                        for (let key in defaultLineItemInfo) {
+                            if (values.hasOwnProperty(key) && values[key].length === 1) {
+                                values[key] = values[key].shift();
+                            } else {
+                                values[key] = defaultLineItemInfo[key];
+                                defaultFields.push(key);
+                            }
+                        }
+
+                        rangeFrom = 999999999;
+                        rangeTo = 0;
+                        order.lineItems.forEach(lineItem => {
+                            if (lineItem.bid > rangeTo) {
+                                rangeTo = lineItem.bid;
+                            }
+                            if (lineItem.bid < rangeFrom) {
+                                rangeFrom = lineItem.bid;
+                            }
+                            adUnitKeys = [...adUnitKeys, ...lineItem.adUnitKeys].unique();
+                        });
+                    }
+
+                    if (isEmpty(values)) {
+                        values = lineItemInfo;
+                    }
+
+                    this.setState(state => ({
+                        isOpen: !state.isOpen,
+                        orderName: order.name,
+                        lineItemInfo: values,
+                        defaultFields: defaultFields,
+                        rangeFrom: rangeFrom,
+                        rangeTo: rangeTo,
+                        adunitsSelected: adUnitKeys,
+                        title: "Duplicate Order"
+                    }));
+                });
+        } else {
+            this.setState(state => ({ isOpen: !state.isOpen }));
+        }
     }
 }

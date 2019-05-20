@@ -3,16 +3,22 @@ import classnames from 'classnames'
 import { Link } from 'react-router-dom'
 import { Table } from 'reactstrap'
 import { OrderController } from '../../controllers'
+import {CreateOrderModal} from "../Popups/CreateOrder";
 
 export class OrdersTable extends Component {
     state = {
-        allSelected: false
+        allSelected: false,
+        orderKey: null
     }
 
     componentDidMount() {
         if (this.props.allSelected) {
             this.toggleAll(true)
         }
+    }
+
+    openModal= () => {
+        this.orderModal.ask()
     }
 
     render() {
@@ -37,6 +43,7 @@ export class OrdersTable extends Component {
                         <th>actions</th>
                     </tr>
                 </thead>
+                <CreateOrderModal withButton={false} ref={orderModal => this.orderModal = orderModal} />
                 <tbody>
                     { orders
                         .filter(filter)
@@ -62,12 +69,20 @@ export class OrdersTable extends Component {
                                         title={ status === 'running' ? 'Disable' : 'Enable' }
                                         onClick={ () => this.togglePause(status, key) }
                                     ></i>
+                                    <i className={ classnames('fa', 'fa-copy')}
+                                        title={ 'Dublicate Order' }
+                                        onClick={ () => this.toggleCopy(key) }
+                                    ></i>
                                 </td>
                             </tr>
                         )) }
                 </tbody>
             </Table>
         )
+    }
+
+    toggleCopy = (key)=> {
+        this.orderModal.toggle(null, key)
     }
 
     togglePause(status, key) {
