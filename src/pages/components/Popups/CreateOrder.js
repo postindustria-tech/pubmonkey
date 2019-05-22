@@ -73,7 +73,7 @@ export class CreateOrderModal extends Component {
             targetIpad: false,
             targetIphone: false,
             targetIpod: false,
-            type: "promo",
+            type: "non_gtee",
             userAppsTargeting: "include",
             userAppsTargetingList: []
         },
@@ -388,7 +388,7 @@ export class CreateOrderModal extends Component {
                 "Line items step can not be less than Keyword step!";
             isValid = false;
         }
-        if (data.rangeTo - data.rangeFrom < data.step) {
+        if ((data.rangeTo != data.rangeFrom) && (data.rangeTo - data.rangeFrom < data.step)) {
             fieldValidationErrors.step = "Range too short!";
             isValid = false;
         }
@@ -459,12 +459,23 @@ export class CreateOrderModal extends Component {
             return;
         }
 
-        rangeFrom = Number(rangeFrom);
-        rangeTo = Number(rangeTo);
-        step = Number(step);
+        rangeFrom = this.toInteger(rangeFrom);
+        rangeTo = this.toInteger(rangeTo);
+        step = this.toInteger(step);
 
-        let items = (rangeTo - rangeFrom) / step;
-        let keywords = step / keywordStep;
+        let items = 0,
+            keywords = 0;
+
+        for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
+            items++;
+            if (items == 1) {
+                const j = this.toDecimal(bid);
+                const s = this.toDecimal(step);
+                for (let i = j; i < j + s; i += keywordStep) {
+                    keywords++;
+                }
+            }
+        }
 
         this.setState(() => ({
             willGenerateLineItems: items.toFixed(0),
@@ -474,6 +485,8 @@ export class CreateOrderModal extends Component {
         this.ask();
     }
 
+    toInteger = num => Number((Number(num) * 100).toFixed(0));
+    toDecimal = num => this.toValidUI(num / 100);
     toValidUI = num => Math.round(num * 100) / 100;
 
     @bind
@@ -501,14 +514,18 @@ export class CreateOrderModal extends Component {
         let requests = [],
             bid;
 
-        rangeFrom = Number(rangeFrom);
-        rangeTo = Number(rangeTo);
-        step = Number(step);
+        rangeFrom = this.toInteger(rangeFrom);
+        rangeTo = this.toInteger(rangeTo);
+        step = this.toInteger(step);
 
         for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-            bid = this.toValidUI(bid);
+            // bid = this.toValidUI(bid);
+
+            const bidDecimal = this.toDecimal(bid);
+            const s = this.toDecimal(step);
+
             let keywords = [];
-            for (let i = bid; i < bid + step; i += keywordStep) {
+            for (let i = bidDecimal; i < bidDecimal + s; i += keywordStep) {
                 i = this.toValidUI(i);
                 // depends on advert
                 const keyword = "pn_bid:" + i;
@@ -516,8 +533,8 @@ export class CreateOrderModal extends Component {
             }
             requests.push({
                 adUnitKeys: adunits,
-                bid: bid,
-                name: lineItemsNaming.replace("{bid}", bid),
+                bid: bidDecimal,
+                name: lineItemsNaming.replace("{bid}", bidDecimal),
                 orderKey: responseOrder.key,
                 keywords: keywords,
                 ...lineItemInfo
