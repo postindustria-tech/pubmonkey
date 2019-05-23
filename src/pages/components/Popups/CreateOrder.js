@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import Select from "react-select";
 import bind from "bind-decorator";
-import {ModalWindowService} from "../../services";
+import {FileService, ModalWindowService} from "../../services";
 import {
     Button,
     Progress,
@@ -29,8 +29,7 @@ import {ProgressModal} from "./";
 import {isEmpty} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
 import _ from 'underscore';
-
-const delay = ms => new Promise(res => setTimeout(() => res(ms), ms));
+import moment from "../Orders/List";
 
 export class CreateOrderModal extends Component {
     static defaultProps = {
@@ -43,6 +42,7 @@ export class CreateOrderModal extends Component {
         title: "Create New Order",
         isOpen: false,
         backdrop: true,
+        advertiser: 'pubnative',
         adunits: [],
         adunitsSelected: [],
         order: {},
@@ -190,11 +190,13 @@ export class CreateOrderModal extends Component {
                                 </Label>
                                 <Input
                                     type="select"
-                                    name={"Advertiser"}
+                                    name={"advertiser"}
+                                    id="advertiser"
                                     onChange={this.handleInputChange}
-                                    id="Advertiser"
+                                    value={this.state.advertiser}
                                 >
-                                    <option value={1}>Pubnative</option>
+                                    <option value={'pubnative'}>Pubnative</option>
+                                    <option value={'openx'}>OpenX</option>
                                 </Input>
                             </FormGroup>
                         </Form>
@@ -438,12 +440,13 @@ export class CreateOrderModal extends Component {
             step,
             keywordStep,
             rangeFrom,
+            rangeTo,
             orderName,
             lineItemsNaming,
-            rangeTo
+            advertiser
         } = this.state;
 
-        const order1 = {
+        const formValid = this.formValidator({
             adunits,
             step,
             keywordStep,
@@ -451,10 +454,7 @@ export class CreateOrderModal extends Component {
             rangeFrom,
             rangeTo,
             lineItemsNaming
-        };
-        // console.log(order1);
-
-        const formValid = this.formValidator(order1);
+        });
         if (!formValid) {
             return;
         }
@@ -496,10 +496,11 @@ export class CreateOrderModal extends Component {
             step,
             keywordStep,
             rangeFrom,
+            rangeTo,
             orderName,
             lineItemInfo,
             lineItemsNaming,
-            rangeTo
+            advertiser
         } = this.state;
 
         let order = {
@@ -508,73 +509,42 @@ export class CreateOrderModal extends Component {
             name: orderName
         };
 
-        const responseOrder = await OrderController.createOrderNew(order);
-        // const responseOrder = {};
-
-        let requests = [],
-            bid;
-
-        rangeFrom = this.toInteger(rangeFrom);
-        rangeTo = this.toInteger(rangeTo);
-        step = this.toInteger(step);
-
-        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-            // bid = this.toValidUI(bid);
-
-            const bidDecimal = this.toDecimal(bid);
-            const s = this.toDecimal(step);
-
-            let keywords = [];
-            for (let i = bidDecimal; i < bidDecimal + s; i += keywordStep) {
-                i = this.toValidUI(i);
-                // depends on advert
-                const keyword = "pn_bid:" + i;
-                keywords.push(keyword);
-            }
-            requests.push({
-                adUnitKeys: adunits,
-                bid: bidDecimal,
-                name: lineItemsNaming.replace("{bid}", bidDecimal),
-                orderKey: responseOrder.key,
-                keywords: keywords,
-                ...lineItemInfo
-            });
-        }
+        let params = {
+            adunits,
+            step,
+            keywordStep,
+            rangeFrom,
+            rangeTo,
+            lineItemInfo,
+            lineItemsNaming,
+            advertiser
+        };
 
         ModalWindowService.ProgressModal.setProgress([
             {
-                title: `orders: 1/1`,
-                progress: {value: 100}
-            },
-            {
-                title: "line items:",
-                progress: {value: 0}
+                title: 'orders:',
+                progress: { value: 0 }
+            }, {
+                title: 'line items:',
+                progress: { value: 0 }
             }
         ]);
 
-        const responseLineItems = await OrderController.createLineItemsNew(
-            requests,
-            (item, step) => {
-                // do some with item
+        let promise = OrderController.createOrderDataFromSet(order, params,
+            ({ lineItemCount, lineItemsDone, orderCount, ordersDone }) => {
                 ModalWindowService.ProgressModal.setProgress([
                     {
-                        title: `orders: 1/1`,
-                        progress: {value: 100}
-                    },
-                    {
-                        title: `line items: ${step}/${requests.length}`,
-                        progress: {value: (step / requests.length) * 100}
+                        title: `orders: ${ordersDone}/${orderCount}`,
+                        progress: { value: ordersDone / orderCount * 100 }
+                    }, {
+                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                        progress: { value: lineItemsDone / lineItemCount * 100 }
                     }
-                ]);
-                // delay(500);
-            }
-        );
+                ])
+            })
+            .then(ModalWindowService.ProgressModal.hideModal)
+            .finally(this.close());
 
-        // hide progress modal after create
-        ModalWindowService.ProgressModal.hideModal();
-
-        // Hide modal after create
-        this.close();
     }
 
     @bind

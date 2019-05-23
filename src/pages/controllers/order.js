@@ -1,7 +1,7 @@
 import Promise from 'bluebird'
 import moment from 'moment'
-import { HTTPService, StorageService } from '../services'
-import { LineItemModel } from '../models'
+import {HTTPService, StorageService} from '../services'
+import {LineItemModel} from '../models'
 
 const WEB_URL = 'https://app.mopub.com'
 
@@ -75,11 +75,11 @@ export const OrderController = new class Order {
     }
 
     updateOrderStatus(status, id) {
-        return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, { status })
+        return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, {status})
     }
 
     updateOrderStatusInSet(orders, status, step) {
-        return wrapSeries(orders, ({ key }) => this.updateOrderStatus(status, key), step)
+        return wrapSeries(orders, ({key}) => this.updateOrderStatus(status, key), step)
     }
 
     updateOrder(data, id) {
@@ -100,15 +100,15 @@ export const OrderController = new class Order {
     }
 
     updateLineItemStatusInSet(lineItems, status, step) {
-        return wrapSeries(lineItems, ({ key }) => this.updateLineItemStatus(status, key), step)
+        return wrapSeries(lineItems, ({key}) => this.updateLineItemStatus(status, key), step)
     }
 
     updateLineItems(lineItems, data, step) {
-        return wrapSeries(lineItems, ({ key }) => this.updateLineItem(data, key), step)
+        return wrapSeries(lineItems, ({key}) => this.updateLineItem(data, key), step)
     }
 
     restoreOrder(data) {
-        let { creatives, ...rest } = data
+        let {creatives, ...rest} = data
 
         rest['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
         rest['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
@@ -122,10 +122,10 @@ export const OrderController = new class Order {
                     let lineItemKey = result.redirect.replace(/.*key=(.+)$/g, '$1')
 
                     return Promise.mapSeries(creatives,
-                        ({ extended, name, adType, format, trackingUrl, images: imageKeys }) =>
+                        ({extended, name, adType, format, trackingUrl, images: imageKeys}) =>
                             this.createCreatives({
                                 extended, name, adType, format, trackingUrl, lineItemKey, imageKeys
-                        }))
+                            }))
                         .then(() => result)
                 }
 
@@ -134,7 +134,7 @@ export const OrderController = new class Order {
     }
 
     restoreLineItem(data, orderId) {
-        let { creatives, ...rest } = data
+        let {creatives, ...rest} = data
 
         rest['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
         rest['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
@@ -148,10 +148,10 @@ export const OrderController = new class Order {
                     let lineItemKey = result.redirect.replace(/.*key=(.+)$/g, '$1')
 
                     return Promise.mapSeries(creatives,
-                        ({ extended, name, adType, format, trackingUrl, images: imageKeys }) =>
+                        ({extended, name, adType, format, trackingUrl, images: imageKeys}) =>
                             this.createCreatives({
                                 extended, name, adType, format, trackingUrl, lineItemKey, imageKeys
-                        }))
+                            }))
                         .then(() => result)
                 }
 
@@ -160,91 +160,203 @@ export const OrderController = new class Order {
     }
 
     cloneLineItems(lineItems, times, step) {
-        return wrapSeries(lineItems, ({ key, orderKey }) =>
-            this.getLineItem(key)
-                .then(lineItem =>
-                    this.restoreLineItem(lineItem, orderKey)
-                )
-        , step, times)
+        return wrapSeries(lineItems, ({key, orderKey}) =>
+                this.getLineItem(key)
+                    .then(lineItem =>
+                        this.restoreLineItem(lineItem, orderKey)
+                    )
+            , step, times)
     }
 
     collectOrderDataFromSet(orders, step) {
-        return Promise.mapSeries(orders, ({ key },  idx, orderCount) =>
-                    this.collectOrderData(key, progress => step({
-                        ...progress,
-                        ordersDone: idx + 1,
-                        orderCount
-                    }))
-               )
+        return Promise.mapSeries(orders, ({key}, idx, orderCount) =>
+            this.collectOrderData(key, progress => step({
+                ...progress,
+                ordersDone: idx + 1,
+                orderCount
+            }))
+        )
     }
 
     collectOrderData(id, step) {
         return this.getOrder(id)
             .then(order => {
-                let { lineItems } = order
+                let {lineItems} = order
 
-                return Promise.mapSeries(lineItems, ({ key }, idx, lineItemCount) => {
-                            let timestamp = Date.now()
+                return Promise.mapSeries(lineItems, ({key}, idx, lineItemCount) => {
+                    let timestamp = Date.now()
 
-                            return this.getLineItem(key).then(result => {
-                                timestamp = Date.now() - timestamp
+                    return this.getLineItem(key).then(result => {
+                        timestamp = Date.now() - timestamp
 
-                                if (step) {
-                                    step({
-                                        lineItemCount,
-                                        timestamp,
-                                        lineItemsDone: idx + 1
-                                    })
-                                }
-
-                                return result
+                        if (step) {
+                            step({
+                                lineItemCount,
+                                timestamp,
+                                lineItemsDone: idx + 1
                             })
-                        }).then(lineItems => ({ ...order, lineItems }))
+                        }
+
+                        return result
+                    })
+                }).then(lineItems => ({...order, lineItems}))
             })
     }
 
     restoreOrdersWithLineItems(orders, step) {
         return Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
-                let timestamp = Date.now()
+            let timestamp = Date.now()
 
-                return OrderController.restoreOrder(order.lineItems[0])
-                    .then(result => {
+            return OrderController.restoreOrder(order.lineItems[0])
+                .then(result => {
+                    timestamp = Date.now() - timestamp
+
+                    step({
+                        ordersDone: orderIdx + 1,
+                        orderCount,
+                        lineItemsDone: 1,
+                        lineItemCount: order.lineItems.length,
+                        timestamp
+                    })
+
+                    return result
+                })
+                .then(({redirect}) => redirect.replace(/.*key=(.+)$/g, '$1'))
+                .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
+                .then(({orderKey}) => {
+                    if (order.lineItems.length > 1) {
+                        return Promise.mapSeries(order.lineItems.slice(1), (lineItem, lineItemIdx, lineItemCount) => {
+                            timestamp = Date.now()
+
+                            return OrderController.restoreLineItem(lineItem, orderKey)
+                                .then(result => {
+                                    timestamp = Date.now() - timestamp
+
+                                    step({
+                                        ordersDone: orderIdx + 1,
+                                        orderCount,
+                                        lineItemCount: lineItemCount + 1,
+                                        lineItemsDone: lineItemIdx + 2,
+                                        timestamp
+                                    })
+
+                                    return result
+                                })
+                        })
+                    }
+                })
+        })
+    }
+
+    toInteger = num => Number((Number(num) * 100).toFixed(0));
+    toDecimal = num => this.toValidUI(num / 100);
+    toValidUI = num => Math.round(num * 100) / 100;
+
+    createOrderDataFromSet(order, params, stepCallback) {
+
+        return this.createOrderNew(order)
+            .then(order => {
+
+                let {
+                    adunits,
+                    step,
+                    keywordStep,
+                    rangeFrom,
+                    rangeTo,
+                    lineItemInfo,
+                    lineItemsNaming,
+                    advertiser
+                } = params;
+
+                let lineItems = [],
+                    bid;
+
+                rangeFrom = this.toInteger(rangeFrom);
+                rangeTo = this.toInteger(rangeTo);
+                step = this.toInteger(step);
+
+                let keywordAdvertiser = null;
+                switch (advertiser) {
+                    case 'pubnative':
+                        keywordAdvertiser = 'pn_bid';
+                        break;
+                    case 'openx':
+                        keywordAdvertiser = 'hb_pb';
+                        break;
+                }
+
+                for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+
+                    const bidDecimal = this.toDecimal(bid);
+                    const s = this.toDecimal(step);
+
+                    let keywords = [];
+                    for (let i = bidDecimal; i < bidDecimal + s; i += keywordStep) {
+                        i = this.toValidUI(i);
+                        const keyword = `${keywordAdvertiser}:${i}`;
+                        keywords.push(keyword);
+                    }
+                    lineItems.push({
+                        adUnitKeys: adunits,
+                        bid: bidDecimal,
+                        name: lineItemsNaming.replace("{bid}", bidDecimal),
+                        orderKey: order.key,
+                        keywords: keywords,
+                        ...lineItemInfo
+                    });
+                }
+
+                stepCallback({
+                    ordersDone: 1,
+                    orderCount: 1,
+                    lineItemsDone: 1,
+                    lineItemCount: lineItems.length
+                });
+
+                return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
+
+                    return this.createLineItemNew(item)
+                        .then(result => {
+
+                            if (stepCallback) {
+                                stepCallback({
+                                    ordersDone: 1,
+                                    orderCount: 1,
+                                    lineItemCount,
+                                    lineItemsDone: idx + 1
+                                })
+                            }
+
+                            return result
+                        })
+
+                }).then(lineItems => ({...order, lineItems}))
+
+            })
+    }
+
+    createOrderData(id, step) {
+        return this.getOrder(id)
+            .then(order => {
+                let {lineItems} = order
+
+                return Promise.mapSeries(lineItems, ({key}, idx, lineItemCount) => {
+                    let timestamp = Date.now()
+
+                    return this.getLineItem(key).then(result => {
                         timestamp = Date.now() - timestamp
 
-                        step({
-                            ordersDone: orderIdx + 1,
-                            orderCount,
-                            lineItemsDone: 1,
-                            lineItemCount: order.lineItems.length,
-                            timestamp
-                        })
+                        if (step) {
+                            step({
+                                lineItemCount,
+                                timestamp,
+                                lineItemsDone: idx + 1
+                            })
+                        }
 
                         return result
                     })
-                    .then(({ redirect }) => redirect.replace(/.*key=(.+)$/g, '$1'))
-                    .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
-                    .then(({ orderKey }) => {
-                        if (order.lineItems.length > 1) {
-                            return Promise.mapSeries(order.lineItems.slice(1), (lineItem, lineItemIdx, lineItemCount) => {
-                                timestamp = Date.now()
-
-                                return OrderController.restoreLineItem(lineItem, orderKey)
-                                    .then(result => {
-                                        timestamp = Date.now() - timestamp
-
-                                        step({
-                                            ordersDone: orderIdx + 1,
-                                            orderCount,
-                                            lineItemCount: lineItemCount + 1,
-                                            lineItemsDone: lineItemIdx + 2,
-                                            timestamp
-                                        })
-
-                                        return result
-                                    })
-                            })
-                        }
-                    })
+                }).then(lineItems => ({...order, lineItems}))
             })
     }
 }
