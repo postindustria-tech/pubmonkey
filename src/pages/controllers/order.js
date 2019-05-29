@@ -261,6 +261,7 @@ export const OrderController = new class Order {
                     adunits,
                     step,
                     keywordStep,
+                    keywordTemplate,
                     rangeFrom,
                     rangeTo,
                     lineItemInfo,
@@ -275,31 +276,51 @@ export const OrderController = new class Order {
                 rangeTo = this.toInteger(rangeTo);
                 step = this.toInteger(step);
 
-                let keywordAdvertiser = null;
+                let keywordAdvertiser = null,
+                    mask = '{bid}';
                 switch (advertiser) {
-                    case 'pubnative':
-                        keywordAdvertiser = 'pn_bid';
-                        break;
-                    case 'openx':
-                        keywordAdvertiser = 'hb_pb';
+                    // case 'pubnative':
+                        // keywordAdvertiser = 'pn_bid';
+                        // break;
+                    // case 'openx':
+                        // keywordAdvertiser = 'hb_pb';
+                        // break;
+                    case 'amazon':
+                        // keywordAdvertiser = 'amznslots:m320x50p';
+                        mask = '{position}';
                         break;
                 }
 
+                let line = 1;
                 for (bid = rangeFrom; bid <= rangeTo; bid += step) {
 
                     const bidDecimal = this.toDecimal(bid);
                     const s = this.toDecimal(step);
 
+                    let name = lineItemsNaming.replace("{bid}", bidDecimal);
+
                     let keywords = [];
-                    for (let i = bidDecimal; i < bidDecimal + s; i += keywordStep) {
-                        i = this.toValidUI(i);
-                        const keyword = `${keywordAdvertiser}:${i}`;
-                        keywords.push(keyword);
+                    if (advertiser == 'amazon') {
+                        for (let i = 0; i < keywordStep; i += 1) {
+                            i = this.toValidUI(i);
+                            // const keyword = `${keywordAdvertiser}${delimiter}${i}`;
+                            const keyword = keywordTemplate.replace(mask, i + line);
+                            keywords.push(keyword);
+                        }
+                        name = name.replace("{position}", line);
+                        line++;
+                    } else {
+                        for (let i = bidDecimal; i < bidDecimal + s; i += keywordStep) {
+                            i = this.toValidUI(i);
+                            // const keyword = `${keywordAdvertiser}${delimiter}${i}`;
+                            const keyword = keywordTemplate.replace(mask, i);
+                            keywords.push(keyword);
+                        }
                     }
                     lineItems.push({
                         adUnitKeys: adunits,
                         bid: bidDecimal,
-                        name: lineItemsNaming.replace("{bid}", bidDecimal),
+                        name: name,
                         orderKey: order.key,
                         keywords: keywords,
                         ...lineItemInfo

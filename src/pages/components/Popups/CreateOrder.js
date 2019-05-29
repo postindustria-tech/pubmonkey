@@ -28,8 +28,16 @@ import FormErrors from "../FormErrors";
 import {ProgressModal} from "./";
 import {isEmpty} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
-import _ from 'underscore';
+import _ from "underscore";
 import moment from "../Orders/List";
+
+const defaultAdvertiserValue = "pubnative";
+
+const keywordTemplateDefaultValue = {
+    pubnative: "pn_bid:{bid}",
+    openx: "hb_pb:{bid}",
+    amazon: "amznslots:m320x50p{position}"
+};
 
 export class CreateOrderModal extends Component {
     static defaultProps = {
@@ -42,7 +50,7 @@ export class CreateOrderModal extends Component {
         title: "Create New Order",
         isOpen: false,
         backdrop: true,
-        advertiser: 'pubnative',
+        advertiser: defaultAdvertiserValue,
         adunits: [],
         adunitsSelected: [],
         order: {},
@@ -78,8 +86,13 @@ export class CreateOrderModal extends Component {
             userAppsTargetingList: []
         },
         lineItemsNaming: "",
+        keywordTemplate:
+            localStorage.getItem(defaultAdvertiserValue) ||
+            keywordTemplateDefaultValue[defaultAdvertiserValue],
         step: 0.1,
+        keywordStepMin: 0.01,
         keywordStep: 0.01,
+        keywordStepLabel: "Keyword Step",
         rangeFrom: 0.1,
         rangeTo: 10,
         formErrors: {
@@ -115,7 +128,7 @@ export class CreateOrderModal extends Component {
 
     componentWillUnmount() {
         ModalWindowService.onUpdate = null;
-    };
+    }
 
     static getDerivedStateFromProps = (props, state) => {
         if (props.isOpen !== undefined) {
@@ -133,15 +146,17 @@ export class CreateOrderModal extends Component {
 
     setCheckedStatus(key) {
         return this.state.adunitsSelected.indexOf(key) !== -1;
-    };
+    }
 
     render() {
         return (
             <React.Fragment>
-                {this.props.withButton ? <Button color="primary" onClick={this.open}>
-                    <i className="fa fa-plus-circle"/>
-                    &nbsp; Create
-                </Button> : null}
+                {this.props.withButton ? (
+                    <Button color="primary" onClick={this.open}>
+                        <i className="fa fa-plus-circle"/>
+                        &nbsp; Create
+                    </Button>
+                ) : null}
                 <Modal
                     isOpen={this.state.isOpen}
                     toggle={this.toggle}
@@ -195,8 +210,9 @@ export class CreateOrderModal extends Component {
                                     onChange={this.handleInputChange}
                                     value={this.state.advertiser}
                                 >
-                                    <option value={'pubnative'}>Pubnative</option>
-                                    <option value={'openx'}>OpenX</option>
+                                    <option value={"pubnative"}>Pubnative</option>
+                                    <option value={"openx"}>OpenX</option>
+                                    <option value={"amazon"}>Amazon A9</option>
                                 </Input>
                             </FormGroup>
                         </Form>
@@ -244,12 +260,12 @@ export class CreateOrderModal extends Component {
                         </Row>
                         <Row>
                             <Col className={"col-sm-12"}>
-                                Keyword Step:
+                                {this.state.keywordStepLabel}:
                                 <InputNumber
                                     invalid={!isEmpty(this.state.formErrors.keywordStep)}
-                                    min={0.01}
+                                    min={this.state.keywordStepMin}
                                     max={1000}
-                                    step={0.01}
+                                    step={this.state.keywordStepMin}
                                     value={this.state.keywordStep}
                                     onChange={this.onChangeKeywordStep}
                                     style={{width: 60}}
@@ -271,8 +287,30 @@ export class CreateOrderModal extends Component {
                                     className={"form-control"}
                                 />
                                 <FormText color="muted">
-                                    "bid" macro above is replaced to the bid value corresponding to the line item
+                                    "bid" macro above is replaced to the bid value corresponding
+                                    to the line item
                                 </FormText>
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col className={"col-sm-3"}>Keywords template:</Col>
+                            <Col className={"col-sm-9"}>
+                                <CustomInput
+                                    invalid={!isEmpty(this.state.formErrors.keywordsTemplate)}
+                                    inline
+                                    style={{width: "300px"}}
+                                    type="text"
+                                    id={"keywordsTemplate"}
+                                    value={this.state.keywordTemplate}
+                                    name={"keywordsTemplate"}
+                                    onChange={this.handleChangeKeywordTemplate}
+                                    placeholder="pn_bid:{bid}"
+                                    className={"form-control"}
+                                />
+                                {/* <FormText color="muted">
+                                    "bid" macro above is replaced to the bid value corresponding to the line item
+                                </FormText> */}
                             </Col>
                         </Row>
                         <Row>
@@ -307,10 +345,14 @@ export class CreateOrderModal extends Component {
                                                                 <label
                                                                     className="custom-control-label"
                                                                     htmlFor={`adUnit${key}`}
-                                                                >&nbsp;</label>
+                                                                >
+                                                                    &nbsp;
+                                                                </label>
                                                             </div>
                                                         </td>
-                                                        <td style={{wordBreak: "break-all"}}>{appName}</td>
+                                                        <td style={{wordBreak: "break-all"}}>
+                                                            {appName}
+                                                        </td>
                                                         <td style={{wordBreak: "break-all"}}>{name}</td>
                                                         <td>{format}</td>
                                                         <td>{key}</td>
@@ -327,11 +369,9 @@ export class CreateOrderModal extends Component {
                             <Col className={"col-sm-12"}>
                                 <h4>Fields with default value:</h4>
                                 <ul>
-                                    {this.state.defaultFields.map(
-                                        (field) => (
-                                            <li key={_.uniqueId('defaultField')}>{field}</li>
-                                        )
-                                    )}
+                                    {this.state.defaultFields.map(field => (
+                                        <li key={_.uniqueId("defaultField")}>{field}</li>
+                                    ))}
                                 </ul>
                             </Col>
                         </Row>
@@ -385,12 +425,19 @@ export class CreateOrderModal extends Component {
             fieldValidationErrors.lineItemsNaming = "Keyword step is required!";
             isValid = false;
         }
-        if (data.keywordStep >= data.step) {
-            fieldValidationErrors.step =
-                "Line items step can not be less than Keyword step!";
-            isValid = false;
+        if (data.advertiser == 'amazon') {
+
+        } else {
+            if (data.keywordStep >= data.step) {
+                fieldValidationErrors.step =
+                    "Line items step can not be less than Keyword step!";
+                isValid = false;
+            }
         }
-        if ((data.rangeTo != data.rangeFrom) && (data.rangeTo - data.rangeFrom < data.step)) {
+        if (
+            data.rangeTo != data.rangeFrom &&
+            data.rangeTo - data.rangeFrom < data.step
+        ) {
             fieldValidationErrors.step = "Range too short!";
             isValid = false;
         }
@@ -405,18 +452,39 @@ export class CreateOrderModal extends Component {
 
     @bind
     open() {
-        this.setState({ isOpen: true });
+        this.setState({isOpen: true});
     }
 
     @bind
     close() {
-        this.setState({ isOpen: false });
+        this.setState({isOpen: false});
     }
 
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
+        if (name === "advertiser") {
+            const storageKeywordTemplate =
+                localStorage.getItem(value) ||
+                keywordTemplateDefaultValue[value],
+                keywordStep = value === "amazon" ? 1 : 0.01,
+                keywordStepLabel = value === "amazon" ? "Keyword Quantity" : "Keyword Step";
+            this.setState({
+                keywordTemplate: storageKeywordTemplate,
+                keywordStep: keywordStep,
+                keywordStepMin: keywordStep,
+                keywordStepLabel: keywordStepLabel
+            });
+        }
         this.setState({[name]: value});
+    }
+
+    @bind
+    handleChangeKeywordTemplate(event) {
+        const {value, name} = event.target;
+        localStorage.setItem(this.state.advertiser, value);
+        this.setState({keywordTemplate: value});
+        return true;
     }
 
     @bind
@@ -453,7 +521,8 @@ export class CreateOrderModal extends Component {
             orderName,
             rangeFrom,
             rangeTo,
-            lineItemsNaming
+            lineItemsNaming,
+            advertiser
         });
         if (!formValid) {
             return;
@@ -479,7 +548,7 @@ export class CreateOrderModal extends Component {
 
         this.setState(() => ({
             willGenerateLineItems: items.toFixed(0),
-            willGenerateKeywords: keywords.toFixed(0),
+            willGenerateKeywords: keywords.toFixed(0)
         }));
 
         this.ask();
@@ -495,6 +564,7 @@ export class CreateOrderModal extends Component {
             adunitsSelected: adunits,
             step,
             keywordStep,
+            keywordTemplate,
             rangeFrom,
             rangeTo,
             orderName,
@@ -513,6 +583,7 @@ export class CreateOrderModal extends Component {
             adunits,
             step,
             keywordStep,
+            keywordTemplate,
             rangeFrom,
             rangeTo,
             lineItemInfo,
@@ -522,98 +593,98 @@ export class CreateOrderModal extends Component {
 
         ModalWindowService.ProgressModal.setProgress([
             {
-                title: 'orders:',
-                progress: { value: 0 }
-            }, {
-                title: 'line items:',
-                progress: { value: 0 }
+                title: "orders:",
+                progress: {value: 0}
+            },
+            {
+                title: "line items:",
+                progress: {value: 0}
             }
         ]);
 
         let promise = OrderController.createOrderDataFromSet(order, params,
-            ({ lineItemCount, lineItemsDone, orderCount, ordersDone }) => {
-                ModalWindowService.ProgressModal.setProgress([
-                    {
-                        title: `orders: ${ordersDone}/${orderCount}`,
-                        progress: { value: ordersDone / orderCount * 100 }
-                    }, {
-                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
-                        progress: { value: lineItemsDone / lineItemCount * 100 }
-                    }
-                ])
-            })
+                ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
+                    ModalWindowService.ProgressModal.setProgress([
+                        {
+                            title: `orders: ${ordersDone}/${orderCount}`,
+                            progress: {value: (ordersDone / orderCount) * 100}
+                        },
+                        {
+                            title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                            progress: {value: (lineItemsDone / lineItemCount) * 100}
+                        }
+                    ]);
+                }
+            )
             .then(ModalWindowService.ProgressModal.hideModal)
             .finally(this.close());
-
     }
 
     @bind
     toggle(event, orderKey = null) {
         if (orderKey) {
-            OrderController.getOrder(orderKey)
-                .then(order => {
-                    let { lineItemInfo, rangeFrom, rangeTo } = this.state,
-                        adUnitKeys = [],
-                        defaultLineItemInfo = lineItemInfo,
-                        values = {},
-                        defaultFields = [];
-                    if (!isEmpty(order.lineItems)) {
-
-                        for (let key in defaultLineItemInfo) {
-                            values[key] = [];
-                        }
-
-                        order.lineItems.forEach(lineItem => {
-                            for (let key in defaultLineItemInfo) {
-                                if (!lineItem.hasOwnProperty(key)) {
-                                    continue;
-                                }
-                                let value = lineItem[key];
-                                if (values[key].indexOf(value) === -1) {
-                                    values[key].push(value);
-                                }
-                            }
-                        });
-
-                        for (let key in defaultLineItemInfo) {
-                            if (values.hasOwnProperty(key) && values[key].length === 1) {
-                                values[key] = values[key].shift();
-                            } else {
-                                values[key] = defaultLineItemInfo[key];
-                                defaultFields.push(key);
-                            }
-                        }
-
-                        rangeFrom = 999999999;
-                        rangeTo = 0;
-                        order.lineItems.forEach(lineItem => {
-                            if (lineItem.bid > rangeTo) {
-                                rangeTo = lineItem.bid;
-                            }
-                            if (lineItem.bid < rangeFrom) {
-                                rangeFrom = lineItem.bid;
-                            }
-                            adUnitKeys = [...adUnitKeys, ...lineItem.adUnitKeys].unique();
-                        });
+            OrderController.getOrder(orderKey).then(order => {
+                let {lineItemInfo, rangeFrom, rangeTo} = this.state,
+                    adUnitKeys = [],
+                    defaultLineItemInfo = lineItemInfo,
+                    values = {},
+                    defaultFields = [];
+                if (!isEmpty(order.lineItems)) {
+                    for (let key in defaultLineItemInfo) {
+                        values[key] = [];
                     }
 
-                    if (isEmpty(values)) {
-                        values = lineItemInfo;
+                    order.lineItems.forEach(lineItem => {
+                        for (let key in defaultLineItemInfo) {
+                            if (!lineItem.hasOwnProperty(key)) {
+                                continue;
+                            }
+                            let value = lineItem[key];
+                            if (values[key].indexOf(value) === -1) {
+                                values[key].push(value);
+                            }
+                        }
+                    });
+
+                    for (let key in defaultLineItemInfo) {
+                        if (values.hasOwnProperty(key) && values[key].length === 1) {
+                            values[key] = values[key].shift();
+                        } else {
+                            values[key] = defaultLineItemInfo[key];
+                            defaultFields.push(key);
+                        }
                     }
 
-                    this.setState(state => ({
-                        isOpen: !state.isOpen,
-                        orderName: order.name,
-                        lineItemInfo: values,
-                        defaultFields: defaultFields,
-                        rangeFrom: rangeFrom,
-                        rangeTo: rangeTo,
-                        adunitsSelected: adUnitKeys,
-                        title: "Duplicate Order"
-                    }));
-                });
+                    rangeFrom = 999999999;
+                    rangeTo = 0;
+                    order.lineItems.forEach(lineItem => {
+                        if (lineItem.bid > rangeTo) {
+                            rangeTo = lineItem.bid;
+                        }
+                        if (lineItem.bid < rangeFrom) {
+                            rangeFrom = lineItem.bid;
+                        }
+                        adUnitKeys = [...adUnitKeys, ...lineItem.adUnitKeys].unique();
+                    });
+                }
+
+                if (isEmpty(values)) {
+                    values = lineItemInfo;
+                }
+
+                this.setState(state => ({
+                    isOpen: !state.isOpen,
+                    orderName: order.name,
+                    lineItemInfo: values,
+                    defaultFields: defaultFields,
+                    rangeFrom: rangeFrom,
+                    rangeTo: rangeTo,
+                    adunitsSelected: adUnitKeys,
+                    title: "Duplicate Order"
+                }));
+            });
         } else {
-            this.setState(state => ({ isOpen: !state.isOpen }));
+            this.setState(state => ({isOpen: !state.isOpen}));
         }
     }
 }
