@@ -310,7 +310,8 @@ export const OrderController = new class Order {
                         name = name.replace("{position}", line);
                         line++;
                     } else {
-                        for (let i = bidDecimal; i < bidDecimal + s; i += keywordStep) {
+                        const to = +this.toValidUI(bidDecimal + s).toFixed(2);
+                        for (let i = bidDecimal; i < to; i += keywordStep) {
                             i = this.toValidUI(i);
                             // const keyword = `${keywordAdvertiser}${delimiter}${i}`;
                             const keyword = keywordTemplate.replace(mask, i);

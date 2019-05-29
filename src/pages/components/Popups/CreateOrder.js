@@ -39,6 +39,12 @@ const keywordTemplateDefaultValue = {
     amazon: "amznslots:m320x50p{position}"
 };
 
+const advertiserDefaultName = {
+    pubnative: "PubNative",
+    openx: "OpenX",
+    amazon: "Amazon A9"
+};
+
 export class CreateOrderModal extends Component {
     static defaultProps = {
         onClose: () => {
@@ -574,7 +580,7 @@ export class CreateOrderModal extends Component {
         } = this.state;
 
         let order = {
-            advertiser: orderName,
+            advertiser: advertiserDefaultName[advertiser],
             description: "",
             name: orderName
         };
