@@ -303,7 +303,6 @@ export const OrderController = new class Order {
                     if (advertiser == 'amazon') {
                         for (let i = 0; i < keywordStep; i += 1) {
                             i = this.toValidUI(i);
-                            // const keyword = `${keywordAdvertiser}${delimiter}${i}`;
                             const keyword = keywordTemplate.replace(mask, i + line);
                             keywords.push(keyword);
                         }
@@ -313,7 +312,6 @@ export const OrderController = new class Order {
                         const to = +this.toValidUI(bidDecimal + s).toFixed(2);
                         for (let i = bidDecimal; i < to; i += keywordStep) {
                             i = this.toValidUI(i);
-                            // const keyword = `${keywordAdvertiser}${delimiter}${i}`;
                             const keyword = keywordTemplate.replace(mask, i);
                             keywords.push(keyword);
                         }

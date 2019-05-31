@@ -36,7 +36,13 @@ const defaultAdvertiserValue = "pubnative";
 const keywordTemplateDefaultValue = {
     pubnative: "pn_bid:{bid}",
     openx: "hb_pb:{bid}",
-    amazon: "amznslots:m320x50p{position}"
+    amazon: "amznslots:m320x50p{position} {bid}"
+};
+
+const keywordPlaceholder = {
+    pubnative: "PN Hybib {bid}",
+    openx: "hb_pb {bid}",
+    amazon: "m320x50p{position}"
 };
 
 const advertiserDefaultName = {
@@ -91,7 +97,7 @@ export class CreateOrderModal extends Component {
             userAppsTargeting: "include",
             userAppsTargetingList: []
         },
-        lineItemsNaming: "",
+        lineItemsNaming: keywordPlaceholder[defaultAdvertiserValue],
         keywordTemplate:
             localStorage.getItem(defaultAdvertiserValue) ||
             keywordTemplateDefaultValue[defaultAdvertiserValue],
@@ -289,6 +295,7 @@ export class CreateOrderModal extends Component {
                                     id={"lineItemsNaming"}
                                     name={"lineItemsNaming"}
                                     onChange={this.handleInputChange}
+                                    value={this.state.lineItemsNaming}
                                     placeholder="PN Hybib {bid}"
                                     className={"form-control"}
                                 />
@@ -470,16 +477,16 @@ export class CreateOrderModal extends Component {
     handleInputChange(event) {
         const {value, name} = event.target;
         if (name === "advertiser") {
-            const storageKeywordTemplate =
-                localStorage.getItem(value) ||
-                keywordTemplateDefaultValue[value],
+            const storageKeywordTemplate = localStorage.getItem(value) || keywordTemplateDefaultValue[value],
+                lineItemsNaming = keywordPlaceholder[value],
                 keywordStep = value === "amazon" ? 1 : 0.01,
                 keywordStepLabel = value === "amazon" ? "Keyword Quantity" : "Keyword Step";
             this.setState({
                 keywordTemplate: storageKeywordTemplate,
                 keywordStep: keywordStep,
                 keywordStepMin: keywordStep,
-                keywordStepLabel: keywordStepLabel
+                keywordStepLabel: keywordStepLabel,
+                lineItemsNaming: lineItemsNaming
             });
         }
         this.setState({[name]: value});
@@ -544,10 +551,16 @@ export class CreateOrderModal extends Component {
         for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
             items++;
             if (items == 1) {
-                const j = this.toDecimal(bid);
-                const s = this.toDecimal(step);
-                for (let i = j; i < j + s; i += keywordStep) {
-                    keywords++;
+                if (advertiser === 'amazon') {
+                    for (let i = 0; i < keywordStep; i += 1) {
+                        keywords++;
+                    }
+                } else {
+                    const j = this.toDecimal(bid);
+                    const s = this.toDecimal(step);
+                    for (let i = j; i < j + s; i += keywordStep) {
+                        keywords++;
+                    }
                 }
             }
         }
