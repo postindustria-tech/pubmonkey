@@ -108,12 +108,12 @@ export const OrderController = new class Order {
     }
 
     restoreOrder(data) {
-        let {creatives, ...rest} = data
+        let {creatives, ...rest} = data;
 
-        rest['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
-        rest['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
-        rest['end_datetime_0'] = ''
-        rest['end_datetime_1'] = ''
+        rest['start_datetime_0'] = '';//moment().format('MM/DD/YYYY')
+        rest['start_datetime_1'] = '';//moment().add(1, 'm').format('hh:mm A')
+        rest['end_datetime_0'] = '';
+        rest['end_datetime_1'] = '';
 
         // let formData = LineItemModel.createFromJSON(data).toFormData()
         return this.createOrder(rest)
@@ -136,11 +136,11 @@ export const OrderController = new class Order {
     restoreLineItem(data, orderId) {
         let {creatives, ...rest} = data
 
-        rest['start_datetime_0'] = ''//moment().format('MM/DD/YYYY')
-        rest['start_datetime_1'] = ''//moment().add(1, 'm').format('hh:mm A')
-        rest['end_datetime_0'] = ''
-        rest['end_datetime_1'] = ''
-// console.log(data, orderId)
+        rest['start_datetime_0'] = '';//moment().format('MM/DD/YYYY')
+        rest['start_datetime_1'] = '';//moment().add(1, 'm').format('hh:mm A')
+        rest['end_datetime_0'] = '';
+        rest['end_datetime_1'] = '';
+
         // let formData = LineItemModel.createFromJSON(data).toFormData()
         return this.createLineItem(rest, orderId)
             .then(result => {
@@ -252,79 +252,85 @@ export const OrderController = new class Order {
     toDecimal = num => this.toValidUI(num / 100);
     toValidUI = num => Math.round(num * 100) / 100;
 
+    composerLineItems(orderKey, params) {
+        let {
+            adunits,
+            step,
+            keywordStep,
+            keywordTemplate,
+            rangeFrom,
+            rangeTo,
+            lineItemInfo,
+            lineItemsNaming,
+            advertiser
+        } = params;
+
+        let lineItems = [],
+            bid;
+
+        rangeFrom = this.toInteger(rangeFrom);
+        rangeTo = this.toInteger(rangeTo);
+        step = this.toInteger(step);
+
+        let keywordAdvertiser = null,
+            mask = '{bid}';
+        switch (advertiser) {
+            // case 'pubnative':
+            // keywordAdvertiser = 'pn_bid';
+            // break;
+            // case 'openx':
+            // keywordAdvertiser = 'hb_pb';
+            // break;
+            case 'amazon':
+                // keywordAdvertiser = 'amznslots:m320x50p';
+                mask = '{position}';
+                break;
+        }
+
+        let line = 1;
+        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+
+            const bidDecimal = this.toDecimal(bid);
+            const s = this.toDecimal(step);
+
+            let name = lineItemsNaming.replace("{bid}", bidDecimal);
+
+            let keywords = [];
+            if (advertiser == 'amazon') {
+                for (let i = 0; i < keywordStep; i += 1) {
+                    i = this.toValidUI(i);
+                    const keyword = keywordTemplate.replace(mask, i + line);
+                    keywords.push(keyword);
+                }
+                name = name.replace("{position}", line);
+                line++;
+            } else {
+                const to = +this.toValidUI(bidDecimal + s).toFixed(2);
+                for (let i = bidDecimal; i < to; i += keywordStep) {
+                    i = this.toValidUI(i);
+                    const keyword = keywordTemplate.replace(mask, i);
+                    keywords.push(keyword);
+                }
+            }
+            lineItems.push({
+                adUnitKeys: adunits,
+                bid: bidDecimal,
+                name: name,
+                orderKey: orderKey,
+                keywords: keywords,
+                ...lineItemInfo
+            });
+        }
+
+        return lineItems;
+    }
+
     createOrderDataFromSet(order, params, stepCallback) {
 
         return this.createOrderNew(order)
             .then(order => {
 
-                let {
-                    adunits,
-                    step,
-                    keywordStep,
-                    keywordTemplate,
-                    rangeFrom,
-                    rangeTo,
-                    lineItemInfo,
-                    lineItemsNaming,
-                    advertiser
-                } = params;
-
-                let lineItems = [],
-                    bid;
-
-                rangeFrom = this.toInteger(rangeFrom);
-                rangeTo = this.toInteger(rangeTo);
-                step = this.toInteger(step);
-
-                let keywordAdvertiser = null,
-                    mask = '{bid}';
-                switch (advertiser) {
-                    // case 'pubnative':
-                        // keywordAdvertiser = 'pn_bid';
-                        // break;
-                    // case 'openx':
-                        // keywordAdvertiser = 'hb_pb';
-                        // break;
-                    case 'amazon':
-                        // keywordAdvertiser = 'amznslots:m320x50p';
-                        mask = '{position}';
-                        break;
-                }
-
-                let line = 1;
-                for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-
-                    const bidDecimal = this.toDecimal(bid);
-                    const s = this.toDecimal(step);
-
-                    let name = lineItemsNaming.replace("{bid}", bidDecimal);
-
-                    let keywords = [];
-                    if (advertiser == 'amazon') {
-                        for (let i = 0; i < keywordStep; i += 1) {
-                            i = this.toValidUI(i);
-                            const keyword = keywordTemplate.replace(mask, i + line);
-                            keywords.push(keyword);
-                        }
-                        name = name.replace("{position}", line);
-                        line++;
-                    } else {
-                        const to = +this.toValidUI(bidDecimal + s).toFixed(2);
-                        for (let i = bidDecimal; i < to; i += keywordStep) {
-                            i = this.toValidUI(i);
-                            const keyword = keywordTemplate.replace(mask, i);
-                            keywords.push(keyword);
-                        }
-                    }
-                    lineItems.push({
-                        adUnitKeys: adunits,
-                        bid: bidDecimal,
-                        name: name,
-                        orderKey: order.key,
-                        keywords: keywords,
-                        ...lineItemInfo
-                    });
-                }
+                const lineItems = this.composerLineItems(order.key, params);
 
                 stepCallback({
                     ordersDone: 1,
@@ -333,9 +339,41 @@ export const OrderController = new class Order {
                     lineItemCount: lineItems.length
                 });
 
+                const {creativeFormat, advertiser} = params,
+                    [width, height] = creativeFormat.split('x');
+                let creativeHtmlData = '<div style="display:inline-block">\n' +
+                    '    <div id="__dtbAd__" style="width:{width}px; height:{height}px; overflow:hidden;">\n' +
+                    '        <!--Placeholder for the Ad --> \n' +
+                    '    </div>\n' +
+                    '    <script type="text/javascript" src="mraid.js"></script>\n' +
+                    '    <script type="text/javascript" src="https://c.amazon-adsystem.com/dtb-m.js"> </script>\n' +
+                    '    <script type="text/javascript">\n' +
+                    '          amzn.dtb.loadAd("%%KEYWORD:amznslots%%", "%%KEYWORD:amzn_b%%", "%%KEYWORD:amzn_h%%");\n' +
+                    '    </script>\n' +
+                    '</div>';
+                creativeHtmlData = creativeHtmlData
+                    .replace('{width}', width)
+                    .replace('{height}', height);
+
+
                 return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
 
                     return this.createLineItemNew(item)
+                        .then(lineItem => {
+                            if (advertiser == "amazon") {
+                                this.createCreatives({
+                                    adType: "html",
+                                    extended: {
+                                        htmlData: creativeHtmlData,
+                                        isMraid: true
+                                    },
+                                    format: creativeFormat,
+                                    imageKeys: [],
+                                    lineItemKey: lineItem.key,
+                                    name: "Mraid"
+                                });
+                            }
+                        })
                         .then(result => {
 
                             if (stepCallback) {

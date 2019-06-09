@@ -36,7 +36,7 @@ const defaultAdvertiserValue = "pubnative";
 const keywordTemplateDefaultValue = {
     pubnative: "pn_bid:{bid}",
     openx: "hb_pb:{bid}",
-    amazon: "amznslots:m320x50p{position} {bid}"
+    amazon: "amznslots:m{format}p{position} {bid}"
 };
 
 const keywordPlaceholder = {
@@ -51,6 +51,13 @@ const advertiserDefaultName = {
     amazon: "Amazon A9"
 };
 
+const creativeFormats = {
+    "320x50": "320 x 50 (Banner)",
+    "300x250": "300 x 250 (MRect)",
+    "728x90": "728 x 90 (Tablet Leaderboard)",
+    "160x600": "160 x 600 (Tablet Skyscraper)"
+};
+
 export class CreateOrderModal extends Component {
     static defaultProps = {
         onClose: () => {
@@ -62,6 +69,7 @@ export class CreateOrderModal extends Component {
         title: "Create New Order",
         isOpen: false,
         backdrop: true,
+        showCreativeFormat: false,
         advertiser: defaultAdvertiserValue,
         adunits: [],
         adunitsSelected: [],
@@ -117,7 +125,8 @@ export class CreateOrderModal extends Component {
         },
         formValid: true,
         willGenerateKeywords: 0,
-        willGenerateLineItems: 0
+        willGenerateLineItems: 0,
+        creativeFormat: "320x50"
     };
 
     onChangeStep = value => {
@@ -285,12 +294,12 @@ export class CreateOrderModal extends Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col className={"col-sm-3"}>Line Items naming:</Col>
-                            <Col className={"col-sm-9"}>
+                            <Col className={"col-sm-12"}>
+                                <span>Line Items naming: </span>
                                 <CustomInput
                                     invalid={!isEmpty(this.state.formErrors.lineItemsNaming)}
                                     inline
-                                    style={{width: "200px"}}
+                                    style={{width: "200px", display: "inline-block"}}
                                     type="text"
                                     id={"lineItemsNaming"}
                                     name={"lineItemsNaming"}
@@ -300,30 +309,33 @@ export class CreateOrderModal extends Component {
                                     className={"form-control"}
                                 />
                                 <FormText color="muted">
-                                    "bid" macro above is replaced to the bid value corresponding
-                                    to the line item
+                                    "bid" macro above is replaced to the bid value corresponding to the line item
                                 </FormText>
                             </Col>
                         </Row>
-
                         <Row>
-                            <Col className={"col-sm-3"}>Keywords template:</Col>
-                            <Col className={"col-sm-9"}>
-                                <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.keywordsTemplate)}
-                                    inline
-                                    style={{width: "300px"}}
-                                    type="text"
-                                    id={"keywordsTemplate"}
-                                    value={this.state.keywordTemplate}
-                                    name={"keywordsTemplate"}
-                                    onChange={this.handleChangeKeywordTemplate}
-                                    placeholder="pn_bid:{bid}"
-                                    className={"form-control"}
-                                />
-                                {/* <FormText color="muted">
-                                    "bid" macro above is replaced to the bid value corresponding to the line item
-                                </FormText> */}
+                            <Col className={"col-sm-12"}>
+                                <span>Keywords template: </span>
+                                {this.state.keywordTemplate}
+                            </Col>
+                        </Row>
+                        <Row hidden={!this.state.showCreativeFormat}>
+                            <Col className={"col-sm-12"}>
+                                <span>Creative format: </span>
+                                <Input
+                                    type="select"
+                                    name={"creativeFormat"}
+                                    id="creativeFormat"
+                                    onChange={this.handleInputChange}
+                                    value={this.state.creativeFormat}
+                                    style={{display: "inline-block", width: "auto"}}
+                                >
+                                    {Object.keys(creativeFormats).map((option, index) =>
+                                        <option key={index} value={option}>
+                                            {creativeFormats[option]}
+                                        </option>
+                                    )}
+                                </Input>
                             </Col>
                         </Row>
                         <Row>
@@ -477,20 +489,35 @@ export class CreateOrderModal extends Component {
     handleInputChange(event) {
         const {value, name} = event.target;
         if (name === "advertiser") {
-            const storageKeywordTemplate = localStorage.getItem(value) || keywordTemplateDefaultValue[value],
-                lineItemsNaming = keywordPlaceholder[value],
+            const lineItemsNaming = keywordPlaceholder[value],
                 keywordStep = value === "amazon" ? 1 : 0.01,
-                keywordStepLabel = value === "amazon" ? "Keyword Quantity" : "Keyword Step";
+                keywordStepLabel = value === "amazon" ? "Keyword Quantity" : "Keyword Step",
+                showCreativeFormat = value === "amazon";
+
             this.setState({
-                keywordTemplate: storageKeywordTemplate,
+                keywordTemplate: CreateOrderModal.getKeywordTemplate(value, this.state.creativeFormat),
                 keywordStep: keywordStep,
                 keywordStepMin: keywordStep,
                 keywordStepLabel: keywordStepLabel,
-                lineItemsNaming: lineItemsNaming
+                lineItemsNaming: lineItemsNaming,
+                showCreativeFormat: showCreativeFormat
+            });
+        }
+        if (name === "creativeFormat") {
+            this.setState({
+                keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value)
             });
         }
         this.setState({[name]: value});
     }
+
+    static getKeywordTemplate = (value, creativeFormat) => {
+        let storageKeywordTemplate = localStorage.getItem(value) || keywordTemplateDefaultValue[value];
+        if (value === "amazon") {
+            storageKeywordTemplate = storageKeywordTemplate.replace('{format}', creativeFormat);
+        }
+        return storageKeywordTemplate;
+    };
 
     @bind
     handleChangeKeywordTemplate(event) {
@@ -589,7 +616,8 @@ export class CreateOrderModal extends Component {
             orderName,
             lineItemInfo,
             lineItemsNaming,
-            advertiser
+            advertiser,
+            creativeFormat
         } = this.state;
 
         let order = {
@@ -607,7 +635,8 @@ export class CreateOrderModal extends Component {
             rangeTo,
             lineItemInfo,
             lineItemsNaming,
-            advertiser
+            advertiser,
+            creativeFormat
         };
 
         ModalWindowService.ProgressModal.setProgress([
