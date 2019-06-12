@@ -20,7 +20,8 @@ import {
     CustomInput,
     Card,
     CardBody,
-    CardHeader
+    CardHeader,
+    Tooltip
 } from "reactstrap";
 import InputNumber from "rc-input-number";
 import {OrderController} from "../../controllers";
@@ -36,7 +37,7 @@ const defaultAdvertiserValue = "pubnative";
 const keywordTemplateDefaultValue = {
     pubnative: "pn_bid:{bid}",
     openx: "hb_pb:{bid}",
-    amazon: "amznslots:m{format}p{position} {bid}"
+    amazon: "amznslots:m{format}p{position}"
 };
 
 const keywordPlaceholder = {
@@ -126,7 +127,15 @@ export class CreateOrderModal extends Component {
         formValid: true,
         willGenerateKeywords: 0,
         willGenerateLineItems: 0,
-        creativeFormat: "320x50"
+        creativeFormat: "320x50",
+        tooltipOpen: false
+    };
+
+    @bind
+    tooltipToggle() {
+        this.setState({
+            tooltipOpen: !this.state.tooltipOpen
+        });
     };
 
     onChangeStep = value => {
@@ -186,116 +195,99 @@ export class CreateOrderModal extends Component {
                 >
                     <ModalHeader>{this.state.title}</ModalHeader>
 
-                    <ModalBody>
+                    <ModalBody className="mp-order-form">
                         <div className="panel panel-default">
                             <FormErrors
                                 formErrors={this.state.formErrors}
                                 formValid={this.state.formValid}
                             />
                         </div>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <Label for="orderName" className="mr-sm-2">
-                                    Order Name:
-                                </Label>
-                                <Input
-                                    invalid={!isEmpty(this.state.formErrors.orderName)}
-                                    type="text"
-                                    name={"orderName"}
-                                    id="orderName"
-                                    onChange={this.handleInputChange}
-                                    value={this.state.orderName}
-                                />
-                            </FormGroup>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <Label for="AdServer" className="mr-sm-2">
-                                    AdServer:
-                                </Label>
-                                <Input
-                                    type="select"
-                                    name={"AdServer"}
-                                    onChange={this.handleInputChange}
-                                    id="AdServer"
-                                >
-                                    <option value={1}>MoPub</option>
-                                </Input>
-                            </FormGroup>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <Label for="Advertiser" className="mr-sm-2">
-                                    Advertiser:
-                                </Label>
-                                <Input
-                                    type="select"
-                                    name={"advertiser"}
-                                    id="advertiser"
-                                    onChange={this.handleInputChange}
-                                    value={this.state.advertiser}
-                                >
-                                    <option value={"pubnative"}>Pubnative</option>
-                                    <option value={"openx"}>OpenX</option>
-                                    <option value={"amazon"}>Amazon A9</option>
-                                </Input>
-                            </FormGroup>
-                        </Form>
+                        <Row>
+                            <Col className={"col-sm-12"}>
+                                <Form inline>
+                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                                        <Label for="orderName" className="mr-sm-2 mp-label">
+                                            Order Name:
+                                        </Label>
+                                        <Input
+                                            invalid={!isEmpty(this.state.formErrors.orderName)}
+                                            type="text"
+                                            name={"orderName"}
+                                            id="orderName"
+                                            onChange={this.handleInputChange}
+                                            value={this.state.orderName}
+                                            className={"mp-form-control"}
+                                        />
+                                    </FormGroup>
+                                </Form>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col className={"col-sm-12"}>
+                                <Form inline>
+                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                                        <Label for="AdServer" className="mr-sm-2 mp-label">
+                                            AdServer:
+                                        </Label>
+                                        <Input
+                                            type="select"
+                                            name={"AdServer"}
+                                            onChange={this.handleInputChange}
+                                            id="AdServer"
+                                            className={"mp-form-control"}
+                                        >
+                                            <option value={1}>MoPub</option>
+                                        </Input>
+                                    </FormGroup>
+                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                                        <Label for="Advertiser" className="mr-sm-2 mp-label">
+                                            Advertiser:
+                                        </Label>
+                                        <Input
+                                            type="select"
+                                            name={"advertiser"}
+                                            id="advertiser"
+                                            onChange={this.handleInputChange}
+                                            value={this.state.advertiser}
+                                            className={"mp-form-control"}
+                                        >
+                                            <option value={"pubnative"}>Pubnative</option>
+                                            <option value={"openx"}>OpenX</option>
+                                            <option value={"amazon"}>Amazon A9</option>
+                                        </Input>
+                                    </FormGroup>
+                                </Form>
+                            </Col>
+                        </Row>
 
                         <Row>
                             <Col className={"col-sm-12"}>
-                                Line Items Range: from [
+                                <span className={"mp-label"}>Line Items Range:</span> from [
                                 <CustomInput
                                     invalid={!isEmpty(this.state.formErrors.rangeFrom)}
                                     inline
-                                    style={{width: "40px"}}
+                                    style={{width: "50px"}}
                                     type="text"
                                     id={"rangeFrom"}
                                     name={"rangeFrom"}
                                     value={this.state.rangeFrom}
                                     onChange={this.handleInputChange}
+                                    className={"mp-form-control"}
                                 />{" "}
                                 to{" "}
                                 <CustomInput
                                     invalid={!isEmpty(this.state.formErrors.rangeTo)}
                                     inline
-                                    style={{width: "40px"}}
+                                    style={{width: "50px"}}
                                     type="text"
                                     id={"rangeTo"}
                                     name={"rangeTo"}
                                     value={this.state.rangeTo}
                                     onChange={this.handleInputChange}
+                                    className={"mp-form-control"}
                                 />
-                                ].
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col className={"col-sm-12"}>
-                                Step:
-                                <InputNumber
-                                    invalid={!isEmpty(this.state.formErrors.step)}
-                                    min={0.1}
-                                    max={1000}
-                                    step={0.1}
-                                    value={this.state.step}
-                                    onChange={this.onChangeStep}
-                                    style={{width: 60}}
-                                />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col className={"col-sm-12"}>
-                                {this.state.keywordStepLabel}:
-                                <InputNumber
-                                    invalid={!isEmpty(this.state.formErrors.keywordStep)}
-                                    min={this.state.keywordStepMin}
-                                    max={1000}
-                                    step={this.state.keywordStepMin}
-                                    value={this.state.keywordStep}
-                                    onChange={this.onChangeKeywordStep}
-                                    style={{width: 60}}
-                                />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col className={"col-sm-12"}>
-                                <span>Line Items naming: </span>
+                                ].{" "}
+                                <span className={"mp-label"}>Line Items naming: </span>
                                 <CustomInput
                                     invalid={!isEmpty(this.state.formErrors.lineItemsNaming)}
                                     inline
@@ -306,22 +298,49 @@ export class CreateOrderModal extends Component {
                                     onChange={this.handleInputChange}
                                     value={this.state.lineItemsNaming}
                                     placeholder="PN Hybib {bid}"
-                                    className={"form-control"}
-                                />
-                                <FormText color="muted">
+                                    className={"mp-form-control"}
+                                />{" "}
+                                <i className="fa fa-question-circle" id={'Tooltip-1'}></i>
+                                <Tooltip placement="top" isOpen={this.state.tooltipOpen} target={'Tooltip-1'} toggle={this.tooltipToggle}>
                                     "bid" macro above is replaced to the bid value corresponding to the line item
-                                </FormText>
+                                </Tooltip>
                             </Col>
                         </Row>
                         <Row>
                             <Col className={"col-sm-12"}>
-                                <span>Keywords template: </span>
+                                <span className={"mp-label"}>Step: </span>
+                                <InputNumber
+                                    invalid={!isEmpty(this.state.formErrors.step)}
+                                    min={0.1}
+                                    max={1000}
+                                    step={0.1}
+                                    value={this.state.step}
+                                    onChange={this.onChangeStep}
+                                    style={{width: 65}}
+                                    className={"mp-form-control"}
+                                />{" "}
+                                <span className={"mp-label"}>{this.state.keywordStepLabel}: </span>
+                                <InputNumber
+                                    invalid={!isEmpty(this.state.formErrors.keywordStep)}
+                                    min={this.state.keywordStepMin}
+                                    max={1000}
+                                    step={this.state.keywordStepMin}
+                                    value={this.state.keywordStep}
+                                    onChange={this.onChangeKeywordStep}
+                                    style={{width: 65}}
+                                    className={"mp-form-control"}
+                                />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col className={"col-sm-12"}>
+                                <span className={"mp-label"}>Keywords template: </span>
                                 {this.state.keywordTemplate}
                             </Col>
                         </Row>
                         <Row hidden={!this.state.showCreativeFormat}>
                             <Col className={"col-sm-12"}>
-                                <span>Creative format: </span>
+                                <span className={"mp-label"}>Creative format: </span>
                                 <Input
                                     type="select"
                                     name={"creativeFormat"}
@@ -329,6 +348,7 @@ export class CreateOrderModal extends Component {
                                     onChange={this.handleInputChange}
                                     value={this.state.creativeFormat}
                                     style={{display: "inline-block", width: "auto"}}
+                                    className={"mp-form-control"}
                                 >
                                     {Object.keys(creativeFormats).map((option, index) =>
                                         <option key={index} value={option}>
@@ -338,6 +358,7 @@ export class CreateOrderModal extends Component {
                                 </Input>
                             </Col>
                         </Row>
+                        <br/>
                         <Row>
                             <Col className={"col-sm-12"}>
                                 <Card>
