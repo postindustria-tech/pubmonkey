@@ -24,9 +24,9 @@ export class AdUnitsList extends Component {
                     <thead>
                         <tr>
                             <th>App Name</th>
-                            <th>AdUnit Name</th>
+                            <th>Ad Unit Name</th>
                             <th>Format</th>
-                            <th>Key</th>
+                            <th>Ad Unit ID</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,7 +34,7 @@ export class AdUnitsList extends Component {
                             adunits.map(({ name, format, key, appName}) =>(
                                 <tr key={ key }>
                                     <td>{ appName }</td>
-                                    <td>{ name }</td>
+                                    <td><a target="_blank" href={ `https://app.mopub.com/ad-unit?key=${key}` }>{ name }</a></td>
                                     <td>{ format }</td>
                                     <td>{ key }</td>
                                 </tr>

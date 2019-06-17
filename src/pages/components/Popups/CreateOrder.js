@@ -136,7 +136,7 @@ export class CreateOrderModal extends Component {
         this.setState({
             tooltipOpen: !this.state.tooltipOpen
         });
-    };
+    }
 
     onChangeStep = value => {
         this.setState({
@@ -286,8 +286,7 @@ export class CreateOrderModal extends Component {
                                     onChange={this.handleInputChange}
                                     className={"mp-form-control"}
                                 />
-                                ].{" "}
-                                <span className={"mp-label"}>Line Items naming: </span>
+                                ]. <span className={"mp-label"}>Line Items naming: </span>
                                 <CustomInput
                                     invalid={!isEmpty(this.state.formErrors.lineItemsNaming)}
                                     inline
@@ -300,9 +299,15 @@ export class CreateOrderModal extends Component {
                                     placeholder="PN Hybib {bid}"
                                     className={"mp-form-control"}
                                 />{" "}
-                                <i className="fa fa-question-circle" id={'Tooltip-1'}></i>
-                                <Tooltip placement="top" isOpen={this.state.tooltipOpen} target={'Tooltip-1'} toggle={this.tooltipToggle}>
-                                    "bid" macro above is replaced to the bid value corresponding to the line item
+                                <i className="fa fa-question-circle" id={"Tooltip-1"}/>
+                                <Tooltip
+                                    placement="top"
+                                    isOpen={this.state.tooltipOpen}
+                                    target={"Tooltip-1"}
+                                    toggle={this.tooltipToggle}
+                                >
+                                    "bid" macro above is replaced to the bid value corresponding
+                                    to the line item
                                 </Tooltip>
                             </Col>
                         </Row>
@@ -319,7 +324,9 @@ export class CreateOrderModal extends Component {
                                     style={{width: 65}}
                                     className={"mp-form-control"}
                                 />{" "}
-                                <span className={"mp-label"}>{this.state.keywordStepLabel}: </span>
+                                <span className={"mp-label"}>
+                  {this.state.keywordStepLabel}:{" "}
+                </span>
                                 <InputNumber
                                     invalid={!isEmpty(this.state.formErrors.keywordStep)}
                                     min={this.state.keywordStepMin}
@@ -350,11 +357,11 @@ export class CreateOrderModal extends Component {
                                     style={{display: "inline-block", width: "auto"}}
                                     className={"mp-form-control"}
                                 >
-                                    {Object.keys(creativeFormats).map((option, index) =>
+                                    {Object.keys(creativeFormats).map((option, index) => (
                                         <option key={index} value={option}>
                                             {creativeFormats[option]}
                                         </option>
-                                    )}
+                                    ))}
                                 </Input>
                             </Col>
                         </Row>
@@ -471,8 +478,7 @@ export class CreateOrderModal extends Component {
             fieldValidationErrors.lineItemsNaming = "Keyword step is required!";
             isValid = false;
         }
-        if (data.advertiser == 'amazon') {
-
+        if (data.advertiser == "amazon") {
         } else {
             if (data.keywordStep >= data.step) {
                 fieldValidationErrors.step =
@@ -512,11 +518,15 @@ export class CreateOrderModal extends Component {
         if (name === "advertiser") {
             const lineItemsNaming = keywordPlaceholder[value],
                 keywordStep = value === "amazon" ? 1 : 0.01,
-                keywordStepLabel = value === "amazon" ? "Keyword Quantity" : "Keyword Step",
+                keywordStepLabel =
+                    value === "amazon" ? "Keyword Quantity" : "Keyword Step",
                 showCreativeFormat = value === "amazon";
 
             this.setState({
-                keywordTemplate: CreateOrderModal.getKeywordTemplate(value, this.state.creativeFormat),
+                keywordTemplate: CreateOrderModal.getKeywordTemplate(
+                    value,
+                    this.state.creativeFormat
+                ),
                 keywordStep: keywordStep,
                 keywordStepMin: keywordStep,
                 keywordStepLabel: keywordStepLabel,
@@ -533,9 +543,13 @@ export class CreateOrderModal extends Component {
     }
 
     static getKeywordTemplate = (value, creativeFormat) => {
-        let storageKeywordTemplate = localStorage.getItem(value) || keywordTemplateDefaultValue[value];
+        let storageKeywordTemplate =
+            localStorage.getItem(value) || keywordTemplateDefaultValue[value];
         if (value === "amazon") {
-            storageKeywordTemplate = storageKeywordTemplate.replace('{format}', creativeFormat);
+            storageKeywordTemplate = storageKeywordTemplate.replace(
+                "{format}",
+                creativeFormat
+            );
         }
         return storageKeywordTemplate;
     };
@@ -599,7 +613,7 @@ export class CreateOrderModal extends Component {
         for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
             items++;
             if (items == 1) {
-                if (advertiser === 'amazon') {
+                if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         keywords++;
                     }
@@ -671,22 +685,27 @@ export class CreateOrderModal extends Component {
             }
         ]);
 
-        let promise = OrderController.createOrderDataFromSet(order, params,
-                ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
-                    ModalWindowService.ProgressModal.setProgress([
-                        {
-                            title: `orders: ${ordersDone}/${orderCount}`,
-                            progress: {value: (ordersDone / orderCount) * 100}
-                        },
-                        {
-                            title: `line items: ${lineItemsDone}/${lineItemCount}`,
-                            progress: {value: (lineItemsDone / lineItemCount) * 100}
-                        }
-                    ]);
-                }
-            )
+        let promise = OrderController.createOrderDataFromSet(
+            order,
+            params,
+            ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
+                ModalWindowService.ProgressModal.setProgress([
+                    {
+                        title: `orders: ${ordersDone}/${orderCount}`,
+                        progress: {value: (ordersDone / orderCount) * 100}
+                    },
+                    {
+                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                        progress: {value: (lineItemsDone / lineItemCount) * 100}
+                    }
+                ]);
+            }
+        )
             .then(ModalWindowService.ProgressModal.hideModal)
-            .finally(this.close());
+            .finally(() => {
+                this.close();
+                this.props.toUpdate && this.props.toUpdate();
+            });
     }
 
     @bind
