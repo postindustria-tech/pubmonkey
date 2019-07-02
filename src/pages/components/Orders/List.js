@@ -252,7 +252,6 @@ export class OrdersList extends Component {
 
     @bind
     loadOrders() {
-        console.log("aaaa");
         OrderController.getAllOrders().then((orders = []) =>
             this.setState({orders})
         );

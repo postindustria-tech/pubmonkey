@@ -5,6 +5,12 @@ import {LineItemModel} from '../models'
 
 const WEB_URL = 'https://app.mopub.com'
 
+
+Promise.config({
+    // Enable cancellation
+    cancellation: true,
+});
+
 export const OrderController = new class Order {
     getAllOrders() {
         return HTTPService.GET(`${WEB_URL}/web-client/api/orders/query`)
@@ -262,7 +268,9 @@ export const OrderController = new class Order {
             rangeTo,
             lineItemInfo,
             lineItemsNaming,
-            advertiser
+            advertiser,
+            networkClass,
+            Ad_ZONE_ID
         } = params;
 
         let lineItems = [],
@@ -312,6 +320,17 @@ export const OrderController = new class Order {
                     keywords.push(keyword);
                 }
             }
+
+            if (advertiser == 'pubnative') {
+                lineItemInfo.type = 'network';
+                lineItemInfo['networkType'] = "custom_native";
+                lineItemInfo['enableOverrides'] = true;
+                lineItemInfo['overrideFields'] = {
+                    custom_event_class_name: networkClass,
+                    custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
+                }
+            }
+
             lineItems.push({
                 adUnitKeys: adunits,
                 bid: bidDecimal,
@@ -341,26 +360,44 @@ export const OrderController = new class Order {
 
                 const {creativeFormat, advertiser} = params,
                     [width, height] = creativeFormat.split('x');
-                let creativeHtmlData = '<div style="display:inline-block">\n' +
-                    '    <div id="__dtbAd__" style="width:{width}px; height:{height}px; overflow:hidden;">\n' +
-                    '        <!--Placeholder for the Ad --> \n' +
-                    '    </div>\n' +
-                    '    <script type="text/javascript" src="mraid.js"></script>\n' +
-                    '    <script type="text/javascript" src="https://c.amazon-adsystem.com/dtb-m.js"> </script>\n' +
-                    '    <script type="text/javascript">\n' +
-                    '          amzn.dtb.loadAd("%%KEYWORD:amznslots%%", "%%KEYWORD:amzn_b%%", "%%KEYWORD:amzn_h%%");\n' +
-                    '    </script>\n' +
-                    '</div>';
-                creativeHtmlData = creativeHtmlData
-                    .replace('{width}', width)
-                    .replace('{height}', height);
+                let creativeHtmlData = null;
+                if (advertiser === "amazon") {
+                    creativeHtmlData = '<div style="display:inline-block">\n' +
+                        '    <div id="__dtbAd__" style="width:{width}px; height:{height}px; overflow:hidden;">\n' +
+                        '        <!--Placeholder for the Ad --> \n' +
+                        '    </div>\n' +
+                        '    <script type="text/javascript" src="mraid.js"></script>\n' +
+                        '    <script type="text/javascript" src="https://c.amazon-adsystem.com/dtb-m.js"> </script>\n' +
+                        '    <script type="text/javascript">\n' +
+                        '          amzn.dtb.loadAd("%%KEYWORD:amznslots%%", "%%KEYWORD:amzn_b%%", "%%KEYWORD:amzn_h%%");\n' +
+                        '    </script>\n' +
+                        '</div>';
+                    creativeHtmlData = creativeHtmlData
+                        .replace('{width}', width)
+                        .replace('{height}', height);
+                }
+                if (advertiser === "openx") {
+                    creativeHtmlData = '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
+                        '<script>\n' +
+                        '   var ucTagData = {};\n' +
+                        '   ucTagData.adServerDomain = "";\n' +
+                        '   ucTagData.pubUrl = "%%KEYWORD:url%%";\n' +
+                        '   ucTagData.targetingKeywords = "%%KEYWORDS%%";\n' +
+                        '   ucTagData.hbPb = "%%KEYWORD:hb_pb%%";\n' +
+                        '   try {\n' +
+                        '       ucTag.renderAd(document, ucTagData);\n' +
+                        '   } catch (e) {\n' +
+                        '       console.log(e);\n' +
+                        '   }\n' +
+                        '</script>';
+                }
 
 
                 return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
 
                     return this.createLineItemNew(item)
                         .then(lineItem => {
-                            if (advertiser == "amazon") {
+                            if (advertiser === "amazon" || advertiser === "openx") {
                                 this.createCreatives({
                                     adType: "html",
                                     extended: {

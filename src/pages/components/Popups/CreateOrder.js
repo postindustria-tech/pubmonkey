@@ -48,8 +48,8 @@ const keywordPlaceholder = {
 
 const advertiserDefaultName = {
     pubnative: "PubNative",
-    openx: "OpenX",
-    amazon: "Amazon A9"
+    openx: "Prebid.org",
+    amazon: "Amazon HB"
 };
 
 const creativeFormats = {
@@ -59,7 +59,30 @@ const creativeFormats = {
     "160x600": "160 x 600 (Tablet Skyscraper)"
 };
 
+const networkClass = {
+    "": {
+        "": "Please select OS"
+    },
+    "iphone": {
+        "HyBidMoPubLeaderboardCustomEvent": "728x90 Leaderboard",
+        "HyBidMoPubBannerCustomEvent": "320x50 Banner",
+        "HyBidMoPubMRectCustomEvent": "300x250 MRect",
+        "HyBidMoPubInterstitialCustomEvent": "728x90 Leaderboard"
+    },
+    "android": {
+        "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50 Banner",
+        "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250 Banner",
+        "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": "Interstitial"
+    }
+};
+
+const helperText = "{bid} macro is replaced with a corresponding bid value\n" +
+    "{position} macro is replaced with a position number (natural values starting from 1)";
+
+let progress = null;
+
 export class CreateOrderModal extends Component {
+    progress = null;
     static defaultProps = {
         onClose: () => {
         },
@@ -128,7 +151,11 @@ export class CreateOrderModal extends Component {
         willGenerateKeywords: 0,
         willGenerateLineItems: 0,
         creativeFormat: "320x50",
-        tooltipOpen: false
+        tooltipOpen: false,
+        selectedAdvertiser: "pubnative",
+        Ad_ZONE_ID: 2,
+        os: "",
+        networkClass: ""
     };
 
     @bind
@@ -150,10 +177,19 @@ export class CreateOrderModal extends Component {
         });
     };
 
+    onCancel = () => {
+        progress.cancel();
+        this.close();
+        this.props.toUpdate && this.props.toUpdate();
+        ModalWindowService.ProgressModal.hideModal();
+    };
+
     componentDidMount = () => {
         window.MopubAutomation.adunits.then(adunits => this.setState({adunits}));
 
         ModalWindowService.onUpdate = () => this.forceUpdate();
+
+        ModalWindowService.ProgressModal.onCancel(this.onCancel);
     };
 
     componentWillUnmount() {
@@ -251,15 +287,16 @@ export class CreateOrderModal extends Component {
                                             value={this.state.advertiser}
                                             className={"mp-form-control"}
                                         >
-                                            <option value={"pubnative"}>Pubnative</option>
-                                            <option value={"openx"}>OpenX</option>
-                                            <option value={"amazon"}>Amazon A9</option>
+                                            {Object.keys(advertiserDefaultName).map((option, index) => (
+                                                <option key={index} value={option}>
+                                                    {advertiserDefaultName[option]}
+                                                </option>
+                                            ))}
                                         </Input>
                                     </FormGroup>
                                 </Form>
                             </Col>
                         </Row>
-
                         <Row>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items Range:</span> from [
@@ -306,8 +343,7 @@ export class CreateOrderModal extends Component {
                                     target={"Tooltip-1"}
                                     toggle={this.tooltipToggle}
                                 >
-                                    "bid" macro above is replaced to the bid value corresponding
-                                    to the line item
+                                    {helperText}
                                 </Tooltip>
                             </Col>
                         </Row>
@@ -325,8 +361,8 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                 />{" "}
                                 <span className={"mp-label"}>
-                  {this.state.keywordStepLabel}:{" "}
-                </span>
+                                  {this.state.keywordStepLabel}:{" "}
+                                </span>
                                 <InputNumber
                                     invalid={!isEmpty(this.state.formErrors.keywordStep)}
                                     min={this.state.keywordStepMin}
@@ -365,6 +401,56 @@ export class CreateOrderModal extends Component {
                                 </Input>
                             </Col>
                         </Row>
+                        <Row hidden={this.state.selectedAdvertiser!=='pubnative'}>
+                            <Col className={"col-sm-12"}>
+                                <span className={"mp-label"}>OS: </span>
+                                <Input
+                                    type="select"
+                                    name={"os"}
+                                    id="creativeFormat"
+                                    onChange={this.handleInputChange}
+                                    value={this.state.os}
+                                    style={{display: "inline-block", width: "auto"}}
+                                    className={"mp-form-control"}
+                                >
+                                    <option value={""}>Select OS</option>
+                                    <option value={"iphone"}>iPhone</option>
+                                    <option value={"android"}>Android</option>
+                                </Input>
+                                {" "}
+                                <span className={"mp-label"}>Class: </span>
+                                <Input
+                                    type="select"
+                                    name={"networkClass"}
+                                    id="creativeFormat"
+                                    onChange={this.handleInputChange}
+                                    value={this.state.networkClass}
+                                    style={{display: "inline-block", width: "auto"}}
+                                    className={"mp-form-control"}
+                                    invalid={!isEmpty(this.state.formErrors.networkClass)}
+                                >
+                                    {Object.keys(networkClass[this.state.os]).map((option, index) => (
+                                        <option key={index} value={option}>
+                                            {networkClass[this.state.os][option]}
+                                        </option>
+                                    ))}
+                                </Input>
+                                {" "}
+                                <span className={"mp-label"}>Ad_ZONE_ID:</span>
+                                <CustomInput
+                                    invalid={!isEmpty(this.state.formErrors.Ad_ZONE_ID)}
+                                    inline
+                                    type="text"
+                                    id={"Ad_ZONE_ID"}
+                                    name={"Ad_ZONE_ID"}
+                                    value={this.state.Ad_ZONE_ID}
+                                    onChange={this.handleInputChange}
+                                    className={"mp-form-control"}
+                                    style={{width: "50px"}}
+                                />
+
+                            </Col>
+                        </Row>
                         <br/>
                         <Row>
                             <Col className={"col-sm-12"}>
@@ -383,7 +469,7 @@ export class CreateOrderModal extends Component {
                                             </thead>
                                             <tbody>
                                             {this.state.adunits.map(
-                                                ({name, format, key, appName}) => (
+                                                ({name, format, key, appName, appType}) => (
                                                     <tr key={key}>
                                                         <td>
                                                             <div className="custom-control custom-checkbox">
@@ -394,6 +480,7 @@ export class CreateOrderModal extends Component {
                                                                     className="custom-control-input"
                                                                     id={`adUnit${key}`}
                                                                     checked={this.setCheckedStatus(key)}
+                                                                    disabled={this.state.os !== "" && this.state.os !== appType}
                                                                 />
                                                                 <label
                                                                     className="custom-control-label"
@@ -457,7 +544,9 @@ export class CreateOrderModal extends Component {
             step: "",
             keywordStep: "",
             rangeFrom: "",
-            rangeTo: ""
+            rangeTo: "",
+            networkClass: "",
+            Ad_ZONE_ID: ""
         };
         let isValid = true;
 
@@ -478,19 +567,26 @@ export class CreateOrderModal extends Component {
             fieldValidationErrors.lineItemsNaming = "Keyword step is required!";
             isValid = false;
         }
-        if (data.advertiser == "amazon") {
-        } else {
-            if (data.keywordStep >= data.step) {
+        if (data.advertiser !== "amazon") {
+            if (data.keywordStep > data.step) {
                 fieldValidationErrors.step =
                     "Line items step can not be less than Keyword step!";
                 isValid = false;
             }
+        }
+        if (data.Ad_ZONE_ID < 1) {
+            fieldValidationErrors.Ad_ZONE_ID = "Minimum value for Ad_ZONE_ID is 1!";
+            isValid = false;
         }
         if (
             data.rangeTo != data.rangeFrom &&
             data.rangeTo - data.rangeFrom < data.step
         ) {
             fieldValidationErrors.step = "Range too short!";
+            isValid = false;
+        }
+        if (data.advertiser === "pubnative" && isEmpty(data.networkClass)) {
+            fieldValidationErrors.networkClass = "Class is required!";
             isValid = false;
         }
 
@@ -520,7 +616,7 @@ export class CreateOrderModal extends Component {
                 keywordStep = value === "amazon" ? 1 : 0.01,
                 keywordStepLabel =
                     value === "amazon" ? "Keyword Quantity" : "Keyword Step",
-                showCreativeFormat = value === "amazon";
+                showCreativeFormat = value === "amazon" || value === "openx";
 
             this.setState({
                 keywordTemplate: CreateOrderModal.getKeywordTemplate(
@@ -531,12 +627,19 @@ export class CreateOrderModal extends Component {
                 keywordStepMin: keywordStep,
                 keywordStepLabel: keywordStepLabel,
                 lineItemsNaming: lineItemsNaming,
-                showCreativeFormat: showCreativeFormat
+                showCreativeFormat: showCreativeFormat,
+                selectedAdvertiser: value,
+                os: ""
             });
         }
-        if (name === "creativeFormat") {
+        if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
             this.setState({
                 keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value)
+            });
+        }
+        if (name === "os") {
+            this.setState({
+                adunitsSelected: []
             });
         }
         this.setState({[name]: value});
@@ -586,7 +689,9 @@ export class CreateOrderModal extends Component {
             rangeTo,
             orderName,
             lineItemsNaming,
-            advertiser
+            advertiser,
+            networkClass,
+            Ad_ZONE_ID
         } = this.state;
 
         const formValid = this.formValidator({
@@ -597,7 +702,9 @@ export class CreateOrderModal extends Component {
             rangeFrom,
             rangeTo,
             lineItemsNaming,
-            advertiser
+            advertiser,
+            networkClass,
+            Ad_ZONE_ID
         });
         if (!formValid) {
             return;
@@ -652,7 +759,9 @@ export class CreateOrderModal extends Component {
             lineItemInfo,
             lineItemsNaming,
             advertiser,
-            creativeFormat
+            creativeFormat,
+            networkClass,
+            Ad_ZONE_ID
         } = this.state;
 
         let order = {
@@ -671,7 +780,9 @@ export class CreateOrderModal extends Component {
             lineItemInfo,
             lineItemsNaming,
             advertiser,
-            creativeFormat
+            creativeFormat,
+            networkClass,
+            Ad_ZONE_ID
         };
 
         ModalWindowService.ProgressModal.setProgress([
@@ -685,7 +796,7 @@ export class CreateOrderModal extends Component {
             }
         ]);
 
-        let promise = OrderController.createOrderDataFromSet(
+        progress = OrderController.createOrderDataFromSet(
             order,
             params,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
@@ -702,7 +813,7 @@ export class CreateOrderModal extends Component {
             }
         )
             .then(ModalWindowService.ProgressModal.hideModal)
-            .finally(() => {
+            .then(() => {
                 this.close();
                 this.props.toUpdate && this.props.toUpdate();
             });
