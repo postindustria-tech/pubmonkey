@@ -414,7 +414,7 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                 >
                                     <option value={""}>Select OS</option>
-                                    <option value={"iphone"}>iPhone</option>
+                                    <option value={"iphone"}>iOS</option>
                                     <option value={"android"}>Android</option>
                                 </Input>
                                 {" "}
