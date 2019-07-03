@@ -358,7 +358,7 @@ export const OrderController = new class Order {
                     lineItemCount: lineItems.length
                 });
 
-                const {creativeFormat, advertiser} = params,
+                const {creativeFormat, advertiser, adServerDomain} = params,
                     [width, height] = creativeFormat.split('x');
                 let creativeHtmlData = null;
                 if (advertiser === "amazon") {
@@ -380,7 +380,7 @@ export const OrderController = new class Order {
                     creativeHtmlData = '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
                         '<script>\n' +
                         '   var ucTagData = {};\n' +
-                        '   ucTagData.adServerDomain = "";\n' +
+                        '   ucTagData.adServerDomain = "' + adServerDomain + '";\n' +
                         '   ucTagData.pubUrl = "%%KEYWORD:url%%";\n' +
                         '   ucTagData.targetingKeywords = "%%KEYWORDS%%";\n' +
                         '   ucTagData.hbPb = "%%KEYWORD:hb_pb%%";\n' +

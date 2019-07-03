@@ -155,7 +155,8 @@ export class CreateOrderModal extends Component {
         selectedAdvertiser: "pubnative",
         Ad_ZONE_ID: 2,
         os: "",
-        networkClass: ""
+        networkClass: "",
+        adServerDomain: ""
     };
 
     @bind
@@ -399,6 +400,22 @@ export class CreateOrderModal extends Component {
                                         </option>
                                     ))}
                                 </Input>
+
+                                <div hidden={this.state.selectedAdvertiser!=='openx'} style={{display: "inline-block", width: "auto"}}>
+                                    <span className={"mp-label"}> AdServer Domain: </span>
+                                    <CustomInput
+                                        invalid={!isEmpty(this.state.formErrors.adServerDomain)}
+                                        inline
+                                        type="text"
+                                        id={"adServerDomain"}
+                                        name={"adServerDomain"}
+                                        value={this.state.adServerDomain}
+                                        onChange={this.handleInputChange}
+                                        className={"mp-form-control"}
+                                        style={{width: "200px"}}
+                                    />
+                                </div>
+
                             </Col>
                         </Row>
                         <Row hidden={this.state.selectedAdvertiser!=='pubnative'}>
@@ -761,7 +778,8 @@ export class CreateOrderModal extends Component {
             advertiser,
             creativeFormat,
             networkClass,
-            Ad_ZONE_ID
+            Ad_ZONE_ID,
+            adServerDomain
         } = this.state;
 
         let order = {
@@ -782,7 +800,8 @@ export class CreateOrderModal extends Component {
             advertiser,
             creativeFormat,
             networkClass,
-            Ad_ZONE_ID
+            Ad_ZONE_ID,
+            adServerDomain
         };
 
         ModalWindowService.ProgressModal.setProgress([
