@@ -402,7 +402,7 @@ export const OrderController = new class Order {
                                     adType: "html",
                                     extended: {
                                         htmlData: creativeHtmlData,
-                                        isMraid: true
+                                        isMraid: (advertiser === "amazon")
                                     },
                                     format: creativeFormat,
                                     imageKeys: [],
