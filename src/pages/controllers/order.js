@@ -314,9 +314,11 @@ export const OrderController = new class Order {
                 line++;
             } else {
                 const to = +this.toValidUI(bidDecimal + s).toFixed(2);
+                const decimalPartLength = (keywordStep + '').replace(/^[-\d]+\./, '').length;
                 for (let i = bidDecimal; i < to; i += keywordStep) {
                     i = this.toValidUI(i);
-                    const keyword = keywordTemplate.replace(mask, i);
+                    let value = i.toFixed(decimalPartLength);
+                    const keyword = keywordTemplate.replace(mask, value);
                     keywords.push(keyword);
                 }
             }
@@ -407,7 +409,7 @@ export const OrderController = new class Order {
                                     format: creativeFormat,
                                     imageKeys: [],
                                     lineItemKey: lineItem.key,
-                                    name: "Mraid"
+                                    name: "Creative"
                                 });
                             }
                         })

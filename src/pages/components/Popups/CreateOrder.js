@@ -31,6 +31,7 @@ import {isEmpty} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
 import _ from "underscore";
 import moment from "../Orders/List";
+import HelperModal from "./HelperModal";
 
 const defaultAdvertiserValue = "pubnative";
 
@@ -63,20 +64,21 @@ const networkClass = {
     "": {
         "": "Please select OS"
     },
-    "iphone": {
-        "HyBidMoPubLeaderboardCustomEvent": "728x90 Leaderboard",
-        "HyBidMoPubBannerCustomEvent": "320x50 Banner",
-        "HyBidMoPubMRectCustomEvent": "300x250 MRect",
-        "HyBidMoPubInterstitialCustomEvent": "728x90 Leaderboard"
+    iphone: {
+        HyBidMoPubLeaderboardCustomEvent: "728x90 Leaderboard",
+        HyBidMoPubBannerCustomEvent: "320x50 Banner",
+        HyBidMoPubMRectCustomEvent: "300x250 MRect",
+        HyBidMoPubInterstitialCustomEvent: "728x90 Leaderboard"
     },
-    "android": {
+    android: {
         "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50 Banner",
         "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250 Banner",
         "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": "Interstitial"
     }
 };
 
-const helperText = "{bid} macro is replaced with a corresponding bid value\n" +
+const helperText =
+    "{bid} macro is replaced with a corresponding bid value\n" +
     "{position} macro is replaced with a position number (natural values starting from 1)";
 
 let progress = null;
@@ -224,6 +226,10 @@ export class CreateOrderModal extends Component {
                         &nbsp; Create
                     </Button>
                 ) : null}
+                <HelperModal
+                    header={"Something went wrong!"}
+                    ref={helperModal => (this.helperModal = helperModal)}
+                />
                 <Modal
                     isOpen={this.state.isOpen}
                     toggle={this.toggle}
@@ -288,11 +294,13 @@ export class CreateOrderModal extends Component {
                                             value={this.state.advertiser}
                                             className={"mp-form-control"}
                                         >
-                                            {Object.keys(advertiserDefaultName).map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {advertiserDefaultName[option]}
-                                                </option>
-                                            ))}
+                                            {Object.keys(advertiserDefaultName).map(
+                                                (option, index) => (
+                                                    <option key={index} value={option}>
+                                                        {advertiserDefaultName[option]}
+                                                    </option>
+                                                )
+                                            )}
                                         </Input>
                                     </FormGroup>
                                 </Form>
@@ -362,8 +370,8 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                 />{" "}
                                 <span className={"mp-label"}>
-                                  {this.state.keywordStepLabel}:{" "}
-                                </span>
+                  {this.state.keywordStepLabel}:{" "}
+                </span>
                                 <InputNumber
                                     invalid={!isEmpty(this.state.formErrors.keywordStep)}
                                     min={this.state.keywordStepMin}
@@ -401,7 +409,10 @@ export class CreateOrderModal extends Component {
                                     ))}
                                 </Input>
 
-                                <div hidden={this.state.selectedAdvertiser!=='openx'} style={{display: "inline-block", width: "auto"}}>
+                                <div
+                                    hidden={this.state.selectedAdvertiser !== "openx"}
+                                    style={{display: "inline-block", width: "auto"}}
+                                >
                                     <span className={"mp-label"}> AdServer Domain: </span>
                                     <CustomInput
                                         invalid={!isEmpty(this.state.formErrors.adServerDomain)}
@@ -415,10 +426,9 @@ export class CreateOrderModal extends Component {
                                         style={{width: "200px"}}
                                     />
                                 </div>
-
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser!=='pubnative'}>
+                        <Row hidden={this.state.selectedAdvertiser !== "pubnative"}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>OS: </span>
                                 <Input
@@ -433,8 +443,7 @@ export class CreateOrderModal extends Component {
                                     <option value={""}>Select OS</option>
                                     <option value={"iphone"}>iOS</option>
                                     <option value={"android"}>Android</option>
-                                </Input>
-                                {" "}
+                                </Input>{" "}
                                 <span className={"mp-label"}>Class: </span>
                                 <Input
                                     type="select"
@@ -446,13 +455,14 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                     invalid={!isEmpty(this.state.formErrors.networkClass)}
                                 >
-                                    {Object.keys(networkClass[this.state.os]).map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {networkClass[this.state.os][option]}
-                                        </option>
-                                    ))}
-                                </Input>
-                                {" "}
+                                    {Object.keys(networkClass[this.state.os]).map(
+                                        (option, index) => (
+                                            <option key={index} value={option}>
+                                                {networkClass[this.state.os][option]}
+                                            </option>
+                                        )
+                                    )}
+                                </Input>{" "}
                                 <span className={"mp-label"}>Ad_ZONE_ID:</span>
                                 <CustomInput
                                     invalid={!isEmpty(this.state.formErrors.Ad_ZONE_ID)}
@@ -465,7 +475,6 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                     style={{width: "50px"}}
                                 />
-
                             </Col>
                         </Row>
                         <br/>
@@ -497,7 +506,10 @@ export class CreateOrderModal extends Component {
                                                                     className="custom-control-input"
                                                                     id={`adUnit${key}`}
                                                                     checked={this.setCheckedStatus(key)}
-                                                                    disabled={this.state.os !== "" && this.state.os !== appType}
+                                                                    disabled={
+                                                                        this.state.os !== "" &&
+                                                                        this.state.os !== appType
+                                                                    }
                                                                 />
                                                                 <label
                                                                     className="custom-control-label"
@@ -649,7 +661,10 @@ export class CreateOrderModal extends Component {
                 os: ""
             });
         }
-        if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
+        if (
+            name === "creativeFormat" &&
+            this.state.selectedAdvertiser === "amazon"
+        ) {
             this.setState({
                 keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value)
             });
@@ -835,6 +850,21 @@ export class CreateOrderModal extends Component {
             .then(() => {
                 this.close();
                 this.props.toUpdate && this.props.toUpdate();
+            })
+            .catch(error => {
+                ModalWindowService.ProgressModal.cancel();
+
+                this.close();
+                this.props.toUpdate && this.props.toUpdate();
+
+                let errorName = JSON.stringify(error);
+                if (errorName.length === 2) {
+                    errorName = error.name;
+                }
+
+                this.helperModal.open({
+                    text: errorName + '<br/>' + error.stack.replace(/\r?\n/g, '<br/>')
+                });
             });
     }
 

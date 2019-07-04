@@ -1,90 +1,106 @@
-import axios from 'ex-axios'
-import HTMLParser from 'fast-html-parser'
+import axios from "ex-axios";
+import HTMLParser from "fast-html-parser";
 
-const CJ = window.MopubAutomation = {},
-      EXTENSION_URL = chrome.extension.getURL('index.html')
+const CJ = (window.MopubAutomation = {}),
+    EXTENSION_URL = chrome.extension.getURL("index.html");
 
-var resolveName, resolveAdUnits
+var resolveName, resolveAdUnits;
 
-CJ.username = new Promise(resolve => resolveName = resolve)
-CJ.adunits = new Promise(resolve => resolveAdUnits = resolve)
+CJ.username = new Promise(resolve => (resolveName = resolve));
+CJ.adunits = new Promise(resolve => (resolveAdUnits = resolve));
 
-chrome.tabs.query({
-    url: EXTENSION_URL
-}, tabs =>
-    tabs.forEach(({ active, id }) =>
-        !active && chrome.tabs.remove(id)
-    )
-)
+chrome.tabs.query(
+    {
+        url: EXTENSION_URL
+    },
+    tabs => tabs.forEach(({active, id}) => !active && chrome.tabs.remove(id))
+);
 
 chrome.webRequest.onHeadersReceived.addListener(
-    ({ frameId, tabId }) => {
+    ({frameId, tabId}) => {
         if (frameId) {
-            CJ.request = { frameId, tabId }
+            CJ.request = {frameId, tabId};
 
-             chrome.tabs.sendMessage(tabId, { action: 'init' }, { frameId }, data => {
-                 if (!data) {
-                     return
-                 }
+            chrome.tabs.sendMessage(tabId, {action: "init"}, {frameId}, data => {
+                if (!data) {
+                    return;
+                }
 
-                 let { name } = data
+                let {name} = data;
 
-                 resolveName(name)
-             })
+                resolveName(name);
+            });
         }
     },
-    { urls: ['https://app.mopub.com/*'] }
-)
+    {urls: ["https://app.mopub.com/*"]}
+);
 
-
-var resolveLoggedIn
-CJ.loggedIn = new Promise(resolve => resolveLoggedIn = resolve)
-
-chrome.webRequest.onHeadersReceived.addListener(({ statusCode }) => {
-    if (statusCode === 302) {
-        resolveLoggedIn(false)
-    } else {
-        resolveLoggedIn(true)
-    }
-}, {
-    urls: [ 'https://app.mopub.com/web-client/api/orders/query', 'https://app.mopub.com/account/' ]
-})
+var resolveLoggedIn;
+CJ.loggedIn = new Promise(resolve => (resolveLoggedIn = resolve));
 
 chrome.webRequest.onHeadersReceived.addListener(
-    ({ responseHeaders }) => ({
-        responseHeaders: responseHeaders.filter(({ name }) =>
-            name !== 'x-frame-options'
-    ) }),
-    {
-     urls: [ 'https://app.mopub.com/*' ],
-     types: [ 'sub_frame' ]
+    ({statusCode}) => {
+        if (statusCode === 302) {
+            resolveLoggedIn(false);
+        } else {
+            resolveLoggedIn(true);
+        }
     },
-    [ 'blocking', 'responseHeaders' ]
-)
+    {
+        urls: [
+            "https://app.mopub.com/web-client/api/orders/query",
+            "https://app.mopub.com/account/"
+        ]
+    }
+);
 
-CJ.openLoginPage = function() {
-    chrome.tabs.create({ url: 'https://app.mopub.com/account/login/' }, ({ id }) => {
-        chrome.tabs.onUpdated.addListener(function handler(tabId, { status, url }) {
-            if (tabId === id && status === 'loading' && (url === 'https://app.mopub.com/dashboard/' || url === 'https://app.mopub.com/new-app')) {
-                chrome.tabs.remove(id)
-                chrome.tabs.onUpdated.removeListener(handler)
+chrome.webRequest.onHeadersReceived.addListener(
+    ({responseHeaders}) => ({
+        responseHeaders: responseHeaders.filter(
+            ({name}) => name !== "x-frame-options"
+        )
+    }),
+    {
+        urls: ["https://app.mopub.com/*"],
+        types: ["sub_frame"]
+    },
+    ["blocking", "responseHeaders"]
+);
 
-                let url = EXTENSION_URL
+CJ.openLoginPage = function () {
+    chrome.tabs.create(
+        {url: "https://app.mopub.com/account/login/"},
+        ({id}) => {
+            chrome.tabs.onUpdated.addListener(function handler(
+                tabId,
+                {status, url}
+            ) {
+                if (
+                    tabId === id &&
+                    status === "loading" &&
+                    (url === "https://app.mopub.com/dashboard/" ||
+                        url === "https://app.mopub.com/new-app")
+                ) {
+                    chrome.tabs.remove(id);
+                    chrome.tabs.onUpdated.removeListener(handler);
 
-                chrome.tabs.query({ url }, tabs =>
-                    chrome.tabs.update(tabs[0].id, { url, active: true })
-                )
-            }
-        })
-    })
-}
+                    let url = EXTENSION_URL;
 
-parseAdUnits()
+                    chrome.tabs.query({url}, tabs =>
+                        chrome.tabs.update(tabs[0].id, {url, active: true})
+                    );
+                }
+            });
+        }
+    );
+};
+
+parseAdUnits();
 
 function parseAdUnits() {
-
-    axios.get('https://app.mopub.com/account/', { responseType: 'text' })
-        .then(({ data }) => {
+    axios
+        .get("https://app.mopub.com/account/", {responseType: "text"})
+        .then(({data}) => {
             // let DOM = HTMLParser.parse(data),
             //     mapping = DOM.querySelectorAll('tr.app')
             //         .map(root => {
@@ -106,59 +122,62 @@ function parseAdUnits() {
             //         })
             //         .reduce((acc, curr) => acc.concat(curr), [])
 
-            axios.get('https://app.mopub.com/web-client/api/ad-units/query')
-                .then(({ data }) => {
+            axios
+                .get("https://app.mopub.com/web-client/api/ad-units/query")
+                .then(({data}) => {
                     resolveAdUnits(
-                        data.map(adunit => {
-                            // let { id } = mapping.filter(({ name, id, appName }) => name === adunit.name && appName === adunit.appName)[0]
-                            return {
-                                ...adunit,
-                                // id
-                            }
-                        })
-                        .sort((a, b) => {
-                            if (a.appName > b.appName) {
-                                return 1
-                            }
+                        data
+                            .map(adunit => {
+                                // let { id } = mapping.filter(({ name, id, appName }) => name === adunit.name && appName === adunit.appName)[0]
+                                return {
+                                    ...adunit
+                                    // id
+                                };
+                            })
+                            .sort((a, b) => {
+                                if (a.appName > b.appName) {
+                                    return 1;
+                                }
 
-                            if (a.appName < b.appName) {
-                                return -1
-                            }
+                                if (a.appName < b.appName) {
+                                    return -1;
+                                }
 
-                            return 0
-                        })
-                    )
-                })
-        }).catch((error) => {
-            ModalWindowService.ErrorPopup.showMessage('Network error')
+                                return 0;
+                            })
+                    );
+                });
         })
+        .catch(error => {
+            console.log({error});
+            ModalWindowService.ErrorPopup.showMessage("Network error");
+        });
 }
-
 
 function getAttr(rawAttrs, name) {
     if (getAttr.rx == null) {
-        getAttr.rx = {}
+        getAttr.rx = {};
     }
 
     if (getAttr.rx[name] == null) {
-        getAttr.rx[name] = new RegExp(name + '="([^"]+)"')
+        getAttr.rx[name] = new RegExp(name + '="([^"]+)"');
     }
 
-    let rx = getAttr.rx[name]
+    let rx = getAttr.rx[name];
 
     if (rx.test(rawAttrs)) {
-        return rawAttrs.match(rx)[1]
+        return rawAttrs.match(rx)[1];
     } else {
-        return ''
+        return "";
     }
 }
 
 function parseEscaped(string) {
-    let { parser } = parseEscaped
+    let {parser} = parseEscaped;
 
     if (parser == null) {
-        parser = parseEscaped.parser = new DOMParser
+        parser = parseEscaped.parser = new DOMParser();
     }
 
-    return parser.parseFromString(string,'text/html').body.textContent
+    return parser.parseFromString(string, "text/html").body.textContent;
 }

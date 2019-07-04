@@ -18,9 +18,15 @@ export const HTTPService = new class {
         return axios.get(url, {
             ...config
         }).then(({ data }) => data).catch((error) => {
+            if (error.response) {
+                if (error.response.status === 401) {
+                    window.MopubAutomation.openLoginPage();
+                    return;
+                }
+            }
             ModalWindowService.ErrorPopup.showMessage('Network error')
         })
-    
+
     }
 
     POST(url, data = {}, config = {}, isFormData) {
