@@ -296,14 +296,18 @@ export const OrderController = new class Order {
         }
 
         let line = 1;
+        const keywordStepDecimalPartLength = (keywordStep + '').replace(/^[-\d]+\./, '').length,
+            stepDecimalPartLength = (step + '').replace(/^[-\d]+\./, '').length;
+
         for (bid = rangeFrom; bid <= rangeTo; bid += step) {
 
-            const bidDecimal = this.toDecimal(bid);
-            const s = this.toDecimal(step);
+            const bidDecimal = this.toDecimal(bid),
+                s = this.toDecimal(step),
+                bidValue = bidDecimal.toFixed(stepDecimalPartLength);
 
-            let name = lineItemsNaming.replace("{bid}", bidDecimal);
+            let name = lineItemsNaming.replace("{bid}", bidValue),
+                keywords = [];
 
-            let keywords = [];
             if (advertiser == 'amazon') {
                 for (let i = 0; i < keywordStep; i += 1) {
                     i = this.toValidUI(i);
@@ -314,11 +318,10 @@ export const OrderController = new class Order {
                 line++;
             } else {
                 const to = +this.toValidUI(bidDecimal + s).toFixed(2);
-                const decimalPartLength = (keywordStep + '').replace(/^[-\d]+\./, '').length;
                 for (let i = bidDecimal; i < to; i += keywordStep) {
                     i = this.toValidUI(i);
-                    let value = i.toFixed(decimalPartLength);
-                    const keyword = keywordTemplate.replace(mask, value);
+                    const value = i.toFixed(keywordStepDecimalPartLength),
+                        keyword = keywordTemplate.replace(mask, value);
                     keywords.push(keyword);
                 }
             }
