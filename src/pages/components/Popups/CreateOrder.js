@@ -888,8 +888,15 @@ export class CreateOrderModal extends Component {
                                 continue;
                             }
                             let value = lineItem[key];
-                            if (values[key].indexOf(value) === -1) {
-                                values[key].push(value);
+                            if (Array.isArray(value)) {
+                                value = value.join('###');
+                                if (values[key].indexOf(value) === -1) {
+                                    values[key].push(value);
+                                }
+                            } else {
+                                if (values[key].indexOf(value) === -1) {
+                                    values[key].push(value);
+                                }
                             }
                         }
                     });
@@ -918,6 +925,12 @@ export class CreateOrderModal extends Component {
 
                 if (isEmpty(values)) {
                     values = lineItemInfo;
+                } else {
+                    if (!isEmpty(values.userAppsTargetingList)) {
+                        values.userAppsTargetingList = values.userAppsTargetingList.split('###');
+                    } else {
+                        values.userAppsTargetingList = [];
+                    }
                 }
 
                 this.setState(state => ({
