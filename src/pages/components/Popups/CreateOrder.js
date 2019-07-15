@@ -876,7 +876,8 @@ export class CreateOrderModal extends Component {
                     adUnitKeys = [],
                     defaultLineItemInfo = lineItemInfo,
                     values = {},
-                    defaultFields = [];
+                    defaultFields = [],
+                    arrays = [];
                 if (!isEmpty(order.lineItems)) {
                     for (let key in defaultLineItemInfo) {
                         values[key] = [];
@@ -889,14 +890,13 @@ export class CreateOrderModal extends Component {
                             }
                             let value = lineItem[key];
                             if (Array.isArray(value)) {
+                                if (arrays.indexOf(key) === -1) {
+                                    arrays.push(key);
+                                }
                                 value = value.join('###');
-                                if (values[key].indexOf(value) === -1) {
-                                    values[key].push(value);
-                                }
-                            } else {
-                                if (values[key].indexOf(value) === -1) {
-                                    values[key].push(value);
-                                }
+                            }
+                            if (values[key].indexOf(value) === -1) {
+                                values[key].push(value);
                             }
                         }
                     });
@@ -926,10 +926,13 @@ export class CreateOrderModal extends Component {
                 if (isEmpty(values)) {
                     values = lineItemInfo;
                 } else {
-                    if (!isEmpty(values.userAppsTargetingList)) {
-                        values.userAppsTargetingList = values.userAppsTargetingList.split('###');
-                    } else {
-                        values.userAppsTargetingList = [];
+                    for (let i in arrays) {
+                        const key = arrays[i];
+                        if (!isEmpty(values[key])) {
+                            values[key] = values[key].split('###');
+                        } else {
+                            values[key] = [];
+                        }
                     }
                 }
 
