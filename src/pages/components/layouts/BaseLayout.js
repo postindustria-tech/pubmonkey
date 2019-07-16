@@ -65,7 +65,7 @@ export class BaseLayout extends Component {
                 </div>
 
                 <footer>
-                    Made by <a target="_blank" href="https://postindustria.com">Postindustria</a> &copy; 2019
+                    Made by <a target="_blank" href="https://postindustria.com">Postindustria</a> &copy; 2006-{new Date().getFullYear()}
                 </footer>
 
                 <ErrorPopup
