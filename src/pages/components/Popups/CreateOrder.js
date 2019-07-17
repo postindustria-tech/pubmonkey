@@ -158,7 +158,8 @@ export class CreateOrderModal extends Component {
         Ad_ZONE_ID: 2,
         os: "",
         networkClass: "",
-        adServerDomain: ""
+        adServerDomain: "",
+        keyword: ""
     };
 
     @bind
@@ -215,6 +216,16 @@ export class CreateOrderModal extends Component {
 
     setCheckedStatus(key) {
         return this.state.adunitsSelected.indexOf(key) !== -1;
+    }
+
+    handleChangeKeyword = (event) => {
+        const { value } = event.target
+        this.setState({ keyword: value })
+    }
+
+    filterAdunits =({name = '', format, key = '', appName, appType}) => {
+        return name.toLocaleLowerCase().includes(this.state.keyword.toLocaleLowerCase()) ||
+         key.toLocaleLowerCase().includes(this.state.keyword.toLocaleLowerCase())
     }
 
     render() {
@@ -481,7 +492,14 @@ export class CreateOrderModal extends Component {
                         <Row>
                             <Col className={"col-sm-12"}>
                                 <Card>
-                                    <CardHeader>Choose ad units:</CardHeader>
+                                    <CardHeader>Choose ad units:
+                                        <Input
+                                            placeholder="Type to find"
+                                            value={this.state.keyword}
+                                            onChange={this.handleChangeKeyword}
+                                            style={{display: "inline-block", width: "300px", float: "right"}}
+                                        />
+                                    </CardHeader>
                                     <CardBody>
                                         <Table size="sm">
                                             <thead>
@@ -494,7 +512,7 @@ export class CreateOrderModal extends Component {
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {this.state.adunits.map(
+                                            {this.state.adunits.filter(this.filterAdunits).map(
                                                 ({name, format, key, appName, appType}) => (
                                                     <tr key={key}>
                                                         <td>
