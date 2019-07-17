@@ -33,7 +33,7 @@ export class BaseLayout extends Component {
         return (
             <div className={ classnames('base-layout', className) }>
                 <Navbar className="header">
-                    <NavbarBrand>MoPorter <small>v. { version }</small></NavbarBrand>
+                    <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
                     <div id="downloadManual">
                         <a href="https://postindustria.com/wp-content/uploads/2019/07/MoPorter-manual.pdf" target="_blank">Download manual</a>
                     </div>

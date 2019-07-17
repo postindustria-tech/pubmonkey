@@ -1,6 +1,6 @@
 import sys, argparse, json
 
-parser = argparse.ArgumentParser(description='MoPorter template replicator',
+parser = argparse.ArgumentParser(description='PubMonkey template replicator',
             usage='\n$ python %(prog)s [-h] [--hybid] template_file data_file > out.json')
 
 parser.add_argument('template', metavar='template_file', type=str, nargs=1, help='order template file. (e.g. template.json)')

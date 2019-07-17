@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
 
-    "name": "MoPorter",
+    "name": "PubMonkey",
     "version": "2.0.1",
     "icons": {
             "16": "images/image.png",
@@ -37,6 +37,6 @@
             "64": "images/image.png",
             "128": "images/image.png"
           },
-          "default_title": "MoPorter"
+          "default_title": "PubMonkey"
     }
 }

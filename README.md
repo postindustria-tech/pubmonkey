@@ -1,6 +1,6 @@
 # Overview
 
-MoPorter is a Chrome Extension to automate some routine MoPub setup tasks.
+PubMonkey is a Chrome Extension to automate some routine MoPub setup tasks.
 
 Here are a couple YT videos describing the use cases of the product:
 
