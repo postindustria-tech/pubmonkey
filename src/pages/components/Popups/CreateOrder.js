@@ -575,7 +575,8 @@ export class CreateOrderModal extends Component {
             rangeFrom: "",
             rangeTo: "",
             networkClass: "",
-            Ad_ZONE_ID: ""
+            Ad_ZONE_ID: "",
+            adunits: ""
         };
         let isValid = true;
 
@@ -616,6 +617,10 @@ export class CreateOrderModal extends Component {
         }
         if (data.advertiser === "pubnative" && isEmpty(data.networkClass)) {
             fieldValidationErrors.networkClass = "Class is required!";
+            isValid = false;
+        }
+        if (isEmpty(data.adunits)) {
+            fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
             isValid = false;
         }
 
