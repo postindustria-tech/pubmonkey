@@ -77,6 +77,16 @@ const networkClass = {
     }
 };
 
+const networkClassToDimension = {
+    "HyBidMoPubLeaderboardCustomEvent": "728x90",
+    "HyBidMoPubBannerCustomEvent": "320x50",
+    "HyBidMoPubMRectCustomEvent": "300x250",
+    "HyBidMoPubInterstitialCustomEvent": "",
+    "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50",
+    "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250",
+    "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": ""
+};
+
 const helperText =
     "{bid} macro is replaced with a corresponding bid value\n" +
     "{position} macro is replaced with a position number (natural values starting from 1)";
@@ -219,14 +229,33 @@ export class CreateOrderModal extends Component {
     }
 
     handleChangeKeyword = (event) => {
-        const { value } = event.target
+        const { value } = event.target;
         this.setState({ keyword: value })
-    }
+    };
 
     filterAdunits =({name = '', format, key = '', appName, appType}) => {
-        return name.toLocaleLowerCase().includes(this.state.keyword.toLocaleLowerCase()) ||
-         key.toLocaleLowerCase().includes(this.state.keyword.toLocaleLowerCase())
-    }
+        let {
+            keyword,
+            advertiser,
+            networkClass,
+            creativeFormat
+        } = this.state;
+
+        let adUnitFormat = true;
+        if (advertiser === "amazon") {
+            adUnitFormat = creativeFormat === format;
+        } else {
+            if (typeof networkClassToDimension[networkClass] !== "undefined" &&
+                !isEmpty(networkClassToDimension[networkClass])) {
+                adUnitFormat = networkClassToDimension[networkClass] === format;
+            }
+        }
+
+        return adUnitFormat && (
+            name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
+            key.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
+        )
+    };
 
     render() {
         return (
@@ -381,8 +410,8 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                 />{" "}
                                 <span className={"mp-label"}>
-                  {this.state.keywordStepLabel}:{" "}
-                </span>
+                                  {this.state.keywordStepLabel}:{" "}
+                                </span>
                                 <InputNumber
                                     invalid={!isEmpty(this.state.formErrors.keywordStep)}
                                     min={this.state.keywordStepMin}
@@ -459,7 +488,7 @@ export class CreateOrderModal extends Component {
                                 <Input
                                     type="select"
                                     name={"networkClass"}
-                                    id="creativeFormat"
+                                    id="networkClass"
                                     onChange={this.handleInputChange}
                                     value={this.state.networkClass}
                                     style={{display: "inline-block", width: "auto"}}
@@ -684,17 +713,15 @@ export class CreateOrderModal extends Component {
                 os: ""
             });
         }
-        if (
-            name === "creativeFormat" &&
-            this.state.selectedAdvertiser === "amazon"
-        ) {
+        if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
             this.setState({
                 keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value)
             });
         }
         if (name === "os") {
             this.setState({
-                adunitsSelected: []
+                adunitsSelected: [],
+                networkClass: Object.keys(networkClass[value])[0]
             });
         }
         this.setState({[name]: value});
