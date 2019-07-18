@@ -68,7 +68,7 @@ const networkClass = {
         HyBidMoPubLeaderboardCustomEvent: "728x90 Leaderboard",
         HyBidMoPubBannerCustomEvent: "320x50 Banner",
         HyBidMoPubMRectCustomEvent: "300x250 MRect",
-        HyBidMoPubInterstitialCustomEvent: "728x90 Leaderboard"
+        HyBidMoPubInterstitialCustomEvent: "Interstitial"
     },
     android: {
         "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50 Banner",
