@@ -1,4 +1,9 @@
-@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
+
+$theme-colors: (
+  "primary": #B3121E,
+);
+
+@import "node_modules/bootstrap/scss/bootstrap";
 @import '../../node_modules/font-awesome/scss/font-awesome.scss';
 @import '../../node_modules/react-select/dist/react-select.css';
 @import '../../node_modules/rc-input-number/assets/index.css';
