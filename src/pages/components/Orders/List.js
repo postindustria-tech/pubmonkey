@@ -22,6 +22,7 @@ const FILTER_FN = [
         {value: 2, label: "paused"},
         {value: 3, label: "archived"}
     ];
+window.canceledExport = false;
 
 export class OrdersList extends Component {
     state = {
@@ -30,7 +31,8 @@ export class OrdersList extends Component {
         orderCount: 0,
         lineItemCount: 0,
         filter: 0,
-        filterFn: FILTER_FN[0]
+        filterFn: FILTER_FN[0],
+        canceled: false
     };
 
     cancelToken = null;
@@ -58,10 +60,12 @@ export class OrdersList extends Component {
                     // onClick={ this.backupSelected }
                     disabled={!orderCount}
                 >
-                    <i className="fa fa-cloud-download"/>&nbsp; Export
+                    <i className="fa fa-cloud-download"/>
+                    &nbsp; Export
                 </Button>
                 <Button color="primary" onClick={this.importSelected}>
-                    <i className="fa fa-cloud-upload"/>&nbsp; Import
+                    <i className="fa fa-cloud-upload"/>
+                    &nbsp; Import
                 </Button>
                 <CreateOrderModal toUpdate={this.loadOrders}/>
                 {/* <Button
@@ -204,6 +208,7 @@ export class OrdersList extends Component {
         let promise = OrderController.collectOrderDataFromSet(
             selected,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp}) => {
+                if (this.state.canceled) return;
                 if (average == null) {
                     average = timestamp;
                 } else {
@@ -227,7 +232,8 @@ export class OrdersList extends Component {
                         )}`
                     }
                 ]);
-            }
+            },
+            this.state.canceled
         )
             .then(orders => ({
                 name,
@@ -243,11 +249,21 @@ export class OrdersList extends Component {
 
                 FileService.saveFile(data, name);
             })
-            .finally(ModalWindowService.ProgressModal.hideModal);
+            .finally(() => {
+                ModalWindowService.ProgressModal.hideModal();
+            });
 
-        ModalWindowService.ProgressModal.onCancel(() =>
-            promise.cancel("canceled by user")
-        );
+        ModalWindowService.ProgressModal.onCancel(() => {
+            this.setState({canceled: true});
+            ModalWindowService.ProgressModal.hideModal();
+            window.canceledExport = true
+            promise.cancel("canceled by user");
+
+            setTimeout(() => {
+                this.setState({canceled: false});
+                window.canceledExport = false
+            }, 1000)
+        });
     }
 
     @bind
