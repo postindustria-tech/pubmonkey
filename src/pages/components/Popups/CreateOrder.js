@@ -42,7 +42,7 @@ const keywordTemplateDefaultValue = {
 };
 
 const keywordPlaceholder = {
-    pubnative: "PN Hybib {bid}",
+    pubnative: "PN HyBid {bid}",
     openx: "hb_pb {bid}",
     amazon: "m320x50p{position}"
 };
