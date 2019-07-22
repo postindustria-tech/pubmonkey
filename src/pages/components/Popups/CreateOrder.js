@@ -484,7 +484,7 @@ export class CreateOrderModal extends Component {
                                     <option value={"iphone"}>iOS</option>
                                     <option value={"android"}>Android</option>
                                 </Input>{" "}
-                                <span className={"mp-label"}>Class: </span>
+                                <span className={"mp-label"}>Creative format: </span>
                                 <Input
                                     type="select"
                                     name={"networkClass"}
