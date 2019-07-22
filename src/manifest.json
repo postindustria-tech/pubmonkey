@@ -1,42 +1,51 @@
 {
-    "manifest_version": 2,
-
-    "name": "PubMonkey",
-    "version": "2.0.1",
-    "icons": {
-            "16": "images/image.png",
-            "32": "images/image.png",
-            "48": "images/image.png",
-            "64": "images/image.png",
-            "128": "images/image.png"
-    },
-    "background": {
-        "scripts": [ "background/index.js" ]
-    },
-    "permissions": [
-        "tabs",
-        "webRequest",
-        "webRequestBlocking",
+  "manifest_version": 2,
+  "name": "PubMonkey",
+  "version": "1.0.1",
+  "icons": {
+    "16": "images/16x16-favicon-PubMonkey.png",
+    "32": "images/32x32-logo-PubMonkey.png",
+    "48": "images/48x48-logo-PubMonkey.png",
+    "64": "images/64x64-logo-PubMonkey.png",
+    "128": "images/128x128-logo-PubMonkey.png"
+  },
+  "background": {
+    "scripts": [
+      "background/index.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "https://app.mopub.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
         "https://app.mopub.com/*"
-    ],
-    "content_scripts": [{
-        "matches": [ "https://app.mopub.com/*" ],
-        "js": [ "content/content.js" ],
-        "run_at": "document_end",
-        "all_frames": true
-    }],
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-    "externally_connectable": {
-        "matches": [ "https://app.mopub.com/*"]
-    },
-    "browser_action": {
-          "default_icon": {
-            "16": "images/image.png",
-            "32": "images/image.png",
-            "48": "images/image.png",
-            "64": "images/image.png",
-            "128": "images/image.png"
-          },
-          "default_title": "PubMonkey"
+      ],
+      "js": [
+        "content/content.js"
+      ],
+      "run_at": "document_end",
+      "all_frames": true
     }
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "externally_connectable": {
+    "matches": [
+      "https://app.mopub.com/*"
+    ]
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "images/16x16-favicon-PubMonkey.png",
+      "32": "images/32x32-logo-PubMonkey.png",
+      "48": "images/48x48-logo-PubMonkey.png",
+      "64": "images/64x64-logo-PubMonkey.png",
+      "128": "images/128x128-logo-PubMonkey.png"
+    },
+    "default_title": "PubMonkey"
+  }
 }
