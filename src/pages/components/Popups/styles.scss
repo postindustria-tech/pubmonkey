@@ -1,74 +1,123 @@
 .mp-order-form {
-    .row {
-        margin-bottom: 4px;
-    }
+  .row {
+    margin-bottom: 4px;
+  }
 
-    .mp-form-control {
-        padding: 0 0.75rem;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #495057;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        height: 34px !important;
-    }
+  .mp-form-control {
+    padding: 0 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    height: 34px !important;
+  }
 
-    .rc-input-number {
-        &.mp-form-control {
-            padding: 0;
-        }
+  .rc-input-number {
+    &.mp-form-control {
+      padding: 0;
     }
-    .rc-input-number-handler {
-        height: 17px;
-    }
+  }
 
-    .mp-label {
-        font-weight: 600;
-    }
+  .rc-input-number-handler {
+    height: 17px;
+  }
+
+  .mp-label {
+    font-weight: 600;
+  }
+
+  .td.header {
+    background: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.3rem;
+    font-weight: 700;
+  }
+
+  .table {
+    display: table;
+    width: 100%;
+    height: 300px;
+    margin-top: 1.25rem
+  }
+
+  .tr {
+    display: table-row;
+  }
+
+  .thead {
+    display: table-header-group;
+  }
+
+  .td, .th {
+    display: table-cell;
+    padding: 0.3rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .th {
+    display: table-header-group;
+  }
+
+  .tfoot {
+    display: table-footer-group;
+  }
+
+  .tbody {
+    display: table-row-group;
+  }
+
+
 }
 
 .progress {
-    margin: 6px 0;
+  margin: 6px 0;
 
-    .progress-bar {
-        transition: unset;
-    }
+  .progress-bar {
+    transition: unset;
+  }
 }
 
 .error-popup {
-    .modal-body {
-        dt {
-            float: left;
-            padding: 6px 12px;
-        }
-
-        dd {
-            overflow: hidden;
-        }
-
-        i.fa {
-            color: #f00;
-            font-size: 42px;
-        }
+  .modal-body {
+    dt {
+      float: left;
+      padding: 6px 12px;
     }
+
+    dd {
+      overflow: hidden;
+    }
+
+    i.fa {
+      color: #f00;
+      font-size: 42px;
+    }
+  }
 }
 
 .error-message {
-    background-color: #fce4e4;
-    border: 1px solid #fcc2c3;
-    border-radius: 0.25rem;
-    padding: 10px;
-    margin-bottom: 5px;
+  background-color: #fce4e4;
+  border: 1px solid #fcc2c3;
+  border-radius: 0.25rem;
+  padding: 10px;
+  margin-bottom: 5px;
 }
+
 .error-text {
-    color: #cc0033;
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 13px;
-    font-weight: bold;
-    line-height: 20px;
-    text-shadow: 1px 1px rgba(250,250,250,.3);
-    margin: 0;
+  color: #cc0033;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 20px;
+  text-shadow: 1px 1px rgba(250, 250, 250, .3);
+  margin: 0;
 }

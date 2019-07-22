@@ -533,22 +533,20 @@ export class CreateOrderModal extends Component {
                                             style={{display: "inline-block", width: "300px", float: "right"}}
                                         />
                                     </CardHeader>
-                                    <CardBody>
-                                        <Table size="sm">
-                                            <thead>
-                                            <tr>
-                                                <th/>
-                                                <th>App Name</th>
-                                                <th>AdUnit Name</th>
-                                                <th>Format</th>
-                                                <th>Key</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
+                                    <CardBody style={{height: "300px", overflowX: "scroll", paddingTop: 0}}>
+
+                                        <div className="table">
+                                            <div className="tr header">
+                                                <div className="td header">&nbsp;</div>
+                                                <div className="td header">App Name</div>
+                                                <div className="td header">AdUnit Name</div>
+                                                <div className="td header">Format</div>
+                                                <div className="td header">Key</div>
+                                            </div>
                                             {this.state.adunits.filter(this.filterAdunits).map(
                                                 ({name, format, key, appName, appType}) => (
-                                                    <tr key={key}>
-                                                        <td>
+                                                    <div className="tr" key={key}>
+                                                        <div className="td">
                                                             <div className="custom-control custom-checkbox">
                                                                 <input
                                                                     type="checkbox"
@@ -569,18 +567,17 @@ export class CreateOrderModal extends Component {
                                                                     &nbsp;
                                                                 </label>
                                                             </div>
-                                                        </td>
-                                                        <td style={{wordBreak: "break-all"}}>
+                                                        </div>
+                                                        <div className="td" style={{wordBreak: "break-all"}}>
                                                             {appName}
-                                                        </td>
-                                                        <td style={{wordBreak: "break-all"}}>{name}</td>
-                                                        <td>{format}</td>
-                                                        <td>{key}</td>
-                                                    </tr>
+                                                        </div>
+                                                        <div className="td" style={{wordBreak: "break-all"}}>{name}</div>
+                                                        <div className="td">{format}</div>
+                                                        <div className="td">{key}</div>
+                                                    </div>
                                                 )
                                             )}
-                                            </tbody>
-                                        </Table>
+                                        </div>
                                     </CardBody>
                                 </Card>
                             </Col>
