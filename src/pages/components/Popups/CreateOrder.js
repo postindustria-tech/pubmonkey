@@ -54,6 +54,7 @@ const advertiserDefaultName = {
 };
 
 const creativeFormats = {
+    "": "All",
     "320x50": "320 x 50 (Banner)",
     "300x250": "300 x 250 (MRect)",
     "728x90": "728 x 90 (Tablet Leaderboard)",
@@ -65,12 +66,14 @@ const networkClass = {
         "": "Please select OS"
     },
     iphone: {
+        "": "All",
         HyBidMoPubLeaderboardCustomEvent: "728x90 Leaderboard",
         HyBidMoPubBannerCustomEvent: "320x50 Banner",
         HyBidMoPubMRectCustomEvent: "300x250 MRect",
         HyBidMoPubInterstitialCustomEvent: "Interstitial"
     },
     android: {
+        "": "All",
         "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50 Banner",
         "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250 Banner",
         "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": "Interstitial"
@@ -162,7 +165,7 @@ export class CreateOrderModal extends Component {
         formValid: true,
         willGenerateKeywords: 0,
         willGenerateLineItems: 0,
-        creativeFormat: "320x50",
+        creativeFormat: "",
         tooltipOpen: false,
         selectedAdvertiser: "pubnative",
         Ad_ZONE_ID: 2,
@@ -242,13 +245,14 @@ export class CreateOrderModal extends Component {
         } = this.state;
 
         let adUnitFormat = true;
-        if (advertiser === "amazon") {
-            adUnitFormat = creativeFormat === format;
-        } else {
+
+        if (advertiser === "pubnative") {
             if (typeof networkClassToDimension[networkClass] !== "undefined" &&
                 !isEmpty(networkClassToDimension[networkClass])) {
                 adUnitFormat = networkClassToDimension[networkClass] === format;
             }
+        } else if (!isEmpty(creativeFormat)) {
+            adUnitFormat = creativeFormat === format;
         }
 
         return adUnitFormat && (
@@ -663,7 +667,7 @@ export class CreateOrderModal extends Component {
             isValid = false;
         }
         if (data.advertiser === "pubnative" && isEmpty(data.networkClass)) {
-            fieldValidationErrors.networkClass = "Class is required!";
+            fieldValidationErrors.networkClass = "Creative format is required!";
             isValid = false;
         }
         if (isEmpty(data.adunits)) {
@@ -710,7 +714,8 @@ export class CreateOrderModal extends Component {
                 lineItemsNaming: lineItemsNaming,
                 showCreativeFormat: showCreativeFormat,
                 selectedAdvertiser: value,
-                os: ""
+                os: "",
+                formValid: true
             });
         }
         if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
@@ -728,13 +733,9 @@ export class CreateOrderModal extends Component {
     }
 
     static getKeywordTemplate = (value, creativeFormat) => {
-        let storageKeywordTemplate =
-            localStorage.getItem(value) || keywordTemplateDefaultValue[value];
+        let storageKeywordTemplate = localStorage.getItem(value) || keywordTemplateDefaultValue[value];
         if (value === "amazon") {
-            storageKeywordTemplate = storageKeywordTemplate.replace(
-                "{format}",
-                creativeFormat
-            );
+            storageKeywordTemplate = storageKeywordTemplate.replace("{format}", creativeFormat);
         }
         return storageKeywordTemplate;
     };
