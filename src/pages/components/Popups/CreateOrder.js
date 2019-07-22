@@ -241,7 +241,8 @@ export class CreateOrderModal extends Component {
             keyword,
             advertiser,
             networkClass,
-            creativeFormat
+            creativeFormat,
+            os
         } = this.state;
 
         let adUnitFormat = true;
@@ -255,7 +256,9 @@ export class CreateOrderModal extends Component {
             adUnitFormat = creativeFormat === format;
         }
 
-        return adUnitFormat && (
+        os = os !== "" ? os === appType : true;
+
+        return adUnitFormat && os && (
             name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
             key.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
         )
@@ -555,10 +558,6 @@ export class CreateOrderModal extends Component {
                                                                     className="custom-control-input"
                                                                     id={`adUnit${key}`}
                                                                     checked={this.setCheckedStatus(key)}
-                                                                    disabled={
-                                                                        this.state.os !== "" &&
-                                                                        this.state.os !== appType
-                                                                    }
                                                                 />
                                                                 <label
                                                                     className="custom-control-label"
