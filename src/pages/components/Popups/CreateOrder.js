@@ -259,6 +259,7 @@ export class CreateOrderModal extends Component {
         os = os !== "" ? os === appType : true;
 
         return adUnitFormat && os && (
+            appName.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
             name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
             key.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
         )
@@ -536,7 +537,7 @@ export class CreateOrderModal extends Component {
                                             style={{display: "inline-block", width: "300px", float: "right"}}
                                         />
                                     </CardHeader>
-                                    <CardBody style={{height: "300px", overflowX: "scroll", paddingTop: 0}}>
+                                    <CardBody style={{height: "400px", overflowX: "scroll", paddingTop: 0}}>
 
                                         <div className="table">
                                             <div className="tr header">
