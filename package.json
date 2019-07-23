@@ -20,7 +20,7 @@
     "type": "git",
     "url": "https://gitlab.postindustria.com/web/mopub-automation.git"
   },
-  "author": "",
+  "author": "Postindustria",
   "license": "ISC",
   "devDependencies": {
     "babel-plugin-syntax-object-rest-spread": "^6.13.0",
