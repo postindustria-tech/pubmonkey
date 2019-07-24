@@ -2,6 +2,7 @@ import Promise from "bluebird";
 import moment from "moment";
 import {HTTPService, StorageService} from "../services";
 import {LineItemModel} from "../models";
+import {isEmpty} from "../helpers";
 
 const WEB_URL = "https://app.mopub.com";
 
@@ -21,10 +22,16 @@ export const OrderController = new (class Order {
 
     getLineItem(id) {
         return this.getLineItemInfo(id).then(data => {
-            return this.getCreatives(data.key).then(creatives => ({
-                creatives,
-                ...data
-            }));
+            return this.getCreatives(data.key)
+                .then(creatives => {
+                    data.creatives = creatives;
+                    return data;
+                })
+                // .then(creatives => ({
+                //     creatives,
+                //     ...data
+                // }))
+                ;
         });
 
         // return HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`, { responseType: 'text' })
@@ -144,56 +151,88 @@ export const OrderController = new (class Order {
     }
 
     restoreOrder(data) {
-        let {creatives, ...rest} = data;
 
-        rest["start_datetime_0"] = ""; //moment().format('MM/DD/YYYY')
-        rest["start_datetime_1"] = ""; //moment().add(1, 'm').format('hh:mm A')
-        rest["end_datetime_0"] = "";
-        rest["end_datetime_1"] = "";
+        let orderRequest = {
+            advertiser: data.advertiser,
+            description: data.description,
+            name: data.name
+        };
 
-        // let formData = LineItemModel.createFromJSON(data).toFormData()
-        return this.createOrder(rest).then(result => {
-            if (creatives) {
-                let lineItemKey = result.redirect.replace(/.*key=(.+)$/g, "$1");
-
-                return Promise.mapSeries(
-                    creatives,
-                    ({
-                         extended,
-                         name,
-                         adType,
-                         format,
-                         trackingUrl,
-                         images: imageKeys
-                     }) =>
-                        this.createCreatives({
-                            extended,
-                            name,
-                            adType,
-                            format,
-                            trackingUrl,
-                            lineItemKey,
-                            imageKeys
-                        })
-                ).then(() => result);
-            }
-
+        return this.createOrderNew(orderRequest).then(result => {
             return result;
         });
     }
 
-    restoreLineItem(data, orderId) {
-        let {creatives, ...rest} = data;
+    restoreLineItem(data, orderId, advertiser) {
+        let {creatives} = data;
 
-        rest["start_datetime_0"] = ""; //moment().format('MM/DD/YYYY')
-        rest["start_datetime_1"] = ""; //moment().add(1, 'm').format('hh:mm A')
-        rest["end_datetime_0"] = "";
-        rest["end_datetime_1"] = "";
+        if (advertiser.toLocaleLowerCase() === "pubnative") {
+            creatives = [];
+        }
+
+        let lineItemInfo = {
+            allocationPercentage: 100,
+            bidStrategy: "cpm",
+            budget: null,
+            budgetStrategy: "allatonce",
+            budgetType: "unlimited",
+            dayPartTargeting: "alltime",
+            deviceTargeting: false,
+            end: null,
+            frequencyCapsEnabled: false,
+            includeConnectivityTargeting: "all",
+            includeGeoTargeting: "all",
+            maxAndroidVersion: "999",
+            maxIosVersion: "999",
+            minAndroidVersion: "1.5",
+            minIosVersion: "2.0",
+            priority: 12,
+            refreshInterval: 0,
+            start: "2019-05-01T00:00:00.000Z",
+            startImmediately: true,
+            targetAndroid: false,
+            targetIOS: "unchecked",
+            targetIpad: false,
+            targetIphone: false,
+            targetIpod: false,
+            type: "non_gtee",
+            userAppsTargeting: "include",
+            userAppsTargetingList: []
+        };
+        let lineItem = {};
+        for (let key in lineItemInfo) {
+            if (!data.hasOwnProperty(key)) {
+                lineItem[key] = lineItemInfo[key]
+            } else {
+                lineItem[key] = data[key]
+            }
+        }
+
+        if (!isEmpty(data.networkType)) {
+            lineItem.networkType = data.networkType;
+            lineItem.type = data.type;
+            lineItem.networkType = data.networkType;
+            lineItem.enableOverrides = data.enableOverrides;
+            lineItem.overrideFields = {
+                custom_event_class_name: data.overrideFields.custom_event_class_name,
+                custom_event_class_data: data.overrideFields.custom_event_class_data
+            };
+        }
+
+        lineItem = {
+            adUnitKeys: data.adUnitKeys,
+            bid: data.bid,
+            name: data.name,
+            orderKey: orderId,
+            keywords: data.keywords,
+            ...lineItem
+        };
 
         // let formData = LineItemModel.createFromJSON(data).toFormData()
-        return this.createLineItem(rest, orderId).then(result => {
+        return this.createLineItemNew(lineItem, orderId).then(result => {
+
             if (creatives) {
-                let lineItemKey = result.redirect.replace(/.*key=(.+)$/g, "$1");
+                let lineItemKey = result.key;
 
                 return Promise.mapSeries(
                     creatives,
@@ -279,7 +318,7 @@ export const OrderController = new (class Order {
         return Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
             let timestamp = Date.now();
 
-            return OrderController.restoreOrder(order.lineItems[0])
+            return OrderController.restoreOrder(order)
                 .then(result => {
                     timestamp = Date.now() - timestamp;
 
@@ -293,32 +332,27 @@ export const OrderController = new (class Order {
 
                     return result;
                 })
-                .then(({redirect}) => redirect.replace(/.*key=(.+)$/g, "$1"))
-                .then(lineItemId => OrderController.getLineItemInfo(lineItemId))
-                .then(({orderKey}) => {
-                    if (order.lineItems.length > 1) {
-                        return Promise.mapSeries(
-                            order.lineItems.slice(1),
-                            (lineItem, lineItemIdx, lineItemCount) => {
-                                timestamp = Date.now();
+                .then(({key}) => {
+                    if (order.lineItems.length > 0) {
+                        return Promise.mapSeries(order.lineItems, (lineItem, lineItemIdx, lineItemCount) => {
+                            timestamp = Date.now();
 
-                                return OrderController.restoreLineItem(lineItem, orderKey).then(
-                                    result => {
-                                        timestamp = Date.now() - timestamp;
+                            return OrderController.restoreLineItem(lineItem, key, order.advertiser).then(
+                                result => {
+                                    timestamp = Date.now() - timestamp;
 
-                                        step({
-                                            ordersDone: orderIdx + 1,
-                                            orderCount,
-                                            lineItemCount: lineItemCount + 1,
-                                            lineItemsDone: lineItemIdx + 2,
-                                            timestamp
-                                        });
+                                    step({
+                                        ordersDone: orderIdx + 1,
+                                        orderCount,
+                                        lineItemCount: lineItemCount + 1,
+                                        lineItemsDone: lineItemIdx + 2,
+                                        timestamp
+                                    });
 
-                                        return result;
-                                    }
-                                );
-                            }
-                        );
+                                    return result;
+                                }
+                            );
+                        });
                     }
                 });
         });
