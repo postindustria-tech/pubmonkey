@@ -1,0 +1,28 @@
+C3 Craigslist Listings	iPadMiniiLeft	320x50	ddc9df18db8c42c98fe34ab0a684fdd5
+C3 Craigslist Listings	iPadMiniOriginaleLeft	320x50	c4d6ebf762b0476985c2e0708264bfb7
+C3 Craigslist Listings	iPadMiniOriginaleRight	320x50	30ef9f13e5634dfcbf9b1390bcc689c1
+C3 Craigslist Listings	iPadMiniRight	320x50	7b7f6cdb070a4bef868ced0fbd94f6e4
+C3 Craigslist Listings	iPhoneBanner	320x50	6cf6a97701c046b0aea46ab4a8e76368
+C3 Craigslist Listings	iPhoneBanner2	320x50	d73393385da240bfb803be86bcc156c1
+C3 Craigslist Listings	iPhoneBG	320x50	9d297da97ca44df59cc597d33a0cd3c8
+C3 Craigslist Listings	iPhoneOriginale	320x50	91a15d0f389742ab9d2190c4c7cd8a8e
+
+CLassic for Craigslist	iPhoneBannerTop	320x50	ca8d9239c84747bea97f344626858aef
+CLassic2 for Craigslist	iPhoneBannerTop	320x50	871208b6592847db929f7ccf85c0ad26
+
+Craigslist Classifieds 2.0	iPhoneBanner	320x50	ee57fe593d204ef5a91f1a7d72428600
+Craigslist Classifieds 2.0	iPhoneOriginale	320x50	70658187aa7d4f62bb3c00d63e2a7334
+
+Craigslist Stuff: free classifieds app	Phone Banner	320x50	04e77e867d854ef59cef1f3c66133f55
+Craigslist Stuff: free classifieds app	Phone Originale	320x50	1dfdde7a7391467cbc5ed2307cfaf0a5
+
+Daily Craigslist (Android)	Phone Banner	320x50	f2e84e76ca2f4fbe893758a465dc1767
+Daily Craigslist (Android)	Phone Originale	320x50	e42ab43de7734434a0e344d3d6a6943b
+
+Daily Craigslist (iPhone)	Banner	320x50	98c92c2c599e11e295fa123138070049
+Daily Craigslist (iPhone)	Originale	320x50	1ba7fc6097e245ac84bec4eb01588524
+Daily Craigslist (iPhone)	House Ad Banner	320x50	0ef4c82fc3f545289fe8fc24f8cc35e5
+
+Stocks Pro App	iPhoneBanner	320x50	ab80ed6c1bfc4932a84849eb24338867
+Stocks Pro App	TradeIt320x50	320x50	82b762102a3c40ab877fe378342dac43
+
