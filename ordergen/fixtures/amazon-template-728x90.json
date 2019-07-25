@@ -87,10 +87,10 @@
               "orderName": "Amazon HB 728x90",
               "extended": {
                 "isMraid": true,
-                "htmlData": "<div style=\"display:inline-block\">\n    <div id=\"__dtbAd__\" style=\"width:320px; height:50px; overflow:hidden;\">\n        <!--Placeholder for the Ad --> \n    </div>\n    <script type=\"text/javascript\" src=\"mraid.js\"></script>\n    <script type=\"text/javascript\" src=\"https://c.amazon-adsystem.com/dtb-m.js\"> </script>\n    <script type=\"text/javascript\">\n          amzn.dtb.loadAd(\"%%KEYWORD:amznslots%%\", \"%%KEYWORD:amzn_b%%\", \"%%KEYWORD:amzn_h%%\");\n    </script>\n</div>"
+                "htmlData": "<div style=\"display:inline-block\">\n    <div id=\"__dtbAd__\" style=\"width:728px; height:90px; overflow:hidden;\">\n        <!--Placeholder for the Ad --> \n    </div>\n    <script type=\"text/javascript\" src=\"mraid.js\"></script>\n    <script type=\"text/javascript\" src=\"https://c.amazon-adsystem.com/dtb-m.js\"> </script>\n    <script type=\"text/javascript\">\n          amzn.dtb.loadAd(\"%%KEYWORD:amznslots%%\", \"%%KEYWORD:amzn_b%%\", \"%%KEYWORD:amzn_h%%\");\n    </script>\n</div>"
               },
               "name": "Creative",
-              "format": "320x50",
+              "format": "728x90",
               "clickUrl": "",
               "trackingUrl": "",
               "customHeight": null,
