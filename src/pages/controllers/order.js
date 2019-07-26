@@ -1,6 +1,6 @@
 import Promise from "bluebird";
 import moment from "moment";
-import {HTTPService, StorageService} from "../services";
+import {FileService, HTTPService, StorageService} from "../services";
 import {LineItemModel} from "../models";
 import {isEmpty} from "../helpers";
 
@@ -534,6 +534,29 @@ export const OrderController = new (class Order {
                         return result;
                     });
             }).then(lineItems => ({...order, lineItems}));
+        });
+    }
+
+    downloadOrderDataFromSet(order, params, stepCallback) {
+        return new Promise((resolve, reject) => {
+
+            let data = {
+                name: order.name,
+                orderCount: 1
+            };
+
+            const lineItems = this.composerLineItems(null, params);
+
+            data.lineItemCount = lineItems.length;
+            order.lineItems = lineItems;
+
+            data.orders = [order];
+
+            data = JSON.stringify(data, null, "  ");
+
+            FileService.saveFile(data, order.name);
+
+            resolve();
         });
     }
 

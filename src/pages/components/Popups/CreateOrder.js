@@ -105,6 +105,7 @@ export class CreateOrderModal extends Component {
     };
 
     state = {
+        executor: "create",
         title: "Create New Order",
         isOpen: false,
         backdrop: true,
@@ -600,11 +601,15 @@ export class CreateOrderModal extends Component {
                         </Row>
                     </ModalBody>
                     <ModalFooter>
+                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning">
+                            Download JSON
+                        </Button>
+
                         <Button onClick={this.close} color="secondary">
                             Cancel
                         </Button>
-                        <Button onClick={this.preOrder} color="primary">
-                            Create
+                        <Button onClick={() => this.preOrder("create")} color="primary">
+                            Create in MoPub
                         </Button>
                     </ModalFooter>
                 </Modal>
@@ -613,7 +618,7 @@ export class CreateOrderModal extends Component {
                     willGenerateLineItems={this.state.willGenerateLineItems}
                     willGenerateKeywords={this.state.willGenerateKeywords}
                     ref={modal => (this.confirmModal = modal)}
-                    onConfirm={this.create}
+                    onConfirm={this.confirmed}
                 />
             </React.Fragment>
         );
@@ -768,7 +773,7 @@ export class CreateOrderModal extends Component {
     }
 
     @bind
-    preOrder() {
+    preOrder(executor) {
         let {
             adunitsSelected: adunits,
             step,
@@ -824,7 +829,8 @@ export class CreateOrderModal extends Component {
 
         this.setState(() => ({
             willGenerateLineItems: items.toFixed(0),
-            willGenerateKeywords: keywords.toFixed(0)
+            willGenerateKeywords: keywords.toFixed(0),
+            executor: executor
         }));
 
         this.ask();
@@ -833,6 +839,19 @@ export class CreateOrderModal extends Component {
     toInteger = num => Number((Number(num) * 100).toFixed(0));
     toDecimal = num => this.toValidUI(num / 100);
     toValidUI = num => Math.round(num * 100) / 100;
+
+    @bind
+    confirmed() {
+        //@TODO: Need to refactor, use only one method for both actions
+        switch (this.state.executor) {
+            case "create":
+                this.create();
+                break;
+            case "download":
+                this.download();
+                break;
+        }
+    }
 
     @bind
     async create() {
@@ -906,6 +925,98 @@ export class CreateOrderModal extends Component {
             .then(() => {
                 this.close();
                 this.props.toUpdate && this.props.toUpdate();
+            })
+            .catch(error => {
+                ModalWindowService.ProgressModal.cancel();
+
+                this.close();
+                this.props.toUpdate && this.props.toUpdate();
+
+                let errorName = JSON.stringify(error);
+                if (errorName.length === 2) {
+                    errorName = error.name;
+                }
+
+                this.helperModal.open({
+                    text: errorName + '<br/>' + error.stack.replace(/\r?\n/g, '<br/>')
+                });
+            });
+    }
+
+    @bind
+    async download() {
+        let {
+            adunitsSelected: adunits,
+            step,
+            keywordStep,
+            keywordTemplate,
+            rangeFrom,
+            rangeTo,
+            orderName,
+            lineItemInfo,
+            lineItemsNaming,
+            advertiser,
+            creativeFormat,
+            networkClass,
+            Ad_ZONE_ID,
+            adServerDomain
+        } = this.state;
+
+        let order = {
+            advertiser: advertiserDefaultName[advertiser],
+            description: "",
+            name: orderName
+        };
+
+        let params = {
+            adunits,
+            step,
+            keywordStep,
+            keywordTemplate,
+            rangeFrom,
+            rangeTo,
+            lineItemInfo,
+            lineItemsNaming,
+            advertiser,
+            creativeFormat,
+            networkClass,
+            Ad_ZONE_ID,
+            adServerDomain
+        };
+
+        ModalWindowService.ProgressModal.setProgress([
+            {
+                title: "orders:",
+                progress: {value: 0}
+            },
+            {
+                title: "line items:",
+                progress: {value: 0}
+            }
+        ]);
+
+        // let method = "downloadOrderDataFromSet";
+
+        progress = OrderController.downloadOrderDataFromSet(
+            order,
+            params,
+            ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
+                ModalWindowService.ProgressModal.setProgress([
+                    {
+                        title: `orders: ${ordersDone}/${orderCount}`,
+                        progress: {value: (ordersDone / orderCount) * 100}
+                    },
+                    {
+                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                        progress: {value: (lineItemsDone / lineItemCount) * 100}
+                    }
+                ]);
+            }
+        )
+            .then(ModalWindowService.ProgressModal.hideModal)
+            .then(() => {
+                this.close();
+                // this.props.toUpdate && this.props.toUpdate();
             })
             .catch(error => {
                 ModalWindowService.ProgressModal.cancel();
