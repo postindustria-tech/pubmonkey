@@ -344,7 +344,7 @@ export const OrderController = new (class Order {
                                     step({
                                         ordersDone: orderIdx + 1,
                                         orderCount,
-                                        lineItemCount: lineItemCount + 1,
+                                        lineItemCount: lineItemCount,
                                         lineItemsDone: lineItemIdx + 2,
                                         timestamp
                                     });
