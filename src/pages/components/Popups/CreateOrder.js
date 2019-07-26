@@ -172,7 +172,8 @@ export class CreateOrderModal extends Component {
         os: "",
         networkClass: "",
         adServerDomain: "",
-        keyword: ""
+        keyword: "",
+        rangeMeasure: "$"
     };
 
     @bind
@@ -380,7 +381,12 @@ export class CreateOrderModal extends Component {
                                     onChange={this.handleInputChange}
                                     className={"mp-form-control"}
                                 />
-                                ]. <span className={"mp-label"}>Line Items naming: </span>
+                                ] {this.state.rangeMeasure}.
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col className={"col-sm-12"}>
+                                <span className={"mp-label"}>Line Items naming: </span>
                                 <CustomInput
                                     invalid={!isEmpty(this.state.formErrors.lineItemsNaming)}
                                     inline
@@ -404,7 +410,7 @@ export class CreateOrderModal extends Component {
                                 </Tooltip>
                             </Col>
                         </Row>
-                        <Row>
+                        <Row hidden={this.state.selectedAdvertiser === "amazon"}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Step: </span>
                                 <InputNumber
@@ -712,7 +718,9 @@ export class CreateOrderModal extends Component {
                 showCreativeFormat: showCreativeFormat,
                 selectedAdvertiser: value,
                 os: "",
-                formValid: true
+                formValid: true,
+                rangeMeasure: value === "amazon" ? "position" : "$",
+                rangeFrom: value === "amazon" ? 1 : 0.1,
             });
         }
         if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
