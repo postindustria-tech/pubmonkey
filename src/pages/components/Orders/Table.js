@@ -36,11 +36,11 @@ export class OrdersTable extends Component {
                                 checked={ allSelected }
                             />
                         </th>
-                        <th>name</th>
-                        <th>advertiser</th>
-                        <th>line items</th>
-                        <th>status</th>
-                        <th>actions</th>
+                        <th>Name</th>
+                        <th>Advertiser</th>
+                        <th>Line items</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <CreateOrderModal withButton={false} ref={orderModal => this.orderModal = orderModal} />
