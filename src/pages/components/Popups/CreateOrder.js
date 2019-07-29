@@ -103,7 +103,6 @@ export class CreateOrderModal extends Component {
         step: 0.1,
         keywordStepMin: 0.01,
         keywordStep: 0.01,
-        keywordStepLabel: "Keyword Step",
         rangeFrom: 0.1,
         rangeTo: 10,
         formErrors: {
@@ -119,7 +118,7 @@ export class CreateOrderModal extends Component {
         willGenerateLineItems: 0,
         creativeFormat: "",
         tooltipOpen: false,
-        selectedAdvertiser: "pubnative",
+        selectedAdvertiser: defaultAdvertiserValue,
         Ad_ZONE_ID: 2,
         os: "",
         networkClass: "",
@@ -376,7 +375,7 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                 />{" "}
                                 <span className={"mp-label"}>
-                                  {this.state.keywordStepLabel}:{" "}
+                                  Keyword Step:{" "}
                                 </span>
                                 <InputNumber
                                     invalid={!isEmpty(this.state.formErrors.keywordStep)}
@@ -660,7 +659,6 @@ export class CreateOrderModal extends Component {
             const lineItemsNaming = KEYWORD_PLACEHOLDER[value],
                 step = value === "amazon" ? 1 : 0.1,
                 keywordStep = value === "amazon" ? 1 : 0.01,
-                keywordStepLabel = value === "amazon" ? "Keyword Quantity" : "Keyword Step",
                 showCreativeFormat = value === "amazon" || value === "openx";
 
             this.setState({
@@ -671,7 +669,6 @@ export class CreateOrderModal extends Component {
                 step: step,
                 keywordStep: keywordStep,
                 keywordStepMin: keywordStep,
-                keywordStepLabel: keywordStepLabel,
                 lineItemsNaming: lineItemsNaming,
                 showCreativeFormat: showCreativeFormat,
                 selectedAdvertiser: value,
