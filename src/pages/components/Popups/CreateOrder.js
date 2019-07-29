@@ -658,9 +658,9 @@ export class CreateOrderModal extends Component {
         const {value, name} = event.target;
         if (name === "advertiser") {
             const lineItemsNaming = KEYWORD_PLACEHOLDER[value],
+                step = value === "amazon" ? 1 : 0.1,
                 keywordStep = value === "amazon" ? 1 : 0.01,
-                keywordStepLabel =
-                    value === "amazon" ? "Keyword Quantity" : "Keyword Step",
+                keywordStepLabel = value === "amazon" ? "Keyword Quantity" : "Keyword Step",
                 showCreativeFormat = value === "amazon" || value === "openx";
 
             this.setState({
@@ -668,6 +668,7 @@ export class CreateOrderModal extends Component {
                     value,
                     this.state.creativeFormat
                 ),
+                step: step,
                 keywordStep: keywordStep,
                 keywordStepMin: keywordStep,
                 keywordStepLabel: keywordStepLabel,
