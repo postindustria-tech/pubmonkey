@@ -1,7 +1,6 @@
 import React, {Component} from "react";
-import Select from "react-select";
 import bind from "bind-decorator";
-import {FileService, ModalWindowService} from "../../services";
+import {ModalWindowService} from "../../services";
 import {
     Button,
     Progress,
@@ -30,65 +29,17 @@ import {ProgressModal} from "./";
 import {isEmpty} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
 import _ from "underscore";
-import moment from "../Orders/List";
 import HelperModal from "./HelperModal";
+import {
+    ADVERTISER_DEFAULT_NAME,
+    KEYWORD_TEMPLATE_DEFAULT_VALUE,
+    KEYWORD_PLACEHOLDER,
+    CREATIVE_FORMATS,
+    NETWORK_CLASS,
+    NETWORK_CLASS_TO_DIMENSION
+} from '../../constants/common';
 
 const defaultAdvertiserValue = "pubnative";
-
-const keywordTemplateDefaultValue = {
-    pubnative: "pn_bid:{bid}",
-    openx: "hb_pb:{bid}",
-    amazon: "amznslots:m{format}p{position}"
-};
-
-const keywordPlaceholder = {
-    pubnative: "PN HyBid {bid}",
-    openx: "hb_pb {bid}",
-    amazon: "m320x50p{position}"
-};
-
-const advertiserDefaultName = {
-    pubnative: "PubNative",
-    openx: "Prebid.org",
-    amazon: "Amazon HB"
-};
-
-const creativeFormats = {
-    "": "All",
-    "320x50": "320 x 50 (Banner)",
-    "300x250": "300 x 250 (MRect)",
-    "728x90": "728 x 90 (Tablet Leaderboard)",
-    "160x600": "160 x 600 (Tablet Skyscraper)"
-};
-
-const networkClass = {
-    "": {
-        "": "Please select OS"
-    },
-    iphone: {
-        "": "All",
-        HyBidMoPubLeaderboardCustomEvent: "728x90 Leaderboard",
-        HyBidMoPubBannerCustomEvent: "320x50 Banner",
-        HyBidMoPubMRectCustomEvent: "300x250 MRect",
-        HyBidMoPubInterstitialCustomEvent: "Interstitial"
-    },
-    android: {
-        "": "All",
-        "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50 Banner",
-        "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250 Banner",
-        "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": "Interstitial"
-    }
-};
-
-const networkClassToDimension = {
-    "HyBidMoPubLeaderboardCustomEvent": "728x90",
-    "HyBidMoPubBannerCustomEvent": "320x50",
-    "HyBidMoPubMRectCustomEvent": "300x250",
-    "HyBidMoPubInterstitialCustomEvent": "",
-    "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50",
-    "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250",
-    "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": ""
-};
 
 const helperText =
     "{bid} macro is replaced with a corresponding bid value\n" +
@@ -145,10 +96,10 @@ export class CreateOrderModal extends Component {
             userAppsTargeting: "include",
             userAppsTargetingList: []
         },
-        lineItemsNaming: keywordPlaceholder[defaultAdvertiserValue],
+        lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiserValue],
         keywordTemplate:
             localStorage.getItem(defaultAdvertiserValue) ||
-            keywordTemplateDefaultValue[defaultAdvertiserValue],
+            KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiserValue],
         step: 0.1,
         keywordStepMin: 0.01,
         keywordStep: 0.01,
@@ -234,11 +185,11 @@ export class CreateOrderModal extends Component {
     }
 
     handleChangeKeyword = (event) => {
-        const { value } = event.target;
-        this.setState({ keyword: value })
+        const {value} = event.target;
+        this.setState({keyword: value})
     };
 
-    filterAdunits =({name = '', format, key = '', appName, appType}) => {
+    filterAdunits = ({name = '', format, key = '', appName, appType}) => {
         let {
             keyword,
             advertiser,
@@ -250,9 +201,9 @@ export class CreateOrderModal extends Component {
         let adUnitFormat = true;
 
         if (advertiser === "pubnative") {
-            if (typeof networkClassToDimension[networkClass] !== "undefined" &&
-                !isEmpty(networkClassToDimension[networkClass])) {
-                adUnitFormat = networkClassToDimension[networkClass] === format;
+            if (typeof NETWORK_CLASS_TO_DIMENSION[networkClass] !== "undefined" &&
+                !isEmpty(NETWORK_CLASS_TO_DIMENSION[networkClass])) {
+                adUnitFormat = NETWORK_CLASS_TO_DIMENSION[networkClass] === format;
             }
         } else if (!isEmpty(creativeFormat)) {
             adUnitFormat = creativeFormat === format;
@@ -344,10 +295,10 @@ export class CreateOrderModal extends Component {
                                             value={this.state.advertiser}
                                             className={"mp-form-control"}
                                         >
-                                            {Object.keys(advertiserDefaultName).map(
+                                            {Object.keys(ADVERTISER_DEFAULT_NAME).map(
                                                 (option, index) => (
                                                     <option key={index} value={option}>
-                                                        {advertiserDefaultName[option]}
+                                                        {ADVERTISER_DEFAULT_NAME[option]}
                                                     </option>
                                                 )
                                             )}
@@ -457,9 +408,9 @@ export class CreateOrderModal extends Component {
                                     style={{display: "inline-block", width: "auto"}}
                                     className={"mp-form-control"}
                                 >
-                                    {Object.keys(creativeFormats).map((option, index) => (
+                                    {Object.keys(CREATIVE_FORMATS).map((option, index) => (
                                         <option key={index} value={option}>
-                                            {creativeFormats[option]}
+                                            {CREATIVE_FORMATS[option]}
                                         </option>
                                     ))}
                                 </Input>
@@ -510,10 +461,10 @@ export class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                     invalid={!isEmpty(this.state.formErrors.networkClass)}
                                 >
-                                    {Object.keys(networkClass[this.state.os]).map(
+                                    {Object.keys(NETWORK_CLASS[this.state.os]).map(
                                         (option, index) => (
                                             <option key={index} value={option}>
-                                                {networkClass[this.state.os][option]}
+                                                {NETWORK_CLASS[this.state.os][option]}
                                             </option>
                                         )
                                     )}
@@ -578,7 +529,8 @@ export class CreateOrderModal extends Component {
                                                         <div className="td" style={{wordBreak: "break-all"}}>
                                                             {appName}
                                                         </div>
-                                                        <div className="td" style={{wordBreak: "break-all"}}>{name}</div>
+                                                        <div className="td"
+                                                             style={{wordBreak: "break-all"}}>{name}</div>
                                                         <div className="td">{format}</div>
                                                         <div className="td">{key}</div>
                                                     </div>
@@ -705,7 +657,7 @@ export class CreateOrderModal extends Component {
     handleInputChange(event) {
         const {value, name} = event.target;
         if (name === "advertiser") {
-            const lineItemsNaming = keywordPlaceholder[value],
+            const lineItemsNaming = KEYWORD_PLACEHOLDER[value],
                 keywordStep = value === "amazon" ? 1 : 0.01,
                 keywordStepLabel =
                     value === "amazon" ? "Keyword Quantity" : "Keyword Step",
@@ -736,14 +688,14 @@ export class CreateOrderModal extends Component {
         if (name === "os") {
             this.setState({
                 adunitsSelected: [],
-                networkClass: Object.keys(networkClass[value])[0]
+                networkClass: Object.keys(NETWORK_CLASS[value])[0]
             });
         }
         this.setState({[name]: value});
     }
 
     static getKeywordTemplate = (value, creativeFormat) => {
-        let storageKeywordTemplate = localStorage.getItem(value) || keywordTemplateDefaultValue[value];
+        let storageKeywordTemplate = localStorage.getItem(value) || KEYWORD_TEMPLATE_DEFAULT_VALUE[value];
         if (value === "amazon") {
             storageKeywordTemplate = storageKeywordTemplate.replace("{format}", creativeFormat);
         }
@@ -873,7 +825,7 @@ export class CreateOrderModal extends Component {
         } = this.state;
 
         let order = {
-            advertiser: advertiserDefaultName[advertiser],
+            advertiser: ADVERTISER_DEFAULT_NAME[advertiser],
             description: "",
             name: orderName
         };
@@ -963,7 +915,7 @@ export class CreateOrderModal extends Component {
         } = this.state;
 
         let order = {
-            advertiser: advertiserDefaultName[advertiser],
+            advertiser: ADVERTISER_DEFAULT_NAME[advertiser],
             description: "",
             name: orderName
         };
