@@ -18,7 +18,8 @@
     "tabs",
     "webRequest",
     "webRequestBlocking",
-    "https://app.mopub.com/*"
+    "https://app.mopub.com/*",
+    "storage"
   ],
   "content_scripts": [
     {

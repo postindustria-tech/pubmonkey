@@ -6,8 +6,8 @@ import Promise from 'bluebird'
 import moment from 'moment'
 import { BaseLayout } from '../layouts'
 import { LineItemsTable } from '../LineItems'
-import { FileService, RPCController, ModalWindowService } from '../../services'
-import { MainController, OrderController } from '../../controllers'
+import { ModalWindowService } from '../../services'
+import { OrderController } from '../../controllers'
 import { LineItemEditModal, CloneModal } from '../Popups'
 
 const

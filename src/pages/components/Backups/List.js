@@ -4,7 +4,7 @@ import moment from 'moment'
 import bind from 'bind-decorator'
 import { BackupsTable } from './Table'
 import { BaseLayout } from '../layouts'
-import { RPCController, FileService } from '../../services'
+import { FileService } from '../../services'
 import { MainController } from '../../controllers'
 
 export class BackupsList extends Component {

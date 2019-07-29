@@ -6,7 +6,7 @@ import bind from "bind-decorator";
 import sha256 from "sha256";
 import {OrdersTable} from "./Table";
 import {BaseLayout} from "../layouts";
-import {FileService, RPCController, ModalWindowService} from "../../services";
+import {FileService, ModalWindowService} from "../../services";
 import {MainController, OrderController} from "../../controllers";
 import {CreateOrderModal} from "../Popups/CreateOrder";
 
@@ -25,6 +25,9 @@ const FILTER_FN = [
 window.canceledExport = false;
 
 export class OrdersList extends Component {
+
+    timer = null;
+
     state = {
         orders: [],
         selected: [],
@@ -39,6 +42,12 @@ export class OrdersList extends Component {
 
     componentDidMount() {
         this.loadOrders();
+    }
+
+    componentWillUnmount() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
     }
 
     render() {
@@ -68,13 +77,13 @@ export class OrdersList extends Component {
                     &nbsp; Import
                 </Button>
                 <CreateOrderModal toUpdate={this.loadOrders}/>
-                {/* <Button
+                <Button
                     color="primary"
                     onClick={ this.backupSelected }
                     disabled={ !orderCount }
                 >
                     Create Backup
-                </Button> */}
+                </Button>
                 {/* <Button
                     color="primary"
                     onClick={ this.archiveSelected }
@@ -259,7 +268,7 @@ export class OrdersList extends Component {
             window.canceledExport = true
             promise.cancel("canceled by user");
 
-            setTimeout(() => {
+            this.timer = setTimeout(() => {
                 this.setState({canceled: false});
                 window.canceledExport = false
             }, 1000)

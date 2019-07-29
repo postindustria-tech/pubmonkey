@@ -5,7 +5,7 @@ import moment from 'moment'
 import bind from 'bind-decorator'
 import { BaseLayout } from '../layouts'
 import { OrdersTable } from '../Orders'
-import { FileService, RPCController, ModalWindowService } from '../../services'
+import { FileService, ModalWindowService } from '../../services'
 import { MainController, OrderController } from '../../controllers'
 
 export class BackupView extends Component {
