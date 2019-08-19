@@ -129,10 +129,7 @@ class Handler extends AbstractHandler {
     }
 
     updateOrderStatus(status, id) {
-        return HTTPService.POST(
-            `${WEB_URL}/web-client/api/order/update-status?key=${id}`,
-            {status}
-        );
+        return HTTPService.POST(`${WEB_URL}/web-client/api/order/update-status?key=${id}`, {status});
     }
 
     updateOrderStatusInSet(orders, status, step) {

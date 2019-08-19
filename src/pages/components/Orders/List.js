@@ -171,6 +171,7 @@ class OrdersList extends Component {
                 </Row>
                 <OrdersTable
                     orders={this.props.orders}
+                    adServer={this.props.type}
                     filter={filterFn}
                     onUpdate={this.onOrdersListUpdate}
                 />

@@ -97,7 +97,7 @@ class Handler extends AbstractHandler {
         if (!Handler.token) {
             Handler.token = await this.getToken();
         }
-        console.log(Handler.token);
+        // console.log(Handler.token);
         if (!this.dfp) {
             this.dfp = new DFP({networkCode: this.networkCode, apiVersion: DFP_API_VERSION, token: Handler.token});
         }
@@ -372,7 +372,7 @@ class Handler extends AbstractHandler {
         });
     }
 
-    async performOrderAction(orderId) {
+    async performOrderAction(status, orderId) {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("OrderService"));
@@ -380,8 +380,8 @@ class Handler extends AbstractHandler {
 
             let result = await Service.performOrderAction({
                 orderAction: {
-                    attributes: {'xsi:type': 'ApproveOrders'},
-                    skipInventoryCheck: true
+                    attributes: {'xsi:type': status},
+                    // skipInventoryCheck: true
                 },
                 filterStatement: {query: 'WHERE id = ' + orderId}
             });
@@ -651,11 +651,10 @@ class Handler extends AbstractHandler {
                 }
             }
 
-            await this.performOrderAction(order.id);
+            await this.performOrderAction('ApproveOrders', order.id);
 
             return this.createLineItems(lineItems)
                 .then(lineItems => {
-                    // if (advertiser === "openx") {
                     let associations = [];
                     lineItems.map(({id}) => {
                         associations.push(LineItemCreativeAssociation(
@@ -665,7 +664,7 @@ class Handler extends AbstractHandler {
                         ));
                     });
                     this.createLineItemCreativeAssociations(associations);
-                    // }
+
                     return lineItems;
                 })
                 .then(lineItems => {
@@ -859,6 +858,25 @@ class Handler extends AbstractHandler {
                 return lineItem;
             }).then(lineItems => ({...order, lineItems}));
         });
+    }
+
+    updateOrderStatus(status, id) {
+        let mappedStatus = null;
+        switch (status) {
+            case 'running':
+                mappedStatus = 'ApproveOrders';
+                break;
+            case 'paused':
+                mappedStatus = 'PauseOrders';
+                break;
+            case 'archived':
+                mappedStatus = 'ArchiveOrders';
+                break;
+            default:
+                throw `Wrong order status ${status}`;
+        }
+
+        return this.performOrderAction(mappedStatus, id);
     }
 }
 

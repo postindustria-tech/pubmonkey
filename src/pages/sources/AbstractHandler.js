@@ -1,3 +1,5 @@
+import {HTTPService} from "../services";
+
 export default class AbstractHandler {
 
     static source = null;
@@ -37,6 +39,10 @@ export default class AbstractHandler {
     }
 
     collectOrderDataFromSet() {
+
+    }
+
+    updateOrderStatus(status, id) {
 
     }
 }
