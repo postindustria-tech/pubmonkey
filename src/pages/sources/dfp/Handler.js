@@ -511,6 +511,7 @@ class Handler extends AbstractHandler {
             customTargetingValues = [...customTargetingValues, ...newValues];
         }
 
+        line = 1;
         await Promise.all(Array(bids.length).fill().map(async (item, index) => {
 
             const bid = bids[index];
@@ -604,11 +605,6 @@ class Handler extends AbstractHandler {
             }];
         }));
 
-
-        // for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-
-        // }
-
         console.log(lineItems);
 
         return lineItems;
@@ -688,7 +684,6 @@ class Handler extends AbstractHandler {
     }
 
     async createOrder(data) {
-
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("OrderService"));
@@ -710,13 +705,10 @@ class Handler extends AbstractHandler {
     }
 
     async createLineItems(data) {
-
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("LineItemService"));
             Service.setToken(Handler.token);
-
-            // console.log(data);
 
             let lineItems = await Service.createLineItems({
                 lineItems: data
