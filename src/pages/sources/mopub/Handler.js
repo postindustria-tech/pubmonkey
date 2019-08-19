@@ -113,9 +113,7 @@ class Handler extends AbstractHandler {
     }
 
     getLineItemInfo(id) {
-        return HTTPService.GET(
-            `${WEB_URL}/web-client/api/line-items/get?key=${id}`
-        );
+        return HTTPService.GET(`${WEB_URL}/web-client/api/line-items/get?key=${id}`);
     }
 
     createOrder(data) {

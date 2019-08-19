@@ -108,7 +108,6 @@ class OrdersList extends Component {
                     color="primary"
                     onClick={this.exportSelected}
                     disabled={!orderCount}
-                    hidden={this.props.type === AD_SERVER_DFP}
                 >
                     <i className="fa fa-cloud-download"/>
                     &nbsp; Export

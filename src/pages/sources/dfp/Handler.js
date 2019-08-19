@@ -2,7 +2,7 @@ import Factory from '../../sources/Factory';
 import AbstractHandler from '../../sources/AbstractHandler';
 import {AdvertiserFactory} from "./Factory";
 import {AD_SERVER_DFP, DFP_API_VERSION} from "../../constants/source";
-import {DFP} from "../../services";
+import {DFP, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {isEmpty, toDecimal, toInteger, toValidUI, deepClone} from "../../helpers";
 import {
@@ -140,7 +140,26 @@ class Handler extends AbstractHandler {
                 return await Service.getCreativesByStatement({
                     filterStatement: filterStatement
                 });
+            case "LineItemCreativeAssociationService":
+                return await Service.getLineItemCreativeAssociationsByStatement({
+                    filterStatement: filterStatement
+                });
         }
+    }
+
+    async getOrder(id) {
+        return new Promise(async (resolve, reject) => {
+            const orders = await this._getByStatement('OrderService', {
+                query: "WHERE OrderId = " + id
+            });
+            resolve(orders);
+        }).then(orders => {
+            let order = {};
+            if (orders.totalResultSetSize > 0) {
+                order = orders.results[0];
+            }
+            return order;
+        });
     }
 
     async getAdUnits() {
@@ -151,8 +170,6 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
             try {
                 let orders = await this._getByStatement('OrderService', {});
-
-                // console.log(orders.results);
 
                 if (orders.totalResultSetSize > 0) {
                     orders = orders.results.filter(({isArchived}) => !isArchived);
@@ -166,39 +183,37 @@ class Handler extends AbstractHandler {
             }
         }).then(async orders => {
 
-            // console.log(orders.length);
-
+            // Use some cache?
             const advertisers = await this.getAllAdvertisers();
-            // console.log(advertisers);
 
-            orders = await Promise.all(orders.map(async (order) => {
-                // const lineItems = await this.getAllLineItems(order.id);
+            const ids = orders.map(({id}) => {
+                return id;
+            });
+            const lineItems = await this.getAllLineItems(ids);
 
+            orders = orders.map(order => {
                 return {
                     key: order.id,
                     name: order.name,
                     status: order.status,
                     advertiser: advertisers.find(advertiser => advertiser.id === order.advertiserId).name,
-                    lineItemCount: 0//lineItems.length
+                    lineItemCount: lineItems.filter(({orderId}) => orderId === order.id).length
                 }
-
-            }));
-
-            // console.log(orders);
+            });
 
             return orders;
         });
     }
 
-    async getAllLineItems(orderId) {
+    async getAllLineItems(ids) {
 
         return new Promise(async (resolve, reject) => {
 
             let lineItems = await this._getByStatement('LineItemService', {
-                query: "WHERE OrderId = " + orderId
+                query: 'WHERE OrderId IN (' + ids.join(',') + ')'
             });
 
-            console.log(lineItems);
+            // console.log(lineItems);
 
             if (lineItems.totalResultSetSize > 0) {
                 lineItems = lineItems.results;
@@ -810,26 +825,46 @@ class Handler extends AbstractHandler {
 
     collectOrderData(id, step, canceled) {
         if (window.canceledExport) return;
-        return this.getOrder(id).then(order => {
+        return this.getOrder(id).then(async order => {
+            const lineItems = await this.getAllLineItems([order.id]);
+            return {
+                ...order,
+                lineItems
+            }
+        }).then(async order => {
             let {lineItems} = order;
 
-            return Promise.mapSeries(lineItems, ({key}, idx, lineItemCount) => {
+            const ids = lineItems.map(({id}) => {
+                return id;
+            });
+
+            let creativeAssociations = await this._getByStatement('LineItemCreativeAssociationService', {
+                query: 'WHERE lineItemId IN (' + ids.join(',') + ')'
+            });
+
+            if (creativeAssociations.totalResultSetSize > 0) {
+                creativeAssociations = creativeAssociations.results;
+            } else {
+                creativeAssociations = [];
+            }
+
+            return Promise.mapSeries(lineItems, (lineItem, idx, lineItemCount) => {
                 if (window.canceledExport) return;
                 let timestamp = Date.now();
 
-                return this.getLineItem(key).then(result => {
-                    timestamp = Date.now() - timestamp;
+                lineItem.creativeAssociations = creativeAssociations.filter(({lineItemId}) => lineItemId === lineItem.id);
 
-                    if (step) {
-                        step({
-                            lineItemCount,
-                            timestamp,
-                            lineItemsDone: idx + 1
-                        });
-                    }
+                timestamp = Date.now() - timestamp;
 
-                    return result;
-                });
+                if (step) {
+                    step({
+                        lineItemCount,
+                        timestamp,
+                        lineItemsDone: idx + 1
+                    });
+                }
+
+                return lineItem;
             }).then(lineItems => ({...order, lineItems}));
         });
     }
