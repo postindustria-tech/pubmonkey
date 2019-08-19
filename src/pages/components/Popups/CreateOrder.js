@@ -585,7 +585,7 @@ export class CreateOrderModal extends Component {
                         </Row>
                     </ModalBody>
                     <ModalFooter>
-                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning">
+                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning" hidden={this.state.adServer === AD_SERVER_DFP}>
                             Download JSON
                         </Button>
 
@@ -975,15 +975,16 @@ export class CreateOrderModal extends Component {
             networkClass,
             Ad_ZONE_ID,
             adServerDomain,
+            adServer,
             customTargetingKeys,
-            customTargetingValues
+            customTargetingValues,
+            granularity
         } = this.state;
 
-        let order = {
-            advertiser: this.state.ADVERTISER_DEFAULT_NAME[advertiser],
-            description: "",
-            name: orderName
-        };
+        let order = this.sourceHandler.composeOrderRequest(
+            adServer === AD_SERVER_DFP ? advertiserId : this.state.ADVERTISER_DEFAULT_NAME[advertiser],
+            orderName
+        );
 
         let params = {
             adunits,
@@ -999,7 +1000,8 @@ export class CreateOrderModal extends Component {
             Ad_ZONE_ID,
             adServerDomain,
             customTargetingKeys,
-            customTargetingValues
+            customTargetingValues,
+            granularity
         };
 
         ModalWindowService.ProgressModal.setProgress([
@@ -1013,9 +1015,7 @@ export class CreateOrderModal extends Component {
             }
         ]);
 
-        // let method = "downloadOrderDataFromSet";
-
-        progress = OrderController.downloadOrderDataFromSet(
+        progress = this.sourceHandler.downloadOrderDataFromSet(
             order,
             params,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {

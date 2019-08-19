@@ -2,7 +2,7 @@ import Factory from '../../sources/Factory';
 import AbstractHandler from '../../sources/AbstractHandler';
 import {AdvertiserFactory} from "./Factory";
 import {AD_SERVER_DFP, DFP_API_VERSION} from "../../constants/source";
-import {DFP, HTTPService} from "../../services";
+import {DFP, FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {isEmpty, toDecimal, toInteger, toValidUI, deepClone} from "../../helpers";
 import {
@@ -679,6 +679,29 @@ class Handler extends AbstractHandler {
 
                     return lineItems;
                 });
+        });
+    }
+
+    downloadOrderDataFromSet(order, params, stepCallback) {
+        return new Promise((resolve, reject) => {
+
+            let data = {
+                name: order.name,
+                orderCount: 1
+            };
+
+            const lineItems = this.composerLineItems(null, params);
+
+            data.lineItemCount = lineItems.length;
+            order.lineItems = lineItems;
+
+            data.orders = [order];
+
+            data = JSON.stringify(data, null, "  ");
+
+            FileService.saveFile(data, order.name);
+
+            resolve();
         });
     }
 
