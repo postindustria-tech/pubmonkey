@@ -201,6 +201,8 @@ class Handler extends AbstractHandler {
                 }
             });
 
+            // console.log(orders);
+
             return orders;
         });
     }
@@ -319,7 +321,7 @@ class Handler extends AbstractHandler {
                     keys = [];
                 }
                 keys = keys.filter(({status}) => status === 'ACTIVE');
-                console.log(keys);
+                // console.log(keys);
 
                 resolve(keys);
             } catch (err) {
@@ -345,7 +347,7 @@ class Handler extends AbstractHandler {
                 } else {
                     values = [];
                 }
-                console.log(values);
+                // console.log(values);
 
                 resolve(values);
             } catch (err) {

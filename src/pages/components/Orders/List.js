@@ -80,7 +80,7 @@ class OrdersList extends Component {
 
     init() {
         this.sourceHandler = SourceFactory.getHandler(this.props.type);
-        console.log(this.props.type + 'sourceHandler inited');
+        console.log(this.props.type + ' sourceHandler inited');
     }
 
     render() {
@@ -473,7 +473,9 @@ class OrdersList extends Component {
     }
 
     calcSelected() {
-        let selected = this.state.orders.filter(({checked}) => checked);
+        let selected = this.state.orders
+            .filter(this.state.filterFn)
+            .filter(({checked}) => checked);
 
         this.setState({
             orderCount: selected.length,
