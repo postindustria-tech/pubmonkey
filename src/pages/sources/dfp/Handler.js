@@ -878,6 +878,10 @@ class Handler extends AbstractHandler {
 
         return this.performOrderAction(mappedStatus, id);
     }
+
+    getOrderUrl(key) {
+        return `https://admanager.google.com/${this.networkCode}#delivery/OrderDetail/orderId=${key}`;
+    }
 }
 
 Factory.registerHandler(Handler);

@@ -45,4 +45,8 @@ export default class AbstractHandler {
     updateOrderStatus(status, id) {
 
     }
+
+    getOrderUrl(key) {
+        return "";
+    }
 }

@@ -71,7 +71,7 @@ export class OrdersTable extends Component {
                                     onChange={() => this.toggleSelected(key)}
                                 />
                             </td>
-                            <td><a target="_blank" href={`https://app.mopub.com/order?key=${key}`}>{name}</a></td>
+                            <td><a target="_blank" href={this.getOrderUrl(key)}>{name}</a></td>
                             <td>{advertiser}</td>
                             <td>{lineItemCount}</td>
                             <td>{status}</td>
@@ -99,9 +99,13 @@ export class OrdersTable extends Component {
         )
     }
 
+    getOrderUrl(key) {
+        return this.sourceHandler.getOrderUrl(key);
+    }
+
     toggleCopy = (key) => {
         this.orderModal.toggle(null, key)
-    }
+    };
 
     togglePause(status, key) {
         status = status === 'running' ? 'paused' : 'running';
