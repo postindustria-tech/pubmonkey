@@ -115,3 +115,9 @@ export function isEmpty(value) {
     if (type === 'number') return false
     return true
 }
+
+export const toInteger = num => Number((Number(num) * 100).toFixed(0));
+export const toDecimal = num => toValidUI(num / 100);
+export const toValidUI = num => Math.round(num * 100) / 100;
+
+export const deepClone = object => JSON.parse(JSON.stringify(object));

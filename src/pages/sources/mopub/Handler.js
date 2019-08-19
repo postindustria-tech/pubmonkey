@@ -1,8 +1,11 @@
+import Factory from '../../sources/Factory'
+import AbstractHandler from '../../sources/AbstractHandler'
+import {AdvertiserFactory} from "./Factory";
+import {FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
-import moment from "moment";
-import {FileService, HTTPService, StorageService} from "../services";
-import {LineItemModel} from "../models";
-import {isEmpty, toInteger, toDecimal, toValidUI} from "../helpers";
+import {wrapSeries} from "../helpers";
+import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
+import {AD_SERVER_MOPUB} from "../../constants/source";
 
 const WEB_URL = "https://app.mopub.com";
 
@@ -11,7 +14,54 @@ Promise.config({
     cancellation: true
 });
 
-export const OrderController = new (class Order {
+class Handler extends AbstractHandler {
+
+    static source = AD_SERVER_MOPUB;
+    ADVERTISER_DEFAULT_NAME = {
+        pubnative: "PubNative",
+        openx: "Prebid.org",
+        amazon: "Amazon HB"
+    };
+
+    lineItemInfo = {
+        allocationPercentage: 100,
+        bidStrategy: "cpm",
+        budget: null,
+        budgetStrategy: "allatonce",
+        budgetType: "unlimited",
+        dayPartTargeting: "alltime",
+        deviceTargeting: false,
+        end: null,
+        frequencyCapsEnabled: false,
+        includeConnectivityTargeting: "all",
+        includeGeoTargeting: "all",
+        maxAndroidVersion: "999",
+        maxIosVersion: "999",
+        minAndroidVersion: "1.5",
+        minIosVersion: "2.0",
+        priority: 12,
+        refreshInterval: 0,
+        start: "2019-05-01T00:00:00.000Z",
+        startImmediately: true,
+        targetAndroid: false,
+        targetIOS: "unchecked",
+        targetIpad: false,
+        targetIphone: false,
+        targetIpod: false,
+        type: "non_gtee",
+        userAppsTargeting: "include",
+        userAppsTargetingList: []
+    };
+
+    constructor() {
+        super();
+        this.setAdvertiserFactory(new AdvertiserFactory());
+    }
+
+    getAdUnits() {
+        return window.MopubAutomation.adunits;
+    }
+
     getAllOrders() {
         return HTTPService.GET(`${WEB_URL}/web-client/api/orders/query`);
     }
@@ -69,31 +119,15 @@ export const OrderController = new (class Order {
     }
 
     createOrder(data) {
-        return HTTPService.POST(`${WEB_URL}/advertise/orders/new/`, data, {}, true);
-    }
-
-    createLineItem(data, id) {
-        return HTTPService.POST(
-            `${WEB_URL}/advertise/orders/${id}/new_line_item/`,
-            data,
-            {},
-            true
-        );
-    }
-
-    createOrderNew(data) {
         return HTTPService.POST(`${WEB_URL}/web-client/api/orders/create`, data);
     }
 
-    createLineItemsNew(data, callback) {
-        return Promise.mapSeries(data.map(this.createLineItemNew), callback);
+    createLineItems(data, callback) {
+        return Promise.mapSeries(data.map(this.createLineItem), callback);
     }
 
-    createLineItemNew(data) {
-        return HTTPService.POST(
-            `${WEB_URL}/web-client/api/line-items/create`,
-            data
-        );
+    createLineItem(data) {
+        return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/create`, data);
     }
 
     updateOrderStatus(status, id) {
@@ -158,7 +192,7 @@ export const OrderController = new (class Order {
             name: data.name
         };
 
-        return this.createOrderNew(orderRequest).then(result => {
+        return this.createOrder(orderRequest).then(result => {
             return result;
         });
     }
@@ -229,7 +263,7 @@ export const OrderController = new (class Order {
         };
 
         // let formData = LineItemModel.createFromJSON(data).toFormData()
-        return this.createLineItemNew(lineItem, orderId).then(result => {
+        return this.createLineItem(lineItem, orderId).then(result => {
 
             if (creatives) {
                 let lineItemKey = result.key;
@@ -366,14 +400,14 @@ export const OrderController = new (class Order {
             keywordTemplate,
             rangeFrom,
             rangeTo,
-            lineItemInfo,
             lineItemsNaming,
             advertiser,
             networkClass,
             Ad_ZONE_ID
         } = params;
 
-        let lineItems = [],
+        let lineItemInfo = this.lineItemInfo,
+            lineItems = [],
             bid;
 
         rangeFrom = toInteger(rangeFrom);
@@ -452,7 +486,7 @@ export const OrderController = new (class Order {
     }
 
     createOrderDataFromSet(order, params, stepCallback) {
-        return this.createOrderNew(order).then(order => {
+        return this.createOrder(order).then(order => {
             const lineItems = this.composerLineItems(order.key, params);
 
             stepCallback({
@@ -501,7 +535,7 @@ export const OrderController = new (class Order {
             }
 
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
-                return this.createLineItemNew(item)
+                return this.createLineItem(item)
                     .then(lineItem => {
                         if (advertiser === "amazon" || advertiser === "openx") {
                             this.createCreatives({
@@ -579,19 +613,7 @@ export const OrderController = new (class Order {
             }).then(lineItems => ({...order, lineItems}));
         });
     }
-})();
 
-function wrapSeries(collection, method, step, times = 1) {
-    return Promise.mapSeries(collection, (item, idx, count) =>
-        Promise.mapSeries(Array(times), (_, i) =>
-            method(item).then(result => {
-                step({
-                    done: idx * times + i + 1,
-                    count: count * times
-                });
-
-                return result;
-            })
-        )
-    );
 }
+
+Factory.registerHandler(Handler);

@@ -1,15 +1,28 @@
 import React, {Component} from "react";
-import {Button, Modal, ModalHeader, ModalBody, ModalFooter} from "reactstrap";
-import Select from "react-select";
+import {
+    Button,
+    Input,
+    Col,
+    Row
+} from "reactstrap";
+import { connect  } from 'react-redux'
 import moment from "moment";
 import bind from "bind-decorator";
-import sha256 from "sha256";
 import {OrdersTable} from "./Table";
 import {BaseLayout} from "../layouts";
 import {FileService, ModalWindowService} from "../../services";
 import {MainController, OrderController} from "../../controllers";
 import {CreateOrderModal} from "../Popups/CreateOrder";
-
+import {
+    AD_SERVERS,
+    AD_SERVER_DFP,
+    AD_SERVER_MOPUB
+} from "../../constants/source";
+import SourceFactory from "../../sources/Factory";
+import AdServerSwitcherContainer from '../../containers/adServerSwitcherContainer/adServerSwitcherContainer'
+import AuthModal from "../../sources/dfp/AuthModal";
+import adServerSelectors from '../../../redux/selectors/adServer'
+import addServerActions from '../../../redux/actions/adServer'
 const FILTER_FN = [
         ({status}) => status !== "archived",
         ({status}) => status === "running",
@@ -24,9 +37,12 @@ const FILTER_FN = [
     ];
 window.canceledExport = false;
 
-export class OrdersList extends Component {
+window.dfpNetworkCode = null;
+
+class OrdersList extends Component {
 
     timer = null;
+    sourceHandler = null;
 
     state = {
         orders: [],
@@ -35,12 +51,18 @@ export class OrdersList extends Component {
         lineItemCount: 0,
         filter: 0,
         filterFn: FILTER_FN[0],
-        canceled: false
+        canceled: false,
+        adServer: Object.keys(AD_SERVERS)[0]
     };
 
-    cancelToken = null;
-
     componentDidMount() {
+
+        window.dfpNetworkCode = localStorage.getItem('dfpNetworkCode') || null;
+        if (!window.dfpNetworkCode) {
+            this.authModal.toggle();
+        }
+
+        this.init();
         this.loadOrders();
     }
 
@@ -50,8 +72,20 @@ export class OrdersList extends Component {
         }
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.type !== prevProps.type) {
+            this.init();
+        }
+    }
+
+    init() {
+        this.sourceHandler = SourceFactory.getHandler(this.props.type);
+        console.log(this.props.type + 'sourceHandler inited');
+    }
+
     render() {
         let {
+            adServer,
             orders,
             progress,
             orderCount,
@@ -62,28 +96,42 @@ export class OrdersList extends Component {
 
         return (
             <BaseLayout className="orders-list-layout">
+
+                <AuthModal
+                    ref={modal => (this.authModal = modal)}
+                />
+
+                <AdServerSwitcherContainer />
+
                 <h2>Orders</h2>
                 <Button
                     color="primary"
                     onClick={this.exportSelected}
-                    // onClick={ this.backupSelected }
                     disabled={!orderCount}
+                    hidden={this.props.type === AD_SERVER_DFP}
                 >
                     <i className="fa fa-cloud-download"/>
                     &nbsp; Export
                 </Button>
-                <Button color="primary" onClick={this.importSelected}>
+                <Button
+                    color="primary"
+                    onClick={this.importSelected}
+                    hidden={this.props.type === AD_SERVER_DFP}
+                >
                     <i className="fa fa-cloud-upload"/>
                     &nbsp; Import
                 </Button>
-                <CreateOrderModal toUpdate={this.loadOrders}/>
-                <Button
+                <CreateOrderModal
+                    toUpdate={this.loadOrders}
+                    adServer={this.props.type}
+                />
+                {/*<Button
                     color="primary"
-                    onClick={ this.backupSelected }
-                    disabled={ !orderCount }
+                    onClick={this.backupSelected}
+                    disabled={!orderCount}
                 >
                     Create Backup
-                </Button>
+                </Button>*/}
                 {/* <Button
                     color="primary"
                     onClick={ this.archiveSelected }
@@ -92,24 +140,48 @@ export class OrdersList extends Component {
                     Archive/Unarchive
                 </Button> */}
 
-                <div className="list-filter">
-                    show:
-                    <Select
-                        multi={false}
-                        clearable={false}
-                        value={filter}
-                        options={STATUS_OPTIONS}
-                        onChange={this.onFilterChange}
-                    />
-                </div>
+                <Row className="list-filter">
+                    <Col className={"col-sm-12"}>
+                        <span className={"mp-label"}>Status: </span>
+                        <Input
+                            type="select"
+                            name={"status"}
+                            onChange={this.onFilterChange}
+                            value={filter}
+                            className={"mp-form-control"}
+                        >
 
+                            {STATUS_OPTIONS.map(
+                                (item, index) => (
+                                    <option key={index} value={item.value}>
+                                        {item.label}
+                                    </option>
+                                )
+                            )}
+                        </Input>
+                    </Col>
+                </Row>
+                <Row hidden={this.props.type !== AD_SERVER_DFP}>
+                    <Col className={"col-sm-12"}>
+                        <Button
+                            color="primary"
+                            onClick={this.logout}
+                        >Logout
+                        </Button>
+                    </Col>
+                </Row>
                 <OrdersTable
-                    orders={orders}
+                    orders={this.props.orders}
                     filter={filterFn}
                     onUpdate={this.onOrdersListUpdate}
                 />
             </BaseLayout>
         );
+    }
+
+    @bind
+    logout() {
+        this.sourceHandler.removeCachedAuthToken();
     }
 
     @bind
@@ -214,7 +286,7 @@ export class OrdersList extends Component {
             }
         ]);
 
-        let promise = OrderController.collectOrderDataFromSet(
+        let promise = this.sourceHandler.collectOrderDataFromSet(
             selected,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp}) => {
                 if (this.state.canceled) return;
@@ -277,9 +349,12 @@ export class OrdersList extends Component {
 
     @bind
     loadOrders() {
-        OrderController.getAllOrders().then((orders = []) =>
-            this.setState({orders})
-        );
+        console.log('loadOrders: ' + this.props.type);
+        // const sourceHandler = SourceFactory.getHandler(this.state.adServer);
+        // sourceHandler.getAllOrders().then((orders = []) => {
+        //     this.setState({orders});
+        // });
+        this.props.setSwitcher(this.props.type)
     }
 
     @bind
@@ -411,10 +486,25 @@ export class OrdersList extends Component {
     }
 
     @bind
-    onFilterChange({value: filter}) {
+    onFilterChange(event) {
+        const {value, name} = event.target;
+
         this.setState({
-            filter,
-            filterFn: FILTER_FN[filter]
+            filter: value,
+            filterFn: FILTER_FN[value]
         });
     }
 }
+
+
+
+const mapDispatchToProps = {
+    setSwitcher: addServerActions.setSwitcher
+};
+
+const mapStateToProps = state => ({
+    orders: adServerSelectors.orders(state),
+    type: adServerSelectors.switcherType(state),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)

@@ -43,7 +43,7 @@ export class OrdersTable extends Component {
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <CreateOrderModal withButton={false} ref={orderModal => this.orderModal = orderModal} />
+                {/*<CreateOrderModal withButton={false} ref={orderModal => this.orderModal = orderModal} />*/}
                 <tbody>
                     { orders
                         .filter(filter)

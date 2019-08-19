@@ -1,6 +1,6 @@
 {
   "name": "PubMonkey",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "",
   "main": " ",
   "scripts": {
@@ -41,6 +41,7 @@
     "gulp-sass": "^4.0.1",
     "gulp-util": "^3.0.8",
     "gulp-zip": "^4.2.0",
+    "redux-actions": "^2.6.5",
     "rimraf": "^2.6.2",
     "uglifyify": "^5.0.1",
     "vinyl-source-stream": "^2.0.0"
@@ -61,11 +62,17 @@
     "rc-input-number": "^4.4.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
+    "react-redux": "^6.0.1",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-select": "^1.2.1",
     "reactstrap": "^6.0.1",
+    "redux": "^4.0.4",
+    "redux-logger": "^3.0.6",
+    "redux-saga": "^1.0.5",
+    "reselect": "^4.0.0",
     "sha256": "^0.2.0",
+    "soap": "^0.29.0",
     "underscore": "^1.9.1"
   }
 }

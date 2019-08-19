@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import { ProgressModal, ErrorPopup } from '../Popups'
 import { ModalWindowService } from '../../services'
 import { version } from '../../../misc.json'
+import SourceTypeViewConteiner from '../../containers/SourceTypeViewConteiner/SourceTypeViewConteiner';
 
 export class BaseLayout extends Component {
     state = {
@@ -34,6 +35,7 @@ export class BaseLayout extends Component {
             <div className={ classnames('base-layout', className) }>
                 <Navbar className="header">
                     <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
+                    <SourceTypeViewConteiner />
                     <div id="downloadManual">
                         <a href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf" target="_blank">Download manual</a>
                     </div>
@@ -65,7 +67,7 @@ export class BaseLayout extends Component {
                 </div>
 
                 <footer>
-                    Made by <a target="_blank" href="https://postindustria.com">Postindustria</a> &copy; 2006-{new Date().getFullYear()}
+                    Made by <a target="_blank" href="https://postindustria.com">Postindustria</a> &copy; {new Date().getFullYear()}
                 </footer>
 
                 <ErrorPopup
