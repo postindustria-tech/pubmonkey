@@ -198,7 +198,9 @@ export class CreateOrderModal extends Component {
     };
 
     filterAdunits = ({name = '', format, key = '', appName, appType}) => {
-        return true;
+        if (this.props.adServer !== AD_SERVER_MOPUB) {
+            return true;
+        }
         let {
             keyword,
             advertiser,
