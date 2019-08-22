@@ -198,9 +198,6 @@ export class CreateOrderModal extends Component {
     };
 
     filterAdunits = ({name = '', format, key = '', appName, appType}) => {
-        if (this.props.adServer !== AD_SERVER_MOPUB) {
-            return true;
-        }
         let {
             keyword,
             advertiser,
@@ -208,6 +205,12 @@ export class CreateOrderModal extends Component {
             creativeFormat,
             os
         } = this.state;
+
+        if (this.props.adServer !== AD_SERVER_MOPUB) {
+            return appName.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
+                name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
+                key.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
+        }
 
         let adUnitFormat = true;
 
