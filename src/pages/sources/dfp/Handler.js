@@ -172,7 +172,13 @@ class Handler extends AbstractHandler {
                 let orders = await this._getByStatement('OrderService', {});
 
                 if (orders.totalResultSetSize > 0) {
-                    orders = orders.results.filter(({isArchived}) => !isArchived);
+                    orders = orders.results.map(order => {
+                        return {
+                            ...order,
+                            status: order.isArchived ? 'archived' : order.status
+                        }
+                    });
+                    console.log(orders);
                 } else {
                     orders = [];
                 }
