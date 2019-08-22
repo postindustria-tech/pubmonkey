@@ -56,12 +56,6 @@ class OrdersList extends Component {
     };
 
     componentDidMount() {
-
-        window.dfpNetworkCode = localStorage.getItem('dfpNetworkCode') || null;
-        if (!window.dfpNetworkCode) {
-            this.authModal.toggle();
-        }
-
         this.init();
         this.loadOrders();
     }
@@ -79,6 +73,13 @@ class OrdersList extends Component {
     }
 
     init() {
+        //@TODO: move to handler
+        if (this.props.type === AD_SERVER_DFP) {
+            window.dfpNetworkCode = localStorage.getItem('dfpNetworkCode') || null;
+            if (!window.dfpNetworkCode) {
+                this.authModal.toggle();
+            }
+        }
         this.sourceHandler = SourceFactory.getHandler(this.props.type);
         console.log(this.props.type + ' sourceHandler inited');
     }
