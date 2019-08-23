@@ -178,7 +178,7 @@ class Handler extends AbstractHandler {
                             status: order.isArchived ? 'archived' : order.status
                         }
                     });
-                    console.log(orders);
+                    // console.log(orders);
                 } else {
                     orders = [];
                 }
