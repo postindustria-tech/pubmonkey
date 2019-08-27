@@ -614,7 +614,7 @@ export class CreateOrderModal extends Component {
     }
 
     @bind
-    formValidator(data) {
+    formValidator() {
         let fieldValidationErrors = {
             orderName: "",
             lineItemsNaming: "",
@@ -629,45 +629,45 @@ export class CreateOrderModal extends Component {
         let isValid = true;
 
         //@TODO: Need to refactor
-        if (isEmpty(data.orderName)) {
+        if (isEmpty(this.state.orderName)) {
             fieldValidationErrors.orderName = "Order name is required!";
             isValid = false;
         }
-        if (isEmpty(data.lineItemsNaming)) {
+        if (isEmpty(this.state.lineItemsNaming)) {
             fieldValidationErrors.lineItemsNaming = "Line item name is required!";
             isValid = false;
         }
-        if (isEmpty(data.step)) {
+        if (isEmpty(this.state.step)) {
             fieldValidationErrors.lineItemsNaming = "Step is required!";
             isValid = false;
         }
-        if (isEmpty(data.keywordStep)) {
+        if (isEmpty(this.state.keywordStep)) {
             fieldValidationErrors.lineItemsNaming = "Keyword step is required!";
             isValid = false;
         }
-        if (data.advertiser !== "amazon") {
-            if (data.keywordStep > data.step) {
-                fieldValidationErrors.step =
-                    "Line items step can not be less than Keyword step!";
+        if (this.state.advertiser !== "amazon") {
+            if (this.state.keywordStep > this.state.step) {
+                fieldValidationErrors.step = "Line items step can not be less than Keyword step!";
                 isValid = false;
             }
         }
-        if (data.Ad_ZONE_ID < 1) {
+        if (this.state.Ad_ZONE_ID < 1) {
             fieldValidationErrors.Ad_ZONE_ID = "Minimum value for Ad_ZONE_ID is 1!";
             isValid = false;
         }
         if (
-            data.rangeTo != data.rangeFrom &&
-            data.rangeTo - data.rangeFrom < data.step
+            this.state.rangeTo != this.state.rangeFrom &&
+            this.state.rangeTo - this.state.rangeFrom < this.state.step
         ) {
             fieldValidationErrors.step = "Range too short!";
             isValid = false;
         }
-        if (data.advertiser === "pubnative" && isEmpty(data.networkClass)) {
+        if ((this.state.advertiser === "pubnative" && isEmpty(this.state.networkClass)) ||
+            (this.state.adServer === AD_SERVER_DFP && isEmpty(this.state.creativeFormat))) {
             fieldValidationErrors.networkClass = "Creative format is required!";
             isValid = false;
         }
-        if (isEmpty(data.adunits)) {
+        if (isEmpty(this.state.adunits)) {
             fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
             isValid = false;
         }
@@ -795,30 +795,14 @@ export class CreateOrderModal extends Component {
     @bind
     preOrder(executor) {
         let {
-            adunitsSelected: adunits,
             step,
             keywordStep,
             rangeFrom,
             rangeTo,
-            orderName,
-            lineItemsNaming,
-            advertiser,
-            networkClass,
-            Ad_ZONE_ID
+            advertiser
         } = this.state;
 
-        const formValid = this.formValidator({
-            adunits,
-            step,
-            keywordStep,
-            orderName,
-            rangeFrom,
-            rangeTo,
-            lineItemsNaming,
-            advertiser,
-            networkClass,
-            Ad_ZONE_ID
-        });
+        const formValid = this.formValidator();
         if (!formValid) {
             return;
         }

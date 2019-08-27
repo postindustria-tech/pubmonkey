@@ -402,7 +402,6 @@ class Handler extends AbstractHandler {
 
     async composerLineItems(orderKey, params) {
         let {
-            adunits,
             step,
             keywordStep,
             keywordTemplate,
@@ -410,17 +409,12 @@ class Handler extends AbstractHandler {
             rangeTo,
             lineItemsNaming,
             advertiser,
-            networkClass,
-            Ad_ZONE_ID,
-            creativeFormat,
             customTargetingKeys,
-            customTargetingValues,
-            granularity
+            customTargetingValues
         } = params;
 
         let lineItems = [],
             bid;
-
 
         rangeFrom = toInteger(rangeFrom);
         rangeTo = toInteger(rangeTo);
@@ -429,8 +423,7 @@ class Handler extends AbstractHandler {
         let lineItemInfo = this.lineItemInfo;
         lineItemInfo = this.advertiser.setupDefaultValues(lineItemInfo, params);
 
-        let keywordAdvertiser = null,
-            mask = "{bid}";
+        let mask = "{bid}";
         switch (advertiser) {
             // case 'pubnative':
             // keywordAdvertiser = 'pn_bid';
