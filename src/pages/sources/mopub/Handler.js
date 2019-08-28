@@ -59,7 +59,8 @@ class Handler extends AbstractHandler {
     }
 
     getAdUnits() {
-        return window.MopubAutomation.adunits;
+        // return window.MopubAutomation.adunits;
+        return HTTPService.GET(`${WEB_URL}/web-client/api/ad-units/query`);
     }
 
     getAllOrders() {

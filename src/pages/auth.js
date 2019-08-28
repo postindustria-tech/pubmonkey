@@ -132,7 +132,7 @@ CJ.openLoginPage = function () {
     );
 };
 
-parseAdUnits();
+// parseAdUnits();
 
 function parseAdUnits() {
     axios
