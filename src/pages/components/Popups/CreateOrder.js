@@ -542,7 +542,8 @@ export class CreateOrderModal extends Component {
                                                 <div className="td header">Format</div>
                                                 <div className="td header">Key</div>
                                             </div>
-                                            {this.state.adunits.filter(this.filterAdunits).map(
+
+                                            {this.state.adunits ? this.state.adunits.filter(this.filterAdunits).map(
                                                 ({name, format, key, appName, appType}) => (
                                                     <div className="tr" key={key}>
                                                         <div className="td">
@@ -572,7 +573,7 @@ export class CreateOrderModal extends Component {
                                                         <div className="td">{key}</div>
                                                     </div>
                                                 )
-                                            )}
+                                            ) : ""}
                                         </div>
                                     </CardBody>
                                 </Card>

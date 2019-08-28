@@ -208,7 +208,7 @@ class OrdersList extends Component {
                     }
                 ]);
 
-                let promise = OrderController.restoreOrdersWithLineItems(
+                let promise = this.sourceHandler.restoreOrdersWithLineItems(
                     orders,
                     ({
                          lineItemCount,

@@ -348,8 +348,9 @@ class Handler extends AbstractHandler {
         return Promise.mapSeries(orders, (order, orderIdx, orderCount) => {
             let timestamp = Date.now();
 
-            return OrderController.restoreOrder(order)
+            return this.restoreOrder(order)
                 .then(result => {
+                    console.log(result);
                     timestamp = Date.now() - timestamp;
 
                     step({
@@ -367,7 +368,7 @@ class Handler extends AbstractHandler {
                         return Promise.mapSeries(order.lineItems, (lineItem, lineItemIdx, lineItemCount) => {
                             timestamp = Date.now();
 
-                            return OrderController.restoreLineItem(lineItem, key, order.advertiser).then(
+                            return this.restoreLineItem(lineItem, key, order.advertiser).then(
                                 result => {
                                     timestamp = Date.now() - timestamp;
 

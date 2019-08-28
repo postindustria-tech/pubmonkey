@@ -7,11 +7,12 @@ import Promise from 'bluebird'
 
 // axios.Promise = Promise
 
-// var csrftoken
+let csrftoken = null;
 
-// chrome.cookies.get({ url: 'https://app.mopub.com', name: 'csrftoken' }, ({ value }) =>
-//     csrftoken = value
-// )
+chrome.cookies.get({ url: 'https://app.mopub.com', name: 'csrftoken' }, ({ value }) => {
+    csrftoken = value;
+    // console.log(value);
+});
 
 export const HTTPService = new class {
     GET(url, config = {}) {
@@ -42,14 +43,16 @@ export const HTTPService = new class {
                 method: 'post',
                 // xsrfCookieName: 'csrftoken',
                 // xsrfHeaderName: 'x-csrftoken',
-                // headers: {
-                //     'x-requested-with': 'XMLHttpRequest',
-                //     // referer: 'https://app.mopub.com/orders',
-                //     // origin: 'https://app.mopub.com',
-                //     'x-csrftoken': csrftoken
-                // },
+                headers: {
+                    // 'x-requested-with': 'XMLHttpRequest',
+                    // referer: 'https://app.mopub.com/orders',
+                    // origin: 'https://app.mopub.com',
+                    'x-csrftoken': csrftoken
+                },
                 ...config
-            }
+            };
+
+        // console.log(payload);
 
         return new Promise((resolve, reject) =>
             chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, (result = {}) => {
