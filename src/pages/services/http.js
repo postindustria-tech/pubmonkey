@@ -51,7 +51,6 @@ export const HTTPService = new class {
                 ...config
             }
 
-
         return new Promise((resolve, reject) =>
             chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, (result = {}) => {
                 // console.log('payload: ', payload)

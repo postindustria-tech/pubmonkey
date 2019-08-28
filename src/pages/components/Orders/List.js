@@ -5,7 +5,7 @@ import {
     Col,
     Row
 } from "reactstrap";
-import { connect  } from 'react-redux'
+import {connect} from 'react-redux'
 import moment from "moment";
 import bind from "bind-decorator";
 import {OrdersTable} from "./Table";

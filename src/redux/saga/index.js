@@ -9,14 +9,28 @@ function* getOrders(action) {
         const sourceHandler = SourceFactory.getHandler(type);
         const orders = yield sourceHandler.getAllOrders() || [];
 
-        yield  put(adServerActions.setOrders(orders))
+        yield put(adServerActions.setOrders(orders))
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+function* getAdUnits(action) {
+    try {
+        const {type} = action.payload;
+
+        const sourceHandler = SourceFactory.getHandler(type);
+        const adunits = yield sourceHandler.getAdUnits() || [];
+
+        yield put(adServerActions.setAdUnits(adunits))
     } catch (error) {
         console.log(error)
     }
 }
 
 function* handleChangeAdServerType() {
-    yield takeEvery(adServerActions.setSwitcher, getOrders)
+    yield takeEvery(adServerActions.setSwitcher, getOrders);
+    yield takeEvery(adServerActions.setSwitcher, getAdUnits);
 }
 
 function* rootSaga() {

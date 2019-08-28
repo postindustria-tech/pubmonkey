@@ -1,0 +1,19 @@
+.ad-server-switcher-wrapper {
+    .adserver-button {
+        display: inline-block;
+        width: 100px;
+        padding: 10px;
+        margin-right: 18px;
+        border: 3px solid #B3121E;
+        border-radius: 1.25rem;
+        text-align: center;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover,
+        &.active {
+            background-color: #B3121E;
+            color: #ffffff;
+        }
+    }
+}

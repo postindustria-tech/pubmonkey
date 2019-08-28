@@ -2,23 +2,30 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 import { Table } from 'reactstrap'
 import { BaseLayout } from '../layouts'
+import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
+import adServerSelectors from '../../../redux/selectors/adServer'
+import addServerActions from '../../../redux/actions/adServer'
+import {connect} from "react-redux";
 
-export class AdUnitsList extends Component {
+class AdUnitsList extends Component {
     state = {
         adunits: []
-    }
+    };
 
     componentDidMount() {
-        window.MopubAutomation.adunits.then(adunits => this.setState({ adunits }))
+        this.props.setSwitcher(this.props.type)
     }
 
     render() {
-        let { adunits } = this.state
+        let { adunits } = this.props;
 
         return (
             <BaseLayout
                 className="adunits-list-layout"
             >
+
+                <AdServerSwitcherContainer />
+
                 <h2>Ad Units</h2>
                 <Table className="adunits-table">
                     <thead>
@@ -46,3 +53,14 @@ export class AdUnitsList extends Component {
         )
     }
 }
+
+const mapDispatchToProps = {
+    setSwitcher: addServerActions.setSwitcher
+};
+
+const mapStateToProps = state => ({
+    adunits: adServerSelectors.adunits(state),
+    type: adServerSelectors.switcherType(state),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdUnitsList)

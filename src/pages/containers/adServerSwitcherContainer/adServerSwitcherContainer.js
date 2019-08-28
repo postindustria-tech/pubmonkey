@@ -13,19 +13,15 @@ class adServerSwitcherContainer extends PureComponent {
 
     render() {
         return (
-            <Row>
+            <Row className={"ad-server-switcher-wrapper"}>
                 <Col className={"col-sm-12"}>
-                    {Object.keys(AD_SERVERS).map((option, index) => (
+                {Object.keys(AD_SERVERS).map((option, index) => (
                     <div
                         key={index}
                         onClick={() => this.handleAdServerChange(option)}
                         className={`adserver-button ${this.props.type === option ? 'active' : ''}`}>{AD_SERVERS[option]}
                     </div>
-                    // <div
-                    //     onClick={() => this.handleAdServerChange(AD_SERVER_MOPUB)}
-                    //     className={`adserver-button ${this.props.type === AD_SERVER_MOPUB ? 'active' : ''}`}>MoPub
-                    // </div>
-                    ))}
+                ))}
                 </Col>
             </Row>
         )

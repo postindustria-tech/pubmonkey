@@ -1,7 +1,7 @@
-const EXTENSION_URL = chrome.extension.getURL('index.html')
+const EXTENSION_URL = chrome.extension.getURL('index.html');
 
 chrome.browserAction.onClicked.addListener(() => {
-    let url = EXTENSION_URL
+    let url = EXTENSION_URL;
 
     chrome.tabs.query({ url }, tabs => {
       if (tabs.length) {

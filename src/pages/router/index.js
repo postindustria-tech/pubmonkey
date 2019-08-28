@@ -1,6 +1,7 @@
 import React from "react";
 import { HashRouter, Route, Switch } from "react-router-dom";
-import { BackupsList, BackupView, OrderView, AdUnitsList } from "../components";
+import { BackupsList, BackupView, OrderView } from "../components";
+import AdUnitsList from "../components/AdUnits/index";
 import OrdersList from "../components/Orders/List";
 import store from "../../redux/config";
 import { Provider } from "react-redux";

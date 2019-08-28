@@ -12,9 +12,15 @@ const orders = createSelector(
   adServer => adServer.orders
 );
 
+const adunits = createSelector(
+  rootSelector,
+  adServer => adServer.adunits
+);
+
 const adServerSelectors = {
   switcherType,
-  orders
+  orders,
+  adunits
 };
 
 export default adServerSelectors;
