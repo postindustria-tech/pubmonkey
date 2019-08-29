@@ -2,11 +2,13 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import {Link} from 'react-router-dom'
 import {Table} from 'reactstrap'
-import {OrderController} from '../../controllers'
 import {CreateOrderModal} from "../Popups/CreateOrder";
 import SourceFactory from "../../sources/Factory";
+import bind from "bind-decorator";
+import addServerActions from "../../../redux/actions/adServer";
+import {connect} from "react-redux";
 
-export class OrdersTable extends Component {
+class OrdersTable extends Component {
 
     sourceHandler = null;
 
@@ -58,7 +60,12 @@ export class OrdersTable extends Component {
                     <th>Actions</th>
                 </tr>
                 </thead>
-                {/*<CreateOrderModal withButton={false} ref={orderModal => this.orderModal = orderModal} />*/}
+                <CreateOrderModal
+                    withButton={false}
+                    adServer={this.props.adServer}
+                    ref={orderModal => this.orderModal = orderModal}
+                    toUpdate={this.loadOrders}
+                />
                 <tbody>
                 {orders
                     .filter(filter)
@@ -137,6 +144,12 @@ export class OrdersTable extends Component {
             })
     }
 
+    @bind
+    loadOrders() {
+        console.log('loadOrders: ' + this.props.adServer);
+        this.props.setSwitcher(this.props.adServer)
+    }
+
     toggleAll(checked) {
         let {orders, onUpdate} = this.props;
 
@@ -170,3 +183,9 @@ export class OrdersTable extends Component {
         )
     }
 }
+
+const mapDispatchToProps = {
+    setSwitcher: addServerActions.setSwitcher
+};
+
+export default connect(null, mapDispatchToProps)(OrdersTable)

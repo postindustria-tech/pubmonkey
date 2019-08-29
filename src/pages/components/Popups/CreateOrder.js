@@ -930,6 +930,7 @@ export class CreateOrderModal extends Component {
             .then(ModalWindowService.ProgressModal.hideModal)
             .then(() => {
                 this.close();
+                console.log(this.props.toUpdate);
                 this.props.toUpdate && this.props.toUpdate();
             })
             .catch(error => {
