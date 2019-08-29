@@ -29,7 +29,7 @@ export class BaseLayout extends Component {
 
     render() {
         let { className, children } = this.props,
-            { username, loggedIn } = this.state
+            { username, loggedIn } = this.state;
 
         return (
             <div className={ classnames('base-layout', className) }>
@@ -72,6 +72,7 @@ export class BaseLayout extends Component {
 
                 <ErrorPopup
                     isOpen={ ModalWindowService.ErrorPopup.isOpen }
+                    header={ ModalWindowService.ErrorPopup.header }
                     message={ ModalWindowService.ErrorPopup.message }
                     toggleModal={ ModalWindowService.ErrorPopup.hideModal }
                 />

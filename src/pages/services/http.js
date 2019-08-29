@@ -19,13 +19,18 @@ export const HTTPService = new class {
         return axios.get(url, {
             ...config
         }).then(({ data }) => data).catch((error) => {
-            // if (error.response) {
-            //     if (error.response.status === 401) {
-            //         window.MopubAutomation.openLoginPage();
-            //         return;
-            //     }
-            // }
-            ModalWindowService.ErrorPopup.showMessage('Network error')
+            let auth = false;
+            if (error.response) {
+                if (error.response.status === 401) {
+                    // window.MopubAutomation.openLoginPage();
+                    ModalWindowService.ErrorPopup.showMessage('Please login to your MoPub account to continue', 'Not logged in');
+                    auth = true;
+                    return;
+                }
+            }
+            if (!auth) {
+                ModalWindowService.ErrorPopup.showMessage('Network error')
+            }
         })
 
     }

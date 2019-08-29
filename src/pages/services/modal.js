@@ -1,73 +1,75 @@
 import bind from 'bind-decorator'
 
 class ModalBase {
-    isOpen = false
+    isOpen = false;
 
     @bind
     showModal() {
-        this.isOpen = true
+        this.isOpen = true;
 
         onUpdate()
     }
 
     @bind
     hideModal() {
-        this.isOpen = false
+        this.isOpen = false;
 
         onUpdate()
     }
 }
 
 const ProgressModal = new class extends ModalBase {
-    progress = []
+    progress = [];
 
     @bind
     setProgress(progress) {
-        this.progress = progress
-        this.showModal()
+        this.progress = progress;
+        this.showModal();
     }
 
     @bind
     hideModal() {
-        this.progress = []
+        this.progress = [];
 
-        super.hideModal()
+        super.hideModal();
     }
 
     @bind
     cancel() {
-        this.cancelHandler && this.cancelHandler()
+        this.cancelHandler && this.cancelHandler();
 
         onUpdate()
     }
 
     @bind
     onCancel(cancelHandler) {
-        this.cancelHandler = cancelHandler
+        this.cancelHandler = cancelHandler;
     }
-}
+};
 
 const CloneModal = new class extends ModalBase {
-    itemCount = 0
+    itemCount = 0;
 
     clone(itemCount) {
-        this.itemCount = itemCount
-        isOpen = true
+        this.itemCount = itemCount;
+        this.isOpen = true;
 
-        onUpdate()
+        onUpdate();
     }
-}
+};
 
 const ErrorPopup = new class extends ModalBase {
-    message = ''
+    message = "";
+    header = "";
 
     @bind
-    showMessage(message) {
-        this.message = message
+    showMessage(message, header) {
+        this.message = message;
+        this.header = header;
 
         this.showModal()
     }
-}
+};
 
 function onUpdate() {
     ModalWindowService.onUpdate && ModalWindowService.onUpdate()
@@ -76,6 +78,6 @@ function onUpdate() {
 export const ModalWindowService = {
     ErrorPopup,
     ProgressModal
-}
+};
 
-window.ModalWindowService = ModalWindowService
+window.ModalWindowService = ModalWindowService;

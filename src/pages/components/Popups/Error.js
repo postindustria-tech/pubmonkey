@@ -1,32 +1,34 @@
-import React, { Component } from 'react'
-import bind from 'bind-decorator'
-import { Button, Progress, Modal, ModalHeader, ModalBody, ModalFooter, Input } from 'reactstrap'
+import React, {Component} from 'react'
+import {Button, Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap'
 
 export class ErrorPopup extends Component {
 
 
     render() {
-        let { toggleModal, isOpen, message } = this.props
+        let {toggleModal, isOpen, header, message} = this.props;
+        if (typeof header === "undefined") {
+            header = "Something went wrong";
+        }
 
         return (
             <Modal
-                isOpen={ isOpen }
+                isOpen={isOpen}
                 className="error-popup"
             >
-                <ModalHeader>Something went wrong</ModalHeader>
+                <ModalHeader>{header}</ModalHeader>
                 <ModalBody>
                     <dl>
                         <dt>
                             <i className="fa fa-exclamation-triangle"></i>&nbsp;
                         </dt>
                         <dd>
-                            { message }
+                            {message}
                         </dd>
                     </dl>
 
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="secondary" onClick={ toggleModal }>Ok</Button>
+                    <Button color="secondary" onClick={toggleModal}>Ok</Button>
                 </ModalFooter>
             </Modal>
         )
