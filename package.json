@@ -1,6 +1,7 @@
 {
   "name": "PubMonkey",
-  "version": "2.1.0.1",
+  "version": "2.1.0",
+  "version_name": "2.1.0.1",
   "description": "",
   "main": " ",
   "scripts": {
