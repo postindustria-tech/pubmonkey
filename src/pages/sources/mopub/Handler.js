@@ -84,18 +84,6 @@ class Handler extends AbstractHandler {
                 // }))
                 ;
         });
-
-        // return HTTPService.GET(`${WEB_URL}/advertise/line_items/${id}/edit/`, { responseType: 'text' })
-        //     .then(data =>
-        //         LineItemModel.createFromHTML(data, id).toJSON()
-        //     ) //@TODO maybe it's not necessary to create instances for parsing only
-        //     .then(data => {
-        //         return this.getCreatives(data.key)
-        //             .then(creatives => ({
-        //                 creatives,
-        //                 ...data
-        //             }))
-        //     })
     }
 
     getCreatives(lineItemId) {
@@ -451,9 +439,10 @@ class Handler extends AbstractHandler {
                 line++;
             } else {
                 const to = +toValidUI(bidDecimal + s).toFixed(2);
-                for (let i = bidDecimal; i < to; i += keywordStep) {
-                    i = toValidUI(i);
-                    const value = i.toFixed(keywordStepDecimalPartLength),
+
+                for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
+                    const key = toDecimal(i);
+                    const value = key.toFixed(keywordStepDecimalPartLength),
                         keyword = keywordTemplate.replace(mask, value);
                     keywords.push(keyword);
                 }
