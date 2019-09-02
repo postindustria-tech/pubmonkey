@@ -823,9 +823,7 @@ export class CreateOrderModal extends Component {
                         keywords++;
                     }
                 } else {
-                    const j = toDecimal(bid);
-                    const s = toDecimal(step);
-                    for (let i = j; i < j + s; i += keywordStep) {
+                    for (let i = bid; i < bid + step; i += toInteger(keywordStep)) {
                         keywords++;
                     }
                 }
