@@ -18,22 +18,24 @@ chrome.tabs.query({ active:false }, function (tabs) {
     const mopub = tabs.filter(tab => {
         const url = new URL(tab.url);
         const domain = url.hostname;
-        // console.log(domain);
         return domain === "app.mopub.com";
     });
 
-    console.log(mopub);
-
     if (mopub.length === 0) {
-        chrome.tabs.create({ url: "https://app.mopub.com/account", active: false });
+        chrome.tabs.create({ url: "https://app.mopub.com/account", active: false }, function (tab) {
+            // console.log(tab);
+            CJ.request = {
+                frameId: 0,
+                tabId: tab.id
+            };
+        });
     } else {
-
         let tabId = mopub[0].id;
         let frameId = 0;
 
-        chrome.webNavigation.getAllFrames({ tabId: tabId }, function (details) {
-            console.log(details);
-        });
+        // chrome.webNavigation.getAllFrames({ tabId: tabId }, function (details) {
+        //     console.log(details);
+        // });
 
         CJ.request = {
             frameId: 0,
@@ -54,7 +56,7 @@ chrome.tabs.query({ active:false }, function (tabs) {
 
 chrome.webRequest.onHeadersReceived.addListener(
     ({frameId, tabId}) => {
-        console.log({frameId, tabId});
+        // console.log({frameId, tabId});
         if (frameId) {
             CJ.request = {frameId, tabId};
 

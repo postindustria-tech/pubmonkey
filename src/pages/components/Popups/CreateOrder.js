@@ -930,7 +930,6 @@ export class CreateOrderModal extends Component {
             .then(ModalWindowService.ProgressModal.hideModal)
             .then(() => {
                 this.close();
-                console.log(this.props.toUpdate);
                 this.props.toUpdate && this.props.toUpdate();
             })
             .catch(error => {
@@ -1047,7 +1046,7 @@ export class CreateOrderModal extends Component {
     @bind
     toggle(event, orderKey = null) {
         if (orderKey) {
-            OrderController.getOrder(orderKey).then(order => {
+            this.sourceHandler.getOrder(orderKey).then(order => {
                 let {lineItemInfo, rangeFrom, rangeTo} = this.state,
                     adUnitKeys = [],
                     defaultLineItemInfo = lineItemInfo,

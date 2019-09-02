@@ -107,9 +107,10 @@ class OrdersTable extends Component {
     }
 
     getOrderUrl(key) {
-        if (this.sourceHandler) return this.sourceHandler.getOrderUrl(key);
-        return null
-        
+        if (this.sourceHandler) {
+            return this.sourceHandler.getOrderUrl(key);
+        }
+        return null;
     }
 
     toggleCopy = (key) => {
