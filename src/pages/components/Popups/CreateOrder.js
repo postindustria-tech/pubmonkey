@@ -668,7 +668,7 @@ export class CreateOrderModal extends Component {
             fieldValidationErrors.networkClass = "Creative format is required!";
             isValid = false;
         }
-        if (isEmpty(this.state.adunits)) {
+        if (isEmpty(this.state.adunitsSelected)) {
             fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
             isValid = false;
         }
