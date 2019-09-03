@@ -128,7 +128,7 @@ export class CreateOrderModal extends Component {
     };
 
     onCancel = () => {
-        // progress.cancel();
+        progress.cancel();
         this.close();
         this.props.toUpdate && this.props.toUpdate();
         ModalWindowService.ProgressModal.hideModal();
@@ -653,6 +653,10 @@ export class CreateOrderModal extends Component {
         }
         if (this.state.Ad_ZONE_ID < 1) {
             fieldValidationErrors.Ad_ZONE_ID = "Minimum value for Ad_ZONE_ID is 1!";
+            isValid = false;
+        }
+        if (this.state.rangeFrom <= 0) {
+            fieldValidationErrors.Ad_ZONE_ID = "Bid must be greater than 0";
             isValid = false;
         }
         if (
