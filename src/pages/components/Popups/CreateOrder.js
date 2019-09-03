@@ -23,7 +23,6 @@ import {
     Tooltip
 } from "reactstrap";
 import InputNumber from "rc-input-number";
-import {OrderController} from "../../controllers";
 import FormErrors from "../FormErrors";
 import {ProgressModal} from "./";
 import {isEmpty, toInteger, toDecimal} from "../../helpers";
@@ -52,8 +51,7 @@ export class CreateOrderModal extends Component {
     sourceHandler = null;
 
     static defaultProps = {
-        onClose: () => {
-        },
+        onClose: () => {},
         withButton: true
     };
 
@@ -311,6 +309,7 @@ export class CreateOrderModal extends Component {
                                             type="select"
                                             name={"advertiserId"}
                                             onChange={this.handleInputChange}
+                                            value={this.state.advertiserId}
                                             id="advertiserId"
                                             className={"mp-form-control"}
                                         >
@@ -1109,6 +1108,17 @@ export class CreateOrderModal extends Component {
                     }
                 }
 
+                let params = {};
+                switch (this.props.adServer) {
+                    case AD_SERVER_MOPUB:
+                        params['advertiser'] = this.sourceHandler.getAdvertiserByName(order.advertiser);
+                        this.changeAdvertiser(params.advertiser);
+                        break;
+                    case AD_SERVER_DFP:
+                        params['advertiserId'] = order.advertiserId;
+                        break;
+                }
+
                 this.setState(state => ({
                     isOpen: !state.isOpen,
                     orderName: order.name,
@@ -1117,7 +1127,8 @@ export class CreateOrderModal extends Component {
                     rangeFrom: rangeFrom,
                     rangeTo: rangeTo,
                     adunitsSelected: adUnitKeys,
-                    title: "Duplicate Order"
+                    title: "Duplicate Order",
+                    ...params
                 }));
             });
         } else {

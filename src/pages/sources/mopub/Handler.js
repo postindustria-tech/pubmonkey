@@ -58,6 +58,16 @@ class Handler extends AbstractHandler {
         this.setAdvertiserFactory(new AdvertiserFactory());
     }
 
+    getAdvertiserByName(advertiserName) {
+        let advertiser = null;
+        Object.keys(this.ADVERTISER_DEFAULT_NAME).map((key, i) => {
+            if (this.ADVERTISER_DEFAULT_NAME[key] === advertiserName) {
+                advertiser = key;
+            }
+        });
+        return advertiser;
+    }
+
     getAdUnits() {
         // return window.MopubAutomation.adunits;
         return HTTPService.GET(`${WEB_URL}/web-client/api/ad-units/query`);
