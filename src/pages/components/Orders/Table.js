@@ -6,6 +6,7 @@ import {CreateOrderModal} from "../Popups/CreateOrder";
 import SourceFactory from "../../sources/Factory";
 import bind from "bind-decorator";
 import addServerActions from "../../../redux/actions/adServer";
+import adServerActions from "../../../redux/actions/adServer";
 import {connect} from "react-redux";
 
 class OrdersTable extends Component {
@@ -129,21 +130,11 @@ class OrdersTable extends Component {
         this.updateStatus(status, key)
     }
 
-    updateStatus(status, key) {
-        let {orders, onUpdate} = this.props;
-
-        this.sourceHandler.updateOrderStatus(status, key)
-            .then(() => {
-                onUpdate(
-                    orders.map(order => {
-                        if (order.key === key) {
-                            order.status = status
-                        }
-                        return order
-                    })
-                )
-            })
-    }
+  updateStatus(status, key) {
+    this.sourceHandler.updateOrderStatus(status, key).then(() => {
+      this.props.updateOrderStatus(status, key);
+    });
+  }
 
     @bind
     loadOrders() {
@@ -186,7 +177,8 @@ class OrdersTable extends Component {
 }
 
 const mapDispatchToProps = {
-    setSwitcher: addServerActions.setSwitcher
+  updateOrderStatus: adServerActions.updateOrderStatus,
+  setSwitcher: addServerActions.setSwitcher
 };
 
 export default connect(null, mapDispatchToProps)(OrdersTable)
