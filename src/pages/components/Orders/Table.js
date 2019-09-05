@@ -160,25 +160,26 @@ class OrdersTable extends Component {
     toggleSelected(_key) {
         let {orders, onUpdate, filter = () => true} = this.props;
 
-        onUpdate(
-            orders
-                .filter(filter)
-                .map(order => {
-                    let {checked, key} = order;
+    orders = orders.map(order => {
+      let { checked, key } = order;
 
-                    if (key === _key) {
-                        order.checked = !order.checked
-                    }
+      if (key === _key) {
+        order.checked = !order.checked;
+      }
 
-                    return order
-                })
-        )
-    }
+      return order;
+    });
+
+    this.props.setOrders(orders);
+
+    onUpdate(orders.filter(filter));
+  }
 }
 
 const mapDispatchToProps = {
   updateOrderStatus: adServerActions.updateOrderStatus,
-  setSwitcher: addServerActions.setSwitcher
+  setSwitcher: addServerActions.setSwitcher,
+  setOrders: addServerActions.setOrders
 };
 
 export default connect(null, mapDispatchToProps)(OrdersTable)
