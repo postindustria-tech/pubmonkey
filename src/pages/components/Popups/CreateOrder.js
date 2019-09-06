@@ -667,7 +667,7 @@ export class CreateOrderModal extends Component {
             isValid = false;
         }
         if ((this.state.advertiser === "pubnative" && isEmpty(this.state.networkClass)) ||
-            (this.state.adServer === AD_SERVER_DFP && isEmpty(this.state.creativeFormat))) {
+            (["amazon", "openx"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.creativeFormat))) {
             fieldValidationErrors.networkClass = "Creative format is required!";
             isValid = false;
         }
