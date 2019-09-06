@@ -27,6 +27,7 @@ export class OpenX extends AbstractAdvertiser {
             '       ucTagData.adServerDomain = "' + params.adServerDomain +'";\n' +
             '       ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
             '       ucTagData.targetingMap = %%PATTERN:TARGETINGMAP%%;\n' +
+            '       ucTagData.hbPb = "%%PATTERN:hb_pb%%";\n' +
             '   try {\n' +
             '       ucTag.renderAd(document, ucTagData);\n' +
             '   } catch (e) {\n' +
