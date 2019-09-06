@@ -81,6 +81,10 @@ class Handler extends AbstractHandler {
         return HTTPService.GET(`${WEB_URL}/web-client/api/orders/get?key=${id}`);
     }
 
+    getOrderWithLineItems(id) {
+        return this.getOrder(id);
+    }
+
     getLineItem(id) {
         return this.getLineItemInfo(id).then(data => {
             return this.getCreatives(data.key)

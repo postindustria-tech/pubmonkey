@@ -1047,7 +1047,8 @@ export class CreateOrderModal extends Component {
     @bind
     toggle(event, orderKey = null) {
         if (orderKey) {
-            this.sourceHandler.getOrder(orderKey).then(order => {
+            this.sourceHandler.getOrderWithLineItems(orderKey).then(order => {
+                // console.log(order);
                 let {lineItemInfo, rangeFrom, rangeTo} = this.state,
                     adUnitKeys = [],
                     defaultLineItemInfo = lineItemInfo,

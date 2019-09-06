@@ -162,6 +162,25 @@ class Handler extends AbstractHandler {
         });
     }
 
+    getOrderWithLineItems(id) {
+        return this.getOrder(id).then(async order => {
+            let lineItems = await this.getAllLineItems([order.id]);
+            lineItems.map(lineItem => {
+
+                lineItem.adUnitKeys = lineItem.targeting.inventoryTargeting.targetedAdUnits.map(({adUnitId}) => {
+                    return adUnitId;
+                });
+                lineItem.bid = Number(lineItem.costPerUnit.microAmount) / 1000000;
+
+                return lineItem;
+            });
+            return {
+                ...order,
+                lineItems
+            }
+        })
+    }
+
     async getAdUnits() {
         return this.getAllAdUnits();
     }
