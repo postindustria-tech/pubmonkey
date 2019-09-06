@@ -25,7 +25,7 @@ export class Amazon extends AbstractAdvertiser {
             '    <script type="text/javascript" src="mraid.js"></script>\n' +
             '    <script type="text/javascript" src="https://c.amazon-adsystem.com/dtb-m.js"> </script>\n' +
             '    <script type="text/javascript">\n' +
-            '          amzn.dtb.loadAd("%%KEYWORD:amznslots%%", "%%KEYWORD:amzn_b%%", "%%KEYWORD:amzn_h%%");\n' +
+            '          amzn.dtb.loadAd("%%PATTERN:amznslots%%", "%%PATTERN:amzn_b%%","%%PATTERN:amzn_h%%");\n' +
             "    </script>\n" +
             "</div>";
         creativeHtmlData = creativeHtmlData
