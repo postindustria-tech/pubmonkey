@@ -641,10 +641,8 @@ class Handler extends AbstractHandler {
                 lineItemCount: lineItems.length
             });
 
-            const {creativeFormat, advertiser, adServerDomain} = params,
+            const {creativeFormat, advertiser} = params,
                 [width, height] = creativeFormat.split("x");
-
-            const creativeHtmlData = this.advertiser.getCreativeHtmlData(creativeFormat);
 
             let size = null;
             switch (advertiser) {
@@ -663,7 +661,7 @@ class Handler extends AbstractHandler {
                         order.advertiserId,
                         "Creative for " + order.name,
                         size,
-                        creativeHtmlData
+                        this.advertiser.getCreativeHtmlData(params)
                     )
                 ]);
                 if (creatives.length === 1) {

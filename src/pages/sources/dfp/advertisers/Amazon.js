@@ -15,20 +15,22 @@ export class Amazon extends AbstractAdvertiser {
         // "it": "interstitial tablet",
     };
 
-    getCreativeHtmlData(creativeFormat) {
-        const creativeHtmlData =
-            '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
-            '<script>\n' +
-            '   var ucTagData = {};\n' +
-            '       ucTagData.adServerDomain = "' + adServerDomain +'";\n' +
-            '       ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
-            '       ucTagData.targetingMap = %%PATTERN:TARGETINGMAP%%;\n' +
-            '   try {\n' +
-            '       ucTag.renderAd(document, ucTagData);\n' +
-            '   } catch (e) {\n' +
-            '       console.log(e);\n' +
-            '   }\n' +
-            '</script>';
+    getCreativeHtmlData(params) {
+        const [width, height] = params.creativeFormat.split("x")
+        let creativeHtmlData =
+            '<div style="display:inline-block">\n' +
+            '    <div id="__dtbAd__" style="width:{width}px; height:{height}px; overflow:hidden;">\n' +
+            "        <!--Placeholder for the Ad --> \n" +
+            "    </div>\n" +
+            '    <script type="text/javascript" src="mraid.js"></script>\n' +
+            '    <script type="text/javascript" src="https://c.amazon-adsystem.com/dtb-m.js"> </script>\n' +
+            '    <script type="text/javascript">\n' +
+            '          amzn.dtb.loadAd("%%KEYWORD:amznslots%%", "%%KEYWORD:amzn_b%%", "%%KEYWORD:amzn_h%%");\n' +
+            "    </script>\n" +
+            "</div>";
+        creativeHtmlData = creativeHtmlData
+            .replace("{width}", width)
+            .replace("{height}", height);
 
         return creativeHtmlData;
     }

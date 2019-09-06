@@ -43,7 +43,7 @@ export default class AbstractAdvertiser {
         return lineItemInfo;
     }
 
-    getCreativeHtmlData(creativeFormat) {
+    getCreativeHtmlData(params) {
         return "";
     }
 }
