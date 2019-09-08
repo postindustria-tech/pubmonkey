@@ -701,8 +701,14 @@ export class CreateOrderModal extends Component {
             this.changeAdvertiser(value);
         }
         if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
+            let lineItemsNaming = KEYWORD_PLACEHOLDER["amazon"];
+            if (value.indexOf("x") !== -1) {
+                const [width, height] = value.split("x");
+                lineItemsNaming = lineItemsNaming.replace("{width}", width).replace("{height}", height);
+            }
             this.setState({
-                keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value)
+                keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value),
+                lineItemsNaming: lineItemsNaming
             });
         }
         if (name === "os") {

@@ -6,7 +6,7 @@ export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
 export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
-  amazon: "m320x50p{position}"
+  amazon: "m{width}x{height}p{position}"
 };
 export const NETWORK_CLASS = {
   "": {

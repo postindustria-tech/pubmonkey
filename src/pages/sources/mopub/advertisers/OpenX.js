@@ -11,4 +11,20 @@ export class OpenX extends AbstractAdvertiser {
         "728x90": "728 x 90 (Tablet Leaderboard)",
         "160x600": "160 x 600 (Tablet Skyscraper)"
     };
+
+    getCreativeHtmlData(params) {
+        return '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
+            "<script>\n" +
+            "   var ucTagData = {};\n" +
+            '   ucTagData.adServerDomain = "' + params.adServerDomain + '";\n' +
+            '   ucTagData.pubUrl = "%%KEYWORD:url%%";\n' +
+            '   ucTagData.targetingKeywords = "%%KEYWORDS%%";\n' +
+            '   ucTagData.hbPb = "%%KEYWORD:hb_pb%%";\n' +
+            "   try {\n" +
+            "       ucTag.renderAd(document, ucTagData);\n" +
+            "   } catch (e) {\n" +
+            "       console.log(e);\n" +
+            "   }\n" +
+            "</script>";
+    }
 }
