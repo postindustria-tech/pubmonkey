@@ -3,7 +3,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import moment from 'moment'
 import bind from 'bind-decorator'
 import { BackupsTable } from './Table'
-import { BaseLayout } from '../layouts'
+import BaseLayout from "../layouts/BaseLayout";
 import { FileService } from '../../services'
 import { MainController } from '../../controllers'
 

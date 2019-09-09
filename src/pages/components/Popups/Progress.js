@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import bind from 'bind-decorator'
 import { Button, Progress, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import {AD_SERVER_MOPUB} from "../../constants/source";
 
 export class ProgressModal extends Component {
     render() {
-        let { toggleModal, isOpen, progress, onCancel } = this.props
+        let { toggleModal, isOpen, progress, onCancel, adServer } = this.props
 
         return (
             <Modal
@@ -22,6 +23,11 @@ export class ProgressModal extends Component {
                     ))}
                 </ModalBody>
                 <ModalFooter>
+                    {adServer === AD_SERVER_MOPUB ? (
+                        <div style={{width: "100%", textAlign: "left", color: "red"}}>
+                            Please don't close or refresh MoPub tab
+                        </div>
+                    ) : null}
                     <Button color="secondary" disabled={ !onCancel } onClick={ this.onCancel }>Cancel</Button>
                 </ModalFooter>
             </Modal>
@@ -30,8 +36,7 @@ export class ProgressModal extends Component {
 
     @bind
     onCancel() {
-        let { onCancel } = this.props
-
+        let { onCancel } = this.props;
         onCancel()
     }
 }

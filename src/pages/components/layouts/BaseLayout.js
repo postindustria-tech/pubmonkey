@@ -6,19 +6,21 @@ import { ProgressModal, ErrorPopup } from '../Popups'
 import { ModalWindowService } from '../../services'
 import { version } from '../../../misc.json'
 import SourceTypeViewConteiner from '../../containers/SourceTypeViewConteiner/SourceTypeViewConteiner';
+import addServerSelectors from "../../../redux/selectors/adServer";
+import {connect} from "react-redux";
 
-export class BaseLayout extends Component {
+class BaseLayout extends Component {
     state = {
         username: '',
         loggedIn: null
-    }
+    };
 
     componentDidMount() {
         window.MopubAutomation.username
-            .then(username => this.setState({ username }))
+            .then(username => this.setState({ username }));
 
         window.MopubAutomation.loggedIn
-            .then(loggedIn => this.setState({ loggedIn }))
+            .then(loggedIn => this.setState({ loggedIn }));
 
         ModalWindowService.onUpdate = () => this.forceUpdate()
     }
@@ -28,7 +30,7 @@ export class BaseLayout extends Component {
     }
 
     render() {
-        let { className, children } = this.props,
+        let { className, children, type } = this.props,
             { username, loggedIn } = this.state;
 
         return (
@@ -82,8 +84,15 @@ export class BaseLayout extends Component {
                     progress={ ModalWindowService.ProgressModal.progress }
                     toggleModal={ ModalWindowService.ProgressModal.hideModal }
                     onCancel={ ModalWindowService.ProgressModal.cancel }
+                    adServer={ type }
                 />
             </div>
         )
     }
 }
+
+const mapStateToProps = state => ({
+    type: addServerSelectors.switcherType(state)
+});
+
+export default connect(mapStateToProps)(BaseLayout)

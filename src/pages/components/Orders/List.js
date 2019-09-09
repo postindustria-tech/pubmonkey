@@ -9,7 +9,7 @@ import {connect} from 'react-redux'
 import moment from "moment";
 import bind from "bind-decorator";
 import OrdersTable from "./Table";
-import {BaseLayout} from "../layouts";
+import BaseLayout from "../layouts/BaseLayout";
 import {FileService, ModalWindowService} from "../../services";
 import {MainController, OrderController} from "../../controllers";
 import {CreateOrderModal} from "../Popups/CreateOrder";

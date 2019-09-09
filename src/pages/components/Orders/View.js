@@ -4,7 +4,7 @@ import Select from 'react-select'
 import bind from 'bind-decorator'
 import Promise from 'bluebird'
 import moment from 'moment'
-import { BaseLayout } from '../layouts'
+import BaseLayout from "../layouts/BaseLayout";
 import { LineItemsTable } from '../LineItems'
 import { ModalWindowService } from '../../services'
 import { OrderController } from '../../controllers'

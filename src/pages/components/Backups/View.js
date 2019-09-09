@@ -3,7 +3,7 @@ import { Redirect } from 'react-router'
 import { Button } from 'reactstrap'
 import moment from 'moment'
 import bind from 'bind-decorator'
-import { BaseLayout } from '../layouts'
+import BaseLayout from "../layouts/BaseLayout";
 import { OrdersTable } from '../Orders'
 import { FileService, ModalWindowService } from '../../services'
 import { MainController, OrderController } from '../../controllers'
