@@ -187,13 +187,15 @@ class OrdersList extends Component {
 
     @bind
     importSelected() {
-        FileService.openFile().then(result => {
+        FileService.openFile().then((result) => {
             if (result) {
-                let {orders} = JSON.parse(result),
-                    total = orders.reduce(
-                        (sum, {lineItems}) => sum + lineItems.length,
-                        0
-                    ),
+                try {
+                    let {orders} = JSON.parse(result);
+                } catch (e) {
+                    return Promise.reject("Import failed. File is damaged or invalid.");
+                }
+
+                let total = orders.reduce((sum, {lineItems}) => sum + lineItems.length, 0),
                     n = 0,
                     average;
 
@@ -261,6 +263,8 @@ class OrdersList extends Component {
                     promise.cancel("canceled by user")
                 );
             }
+        }).catch(err => {
+            ModalWindowService.ErrorPopup.showMessage(err)
         });
     }
 
