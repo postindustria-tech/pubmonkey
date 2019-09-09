@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 import { Table } from 'reactstrap'
-import { BaseLayout } from '../layouts'
+import BaseLayout from '../layouts/BaseLayout'
 import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
 import adServerSelectors from '../../../redux/selectors/adServer'
 import addServerActions from '../../../redux/actions/adServer'
