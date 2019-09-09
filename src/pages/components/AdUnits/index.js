@@ -6,6 +6,7 @@ import AdServerSwitcherContainer from "../../containers/adServerSwitcherContaine
 import adServerSelectors from '../../../redux/selectors/adServer'
 import addServerActions from '../../../redux/actions/adServer'
 import {connect} from "react-redux";
+import SourceFactory from "../../sources/Factory";
 
 class AdUnitsList extends Component {
     state = {
@@ -13,7 +14,18 @@ class AdUnitsList extends Component {
     };
 
     componentDidMount() {
-        this.props.setSwitcher(this.props.type)
+        this.props.setSwitcher(this.props.type);
+        this.initHandler();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.type !== prevProps.type) {
+            this.initHandler();
+        }
+    }
+
+    initHandler() {
+        this.sourceHandler = SourceFactory.getHandler(this.props.type);
     }
 
     render() {
@@ -41,7 +53,7 @@ class AdUnitsList extends Component {
                             adunits.map(({ name, format, key, appName}) =>(
                                 <tr key={ key }>
                                     <td>{ appName }</td>
-                                    <td><a target="_blank" href={ `https://app.mopub.com/ad-unit?key=${key}` }>{ name }</a></td>
+                                    <td><a target="_blank" href={this.getAdUnitUrl(key)}>{name}</a></td>
                                     <td>{ format }</td>
                                     <td>{ key }</td>
                                 </tr>
@@ -51,6 +63,13 @@ class AdUnitsList extends Component {
                 </Table>
             </BaseLayout>
         )
+    }
+
+    getAdUnitUrl(key) {
+        if (this.sourceHandler) {
+            return this.sourceHandler.getAdUnitUrl(key);
+        }
+        return null;
     }
 }
 

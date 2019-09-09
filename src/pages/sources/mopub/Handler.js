@@ -581,6 +581,10 @@ class Handler extends AbstractHandler {
     getOrderUrl(key) {
         return `https://app.mopub.com/order?key=${key}`;
     }
+
+    getAdUnitUrl(key) {
+        return `https://app.mopub.com/ad-unit?key=${key}`;
+    }
 }
 
 Factory.registerHandler(Handler);

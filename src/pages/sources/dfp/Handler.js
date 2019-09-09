@@ -324,12 +324,21 @@ class Handler extends AbstractHandler {
         }).then(adunits => {
             adunits = adunits.map(adunit => ({
                 name: adunit.name,
-                format: "",
+                format: this.extractAdUnitSizes(adunit.adUnitSizes).join(', '),
                 key: adunit.id,
                 appName: "",
                 appType: ""
             }));
             return adunits;
+        });
+    }
+
+    extractAdUnitSizes(sizes) {
+        if (isEmpty(sizes)) {
+            return [];
+        }
+        return sizes.map(size => {
+            return size.fullDisplayString
         });
     }
 
@@ -922,6 +931,10 @@ class Handler extends AbstractHandler {
 
     getOrderUrl(key) {
         return `https://admanager.google.com/${this.networkCode}#delivery/OrderDetail/orderId=${key}`;
+    }
+
+    getAdUnitUrl(key) {
+        return `https://admanager.google.com/${this.networkCode}#inventory/inventory/adSlotId=${key}`;
     }
 }
 
