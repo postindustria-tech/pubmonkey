@@ -128,7 +128,7 @@ export class CreateOrderModal extends Component {
     };
 
     onCancel = () => {
-        progress.cancel();
+        // progress.cancel();
         this.close();
         this.props.toUpdate && this.props.toUpdate();
         ModalWindowService.ProgressModal.hideModal();
@@ -148,6 +148,7 @@ export class CreateOrderModal extends Component {
         if (this.state.adServer !== prevState.adServer) {
             this.init();
         }
+        ModalWindowService.ProgressModal.onCancel(this.onCancel);
     }
 
     init() {
@@ -942,12 +943,17 @@ export class CreateOrderModal extends Component {
             .catch(error => {
                 ModalWindowService.ProgressModal.cancel();
 
-                this.close();
-                this.props.toUpdate && this.props.toUpdate();
-
+                let close = true;
                 let errorName = JSON.stringify(error);
-                if (errorName.length === 2) {
+                if (errorName.length) {
                     errorName = error.name;
+                    if (error.hasOwnProperty('close')) {
+                        close = error.close;
+                    }
+                }
+                if (close) {
+                    this.close();
+                    this.props.toUpdate && this.props.toUpdate();
                 }
 
                 this.helperModal.open({

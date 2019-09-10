@@ -14,8 +14,17 @@ import {
     CustomCriteria,
     LineItemCreativeAssociation
 } from "./DataTypes";
+import {DOMParser} from "xmldom";
 
-// const networkCode = '21808260008';
+function OrderError(message, close) {
+    this.name = "OrderError";
+    this.message = (message || "");
+    if (typeof close == "undefined") {
+        close = true;
+    }
+    this.close = close;
+}
+OrderError.prototype = Error.prototype;
 
 class Handler extends AbstractHandler {
 
@@ -741,11 +750,37 @@ class Handler extends AbstractHandler {
             const user = await this.getCurrentUser();
             data.traffickerId = user.id;
 
-            let orders = await Service.createOrders({
-                orders: [
-                    data
-                ]
-            });
+            try {
+                let orders = await Service.createOrders({
+                    orders: [
+                        data
+                    ]
+                });
+            } catch (e) {
+                console.log(e);
+
+                let message = e;
+
+                const parser = new DOMParser();
+                let docError = parser.parseFromString(e.body);
+                const ApiExceptions = docError.getElementsByTagName("ApiExceptionFault");
+                if (ApiExceptions.length > 0) {
+                    const errors = ApiExceptions[0].getElementsByTagName('errors');
+                    if (errors.length > 0) {
+                        const errorString = errors[0].getElementsByTagName('errorString');
+                        if (errorString.length > 0) {
+                            const nodeValue = errorString[0].childNodes[0].nodeValue
+                            if (nodeValue === "UniqueError.NOT_UNIQUE") {
+                                message = new OrderError("Order with specified name already exists", false);
+                            } else {
+                                message = new Error(nodeValue);
+                            }
+                        }
+                    }
+                }
+
+                return reject(message);
+            }
 
             console.log(orders[0]);
 

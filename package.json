@@ -74,6 +74,7 @@
     "reselect": "^4.0.0",
     "sha256": "^0.2.0",
     "soap": "^0.29.0",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "xmldom": "^0.1.27"
   }
 }
