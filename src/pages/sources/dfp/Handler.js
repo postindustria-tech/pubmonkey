@@ -750,8 +750,9 @@ class Handler extends AbstractHandler {
             const user = await this.getCurrentUser();
             data.traffickerId = user.id;
 
+            let orders = [];
             try {
-                let orders = await Service.createOrders({
+                orders = await Service.createOrders({
                     orders: [
                         data
                     ]
