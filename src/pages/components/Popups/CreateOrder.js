@@ -42,6 +42,8 @@ const helperText =
     "{bid} macro is replaced with a corresponding bid value\n" +
     "{position} macro is replaced with a position number (natural values starting from 1)";
 
+const ONLY_NUMBERS = /^[0-9\b\.]+$/;
+
 let progress = null,
     defaultAdvertiser = "pubnative";
 
@@ -116,9 +118,11 @@ export class CreateOrderModal extends Component {
     }
 
     onChangeStep = value => {
-        this.setState({
-            step: value
-        });
+        if (value === "" || ONLY_NUMBERS.test(value)) {
+            this.setState({
+                step: value
+            });
+        }
     };
 
     onChangeKeywordStep = value => {
@@ -391,6 +395,7 @@ export class CreateOrderModal extends Component {
                                     onChange={this.onChangeStep}
                                     style={{width: 65}}
                                     className={"mp-form-control"}
+                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />{" "}
                                 <span className={"mp-label"}>
                                   Keyword Step:{" "}
@@ -404,6 +409,7 @@ export class CreateOrderModal extends Component {
                                     onChange={this.onChangeKeywordStep}
                                     style={{width: 65}}
                                     className={"mp-form-control"}
+                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />
                                 {/*{" "}
                                 <span className={"mp-label"}>
@@ -698,6 +704,11 @@ export class CreateOrderModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
+        if (['rangeFrom', 'rangeTo'].includes(name)) {
+            if (value !== "" && !ONLY_NUMBERS.test(value)) {
+                return;
+            }
+        }
         if (name === "advertiser") {
             this.changeAdvertiser(value);
         }
