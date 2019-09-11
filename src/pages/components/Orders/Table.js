@@ -130,11 +130,11 @@ class OrdersTable extends Component {
         this.updateStatus(status, key)
     }
 
-  updateStatus(status, key) {
-    this.sourceHandler.updateOrderStatus(status, key).then(() => {
-      this.props.updateOrderStatus(status, key);
-    });
-  }
+    updateStatus(status, key) {
+        this.sourceHandler.updateOrderStatus(status, key).then(() => {
+            this.props.updateOrderStatus(status, key);
+        });
+    }
 
     @bind
     loadOrders() {

@@ -52,6 +52,7 @@ function* setSourceHandler(action) {
         const sourceHandler = SourceFactory.getHandler(type);
 
         yield put(adServerActions.setSourceHandler(sourceHandler))
+        
     } catch (error) {
         console.log(error)
     }

@@ -42,7 +42,6 @@ window.dfpNetworkCode = null;
 class OrdersList extends Component {
 
     timer = null;
-    sourceHandler = null;
 
     state = {
         orders: [],
@@ -81,7 +80,7 @@ class OrdersList extends Component {
             }
         }
         // this.sourceHandler = SourceFactory.getHandler(this.props.type);
-        this.sourceHandler = this.props.sourceHandler;
+        // this.sourceHandler = this.props.sourceHandler;
     }
 
     render() {
@@ -181,7 +180,7 @@ class OrdersList extends Component {
 
     @bind
     logout() {
-        this.sourceHandler.removeCachedAuthToken();
+        this.props.sourceHandler.removeCachedAuthToken();
     }
 
     @bind
@@ -209,7 +208,7 @@ class OrdersList extends Component {
                     }
                 ]);
 
-                let promise = this.sourceHandler.restoreOrdersWithLineItems(
+                let promise = this.props.sourceHandler.restoreOrdersWithLineItems(
                     orders,
                     ({
                          lineItemCount,
@@ -290,7 +289,7 @@ class OrdersList extends Component {
             }
         ]);
 
-        let promise = this.sourceHandler.collectOrderDataFromSet(
+        let promise = this.props.sourceHandler.collectOrderDataFromSet(
             selected,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp}) => {
                 if (this.state.canceled) return;
