@@ -187,8 +187,9 @@ class OrdersList extends Component {
     importSelected() {
         FileService.openFile().then((result) => {
             if (result) {
+                let orders;
                 try {
-                    let {orders} = JSON.parse(result);
+                    orders = JSON.parse(result).orders;
                 } catch (e) {
                     return Promise.reject("Import failed. File is damaged or invalid.");
                 }
