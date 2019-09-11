@@ -195,6 +195,8 @@ class Handler extends AbstractHandler {
     }
 
     async getAllOrders() {
+        return this.getOrders();
+
         return new Promise(async (resolve, reject) => {
             try {
                 let orders = await this._getByStatement('OrderService', {});
@@ -238,6 +240,59 @@ class Handler extends AbstractHandler {
             // console.log(orders);
 
             return orders;
+        });
+    }
+
+    async getOrders() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let orders = await this._getByStatement('OrderService', {});
+
+                if (orders.totalResultSetSize > 0) {
+                    orders = orders.results.map(order => {
+                        return {
+                            ...order,
+                            status: order.isArchived ? 'archived' : order.status
+                        }
+                    });
+                    // console.log(orders);
+                } else {
+                    orders = [];
+                }
+
+                resolve(orders);
+            } catch (err) {
+                // console.log(err);
+            }
+        }).then(orders => {
+            return orders.map(order => {
+                return {
+                    key: order.id,
+                    name: order.name,
+                    status: order.status,
+                    advertiser: "Calculating...",
+                    advertiserId: order.advertiserId,
+                    lineItemCount: "Calculating..."
+                }
+            });
+        });
+    }
+
+    async getOrdersAfter(ordersOriginal) {
+
+        const advertisers = await this.getAllAdvertisers();
+
+        const ids = ordersOriginal.map(({key}) => {
+            return key;
+        });
+        const lineItems = await this.getAllLineItems(ids);
+
+        return ordersOriginal.map(order => {
+            return {
+                ...order,
+                advertiser: advertisers.find(advertiser => advertiser.id === order.advertiserId).name,
+                lineItemCount: lineItems.filter(({orderId}) => orderId === order.key).length
+            }
         });
     }
 

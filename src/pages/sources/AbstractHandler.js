@@ -1,4 +1,3 @@
-import {HTTPService} from "../services";
 
 export default class AbstractHandler {
 
@@ -24,6 +23,10 @@ export default class AbstractHandler {
 
     getAdvertiser() {
         return this.advertiser;
+    }
+
+    getOrdersAfter(ordersOriginal) {
+        return ordersOriginal;
     }
 
     getAdUnits() {

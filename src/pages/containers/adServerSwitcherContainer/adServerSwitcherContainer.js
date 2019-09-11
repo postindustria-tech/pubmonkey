@@ -9,7 +9,7 @@ class adServerSwitcherContainer extends PureComponent {
 
     handleAdServerChange = (type) => {
         this.props.setSwitcher(type)
-    }
+    };
 
     render() {
         return (

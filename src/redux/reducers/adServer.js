@@ -4,6 +4,7 @@ import {AD_SERVER_MOPUB} from "../../pages/constants/source";
 
 export const adServerInitialState = {
     type: AD_SERVER_MOPUB,
+    sourceHandler: null,
     orders: [],
     adunits: []
 };
@@ -14,7 +15,15 @@ const adServerReduces = handleActions(
             ...state,
             type: action.payload.type
         }),
+        [adServerActions.setSourceHandler]: (state, action) => ({
+            ...state,
+            sourceHandler: action.payload.sourceHandler
+        }),
         [adServerActions.setOrders]: (state, action) => ({
+            ...state,
+            orders: action.payload.orders
+        }),
+        [adServerActions.setOrdersAfter]: (state, action) => ({
             ...state,
             orders: action.payload.orders
         }),

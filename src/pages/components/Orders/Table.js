@@ -70,7 +70,7 @@ class OrdersTable extends Component {
                 <tbody>
                 {orders
                     .filter(filter)
-                    .map(({name, status, advertiser, lineItemCount, key, checked = false}) => (
+                    .map(({name, status, advertiser, lineItemCount, key, checked = false}, index) => (
                         <tr key={key} className="order">
                             <td className="select">
                                 <input
@@ -160,20 +160,20 @@ class OrdersTable extends Component {
     toggleSelected(_key) {
         let {orders, onUpdate, filter = () => true} = this.props;
 
-    orders = orders.map(order => {
-      let { checked, key } = order;
+        orders = orders.map(order => {
+            let {checked, key} = order;
 
-      if (key === _key) {
-        order.checked = !order.checked;
-      }
+            if (key === _key) {
+                order.checked = !order.checked;
+            }
 
-      return order;
-    });
+            return order;
+        });
 
-    this.props.setOrders(orders);
+        this.props.setOrders(orders);
 
-    onUpdate(orders.filter(filter));
-  }
+        onUpdate(orders.filter(filter));
+    }
 }
 
 const mapDispatchToProps = {

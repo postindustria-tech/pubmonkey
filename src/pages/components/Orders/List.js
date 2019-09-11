@@ -80,8 +80,8 @@ class OrdersList extends Component {
                 this.authModal.toggle();
             }
         }
-        this.sourceHandler = SourceFactory.getHandler(this.props.type);
-        console.log(this.props.type + ' sourceHandler inited');
+        // this.sourceHandler = SourceFactory.getHandler(this.props.type);
+        this.sourceHandler = this.props.sourceHandler;
     }
 
     render() {
@@ -90,7 +90,6 @@ class OrdersList extends Component {
             orders,
             progress,
             orderCount,
-            lineItemCount,
             filter,
             filterFn
         } = this.state;
@@ -355,10 +354,6 @@ class OrdersList extends Component {
     @bind
     loadOrders() {
         console.log('loadOrders: ' + this.props.type);
-        // const sourceHandler = SourceFactory.getHandler(this.state.adServer);
-        // sourceHandler.getAllOrders().then((orders = []) => {
-        //     this.setState({orders});
-        // });
         this.props.setSwitcher(this.props.type)
     }
 
@@ -512,6 +507,7 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
     type: adServerSelectors.switcherType(state),
+    sourceHandler: adServerSelectors.sourceHandler(state),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)
