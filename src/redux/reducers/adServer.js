@@ -17,6 +17,8 @@ const adServerReduces = handleActions(
         }),
         [adServerActions.setSourceHandler]: (state, action) => ({
             ...state,
+            orders: [],
+            adunits: [],
             sourceHandler: action.payload.sourceHandler
         }),
         [adServerActions.setOrders]: (state, action) => ({
