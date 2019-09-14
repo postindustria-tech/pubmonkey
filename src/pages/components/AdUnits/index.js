@@ -4,7 +4,7 @@ import { Table } from 'reactstrap'
 import BaseLayout from '../layouts/BaseLayout'
 import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
 import adServerSelectors from '../../../redux/selectors/adServer'
-import addServerActions from '../../../redux/actions/adServer'
+import adServerActions from '../../../redux/actions/adServer'
 import {connect} from "react-redux";
 import SourceFactory from "../../sources/Factory";
 
@@ -74,7 +74,7 @@ class AdUnitsList extends Component {
 }
 
 const mapDispatchToProps = {
-    setSwitcher: addServerActions.setSwitcher
+    setSwitcher: adServerActions.setSwitcher
 };
 
 const mapStateToProps = state => ({

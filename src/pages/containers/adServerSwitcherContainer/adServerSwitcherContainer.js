@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Col, Row} from "reactstrap";
-import addServerActions from '../../../redux/actions/adServer'
-import addServerSelectors from '../../../redux/selectors/adServer'
+import adServerActions from '../../../redux/actions/adServer'
+import adServerSelectors from '../../../redux/selectors/adServer'
 import {connect} from "react-redux";
 import {AD_SERVERS} from "../../constants/source";
 
@@ -29,11 +29,11 @@ class adServerSwitcherContainer extends PureComponent {
 }
 
 const mapDispatchToProps = {
-    setSwitcher: addServerActions.setSwitcher
+    setSwitcher: adServerActions.setSwitcher
 };
 
 const mapStateToProps = state => ({
-    type: addServerSelectors.switcherType(state)
+    type: adServerSelectors.switcherType(state)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(adServerSwitcherContainer)

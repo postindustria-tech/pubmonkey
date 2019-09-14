@@ -22,7 +22,7 @@ import SourceFactory from "../../sources/Factory";
 import AdServerSwitcherContainer from '../../containers/adServerSwitcherContainer/adServerSwitcherContainer'
 import AuthModal from "../../sources/dfp/AuthModal";
 import adServerSelectors from '../../../redux/selectors/adServer'
-import addServerActions from '../../../redux/actions/adServer'
+import adServerActions from '../../../redux/actions/adServer'
 const FILTER_FN = [
         ({status}) => status !== "archived",
         ({status}) => status === "running",
@@ -79,14 +79,10 @@ class OrdersList extends Component {
                 this.authModal.toggle();
             }
         }
-        // this.sourceHandler = SourceFactory.getHandler(this.props.type);
-        // this.sourceHandler = this.props.sourceHandler;
     }
 
     render() {
         let {
-            adServer,
-            orders,
             progress,
             orderCount,
             filter,
@@ -98,6 +94,7 @@ class OrdersList extends Component {
 
                 <AuthModal
                     ref={modal => (this.authModal = modal)}
+                    onSubmit={this.onAuthModalSubmit}
                 />
 
                 <AdServerSwitcherContainer />
@@ -148,7 +145,6 @@ class OrdersList extends Component {
                             value={filter}
                             className={"mp-form-control"}
                         >
-
                             {STATUS_OPTIONS.map(
                                 (item, index) => (
                                     <option key={index} value={item.value}>
@@ -176,6 +172,11 @@ class OrdersList extends Component {
                 />
             </BaseLayout>
         );
+    }
+
+    @bind
+    onAuthModalSubmit(networkCode) {
+        this.props.setNetworkCode(networkCode);
     }
 
     @bind
@@ -501,13 +502,15 @@ class OrdersList extends Component {
 
 
 const mapDispatchToProps = {
-    setSwitcher: addServerActions.setSwitcher
+    setSwitcher: adServerActions.setSwitcher,
+    setNetworkCode: adServerActions.setNetworkCode
 };
 
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
+    networkCode: adServerSelectors.networkCode(state)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)

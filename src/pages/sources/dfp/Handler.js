@@ -74,8 +74,20 @@ class Handler extends AbstractHandler {
         this.setNetworkCode();
     }
 
+    isReady() {
+        return this.getNetworkCode() !== null;
+    }
+
     setNetworkCode() {
         this.networkCode = localStorage.getItem("dfpNetworkCode") || null;
+    }
+
+    getNetworkCode() {
+        if (this.networkCode) {
+            return this.networkCode;
+        }
+        this.networkCode = localStorage.getItem('dfpNetworkCode') || null;
+        return this.networkCode;
     }
 
     composeOrderRequest(advertiser, name) {
@@ -197,50 +209,50 @@ class Handler extends AbstractHandler {
     async getAllOrders() {
         return this.getOrders();
 
-        return new Promise(async (resolve, reject) => {
-            try {
-                let orders = await this._getByStatement('OrderService', {});
-
-                if (orders.totalResultSetSize > 0) {
-                    orders = orders.results.map(order => {
-                        return {
-                            ...order,
-                            status: order.isArchived ? 'archived' : order.status
-                        }
-                    });
-                    // console.log(orders);
-                } else {
-                    orders = [];
-                }
-
-                resolve(orders);
-            } catch (err) {
-                // console.log(err);
-            }
-        }).then(async orders => {
-
-            // Use some cache?
-            const advertisers = await this.getAllAdvertisers();
-
-            const ids = orders.map(({id}) => {
-                return id;
-            });
-            const lineItems = await this.getAllLineItems(ids);
-
-            orders = orders.map(order => {
-                return {
-                    key: order.id,
-                    name: order.name,
-                    status: order.status,
-                    advertiser: advertisers.find(advertiser => advertiser.id === order.advertiserId).name,
-                    lineItemCount: lineItems.filter(({orderId}) => orderId === order.id).length
-                }
-            });
-
-            // console.log(orders);
-
-            return orders;
-        });
+        // return new Promise(async (resolve, reject) => {
+        //     try {
+        //         let orders = await this._getByStatement('OrderService', {});
+        //
+        //         if (orders.totalResultSetSize > 0) {
+        //             orders = orders.results.map(order => {
+        //                 return {
+        //                     ...order,
+        //                     status: order.isArchived ? 'archived' : order.status
+        //                 }
+        //             });
+        //             // console.log(orders);
+        //         } else {
+        //             orders = [];
+        //         }
+        //
+        //         resolve(orders);
+        //     } catch (err) {
+        //         // console.log(err);
+        //     }
+        // }).then(async orders => {
+        //
+        //     // Use some cache?
+        //     const advertisers = await this.getAllAdvertisers();
+        //
+        //     const ids = orders.map(({id}) => {
+        //         return id;
+        //     });
+        //     const lineItems = await this.getAllLineItems(ids);
+        //
+        //     orders = orders.map(order => {
+        //         return {
+        //             key: order.id,
+        //             name: order.name,
+        //             status: order.status,
+        //             advertiser: advertisers.find(advertiser => advertiser.id === order.advertiserId).name,
+        //             lineItemCount: lineItems.filter(({orderId}) => orderId === order.id).length
+        //         }
+        //     });
+        //
+        //     // console.log(orders);
+        //
+        //     return orders;
+        // });
     }
 
     async getOrders() {

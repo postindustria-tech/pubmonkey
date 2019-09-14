@@ -5,8 +5,8 @@ import classnames from 'classnames'
 import { ProgressModal, ErrorPopup } from '../Popups'
 import { ModalWindowService } from '../../services'
 import { version } from '../../../misc.json'
-import SourceTypeViewConteiner from '../../containers/SourceTypeViewConteiner/SourceTypeViewConteiner';
-import addServerSelectors from "../../../redux/selectors/adServer";
+import SourceTypeViewContainer from '../../containers/SourceTypeViewContainer/SourceTypeViewContainer';
+import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 
 class BaseLayout extends Component {
@@ -37,7 +37,7 @@ class BaseLayout extends Component {
             <div className={ classnames('base-layout', className) }>
                 <Navbar className="header">
                     <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
-                    <SourceTypeViewConteiner />
+                    <SourceTypeViewContainer />
                     <div id="downloadManual">
                         <a href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf" target="_blank">Download manual</a>
                     </div>
@@ -92,7 +92,7 @@ class BaseLayout extends Component {
 }
 
 const mapStateToProps = state => ({
-    type: addServerSelectors.switcherType(state)
+    type: adServerSelectors.switcherType(state)
 });
 
 export default connect(mapStateToProps)(BaseLayout)

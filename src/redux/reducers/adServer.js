@@ -4,6 +4,7 @@ import {AD_SERVER_MOPUB} from "../../pages/constants/source";
 
 export const adServerInitialState = {
     type: AD_SERVER_MOPUB,
+    networkCode: null,
     sourceHandler: null,
     orders: [],
     adunits: []
@@ -14,6 +15,10 @@ const adServerReduces = handleActions(
         [adServerActions.setSwitcher]: (state, action) => ({
             ...state,
             type: action.payload.type
+        }),
+        [adServerActions.setNetworkCode]: (state, action) => ({
+            ...state,
+            networkCode: action.payload.networkCode
         }),
         [adServerActions.setSourceHandler]: (state, action) => ({
             ...state,

@@ -12,6 +12,11 @@ const sourceHandler = createSelector(
   adServer => adServer.sourceHandler
 );
 
+const networkCode = createSelector(
+  rootSelector,
+  adServer => adServer.networkCode
+);
+
 const orders = createSelector(
   rootSelector,
   adServer => adServer.orders
@@ -25,6 +30,7 @@ const adunits = createSelector(
 const adServerSelectors = {
   switcherType,
   sourceHandler,
+  networkCode,
   orders,
   adunits
 };

@@ -25,6 +25,14 @@ export default class AbstractHandler {
         return this.advertiser;
     }
 
+    /**
+     * Check if handler configured properly and ready to make requests
+     * @returns {boolean}
+     */
+    isReady() {
+        return true;
+    }
+
     getOrdersAfter(ordersOriginal) {
         return ordersOriginal;
     }

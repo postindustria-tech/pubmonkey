@@ -5,7 +5,6 @@ import {Table} from 'reactstrap'
 import {CreateOrderModal} from "../Popups/CreateOrder";
 import SourceFactory from "../../sources/Factory";
 import bind from "bind-decorator";
-import addServerActions from "../../../redux/actions/adServer";
 import adServerActions from "../../../redux/actions/adServer";
 import {connect} from "react-redux";
 
@@ -178,8 +177,8 @@ class OrdersTable extends Component {
 
 const mapDispatchToProps = {
   updateOrderStatus: adServerActions.updateOrderStatus,
-  setSwitcher: addServerActions.setSwitcher,
-  setOrders: addServerActions.setOrders
+  setSwitcher: adServerActions.setSwitcher,
+  setOrders: adServerActions.setOrders
 };
 
 export default connect(null, mapDispatchToProps)(OrdersTable)

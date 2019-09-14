@@ -4,8 +4,9 @@ import {isEmpty} from "../../helpers";
 import bind from "bind-decorator";
 
 export default class AuthModal extends Component {
+
     static defaultProps = {
-        onConfirm: () => {}
+        onSubmit: () => {}
     };
 
     state = {
@@ -18,9 +19,10 @@ export default class AuthModal extends Component {
 
     submit = () => {
         this.toggle();
-        this.props.onConfirm();
 
         localStorage.setItem("dfpNetworkCode", this.state.networkCode);
+
+        this.props.onSubmit(this.state.networkCode);
     };
 
     toggle = () => {
