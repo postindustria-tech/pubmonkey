@@ -2,6 +2,7 @@ import adServerActions from "../actions/adServer";
 import {put, takeEvery, all, select, } from 'redux-saga/effects'
 import SourceFactory from "../../pages/sources/Factory";
 import adServerSelectors from "../selectors/adServer";
+import {AD_SERVER_DFP} from "../../pages/constants/source";
 
 function* getOrders(action) {
     try {
@@ -10,6 +11,8 @@ function* getOrders(action) {
             const orders = yield sourceHandler.getAllOrders() || [];
             yield put(adServerActions.setOrders(orders));
             yield getOrdersAfter(sourceHandler)
+        } else {
+            console.log("sourceHandler isn't ready");
         }
     } catch (error) {
         console.log(error)
@@ -41,7 +44,7 @@ function* getAdUnits(action) {
         const sourceHandler = yield select(adServerSelectors.sourceHandler);
         if (sourceHandler.isReady()) {
             const adunits = yield sourceHandler.getAdUnits() || [];
-            yield put(adServerActions.setAdUnits(adunits))
+            yield put(adServerActions.setAdUnits(adunits));
         }
     } catch (error) {
         console.log(error)
@@ -52,7 +55,10 @@ function* setSourceHandler(action) {
     try {
         const {type} = action.payload;
         const sourceHandler = SourceFactory.getHandler(type);
-        yield put(adServerActions.setSourceHandler(sourceHandler))
+        yield put(adServerActions.setSourceHandler(sourceHandler));
+        if (type === AD_SERVER_DFP && !sourceHandler.getNetworkCode()) {
+            yield put(adServerActions.dfpAuthModalToggle());
+        }
     } catch (error) {
         console.log(error)
     }

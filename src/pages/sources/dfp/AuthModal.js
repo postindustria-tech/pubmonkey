@@ -2,15 +2,17 @@ import React, {Component} from "react";
 import {Modal, ModalBody, ModalFooter, ModalHeader, Button, Col, Form, FormGroup, Label, Input, Row} from "reactstrap";
 import {isEmpty} from "../../helpers";
 import bind from "bind-decorator";
+import adServerActions from "../../../redux/actions/adServer";
+import adServerSelectors from "../../../redux/selectors/adServer";
+import {connect} from "react-redux";
 
-export default class AuthModal extends Component {
+class AuthModal extends Component {
 
     static defaultProps = {
         onSubmit: () => {}
     };
 
     state = {
-        open: false,
         networkCode: localStorage.getItem("dfpNetworkCode") || "",
         formErrors: {
             networkCode: ""
@@ -22,16 +24,17 @@ export default class AuthModal extends Component {
 
         localStorage.setItem("dfpNetworkCode", this.state.networkCode);
 
-        this.props.onSubmit(this.state.networkCode);
+        this.props.setNetworkCode(this.state.networkCode);
     };
 
     toggle = () => {
-        this.setState(state => ({open: !state.open}));
+        // this.setState(state => ({open: !state.open}));
+        this.props.dfpAuthModalToggle();
     };
 
     render() {
         return (
-            <Modal isOpen={this.state.open} toggle={this.toggle}>
+            <Modal isOpen={this.props.dfpAuthModalOpen} toggle={this.toggle}>
                 <ModalHeader>Google Ad Manager (DFP)</ModalHeader>
                 <ModalBody>
                     <Row>
@@ -68,3 +71,15 @@ export default class AuthModal extends Component {
         this.setState({[name]: value});
     }
 }
+
+const mapDispatchToProps = {
+    dfpAuthModalToggle: adServerActions.dfpAuthModalToggle,
+    setNetworkCode: adServerActions.setNetworkCode
+};
+
+const mapStateToProps = state => ({
+    dfpAuthModalOpen: adServerSelectors.dfpAuthModalOpen(state),
+    networkCode: adServerSelectors.networkCode(state)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(AuthModal)

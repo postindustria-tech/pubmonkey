@@ -17,6 +17,11 @@ const networkCode = createSelector(
   adServer => adServer.networkCode
 );
 
+const dfpAuthModalOpen = createSelector(
+  rootSelector,
+  adServer => adServer.dfpAuthModalOpen
+);
+
 const orders = createSelector(
   rootSelector,
   adServer => adServer.orders
@@ -31,6 +36,7 @@ const adServerSelectors = {
   switcherType,
   sourceHandler,
   networkCode,
+  dfpAuthModalOpen,
   orders,
   adunits
 };

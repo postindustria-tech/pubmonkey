@@ -38,7 +38,7 @@ class Handler extends AbstractHandler {
     dfp = null;
     networkCode = null;
 
-    static token = null;
+    token = null;
     static user = null;
 
     lineItemInfo = {
@@ -78,6 +78,12 @@ class Handler extends AbstractHandler {
         return this.getNetworkCode() !== null;
     }
 
+    clear() {
+        this.token = null;
+        this.networkCode = null;
+        this.dfp = null;
+    }
+
     setNetworkCode() {
         this.networkCode = localStorage.getItem("dfpNetworkCode") || null;
     }
@@ -105,25 +111,25 @@ class Handler extends AbstractHandler {
     }
 
     removeCachedAuthToken() {
-        console.log(Handler.token);
-        var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + Handler.token;
+        console.log(this.token);
+        var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + this.token;
         window.fetch(url);
-        chrome.identity.removeCachedAuthToken({token: Handler.token}, function () {
+        chrome.identity.removeCachedAuthToken({token: this.token}, function () {
             //token was removed from cache
             // window.location.reload();
         });
     }
 
     async getDfp() {
-        if (!Handler.token) {
-            Handler.token = await this.getToken();
+        if (!this.token) {
+            this.token = await this.getToken();
         }
-        // console.log(Handler.token);
+        // console.log(this.token);
         if (!this.dfp) {
-            this.dfp = new DFP({networkCode: this.networkCode, apiVersion: DFP_API_VERSION, token: Handler.token});
+            this.dfp = new DFP({networkCode: this.networkCode, apiVersion: DFP_API_VERSION, token: this.token});
         }
         // const Service = await this.dfp.getService('UserService');
-        // Service.setToken(Handler.token);
+        // Service.setToken(this.token);
         //
         // Handler.user = await Service.getCurrentUser({});
         // console.log(user);
@@ -134,7 +140,7 @@ class Handler extends AbstractHandler {
     async _getByStatement(serviceName, filterStatement) {
 
         const Service = await this.getDfp().then(dfp => dfp.getService(serviceName));
-        Service.setToken(Handler.token);
+        Service.setToken(this.token);
 
         switch (serviceName) {
             case "OrderService":
@@ -203,56 +209,38 @@ class Handler extends AbstractHandler {
     }
 
     async getAdUnits() {
-        return this.getAllAdUnits();
+        return new Promise(async (resolve, reject) => {
+            try {
+                let adunits = await this._getByStatement('InventoryService', {
+                    query: "WHERE status = 'ACTIVE'"
+                });
+
+                if (adunits.totalResultSetSize > 0) {
+                    adunits = adunits.results;
+                } else {
+                    adunits = [];
+                }
+                adunits = adunits.filter(({hasChildren}) => !hasChildren);
+                console.log(adunits);
+
+                resolve(adunits);
+            } catch (err) {
+                // console.log(err);
+            }
+        }).then(adunits => {
+            adunits = adunits.map(adunit => ({
+                name: adunit.name,
+                format: this.extractAdUnitSizes(adunit.adUnitSizes).join(', '),
+                key: adunit.id,
+                appName: "",
+                appType: ""
+            }));
+            return adunits;
+        });
     }
 
     async getAllOrders() {
         return this.getOrders();
-
-        // return new Promise(async (resolve, reject) => {
-        //     try {
-        //         let orders = await this._getByStatement('OrderService', {});
-        //
-        //         if (orders.totalResultSetSize > 0) {
-        //             orders = orders.results.map(order => {
-        //                 return {
-        //                     ...order,
-        //                     status: order.isArchived ? 'archived' : order.status
-        //                 }
-        //             });
-        //             // console.log(orders);
-        //         } else {
-        //             orders = [];
-        //         }
-        //
-        //         resolve(orders);
-        //     } catch (err) {
-        //         // console.log(err);
-        //     }
-        // }).then(async orders => {
-        //
-        //     // Use some cache?
-        //     const advertisers = await this.getAllAdvertisers();
-        //
-        //     const ids = orders.map(({id}) => {
-        //         return id;
-        //     });
-        //     const lineItems = await this.getAllLineItems(ids);
-        //
-        //     orders = orders.map(order => {
-        //         return {
-        //             key: order.id,
-        //             name: order.name,
-        //             status: order.status,
-        //             advertiser: advertisers.find(advertiser => advertiser.id === order.advertiserId).name,
-        //             lineItemCount: lineItems.filter(({orderId}) => orderId === order.id).length
-        //         }
-        //     });
-        //
-        //     // console.log(orders);
-        //
-        //     return orders;
-        // });
     }
 
     async getOrders() {
@@ -370,42 +358,11 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService('UserService'));
-            Service.setToken(Handler.token);
+            Service.setToken(this.token);
 
             Handler.user = await Service.getCurrentUser({});
 
             resolve(Handler.user);
-        });
-    }
-
-    async getAllAdUnits() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                let adunits = await this._getByStatement('InventoryService', {
-                    query: "WHERE status = 'ACTIVE'"
-                });
-
-                if (adunits.totalResultSetSize > 0) {
-                    adunits = adunits.results;
-                } else {
-                    adunits = [];
-                }
-                adunits = adunits.filter(({hasChildren}) => !hasChildren);
-                console.log(adunits);
-
-                resolve(adunits);
-            } catch (err) {
-                // console.log(err);
-            }
-        }).then(adunits => {
-            adunits = adunits.map(adunit => ({
-                name: adunit.name,
-                format: this.extractAdUnitSizes(adunit.adUnitSizes).join(', '),
-                key: adunit.id,
-                appName: "",
-                appType: ""
-            }));
-            return adunits;
         });
     }
 
@@ -444,7 +401,7 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
             try {
                 const Service = await this.getDfp().then(dfp => dfp.getService('CustomTargetingService'));
-                Service.setToken(Handler.token);
+                Service.setToken(this.token);
 
                 let values = await Service.getCustomTargetingValuesByStatement({
                     filterStatement: {
@@ -488,7 +445,7 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("OrderService"));
-            Service.setToken(Handler.token);
+            Service.setToken(this.token);
 
             let result = await Service.performOrderAction({
                 orderAction: {
@@ -812,7 +769,7 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("OrderService"));
-            Service.setToken(Handler.token);
+            Service.setToken(this.token);
 
             const user = await this.getCurrentUser();
             data.traffickerId = user.id;
@@ -860,7 +817,7 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("LineItemService"));
-            Service.setToken(Handler.token);
+            Service.setToken(this.token);
 
             let lineItems = await Service.createLineItems({
                 lineItems: data
@@ -876,7 +833,7 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("CreativeService"));
-            Service.setToken(Handler.token);
+            Service.setToken(this.token);
 
             let creatives = await Service.createCreatives({
                 creatives: data
@@ -892,7 +849,7 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("LineItemCreativeAssociationService"));
-            Service.setToken(Handler.token);
+            Service.setToken(this.token);
 
             let associations = await Service.createLineItemCreativeAssociations({
                 lineItemCreativeAssociations: data
@@ -907,7 +864,7 @@ class Handler extends AbstractHandler {
     async createCustomTargetingKeys(data) {
 
         const Service = await this.getDfp().then(dfp => dfp.getService("CustomTargetingService"));
-        Service.setToken(Handler.token);
+        Service.setToken(this.token);
 
         return new Promise(async (resolve, reject) => {
 
@@ -939,7 +896,7 @@ class Handler extends AbstractHandler {
         return new Promise(async (resolve, reject) => {
 
             const Service = await this.getDfp().then(dfp => dfp.getService("CustomTargetingService"));
-            Service.setToken(Handler.token);
+            Service.setToken(this.token);
 
             let values = await Service.createCustomTargetingValues({
                 values: data

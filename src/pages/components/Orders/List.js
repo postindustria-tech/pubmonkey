@@ -18,9 +18,7 @@ import {
     AD_SERVER_DFP,
     AD_SERVER_MOPUB
 } from "../../constants/source";
-import SourceFactory from "../../sources/Factory";
 import AdServerSwitcherContainer from '../../containers/adServerSwitcherContainer/adServerSwitcherContainer'
-import AuthModal from "../../sources/dfp/AuthModal";
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 const FILTER_FN = [
@@ -36,8 +34,6 @@ const FILTER_FN = [
         {value: 3, label: "archived"}
     ];
 window.canceledExport = false;
-
-window.dfpNetworkCode = null;
 
 class OrdersList extends Component {
 
@@ -73,12 +69,12 @@ class OrdersList extends Component {
 
     init() {
         //@TODO: move to handler
-        if (this.props.type === AD_SERVER_DFP) {
-            window.dfpNetworkCode = localStorage.getItem('dfpNetworkCode') || null;
-            if (!window.dfpNetworkCode) {
-                this.authModal.toggle();
-            }
-        }
+        // if (this.props.type === AD_SERVER_DFP) {
+        //     const dfpNetworkCode = localStorage.getItem('dfpNetworkCode') || null;
+        //     if (!dfpNetworkCode) {
+        //         this.authModal.toggle();
+        //     }
+        // }
     }
 
     render() {
@@ -92,10 +88,10 @@ class OrdersList extends Component {
         return (
             <BaseLayout className="orders-list-layout">
 
-                <AuthModal
-                    ref={modal => (this.authModal = modal)}
-                    onSubmit={this.onAuthModalSubmit}
-                />
+                {/*<AuthModal*/}
+                {/*    ref={modal => (this.authModal = modal)}*/}
+                {/*    onSubmit={this.onAuthModalSubmit}*/}
+                {/*/>*/}
 
                 <AdServerSwitcherContainer />
 
@@ -155,15 +151,6 @@ class OrdersList extends Component {
                         </Input>
                     </Col>
                 </Row>
-                <Row hidden={this.props.type !== AD_SERVER_DFP}>
-                    <Col className={"col-sm-12"}>
-                        <Button
-                            color="primary"
-                            onClick={this.logout}
-                        >Logout
-                        </Button>
-                    </Col>
-                </Row>
                 <OrdersTable
                     orders={this.props.orders}
                     adServer={this.props.type}
@@ -172,16 +159,6 @@ class OrdersList extends Component {
                 />
             </BaseLayout>
         );
-    }
-
-    @bind
-    onAuthModalSubmit(networkCode) {
-        this.props.setNetworkCode(networkCode);
-    }
-
-    @bind
-    logout() {
-        this.props.sourceHandler.removeCachedAuthToken();
     }
 
     @bind
@@ -499,18 +476,14 @@ class OrdersList extends Component {
     }
 }
 
-
-
 const mapDispatchToProps = {
-    setSwitcher: adServerActions.setSwitcher,
-    setNetworkCode: adServerActions.setNetworkCode
+    setSwitcher: adServerActions.setSwitcher
 };
 
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
     type: adServerSelectors.switcherType(state),
-    sourceHandler: adServerSelectors.sourceHandler(state),
-    networkCode: adServerSelectors.networkCode(state)
+    sourceHandler: adServerSelectors.sourceHandler(state)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)

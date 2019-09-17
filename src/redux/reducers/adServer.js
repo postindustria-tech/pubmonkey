@@ -7,7 +7,8 @@ export const adServerInitialState = {
     networkCode: null,
     sourceHandler: null,
     orders: [],
-    adunits: []
+    adunits: [],
+    dfpAuthModalOpen: false
 };
 
 const adServerReduces = handleActions(
@@ -19,6 +20,16 @@ const adServerReduces = handleActions(
         [adServerActions.setNetworkCode]: (state, action) => ({
             ...state,
             networkCode: action.payload.networkCode
+        }),
+        [adServerActions.dfpLogOut]: (state, action) => ({
+            ...state,
+            networkCode: null,
+            orders: [],
+            adunits: []
+        }),
+        [adServerActions.dfpAuthModalToggle]: (state, action) => ({
+            ...state,
+            dfpAuthModalOpen: !state.dfpAuthModalOpen,
         }),
         [adServerActions.setSourceHandler]: (state, action) => ({
             ...state,

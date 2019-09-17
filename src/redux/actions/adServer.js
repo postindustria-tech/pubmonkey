@@ -7,6 +7,8 @@ const setOrders = createAction('adServer--setOrders', orders => ({orders}));
 const setOrdersAfter = createAction('adServer--setOrdersAfter', orders => ({orders}));
 const setAdUnits = createAction('adServer--setAdUnits', adunits => ({adunits}));
 const updateOrderStatus = createAction("adServer--updateOrderStatus", (status, key) => ({status, key}));
+const dfpLogOut = createAction("adServer--dfpLogOut");
+const dfpAuthModalToggle = createAction("adServer--dfpAuthModalToggle");
 
 const adServerActions = {
     setSwitcher,
@@ -15,7 +17,9 @@ const adServerActions = {
     setOrders,
     setOrdersAfter,
     setAdUnits,
-    updateOrderStatus
+    updateOrderStatus,
+    dfpLogOut,
+    dfpAuthModalToggle
 };
 
 export default adServerActions;
