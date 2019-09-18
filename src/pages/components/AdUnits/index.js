@@ -29,7 +29,7 @@ class AdUnitsList extends Component {
     }
 
     render() {
-        let { adunits } = this.props;
+        let { adunits = [] } = this.props;
 
         return (
             <BaseLayout
