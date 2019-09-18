@@ -7,10 +7,10 @@ import SourceFactory from "../../sources/Factory";
 import bind from "bind-decorator";
 import adServerActions from "../../../redux/actions/adServer";
 import {connect} from "react-redux";
+import adServerSelectors from "../../../redux/selectors/adServer";
+import {AD_SERVER_DFP} from "../../constants/source";
 
 class OrdersTable extends Component {
-
-    sourceHandler = null;
 
     state = {
         allSelected: false,
@@ -21,17 +21,6 @@ class OrdersTable extends Component {
         if (this.props.allSelected) {
             this.toggleAll(true)
         }
-        this.initHandler();
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (this.props.adServer !== prevProps.adServer) {
-            this.initHandler();
-        }
-    }
-
-    initHandler() {
-        this.sourceHandler = SourceFactory.getHandler(this.props.adServer);
     }
 
     openModal = () => {
@@ -107,8 +96,8 @@ class OrdersTable extends Component {
     }
 
     getOrderUrl(key) {
-        if (this.sourceHandler) {
-            return this.sourceHandler.getOrderUrl(key);
+        if (this.props.sourceHandler) {
+            return this.props.sourceHandler.getOrderUrl(key);
         }
         return null;
     }
@@ -124,13 +113,13 @@ class OrdersTable extends Component {
     }
 
     toggleArchive(status, key) {
-        status = status === 'archived' ? 'running' : 'archived';
+        status = status === 'archived' ? (this.props.type === AD_SERVER_DFP ? 'unarchived' : 'running') : 'archived';
 
         this.updateStatus(status, key)
     }
 
     updateStatus(status, key) {
-        this.sourceHandler.updateOrderStatus(status, key).then(() => {
+        this.props.sourceHandler.updateOrderStatus(status, key).then(() => {
             this.props.updateOrderStatus(status, key);
         });
     }
@@ -176,9 +165,14 @@ class OrdersTable extends Component {
 }
 
 const mapDispatchToProps = {
-  updateOrderStatus: adServerActions.updateOrderStatus,
-  setSwitcher: adServerActions.setSwitcher,
-  setOrders: adServerActions.setOrders
+    updateOrderStatus: adServerActions.updateOrderStatus,
+    setSwitcher: adServerActions.setSwitcher,
+    setOrders: adServerActions.setOrders
 };
 
-export default connect(null, mapDispatchToProps)(OrdersTable)
+const mapStateToProps = state => ({
+    type: adServerSelectors.switcherType(state),
+    sourceHandler: adServerSelectors.sourceHandler(state),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrdersTable)

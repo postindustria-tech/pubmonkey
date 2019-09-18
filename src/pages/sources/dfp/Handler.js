@@ -982,6 +982,9 @@ class Handler extends AbstractHandler {
             case 'archived':
                 mappedStatus = 'ArchiveOrders';
                 break;
+            case 'unarchived':
+                mappedStatus = 'UnarchiveOrders';
+                break;
             default:
                 throw `Wrong order status ${status}`;
         }

@@ -51,7 +51,6 @@ class OrdersList extends Component {
     };
 
     componentDidMount() {
-        this.init();
         this.loadOrders();
     }
 
@@ -59,22 +58,6 @@ class OrdersList extends Component {
         if (this.timer) {
             clearTimeout(this.timer);
         }
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (this.props.type !== prevProps.type) {
-            this.init();
-        }
-    }
-
-    init() {
-        //@TODO: move to handler
-        // if (this.props.type === AD_SERVER_DFP) {
-        //     const dfpNetworkCode = localStorage.getItem('dfpNetworkCode') || null;
-        //     if (!dfpNetworkCode) {
-        //         this.authModal.toggle();
-        //     }
-        // }
     }
 
     render() {
@@ -87,11 +70,6 @@ class OrdersList extends Component {
 
         return (
             <BaseLayout className="orders-list-layout">
-
-                {/*<AuthModal*/}
-                {/*    ref={modal => (this.authModal = modal)}*/}
-                {/*    onSubmit={this.onAuthModalSubmit}*/}
-                {/*/>*/}
 
                 <AdServerSwitcherContainer />
 
