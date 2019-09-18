@@ -33,7 +33,11 @@ class SourceTypeViewContainer extends PureComponent {
             <Row>
                 <AuthModal/>
                 {this.props.type === AD_SERVER_DFP ? (
-                    <div>Network Code: {this.state.networkCode} {this.state.networkCode ?
+                    <div>
+                        <a
+                            href="#"
+                            style={{color:"#ffffff"}}
+                            onClick={this.changeNetworkCode}>Network Code: {this.state.networkCode}</a> {this.state.networkCode ?
                         (<a href="#" onClick={this.dfpLogOut}>Logout</a>) :
                         (<a href="#" onClick={this.dfpLogIn}>Login</a>)}
                     </div>
@@ -43,6 +47,11 @@ class SourceTypeViewContainer extends PureComponent {
                 ) : null}
             </Row>
         )
+    }
+
+    @bind
+    changeNetworkCode() {
+        this.props.dfpAuthModalToggle();
     }
 
     @bind

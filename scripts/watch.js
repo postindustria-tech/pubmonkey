@@ -13,6 +13,7 @@ export function watch(cb) {
     gulp.watch(['./src/content/*.js'], contentScriptsBundle)
     // gulp.watch(['./src/background/*.js', './src/core/**/*.js'], backgroundScriptsBundle)
     // gulp.watch(['./src/popup/*.js'], popupScriptsBundle)
+    gulp.watch(['./src/redux/**/*.js'], pageScriptsBundle)
     gulp.watch(['./src/pages/**/*.js'], pageScriptsBundle)
     gulp.watch(['./src/pages/**/*.scss'], pagesCSS)
     gulp.watch(['./src/popup/*.html'], updatePopupFiles)

@@ -64,14 +64,26 @@ function* setSourceHandler(action) {
     }
 }
 
+function* setNetworkCode(action) {
+    try {
+        // const {networkCode} = action.payload;
+        const sourceHandler = SourceFactory.getHandler(AD_SERVER_DFP);
+        yield put(adServerActions.setSourceHandler(sourceHandler));
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 function* handleChangeAdServerType() {
     yield takeEvery(adServerActions.setSwitcher, setSourceHandler);
 
     yield takeEvery(adServerActions.setSourceHandler, getOrders);
     yield takeEvery(adServerActions.setSourceHandler, getAdUnits);
 
-    yield takeEvery(adServerActions.setNetworkCode, getOrders);
-    yield takeEvery(adServerActions.setNetworkCode, getAdUnits);
+    yield takeEvery(adServerActions.setNetworkCode, setNetworkCode);
+
+    // yield takeEvery(adServerActions.setNetworkCode, getOrders);
+    // yield takeEvery(adServerActions.setNetworkCode, getAdUnits);
 }
 
 function* rootSaga() {
