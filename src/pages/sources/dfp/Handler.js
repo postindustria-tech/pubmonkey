@@ -449,11 +449,18 @@ class Handler extends AbstractHandler {
 
             let result = await Service.performOrderAction({
                 orderAction: {
-                    attributes: {'xsi:type': status},
-                    // skipInventoryCheck: true
+                    attributes: {'xsi:type': status}
                 },
                 filterStatement: {query: 'WHERE id = ' + orderId}
             });
+            if (status === "UnarchiveOrders") { // Hot fix, to do unarchive we need to send two request
+                result = await Service.performOrderAction({
+                    orderAction: {
+                        attributes: {'xsi:type': "ApproveOrders"}
+                    },
+                    filterStatement: {query: 'WHERE id = ' + orderId}
+                });
+            }
 
             console.log(result);
 

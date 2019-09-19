@@ -84,7 +84,7 @@ class OrdersTable extends Component {
                                    onClick={() => this.togglePause(status, key)}
                                 ></i>
                                 <i className={classnames('fa', 'fa-copy')}
-                                   title={'Dublicate Order'}
+                                   title={'Duplicate Order'}
                                    onClick={() => this.toggleCopy(key)}
                                 ></i>
                             </td>
