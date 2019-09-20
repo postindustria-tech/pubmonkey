@@ -2,8 +2,10 @@ import {handleActions} from "redux-actions";
 import adServerActions from "../actions/adServer";
 import {AD_SERVER_MOPUB} from "../../pages/constants/source";
 
+const type = localStorage.getItem('type') || AD_SERVER_MOPUB;
+
 export const adServerInitialState = {
-    type: AD_SERVER_MOPUB,
+    type: type,
     networkCode: null,
     sourceHandler: null,
     orders: [],

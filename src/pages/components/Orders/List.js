@@ -47,7 +47,8 @@ class OrdersList extends Component {
         filter: 0,
         filterFn: FILTER_FN[0],
         canceled: false,
-        adServer: Object.keys(AD_SERVERS)[0]
+        adServer: Object.keys(AD_SERVERS)[0],
+        updatedFiltersAt: null
     };
 
     componentDidMount() {
@@ -130,6 +131,7 @@ class OrdersList extends Component {
                     </Col>
                 </Row>
                 <OrdersTable
+                    updatedFiltersAt={this.state.updatedFiltersAt}
                     orders={this.props.orders}
                     adServer={this.props.type}
                     filter={filterFn}
@@ -449,7 +451,8 @@ class OrdersList extends Component {
 
         this.setState({
             filter: value,
-            filterFn: FILTER_FN[value]
+            filterFn: FILTER_FN[value],
+            updatedFiltersAt: Date.now()
         });
     }
 }

@@ -1,7 +1,7 @@
-import React, {Component} from 'react'
-import classnames from 'classnames'
-import {Link} from 'react-router-dom'
-import {Table} from 'reactstrap'
+import React, {Component} from "react";
+import classnames from "classnames";
+import {Link} from "react-router-dom";
+import {Table} from "reactstrap";
 import {CreateOrderModal} from "../Popups/CreateOrder";
 import SourceFactory from "../../sources/Factory";
 import bind from "bind-decorator";
@@ -11,20 +11,41 @@ import adServerSelectors from "../../../redux/selectors/adServer";
 import {AD_SERVER_DFP} from "../../constants/source";
 
 class OrdersTable extends Component {
-
     state = {
         allSelected: false,
-        orderKey: null
+        orderKey: null,
+        updatedFiltersAt: null
     };
 
     componentDidMount() {
         if (this.props.allSelected) {
-            this.toggleAll(true)
+            this.toggleAll(true);
         }
     }
 
+    componentWillReceiveProps = (props, state) => {
+        if (props.updatedFiltersAt !== this.state.updatedFiltersAt) {
+            this.setState({updatedFiltersAt: props.updatedFiltersAt})
+            this.toggleAll(false)
+        }
+    }
+
+    // static getDerivedStateFromProps = (props, state) => {
+    //   if (props.updatedFiltersAt !== state.updatedFiltersAt) {
+    //     this.toggleAll(false)
+
+    //     return {
+    //       ...state,
+    //       updatedFiltersAt: props.updatedFiltersAt,
+    //     };
+
+    //   }
+
+    //   return state;
+    // };
+
     openModal = () => {
-        this.orderModal.ask()
+        this.orderModal.ask();
     };
 
     render() {
@@ -52,47 +73,68 @@ class OrdersTable extends Component {
                 <CreateOrderModal
                     withButton={false}
                     adServer={this.props.adServer}
-                    ref={orderModal => this.orderModal = orderModal}
+                    ref={orderModal => (this.orderModal = orderModal)}
                     toUpdate={this.loadOrders}
                 />
                 <tbody>
                 {orders
                     .filter(filter)
-                    .map(({name, status, advertiser, lineItemCount, key, checked = false}, index) => (
-                        <tr key={key} className="order">
-                            <td className="select">
-                                <input
-                                    type="checkbox"
-                                    checked={checked}
-                                    onChange={() => this.toggleSelected(key)}
-                                />
-                            </td>
-                            <td><a target="_blank" href={this.getOrderUrl(key)}>{name}</a></td>
-                            <td>{advertiser}</td>
-                            <td>{lineItemCount}</td>
-                            <td>{status}</td>
-                            <td className="actions">
-                                <i className={classnames('fa', 'fa-archive', {archived: status === 'archived'})}
-                                   title={status === 'archived' ? 'Unarchive' : 'Archive'}
-                                   onClick={() => this.toggleArchive(status, key)}
-                                ></i>
-                                <i className={classnames('fa', {
-                                    'fa-pause': status === 'running',
-                                    'fa-play': status === 'paused'
-                                })}
-                                   title={status === 'running' ? 'Disable' : 'Enable'}
-                                   onClick={() => this.togglePause(status, key)}
-                                ></i>
-                                <i className={classnames('fa', 'fa-copy')}
-                                   title={'Duplicate Order'}
-                                   onClick={() => this.toggleCopy(key)}
-                                ></i>
-                            </td>
-                        </tr>
-                    ))}
+                    .map(
+                        (
+                            {
+                                name,
+                                status,
+                                advertiser,
+                                lineItemCount,
+                                key,
+                                checked = false
+                            },
+                            index
+                        ) => (
+                            <tr key={key} className="order">
+                                <td className="select">
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={() => this.toggleSelected(key)}
+                                    />
+                                </td>
+                                <td>
+                                    <a target="_blank" href={this.getOrderUrl(key)}>
+                                        {name}
+                                    </a>
+                                </td>
+                                <td>{advertiser}</td>
+                                <td>{lineItemCount}</td>
+                                <td>{status}</td>
+                                <td className="actions">
+                                    <i
+                                        className={classnames("fa", "fa-archive", {
+                                            archived: status === "archived"
+                                        })}
+                                        title={status === "archived" ? "Unarchive" : "Archive"}
+                                        onClick={() => this.toggleArchive(status, key)}
+                                    ></i>
+                                    <i
+                                        className={classnames("fa", {
+                                            "fa-pause": status === "running",
+                                            "fa-play": status === "paused"
+                                        })}
+                                        title={status === "running" ? "Disable" : "Enable"}
+                                        onClick={() => this.togglePause(status, key)}
+                                    ></i>
+                                    <i
+                                        className={classnames("fa", "fa-copy")}
+                                        title={"Duplicate Order"}
+                                        onClick={() => this.toggleCopy(key)}
+                                    ></i>
+                                </td>
+                            </tr>
+                        )
+                    )}
                 </tbody>
             </Table>
-        )
+        );
     }
 
     getOrderUrl(key) {
@@ -102,20 +144,25 @@ class OrdersTable extends Component {
         return null;
     }
 
-    toggleCopy = (key) => {
-        this.orderModal.toggle(null, key)
+    toggleCopy = key => {
+        this.orderModal.toggle(null, key);
     };
 
     togglePause(status, key) {
-        status = status === 'running' ? 'paused' : 'running';
+        status = status === "running" ? "paused" : "running";
 
-        this.updateStatus(status, key)
+        this.updateStatus(status, key);
     }
 
     toggleArchive(status, key) {
-        status = status === 'archived' ? (this.props.type === AD_SERVER_DFP ? 'unarchived' : 'running') : 'archived';
+        status =
+            status === "archived"
+                ? this.props.type === AD_SERVER_DFP
+                ? "unarchived"
+                : "running"
+                : "archived";
 
-        this.updateStatus(status, key)
+        this.updateStatus(status, key);
     }
 
     updateStatus(status, key) {
@@ -126,8 +173,8 @@ class OrdersTable extends Component {
 
     @bind
     loadOrders() {
-        console.log('loadOrders: ' + this.props.adServer);
-        this.props.setSwitcher(this.props.adServer)
+        console.log("loadOrders: " + this.props.adServer);
+        this.props.setSwitcher(this.props.adServer);
     }
 
     toggleAll(checked) {
@@ -140,9 +187,9 @@ class OrdersTable extends Component {
         onUpdate(
             orders.map(order => {
                 order.checked = checked;
-                return order
+                return order;
             })
-        )
+        );
     }
 
     toggleSelected(_key) {
@@ -172,7 +219,10 @@ const mapDispatchToProps = {
 
 const mapStateToProps = state => ({
     type: adServerSelectors.switcherType(state),
-    sourceHandler: adServerSelectors.sourceHandler(state),
+    sourceHandler: adServerSelectors.sourceHandler(state)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrdersTable)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(OrdersTable);
