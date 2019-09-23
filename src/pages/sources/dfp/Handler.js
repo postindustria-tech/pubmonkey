@@ -16,6 +16,11 @@ import {
 } from "./DataTypes";
 import {DOMParser} from "xmldom";
 
+Promise.config({
+    // Enable cancellation
+    cancellation: true
+});
+
 function OrderError(message, close) {
     this.name = "OrderError";
     this.message = (message || "");

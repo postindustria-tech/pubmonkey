@@ -132,7 +132,7 @@ export class CreateOrderModal extends Component {
     };
 
     onCancel = () => {
-        if (progress) progress.cancel();
+        if (progress && progress.cancel) progress.cancel();
         this.close();
         this.props.toUpdate && this.props.toUpdate();
         ModalWindowService.ProgressModal.hideModal();

@@ -62,15 +62,17 @@ export const HTTPService = new class {
         return new Promise((resolve, reject) =>
             chrome.tabs.sendMessage(tabId, { action: 'request', payload }, { frameId }, (result = {}) => {
                 // console.log('payload: ', payload)
-                let { ok, data, error } = result
+                let { ok, data, error } = result;
                 if (ok) {
                     resolve(data)
                 } else {
-                    error = error || { errors: ['PANIC!']}
 
-                    let err = new Error(error.errors)
+                    alert('Mopub tab has been closed or refreshed. Operation aborted.');
+                    error = error || { errors: ['Fatal error']};
 
-                    err.data = error
+                    let err = new Error(error.errors);
+
+                    err.data = error;
 
                     reject(err)
                 }
