@@ -1,0 +1,12 @@
+TestApp Android	android01	300x250	33e3d4e6c1814c1abdfde3fb1a60c263
+TestApp Android	android02	320x50	4100870b260746b8816f89e8351f85f5
+TestApp Android	android3	custom	29af8dd6864a43b3805bb41fd4255a4c
+TestApp Android	android4	rewarded_video	e9763f008def4cdc9409975e37489ee2
+TestApp Android	new unit(test)	full	555d0d9298064e3d88c1c551795478ae
+Test iOS	NewUnit-test	320x50	b60db456a8d2481496fa08b3599d7d5f
+Test iOS	NewUnit-test1	160x600	563a9fb0ff8244f7be6be69df407f3da
+Test iOS	NewUnit-test1	full	b47abd4bc2074bc89270c6e8c88d916e
+Test iOS	NewUnit-test3	320x50	bf2f0c8de518426280ba23bb8e9a27bd
+Test iOS	test01	320x50	2e6be80e04ca4291bea75e96b34614fe
+Test iOS	test02	300x250	ce9b265b647041758d05feaf2dd9cf86
+Test iOS	TestingAdMarketplaceNativeAdUnitTesting	320x50	337b39dfb73d4ba9bc938b065d5d2db9

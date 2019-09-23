@@ -37,7 +37,13 @@ for [k,v] in kvs:
      lineitem = copy(lineitem_tpl)
      lineitem['name'] = k
      lineitem['bid'] = v
-     lineitem['keywords'] = ['amznslots:'+k]
+
+     #distinct order per format:
+     #lineitem['keywords'] = ['amznslots:'+k]
+
+     #compact order mode:
+     lineitem['keywords'] = ['amznslots:m320x50' + k, 'amznslots:m728x90' + k]
+
      lineitems.append(lineitem)
 
 order['lineItems']=lineitems

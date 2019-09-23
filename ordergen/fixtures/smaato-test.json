@@ -1,0 +1,116 @@
+{
+  "name": "Smaato UB iOS",
+  "orderCount": 1,
+  "lineItemCount": 1,
+  "created": 1567627496604,
+  "orders": [
+    {
+      "status": "running",
+      "advertiser": "Smaato",
+      "description": "Smaato Unified Bidding",
+      "lineItemCount": 1,
+      "key": "d00da8f9f1e24be5a0897b50cd0a16a2",
+      "activeLineItemCount": 1,
+      "lineItems": [
+        {
+          "deviceTargeting": false,
+          "advertiser": "Smaato",
+          "enableOverrides": true,
+          "adUnitKeys": [
+            "4100870b260746b8816f89e8351f85f5",
+"b60db456a8d2481496fa08b3599d7d5f",
+"bf2f0c8de518426280ba23bb8e9a27bd",
+"2e6be80e04ca4291bea75e96b34614fe",
+"337b39dfb73d4ba9bc938b065d5d2db9"
+          ],
+          "frequencyCapsEnabled": false,
+          "budgetType": "unlimited",
+          "targetedRegions": [],
+          "includeRegionalGeoTargeting": "all",
+          "includeGeoTargeting": "all",
+          "frequencyCaps": [],
+          "orderKey": "d00da8f9f1e24be5a0897b50cd0a16a2",
+          "targetIOS": "checked",
+          "keywords": [
+            "smaato_cpm:0.1"
+          ],
+          "filterLevel": "moderate",
+          "targetedZipCodes": [],
+          "budgetStrategy": "allatonce",
+          "targetedCountries": [],
+          "end": null,
+          "network": {
+            "supported": false,
+            "implementationType": "custom-sdk",
+            "name": "Custom Native Network"
+          },
+          "categoryBlocklist": [
+            "IAB25",
+            "IAB26",
+            "IAB7-39",
+            "IAB8-5",
+            "IAB8-18",
+            "IAB9-9"
+          ],
+          "minIosVersion": "2.0",
+          "targetIpad": true,
+          "priority": 12,
+          "start": "2019-09-04T20:04:25.570Z",
+          "includeConnectivityTargeting": "all",
+          "targetIpod": true,
+          "maxAndroidVersion": "999",
+          "minAndroidVersion": "1.5",
+          "advanceBiddingEnabled": false,
+          "userAppsTargeting": "include",
+          "type": "network",
+          "disallowAutoCpm": false,
+          "status": "running",
+          "bidStrategy": "cpm",
+          "userAppsTargetingList": [],
+          "dspWhitelist": [],
+          "targetAndroid": true,
+          "started": true,
+          "bid": 0.01,
+          "maxIosVersion": "999",
+          "orderName": "Smaato UB iOS",
+          "key": "712cf003e9b643a3833bf37959c16086",
+          "active": true,
+          "networkType": "custom_native",
+          "pmpDealFields": null,
+          "attributeBlocklist": [
+            3,
+            8,
+            9,
+            10,
+            14
+          ],
+          "allocationPercentage": 100,
+          "targetedCarriers": [],
+          "targetOther": true,
+          "name": "Smaato UB iOS ${bid}",
+          "dayPartTargeting": "alltime",
+          "overrideFields": {
+            "network_account_id": "",
+            "network_adunit_id": "",
+            "custom_event_class_name": "SMAMoPubSmaatoBannerAdapter",
+            "custom_event_class_data": "{\"bannerSpaceId\":\"130701404\", \"leaderboardSpaceId\":\"130701405\"}",
+            "network_app_id": ""
+          },
+          "budget": null,
+          "dayParts": [],
+          "allowVideo": "all",
+          "targetedCities": [],
+          "domainBlocklist": [],
+          "visible": true,
+          "enablePrivateKeywords": true,
+          "targetIphone": true,
+          "refreshInterval": 0,
+          "videoSetting": "both",
+          "autoCpm": null
+        }
+      ],
+      "name": "Smaato UB iOS"
+    }
+  ],
+  "updated": null
+}
