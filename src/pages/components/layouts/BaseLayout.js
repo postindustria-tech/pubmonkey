@@ -10,18 +10,8 @@ import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 
 class BaseLayout extends Component {
-    state = {
-        username: '',
-        loggedIn: null
-    };
 
     componentDidMount() {
-        window.MopubAutomation.username
-            .then(username => this.setState({ username }));
-
-        window.MopubAutomation.loggedIn
-            .then(loggedIn => this.setState({ loggedIn }));
-
         ModalWindowService.onUpdate = () => this.forceUpdate()
     }
 
@@ -30,29 +20,17 @@ class BaseLayout extends Component {
     }
 
     render() {
-        let { className, children, type } = this.props,
-            { username, loggedIn } = this.state;
+        let { className, children, type } = this.props;
 
         return (
             <div className={ classnames('base-layout', className) }>
                 <Navbar className="header">
                     <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
-                    <SourceTypeViewContainer />
                     <div id="downloadManual">
                         <a href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf" target="_blank">Download manual</a>
                     </div>
                     <Nav>
-                        <div className="username">
-                            { loggedIn != null
-                                && loggedIn
-                                    ? (<a href="https://app.mopub.com/dashboard/" target="_blank">{ username }</a>)
-                                    : (
-                                        <div className="login-link">Not logged in.&nbsp;
-                                            <a href="#" onClick={ window.MopubAutomation.openLoginPage }>Log in.</a>
-                                        </div>
-                                    )
-                            }
-                        </div>
+                        <SourceTypeViewContainer />
                         <NavItem>
                             <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">Ad Units</NavLink>
                         </NavItem>

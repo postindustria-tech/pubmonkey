@@ -10,11 +10,19 @@ import AuthModal from "../../sources/dfp/AuthModal";
 class SourceTypeViewContainer extends PureComponent {
 
     state = {
-        networkCode: ""
+        networkCode: "",
+        username: '',
+        loggedIn: null
     };
 
     componentDidMount() {
         this.setNetworkCode();
+
+        window.MopubAutomation.username
+            .then(username => this.setState({ username }));
+
+        window.MopubAutomation.loggedIn
+            .then(loggedIn => this.setState({ loggedIn }));
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -29,8 +37,11 @@ class SourceTypeViewContainer extends PureComponent {
     }
 
     render() {
+
+        const { username, loggedIn } = this.state;
+
         return (
-            <Row>
+            <div className={"username"}>
                 <AuthModal/>
                 {this.props.type === AD_SERVER_DFP ? (
                     <div>
@@ -42,10 +53,16 @@ class SourceTypeViewContainer extends PureComponent {
                         (<a href="#" onClick={this.dfpLogIn}>Login</a>)}
                     </div>
                 ) : null}
-                {this.props.type === AD_SERVER_MOPUB ? (
-                    <div>MoPub</div>
-                ) : null}
-            </Row>
+                {this.props.type === AD_SERVER_MOPUB ?
+                    loggedIn != null && loggedIn
+                        ? (<a href="https://app.mopub.com/dashboard/" target="_blank">{ username }</a>)
+                        : (
+                            <div className="login-link">Not logged in.&nbsp;
+                                <a href="#" onClick={ window.MopubAutomation.openLoginPage }>Log in.</a>
+                            </div>
+                        )
+                 : null}
+            </div>
         )
     }
 
