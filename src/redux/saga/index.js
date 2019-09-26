@@ -2,7 +2,7 @@ import adServerActions from "../actions/adServer";
 import {put, takeEvery, all, select} from "redux-saga/effects";
 import SourceFactory from "../../pages/sources/Factory";
 import adServerSelectors from "../selectors/adServer";
-import {AD_SERVER_DFP} from "../../pages/constants/source";
+import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../pages/constants/source";
 
 function* getOrders(action) {
     try {
@@ -52,6 +52,17 @@ function* setSourceHandler(action) {
         // if (type === AD_SERVER_DFP && !sourceHandler.getNetworkCode()) {
         //     yield put(adServerActions.dfpAuthModalToggle());
         // }
+        // yield setSourceHandlerAfter();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+function* setSourceHandlerAfter() {
+    try {
+        const sourceHandler = yield select(adServerSelectors.sourceHandler);
+        const type = yield select(adServerSelectors.switcherType);
+
         if (type === AD_SERVER_DFP) {
             const dfpLoggedIn = sourceHandler.getToken() !== null;
             yield put(adServerActions.dfpLoggedIn(dfpLoggedIn));
@@ -63,6 +74,12 @@ function* setSourceHandler(action) {
                     ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME
                 }));
             }
+        }
+        if (type === AD_SERVER_MOPUB) {
+            yield put(adServerActions.dfpLoadInventory({
+                ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME
+            }));
+            yield put(adServerActions.setSourceHandlerStatus(true));
         }
     } catch (error) {
         console.log(error);
@@ -83,6 +100,10 @@ function* loadAdvertiser(action) {
     try {
         let {advertiser} = action.payload;
         const sourceHandler = yield select(adServerSelectors.sourceHandler);
+        const type = yield select(adServerSelectors.switcherType);
+
+        let customTargetingValues = [],
+            customTargetingKeys = [];
 
         if (sourceHandler.isReady()) {
             if (advertiser === undefined) {
@@ -91,25 +112,26 @@ function* loadAdvertiser(action) {
 
             sourceHandler.setAdvertiser(advertiser);
 
-            let customTargetingValues = [];
-            let customTargetingKeys = yield sourceHandler.getCustomTargetingKeys(sourceHandler.getAdvertiser().customTargetingKey)
-                .then(keys => {
-                    keys = keys.map(({id}) => {
-                        return id;
-                    });
-                    return keys;
-                });
-
-            yield Promise.all(customTargetingKeys.map(async id => {
-                await sourceHandler.getCustomTargetingValues(id)
-                    .then(values => {
-                        values = values.map(({id, name}) => {
-                            return {id, name};
+            if (type === AD_SERVER_DFP) {
+                customTargetingKeys = yield sourceHandler.getCustomTargetingKeys(sourceHandler.getAdvertiser().customTargetingKey)
+                    .then(keys => {
+                        keys = keys.map(({id}) => {
+                            return id;
                         });
-                        return values;
-                    })
-                    .then(values => (customTargetingValues = values));
-            }));
+                        return keys;
+                    });
+
+                yield Promise.all(customTargetingKeys.map(async id => {
+                    await sourceHandler.getCustomTargetingValues(id)
+                        .then(values => {
+                            values = values.map(({id, name}) => {
+                                return {id, name};
+                            });
+                            return values;
+                        })
+                        .then(values => (customTargetingValues = values));
+                }));
+            }
 
             yield put(adServerActions.dfpLoadAdvertiser({
                 customTargetingKeys,
@@ -125,6 +147,7 @@ function* loadAdvertiser(action) {
 function* handleChangeAdServerType() {
     yield takeEvery(adServerActions.setSwitcher, setSourceHandler);
 
+    yield takeEvery(adServerActions.setSourceHandler, setSourceHandlerAfter);
     yield takeEvery(adServerActions.setSourceHandler, getOrders);
     yield takeEvery(adServerActions.setSourceHandler, getAdUnits);
     yield takeEvery(adServerActions.setSourceHandler, loadAdvertiser);

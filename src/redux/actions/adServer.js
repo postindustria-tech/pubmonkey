@@ -2,6 +2,7 @@ import {createAction} from "redux-actions";
 
 const setSwitcher = createAction('adServer--setSwitcher', type => ({type}));
 const setSourceHandler = createAction('adServer--setSourceHandler', sourceHandler => ({sourceHandler}));
+const setSourceHandlerStatus = createAction('adServer--setSourceHandlerStatus', sourceHandlerReady => ({sourceHandlerReady}));
 const setAdvertiser = createAction('adServer--setAdvertiser', advertiser => ({advertiser}));
 const setNetworkCode = createAction('adServer--setNetworkCode', networkCode => ({networkCode}));
 const setOrders = createAction('adServer--setOrders', orders => ({orders}));
@@ -19,6 +20,7 @@ const dfpLoadAdvertiser = createAction('adServer--dfpLoadAdvertiser', payload =>
 const adServerActions = {
     setSwitcher,
     setSourceHandler,
+    setSourceHandlerStatus,
     setAdvertiser,
     setNetworkCode,
     setOrders,

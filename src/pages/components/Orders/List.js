@@ -39,6 +39,10 @@ class OrdersList extends Component {
 
     timer = null;
 
+    static defaultProps = {
+        sourceHandlerReady: false
+    };
+
     state = {
         orders: [],
         selected: [],
@@ -78,7 +82,7 @@ class OrdersList extends Component {
                 <Button
                     color="primary"
                     onClick={this.exportSelected}
-                    disabled={!orderCount}
+                    disabled={!orderCount || !this.props.sourceHandlerReady}
                 >
                     <i className="fa fa-cloud-download"/>
                     &nbsp; Export
@@ -87,6 +91,7 @@ class OrdersList extends Component {
                     color="primary"
                     onClick={this.importSelected}
                     hidden={this.props.type === AD_SERVER_DFP}
+                    disabled={!this.props.sourceHandlerReady}
                 >
                     <i className="fa fa-cloud-upload"/>
                     &nbsp; Import
@@ -460,7 +465,8 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
     type: adServerSelectors.switcherType(state),
-    sourceHandler: adServerSelectors.sourceHandler(state)
+    sourceHandler: adServerSelectors.sourceHandler(state),
+    sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)

@@ -12,6 +12,11 @@ const sourceHandler = createSelector(
     adServer => adServer.sourceHandler
 );
 
+const sourceHandlerStatus = createSelector(
+    rootSelector,
+    adServer => adServer.sourceHandlerReady
+);
+
 const networkCode = createSelector(
     rootSelector,
     adServer => adServer.networkCode
@@ -57,6 +62,7 @@ const dfpInventory = createSelector(
 const adServerSelectors = {
     switcherType,
     sourceHandler,
+    sourceHandlerStatus,
     networkCode,
     dfpAuthModalOpen,
     dfpLoggedIn,

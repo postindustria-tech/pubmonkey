@@ -56,6 +56,7 @@ class CreateOrderModal extends Component {
         onClose: () => {},
         withButton: true,
         sourceAdvertisers: [],
+        sourceHandlerReady: false,
         customTargetingKeys: [],
         customTargetingValues: [],
         ADVERTISER_DEFAULT_NAME: {},
@@ -216,7 +217,11 @@ class CreateOrderModal extends Component {
         return (
             <React.Fragment>
                 {this.props.withButton ? (
-                    <Button color="primary" onClick={this.open}>
+                    <Button
+                        color="primary"
+                        onClick={this.open}
+                        disabled={!this.props.sourceHandlerReady}
+                    >
                         <i className="fa fa-plus-circle"/>
                         &nbsp; Create
                     </Button>
@@ -1145,6 +1150,7 @@ const mapStateToProps = state => ({
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
     adunits: adServerSelectors.adunits(state),
+    sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
 
     ...adServerSelectors.dfpInventory(state),
 });
