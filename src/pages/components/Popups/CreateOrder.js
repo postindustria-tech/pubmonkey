@@ -24,7 +24,6 @@ import {
 } from "reactstrap";
 import InputNumber from "rc-input-number";
 import FormErrors from "../FormErrors";
-import {ProgressModal} from "./";
 import {isEmpty, toInteger, toDecimal} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
 import _ from "underscore";
@@ -36,7 +35,9 @@ import {
     NETWORK_CLASS_TO_DIMENSION
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
-import SourceFactory from "../../sources/Factory";
+import adServerActions from "../../../redux/actions/adServer";
+import adServerSelectors from "../../../redux/selectors/adServer";
+import {connect} from "react-redux";
 
 const helperText =
     "{bid} macro is replaced with a corresponding bid value\n" +
@@ -47,25 +48,27 @@ const ONLY_NUMBERS = /^[0-9\b\.]+$/;
 let progress = null,
     defaultAdvertiser = "pubnative";
 
-export class CreateOrderModal extends Component {
+class CreateOrderModal extends Component {
 
     progress = null;
-    sourceHandler = null;
 
     static defaultProps = {
         onClose: () => {},
-        withButton: true
+        withButton: true,
+        sourceAdvertisers: [],
+        customTargetingKeys: [],
+        customTargetingValues: [],
+        ADVERTISER_DEFAULT_NAME: {},
+        creativeFormats: {}
     };
 
     state = {
-        adServer: this.props.adServer,
         executor: "create",
         title: "Create New Order",
         isOpen: false,
         backdrop: true,
         showCreativeFormat: false,
         advertiser: defaultAdvertiser,
-        adunits: [],
         adunitsSelected: [],
         order: {},
         orderName: "",
@@ -101,13 +104,7 @@ export class CreateOrderModal extends Component {
         rangeMeasure: "$",
         granularity: "",
 
-        advertiserId: null,
-        sourceAdvertisers: [],
-        creativeFormats: {},
-        ADVERTISER_DEFAULT_NAME: {},
-
-        customTargetingKeys: [],
-        customTargetingValues: []
+        advertiserId: null
     };
 
     @bind
@@ -139,7 +136,6 @@ export class CreateOrderModal extends Component {
     };
 
     componentDidMount = () => {
-        this.init();
         ModalWindowService.onUpdate = () => this.forceUpdate();
         ModalWindowService.ProgressModal.onCancel(this.onCancel);
     };
@@ -149,33 +145,14 @@ export class CreateOrderModal extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.adServer !== prevState.adServer) {
-            this.init();
-        }
         ModalWindowService.ProgressModal.onCancel(this.onCancel);
     }
 
-    init() {
-        this.sourceHandler = SourceFactory.getHandler(this.props.adServer);
-        this.sourceHandler.getAdUnits().then(adunits => this.setState({adunits}));
-        if (this.props.adServer === AD_SERVER_DFP) {
-            this.sourceHandler.getAllAdvertisers()
-                .then(companies => this.setState({
-                    sourceAdvertisers: companies,
-                    advertiserId: companies[0].id
-                }));
-        }
-        this.setState({
-            ADVERTISER_DEFAULT_NAME: this.sourceHandler.ADVERTISER_DEFAULT_NAME
-        });
-        this.changeAdvertiser(Object.keys(this.sourceHandler.ADVERTISER_DEFAULT_NAME)[0]);
-    }
-
     static getDerivedStateFromProps = (props, state) => {
-        if (props.adServer !== state.adServer) {
+        if (props.advertiserId !== state.advertiserId) {
             return {
                 ...state,
-                adServer: props.adServer
+                advertiserId: props.advertiserId
             }
         }
         if (props.isOpen !== undefined) {
@@ -209,7 +186,7 @@ export class CreateOrderModal extends Component {
             os
         } = this.state;
 
-        if (this.props.adServer !== AD_SERVER_MOPUB) {
+        if (this.props.type !== AD_SERVER_MOPUB) {
             return appName.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
                 name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
                 key.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
@@ -297,16 +274,16 @@ export class CreateOrderModal extends Component {
                                             value={this.state.advertiser}
                                             className={"mp-form-control"}
                                         >
-                                            {Object.keys(this.state.ADVERTISER_DEFAULT_NAME).map(
+                                            {Object.keys(this.props.ADVERTISER_DEFAULT_NAME).map(
                                                 (option, index) => (
                                                     <option key={index} value={option}>
-                                                        {this.state.ADVERTISER_DEFAULT_NAME[option]}
+                                                        {this.props.ADVERTISER_DEFAULT_NAME[option]}
                                                     </option>
                                                 )
                                             )}
                                         </Input>
                                     </FormGroup>
-                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0" hidden={this.state.adServer !== AD_SERVER_DFP}>
+                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0" hidden={this.props.type !== AD_SERVER_DFP}>
                                         <Label for="advertiserId" className="mr-sm-2 mp-label">
                                             Advertiser DFP:
                                         </Label>
@@ -318,7 +295,7 @@ export class CreateOrderModal extends Component {
                                             id="advertiserId"
                                             className={"mp-form-control"}
                                         >
-                                            {this.state.sourceAdvertisers.map(
+                                            {this.props.sourceAdvertisers.map(
                                                 ({id, name}) => (
                                             <option key={id} value={id}>{name}</option>
                                                 )
@@ -451,9 +428,9 @@ export class CreateOrderModal extends Component {
                                     style={{display: "inline-block", width: "auto"}}
                                     className={"mp-form-control"}
                                 >
-                                    {Object.keys(this.state.creativeFormats).map((option, index) => (
+                                    {Object.keys(this.props.creativeFormats).map((option, index) => (
                                         <option key={index} value={option}>
-                                            {this.state.creativeFormats[option]}
+                                            {this.props.creativeFormats[option]}
                                         </option>
                                     ))}
                                 </Input>
@@ -549,7 +526,7 @@ export class CreateOrderModal extends Component {
                                                 <div className="td header">Key</div>
                                             </div>
 
-                                            {this.state.adunits ? this.state.adunits.filter(this.filterAdunits).map(
+                                            {this.props.adunits ? this.props.adunits.filter(this.filterAdunits).map(
                                                 ({name, format, key, appName, appType}) => (
                                                     <div className="tr" key={key}>
                                                         <div className="td">
@@ -597,7 +574,7 @@ export class CreateOrderModal extends Component {
                         </Row>
                     </ModalBody>
                     <ModalFooter>
-                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning" hidden={this.state.adServer === AD_SERVER_DFP}>
+                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning" hidden={this.props.type === AD_SERVER_DFP}>
                             Download JSON
                         </Button>
 
@@ -605,7 +582,7 @@ export class CreateOrderModal extends Component {
                             Cancel
                         </Button>
                         <Button onClick={() => this.preOrder("create")} color="primary">
-                            Create in {AD_SERVERS[this.state.adServer]}
+                            Create in {AD_SERVERS[this.props.type]}
                         </Button>
                     </ModalFooter>
                 </Modal>
@@ -738,7 +715,8 @@ export class CreateOrderModal extends Component {
             keywordStep = advertiser === "amazon" ? 1 : 0.01,
             showCreativeFormat = advertiser === "amazon" || advertiser === "openx";
 
-        this.sourceHandler.setAdvertiser(advertiser);
+        this.props.sourceHandler.setAdvertiser(advertiser);
+        this.props.setAdvertiser(advertiser);
 
         this.setState({
             keywordTemplate: CreateOrderModal.getKeywordTemplate(
@@ -755,33 +733,32 @@ export class CreateOrderModal extends Component {
             os: "",
             formValid: true,
             rangeMeasure: advertiser === "amazon" ? "position" : "$",
-            rangeFrom: advertiser === "amazon" ? 1 : 0.1,
-            creativeFormats: this.sourceHandler.getAdvertiser().CREATIVE_FORMATS,
+            rangeFrom: advertiser === "amazon" ? 1 : 0.1
         });
 
-        if (this.props.adServer === AD_SERVER_DFP) {
-            this.sourceHandler.getCustomTargetingKeys(this.sourceHandler.getAdvertiser().customTargetingKey)
-                .then(keys => {
-                    keys = keys.map(({id}) => {
-                        return id;
-                    });
-                    return keys;
-                })
-                .then(keys => {
-                    keys.map(id => {
-                        this.sourceHandler.getCustomTargetingValues(id)
-                            .then(values => {
-                                values = values.map(({id, name}) => {
-                                    return {id, name};
-                                });
-                                return values;
-                            })
-                            .then(values => this.setState({customTargetingValues: values}));
-                    });
-                    return keys;
-                })
-                .then(keys => this.setState({customTargetingKeys: keys}));
-        }
+        // if (this.props.type === AD_SERVER_DFP) {
+        //     this.props.sourceHandler.getCustomTargetingKeys(this.props.sourceHandler.getAdvertiser().customTargetingKey)
+        //         .then(keys => {
+        //             keys = keys.map(({id}) => {
+        //                 return id;
+        //             });
+        //             return keys;
+        //         })
+        //         .then(keys => {
+        //             keys.map(id => {
+        //                 this.props.sourceHandler.getCustomTargetingValues(id)
+        //                     .then(values => {
+        //                         values = values.map(({id, name}) => {
+        //                             return {id, name};
+        //                         });
+        //                         return values;
+        //                     })
+        //                     .then(values => this.setState({customTargetingValues: values}));
+        //             });
+        //             return keys;
+        //         })
+        //         .then(keys => this.setState({customTargetingKeys: keys}));
+        // }
     }
 
     static getKeywordTemplate = (value, creativeFormat) => {
@@ -890,16 +867,14 @@ export class CreateOrderModal extends Component {
             Ad_ZONE_ID,
             adServerDomain,
             advertiserId,
-            adServer,
-            customTargetingKeys,
-            customTargetingValues,
             granularity
         } = this.state;
 
-        let order = this.sourceHandler.composeOrderRequest(
-            adServer === AD_SERVER_DFP ? advertiserId : this.state.ADVERTISER_DEFAULT_NAME[advertiser],
+        let order = this.props.sourceHandler.composeOrderRequest(
+            this.props.type === AD_SERVER_DFP ? advertiserId : this.props.ADVERTISER_DEFAULT_NAME[advertiser],
             orderName
         );
+        console.log(order);
 
         let params = {
             adunits,
@@ -914,8 +889,8 @@ export class CreateOrderModal extends Component {
             networkClass,
             Ad_ZONE_ID,
             adServerDomain,
-            customTargetingKeys,
-            customTargetingValues,
+            customTargetingKeys: this.props.customTargetingKeys,
+            customTargetingValues: this.props.customTargetingValues,
             granularity
         };
 
@@ -930,7 +905,7 @@ export class CreateOrderModal extends Component {
             }
         ]);
 
-        progress = this.sourceHandler.createOrderDataFromSet(
+        progress = this.props.sourceHandler.createOrderDataFromSet(
             order,
             params,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
@@ -989,14 +964,11 @@ export class CreateOrderModal extends Component {
             networkClass,
             Ad_ZONE_ID,
             adServerDomain,
-            adServer,
-            customTargetingKeys,
-            customTargetingValues,
             granularity
         } = this.state;
 
-        let order = this.sourceHandler.composeOrderRequest(
-            adServer === AD_SERVER_DFP ? advertiserId : this.state.ADVERTISER_DEFAULT_NAME[advertiser],
+        let order = this.props.sourceHandler.composeOrderRequest(
+            this.props.type === AD_SERVER_DFP ? advertiserId : this.props.ADVERTISER_DEFAULT_NAME[advertiser],
             orderName
         );
 
@@ -1013,8 +985,8 @@ export class CreateOrderModal extends Component {
             networkClass,
             Ad_ZONE_ID,
             adServerDomain,
-            customTargetingKeys,
-            customTargetingValues,
+            customTargetingKeys: this.props.customTargetingKeys,
+            customTargetingValues: this.props.customTargetingValues,
             granularity
         };
 
@@ -1029,7 +1001,7 @@ export class CreateOrderModal extends Component {
             }
         ]);
 
-        progress = this.sourceHandler.downloadOrderDataFromSet(
+        progress = this.props.sourceHandler.downloadOrderDataFromSet(
             order,
             params,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
@@ -1070,7 +1042,7 @@ export class CreateOrderModal extends Component {
     @bind
     toggle(event, orderKey = null) {
         if (orderKey) {
-            this.sourceHandler.getOrderWithLineItems(orderKey).then(order => {
+            this.props.sourceHandler.getOrderWithLineItems(orderKey).then(order => {
                 // console.log(order);
                 let {lineItemInfo, rangeFrom, rangeTo} = this.state,
                     adUnitKeys = [],
@@ -1137,9 +1109,9 @@ export class CreateOrderModal extends Component {
                 }
 
                 let params = {};
-                switch (this.props.adServer) {
+                switch (this.props.type) {
                     case AD_SERVER_MOPUB:
-                        params['advertiser'] = this.sourceHandler.getAdvertiserByName(order.advertiser);
+                        params['advertiser'] = this.props.sourceHandler.getAdvertiserByName(order.advertiser);
                         this.changeAdvertiser(params.advertiser);
                         break;
                     case AD_SERVER_DFP:
@@ -1164,3 +1136,17 @@ export class CreateOrderModal extends Component {
         }
     }
 }
+
+const mapDispatchToProps = {
+    setAdvertiser: adServerActions.setAdvertiser
+};
+
+const mapStateToProps = state => ({
+    type: adServerSelectors.switcherType(state),
+    sourceHandler: adServerSelectors.sourceHandler(state),
+    adunits: adServerSelectors.adunits(state),
+
+    ...adServerSelectors.dfpInventory(state),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateOrderModal)

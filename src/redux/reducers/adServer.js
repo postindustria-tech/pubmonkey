@@ -10,7 +10,11 @@ export const adServerInitialState = {
     sourceHandler: null,
     orders: [],
     adunits: [],
-    dfpAuthModalOpen: false
+    dfpAuthModalOpen: false,
+    dfpLoggedIn: false,
+    dfpToken: null,
+    customTargetingKeys: [],
+    customTargetingValues: []
 };
 
 const adServerReduces = handleActions(
@@ -23,9 +27,20 @@ const adServerReduces = handleActions(
             ...state,
             networkCode: action.payload.networkCode
         }),
+        [adServerActions.dfpLoggedIn]: (state, action) => ({
+            ...state,
+            dfpLoggedIn: action.payload.dfpLoggedIn
+        }),
+        [adServerActions.dfpLogIn]: (state, action) => ({
+            ...state,
+            dfpLoggedIn: true,
+            dfpToken: action.payload.dfpToken
+        }),
         [adServerActions.dfpLogOut]: (state, action) => ({
             ...state,
-            networkCode: null,
+            // networkCode: null,
+            dfpLoggedIn: false,
+            dfpToken: null,
             orders: [],
             adunits: []
         }),
@@ -59,6 +74,15 @@ const adServerReduces = handleActions(
                 }
                 return order;
             })
+        }),
+        [adServerActions.dfpLoadInventory]: (state, action) => ({
+            ...state,
+            ...action.payload,
+            advertiserId: action.payload.sourceAdvertisers && action.payload.sourceAdvertisers.length > 0 ? action.payload.sourceAdvertisers[0].id : null,
+        }),
+        [adServerActions.dfpLoadAdvertiser]: (state, action) => ({
+            ...state,
+            ...action.payload
         })
     },
     adServerInitialState

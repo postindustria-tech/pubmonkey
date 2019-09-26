@@ -1,44 +1,69 @@
-import { createSelector } from "reselect";
+import {createSelector} from "reselect";
 
 const rootSelector = state => state.adServer;
 
 const switcherType = createSelector(
-  rootSelector,
-  adServer => adServer.type
+    rootSelector,
+    adServer => adServer.type
 );
 
 const sourceHandler = createSelector(
-  rootSelector,
-  adServer => adServer.sourceHandler
+    rootSelector,
+    adServer => adServer.sourceHandler
 );
 
 const networkCode = createSelector(
-  rootSelector,
-  adServer => adServer.networkCode
+    rootSelector,
+    adServer => adServer.networkCode
 );
 
 const dfpAuthModalOpen = createSelector(
-  rootSelector,
-  adServer => adServer.dfpAuthModalOpen
+    rootSelector,
+    adServer => adServer.dfpAuthModalOpen
 );
 
 const orders = createSelector(
-  rootSelector,
-  adServer => adServer.orders
+    rootSelector,
+    adServer => adServer.orders
 );
 
 const adunits = createSelector(
-  rootSelector,
-  adServer => adServer.adunits
+    rootSelector,
+    adServer => adServer.adunits
+);
+
+const dfpLoggedIn = createSelector(
+    rootSelector,
+    adServer => adServer.dfpLoggedIn
+);
+
+const dfpToken = createSelector(
+    rootSelector,
+    adServer => adServer.dfpToken
+);
+
+const dfpInventory = createSelector(
+    rootSelector,
+    adServer => ({
+        sourceAdvertisers: adServer.sourceAdvertisers,
+        customTargetingKeys: adServer.customTargetingKeys,
+        customTargetingValues: adServer.customTargetingValues,
+        ADVERTISER_DEFAULT_NAME: adServer.ADVERTISER_DEFAULT_NAME,
+        creativeFormats: adServer.creativeFormats,
+        advertiserId: adServer.advertiserId
+    })
 );
 
 const adServerSelectors = {
-  switcherType,
-  sourceHandler,
-  networkCode,
-  dfpAuthModalOpen,
-  orders,
-  adunits
+    switcherType,
+    sourceHandler,
+    networkCode,
+    dfpAuthModalOpen,
+    dfpLoggedIn,
+    dfpToken,
+    dfpInventory,
+    orders,
+    adunits
 };
 
 export default adServerSelectors;

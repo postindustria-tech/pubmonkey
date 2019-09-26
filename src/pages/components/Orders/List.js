@@ -12,7 +12,7 @@ import OrdersTable from "./Table";
 import BaseLayout from "../layouts/BaseLayout";
 import {FileService, ModalWindowService} from "../../services";
 import {MainController, OrderController} from "../../controllers";
-import {CreateOrderModal} from "../Popups/CreateOrder";
+import CreateOrderModal from "../Popups/CreateOrder";
 import {
     AD_SERVERS,
     AD_SERVER_DFP,
@@ -93,7 +93,6 @@ class OrdersList extends Component {
                 </Button>
                 <CreateOrderModal
                     toUpdate={this.loadOrders}
-                    adServer={this.props.type}
                 />
                 {/*<Button
                     color="primary"
@@ -437,10 +436,7 @@ class OrdersList extends Component {
 
         this.setState({
             orderCount: selected.length,
-            lineItemCount: selected.reduce(
-                (sum, {lineItemCount}) => sum + lineItemCount,
-                0
-            ),
+            lineItemCount: selected.reduce((sum, {lineItemCount}) => sum + lineItemCount, 0),
             selected
         });
     }

@@ -2,8 +2,6 @@ import React, {Component} from "react";
 import classnames from "classnames";
 import {Link} from "react-router-dom";
 import {Table} from "reactstrap";
-import {CreateOrderModal} from "../Popups/CreateOrder";
-import SourceFactory from "../../sources/Factory";
 import bind from "bind-decorator";
 import adServerActions from "../../../redux/actions/adServer";
 import {connect} from "react-redux";
@@ -25,10 +23,10 @@ class OrdersTable extends Component {
 
     componentWillReceiveProps = (props, state) => {
         if (props.updatedFiltersAt !== this.state.updatedFiltersAt) {
-            this.setState({updatedFiltersAt: props.updatedFiltersAt})
+            this.setState({updatedFiltersAt: props.updatedFiltersAt});
             this.toggleAll(false)
         }
-    }
+    };
 
     // static getDerivedStateFromProps = (props, state) => {
     //   if (props.updatedFiltersAt !== state.updatedFiltersAt) {
@@ -70,12 +68,6 @@ class OrdersTable extends Component {
                     <th>Actions</th>
                 </tr>
                 </thead>
-                <CreateOrderModal
-                    withButton={false}
-                    adServer={this.props.adServer}
-                    ref={orderModal => (this.orderModal = orderModal)}
-                    toUpdate={this.loadOrders}
-                />
                 <tbody>
                 {orders
                     .filter(filter)
@@ -157,9 +149,7 @@ class OrdersTable extends Component {
     toggleArchive(status, key) {
         status =
             status === "archived"
-                ? this.props.type === AD_SERVER_DFP
-                ? "unarchived"
-                : "running"
+                ? this.props.type === AD_SERVER_DFP ? "unarchived" : "running"
                 : "archived";
 
         this.updateStatus(status, key);
@@ -222,7 +212,4 @@ const mapStateToProps = state => ({
     sourceHandler: adServerSelectors.sourceHandler(state)
 });
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(OrdersTable);
+export default connect(mapStateToProps, mapDispatchToProps)(OrdersTable);

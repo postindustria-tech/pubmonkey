@@ -29,6 +29,7 @@ function OrderError(message, close) {
     }
     this.close = close;
 }
+
 OrderError.prototype = Error.prototype;
 
 class Handler extends AbstractHandler {
@@ -42,8 +43,9 @@ class Handler extends AbstractHandler {
 
     dfp = null;
     networkCode = null;
-
     token = null;
+    loggedIn = false;
+
     static user = null;
 
     lineItemInfo = {
@@ -77,10 +79,11 @@ class Handler extends AbstractHandler {
         super();
         this.setAdvertiserFactory(new AdvertiserFactory());
         this.setNetworkCode();
+        this.setToken();
     }
 
     isReady() {
-        return this.getNetworkCode() !== null;
+        return this.getNetworkCode() !== null && this.getToken() !== null;
     }
 
     clear() {
@@ -101,6 +104,24 @@ class Handler extends AbstractHandler {
         return this.networkCode;
     }
 
+    setToken() {
+
+        const dfpTokenExpire = localStorage.getItem("dfpTokenExpire") || null;
+        if (!dfpTokenExpire || Number(dfpTokenExpire) < Date.now()) {
+            localStorage.removeItem("dfpToken");
+        }
+
+        this.token = localStorage.getItem("dfpToken") || null;
+    }
+
+    getToken() {
+        if (this.token) {
+            return this.token;
+        }
+        this.token = localStorage.getItem("dfpToken") || null;
+        return this.token;
+    }
+
     composeOrderRequest(advertiser, name) {
         return {
             name: name,
@@ -109,20 +130,15 @@ class Handler extends AbstractHandler {
         }
     }
 
-    getToken() {
-        return new Promise((resolve, reject) => {
-            chrome.identity.getAuthToken({interactive: true}, resolve);
-        });
-    }
-
     removeCachedAuthToken() {
-        console.log(this.token);
-        var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + this.token;
-        window.fetch(url);
-        chrome.identity.removeCachedAuthToken({token: this.token}, function () {
-            //token was removed from cache
-            // window.location.reload();
-        });
+        if (this.token) {
+            var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + this.token;
+            window.fetch(url);
+            chrome.identity.removeCachedAuthToken({token: this.token}, function () {
+                //token was removed from cache
+                // window.location.reload();
+            });
+        }
     }
 
     async getDfp() {
