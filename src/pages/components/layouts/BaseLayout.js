@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Navbar, NavbarBrand, Nav, NavItem, NavLink } from 'reactstrap'
+import {Navbar, NavbarBrand, Nav, NavItem, NavLink, Button} from 'reactstrap'
 import { NavLink as RRNavLink } from 'react-router-dom'
 import classnames from 'classnames'
 import { ProgressModal, ErrorPopup } from '../Popups'
@@ -23,27 +23,67 @@ class BaseLayout extends Component {
         let { className, children, type } = this.props;
 
         return (
-            <div className={ classnames('base-layout', className) }>
-                <Navbar className="header">
-                    <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
-                    <div id="downloadManual">
-                        <a href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf" target="_blank">Download manual</a>
+            <div className={ classnames('base-layout d-flex', className) } id="wrapper">
+
+                <div className={"bg-light border-right"} id="sidebar-wrapper">
+                    <div className={"sidebar-heading"}>
+                        <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
                     </div>
-                    <Nav>
-                        <SourceTypeViewContainer />
-                        <NavItem>
-                            <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">Ad Units</NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink tag={ RRNavLink } activeClassName="active" to="/orders">Orders</NavLink>
-                        </NavItem>
-                        {/*<NavItem>
-                            <NavLink tag={ RRNavLink } activeClassName="active" to="/backups">Backups</NavLink>
-                        </NavItem>*/}
-                    </Nav>
-                </Navbar>
-                <div className="container">
-                    { children }
+                    <div className={"list-group list-group-flush"}>
+                        <NavLink
+                            tag={ RRNavLink }
+                            className={"list-group-item list-group-item-action bg-light"}
+                            activeClassName="active"
+                            to="/orders">
+                            <i className="fas fa-truck"/>
+                            &nbsp;Orders
+                        </NavLink>
+                        <NavLink
+                            tag={ RRNavLink }
+                            className={"list-group-item list-group-item-action bg-light"}
+                            activeClassName="active"
+                            to="/adunits">
+                            <i className="fas fa-boxes"/>
+                            &nbsp; Ad Units
+                        </NavLink>
+                    </div>
+                    <div className={"list-group list-group-flush"} style={{position: "absolute", bottom: "41px"}}>
+                        <a
+                            className={"list-group-item list-group-item-action bg-light"}
+                            href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf"
+                            target="_blank">
+                            <i className="far fa-question-circle"/>
+                            &nbsp;Download manual
+                        </a>
+                    </div>
+                </div>
+
+                <div id="page-content-wrapper">
+
+                    <Navbar className="header">
+                        <NavbarBrand>
+                            {/*PubMonkey <small>v. { version }</small>*/}
+                        </NavbarBrand>
+                        {/*<div id="downloadManual">
+                            <a href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf" target="_blank">Download manual</a>
+                        </div>*/}
+                        <Nav>
+                            <SourceTypeViewContainer />
+                            {/*<NavItem>
+                                <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">Ad Units</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink tag={ RRNavLink } activeClassName="active" to="/orders">Orders</NavLink>
+                            </NavItem>*/}
+                            {/*<NavItem>
+                                <NavLink tag={ RRNavLink } activeClassName="active" to="/backups">Backups</NavLink>
+                            </NavItem>*/}
+                        </Nav>
+                    </Navbar>
+                    <div className="container">
+                        { children }
+                    </div>
+
                 </div>
 
                 <footer>

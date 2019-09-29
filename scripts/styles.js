@@ -7,6 +7,8 @@ import concat from 'gulp-concat-css'
 const isDev = process.env.NODE_ENV === 'development'
 
 export function styles(cb) {
+    gulp.src('node_modules/@fortawesome/fontawesome-free/webfonts/*')
+        .pipe(gulp.dest('./build/pages/webfonts/'));
     gulp.series(pagesCSS)(cb)
 }
 
