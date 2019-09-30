@@ -14,8 +14,10 @@ function copyFiles(cb) {
         // copyFolder('popup'),
         () => gulp.src([ 'src/images/*' ])
             .pipe(gulp.dest('./build/images')),
-        () => gulp.src([ 'src/pages/fonts/*' ])
-            .pipe(gulp.dest('./build/pages/fonts')),
+        // () => gulp.src([ 'src/pages/fonts/*' ])
+        //     .pipe(gulp.dest('./build/pages/fonts')),
+        () => gulp.src('node_modules/@fortawesome/fontawesome-free/webfonts/*')
+            .pipe(gulp.dest('./build/pages/webfonts/')),
         () => gulp.src([ 'src/background/index.js' ])
             .pipe(gulp.dest('./build/background')),
         () => gulp.src([ 'src/manifest.json', 'src/index.html' ])
