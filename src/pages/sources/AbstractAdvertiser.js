@@ -1,4 +1,6 @@
 import {CreativePlaceholder, Size, Targeting} from "./dfp/DataTypes";
+import {NETWORK_CLASS_TO_DIMENSION} from "../constants/common";
+import {isEmpty} from "../helpers";
 
 export default class AbstractAdvertiser {
 
@@ -17,7 +19,17 @@ export default class AbstractAdvertiser {
             adUnitId: id,
             includeDescendants: true
         }));
-        const [width, height] = params.creativeFormat.split("x");
+        let size = null;
+        if (params.advertiser === "pubnative") {
+            if (typeof NETWORK_CLASS_TO_DIMENSION[params.networkClass] !== "undefined" &&
+                !isEmpty(NETWORK_CLASS_TO_DIMENSION[params.networkClass])) {
+                size = NETWORK_CLASS_TO_DIMENSION[params.networkClass];
+            }
+        } else {
+            size = params.creativeFormat;
+        }
+
+        const [width, height] = size ? size.split("x") : [0, 0];
 
         lineItemInfo.targeting = Targeting(
             {
