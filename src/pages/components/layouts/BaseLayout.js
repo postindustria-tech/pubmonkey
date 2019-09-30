@@ -22,6 +22,13 @@ class BaseLayout extends Component {
     render() {
         let { className, children, type } = this.props;
 
+        const isActive = (match, location) => {
+            if (!match) {
+                return location.pathname === "/";
+            }
+            return match.url === location.pathname;
+        };
+
         return (
 
             <div className={ classnames('base-layout d-flex', className) } id="wrapper">
@@ -35,7 +42,9 @@ class BaseLayout extends Component {
                             tag={ RRNavLink }
                             className={"list-group-item list-group-item-action bg-light"}
                             activeClassName="active"
-                            to="/orders">
+                            to="/orders"
+                            isActive={isActive}
+                        >
                             <i className="fas fa-truck"/>
                             &nbsp; Orders
                         </NavLink>
@@ -43,7 +52,8 @@ class BaseLayout extends Component {
                             tag={ RRNavLink }
                             className={"list-group-item list-group-item-action bg-light"}
                             activeClassName="active"
-                            to="/adunits">
+                            to="/adunits"
+                        >
                             <i className="fas fa-boxes"/>
                             &nbsp; Ad Units
                         </NavLink>
