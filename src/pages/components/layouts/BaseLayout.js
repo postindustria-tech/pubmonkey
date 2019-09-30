@@ -23,9 +23,10 @@ class BaseLayout extends Component {
         let { className, children, type } = this.props;
 
         return (
+
             <div className={ classnames('base-layout d-flex', className) } id="wrapper">
 
-                <div className={"bg-light border-right"} id="sidebar-wrapper">
+                <div className={"bg-light sticky-top"} id="sidebar-wrapper" style={{height: "100%"}}>
                     <div className={"sidebar-heading"}>
                         <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
                     </div>
@@ -36,7 +37,7 @@ class BaseLayout extends Component {
                             activeClassName="active"
                             to="/orders">
                             <i className="fas fa-truck"/>
-                            &nbsp;Orders
+                            &nbsp; Orders
                         </NavLink>
                         <NavLink
                             tag={ RRNavLink }
@@ -46,8 +47,15 @@ class BaseLayout extends Component {
                             <i className="fas fa-boxes"/>
                             &nbsp; Ad Units
                         </NavLink>
+                        <a
+                            className={"list-group-item list-group-item-action bg-light"}
+                            href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf"
+                            target="_blank">
+                            <i className="fas fa-question-circle"/>
+                            &nbsp; Download manual
+                        </a>
                     </div>
-                    <div className={"list-group list-group-flush"} style={{position: "absolute", bottom: "41px"}}>
+                    {/*<div className={"list-group list-group-flush"}>
                         <a
                             className={"list-group-item list-group-item-action bg-light"}
                             href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf"
@@ -55,12 +63,12 @@ class BaseLayout extends Component {
                             <i className="far fa-question-circle"/>
                             &nbsp;Download manual
                         </a>
-                    </div>
+                    </div>*/}
                 </div>
 
-                <div id="page-content-wrapper">
+                <div id="page-content-wrapper" className={"border-left"}>
 
-                    <Navbar className="header">
+                    <Navbar className="header sticky-top">
                         <NavbarBrand>
                             {/*PubMonkey <small>v. { version }</small>*/}
                         </NavbarBrand>
