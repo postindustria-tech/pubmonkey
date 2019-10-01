@@ -94,8 +94,10 @@ function* setSourceHandlerAfter() {
 function* setNetworkCode() {
     try {
         const sourceHandler = yield select(adServerSelectors.sourceHandler);
-
-        yield put(adServerActions.setSourceHandler(sourceHandler));
+        const ready = yield sourceHandler.isReady();
+        if (ready) {
+            yield put(adServerActions.setSourceHandler(sourceHandler));
+        }
     } catch (error) {
         console.log(error);
     }
@@ -163,6 +165,7 @@ function* handleChangeAdServerType() {
     yield takeEvery(adServerActions.setNetworkCode, setNetworkCode);
     // Gave permission for google account
     yield takeEvery(adServerActions.dfpLogIn, setNetworkCode);
+
     // Changed advertiser in create order modal
     yield takeEvery(adServerActions.setAdvertiser, loadAdvertiser);
 
