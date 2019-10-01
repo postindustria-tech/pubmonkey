@@ -77,10 +77,8 @@ function* setSourceHandlerAfter() {
                 }));
             }
         }
-        console.log(type === AD_SERVER_MOPUB);
         if (type === AD_SERVER_MOPUB) {
             const ready = yield sourceHandler.isReady();
-            console.log(ready);
             if (ready) {
                 yield put(adServerActions.loadInventory({
                     ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME

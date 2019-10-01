@@ -6,6 +6,7 @@ import Promise from "bluebird";
 import {wrapSeries} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
 import {AD_SERVER_MOPUB} from "../../constants/source";
+import axios from "ex-axios";
 
 const WEB_URL = "https://app.mopub.com";
 
@@ -17,6 +18,9 @@ Promise.config({
 class Handler extends AbstractHandler {
 
     static source = AD_SERVER_MOPUB;
+
+    sessionChecked = false;
+
     ADVERTISER_DEFAULT_NAME = {
         pubnative: "PubNative",
         openx: "Prebid.org",
@@ -59,22 +63,24 @@ class Handler extends AbstractHandler {
     }
 
     async isReady() {
-        console.log('isReady');
-
-        // await this.getAccount();
-        return true;
-
-        return new Promise((resolve, reject) => {
-            console.log(window.MopubAutomation.loggedIn);
-            window.MopubAutomation.loggedIn
+        // console.log('isReady');
+        if (this.sessionChecked) {
+            return window.MopubAutomation.loggedIn
                 .then(loggedIn => {
-                    console.log(loggedIn);
-                    resolve(loggedIn);
-                })
-                .catch(error => {
-                    console.log(error);
+                    return loggedIn;
                 });
-        })
+        } else {
+            this.sessionChecked = true;
+            return axios.get(`${WEB_URL}/account/`, {responseType: 'text'})
+                .then(result => {
+                    // console.log(result);
+                    // console.log(window.MopubAutomation.loggedIn);
+                    return window.MopubAutomation.loggedIn
+                        .then(loggedIn => {
+                            return loggedIn;
+                        });
+                });
+        }
     }
 
     getAdvertiserByName(advertiserName) {
