@@ -7,7 +7,8 @@ import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../pages/constants/source";
 function* getOrders(action) {
     try {
         const sourceHandler = yield select(adServerSelectors.sourceHandler);
-        if (sourceHandler.isReady()) {
+        const ready = yield sourceHandler.isReady();
+        if (ready) {
             const orders = yield sourceHandler.getAllOrders() || [];
             yield put(adServerActions.setOrders(orders));
             yield getOrdersAfter(sourceHandler);
@@ -33,7 +34,8 @@ function* getOrdersAfter(sourceHandler) {
 function* getAdUnits(action) {
     try {
         const sourceHandler = yield select(adServerSelectors.sourceHandler);
-        if (sourceHandler.isReady()) {
+        const ready = yield sourceHandler.isReady();
+        if (ready) {
             const adunits = yield sourceHandler.getAdUnits() || [];
             yield put(adServerActions.setAdUnits(adunits));
         }
@@ -69,17 +71,22 @@ function* setSourceHandlerAfter() {
 
             if (dfpLoggedIn) {
                 const sourceAdvertisers = yield sourceHandler.getAllAdvertisers() || [];
-                yield put(adServerActions.dfpLoadInventory({
+                yield put(adServerActions.loadInventory({
                     sourceAdvertisers,
                     ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME
                 }));
             }
         }
+        console.log(type === AD_SERVER_MOPUB);
         if (type === AD_SERVER_MOPUB) {
-            yield put(adServerActions.dfpLoadInventory({
-                ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME
-            }));
-            yield put(adServerActions.setSourceHandlerStatus(true));
+            const ready = yield sourceHandler.isReady();
+            console.log(ready);
+            if (ready) {
+                yield put(adServerActions.loadInventory({
+                    ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME
+                }));
+                yield put(adServerActions.setSourceHandlerStatus(true));
+            }
         }
     } catch (error) {
         console.log(error);
@@ -105,7 +112,8 @@ function* loadAdvertiser(action) {
         let customTargetingValues = [],
             customTargetingKeys = [];
 
-        if (sourceHandler.isReady()) {
+        const ready = yield sourceHandler.isReady();
+        if (ready) {
             if (advertiser === undefined) {
                 advertiser = Object.keys(sourceHandler.ADVERTISER_DEFAULT_NAME)[0];
             }
@@ -133,7 +141,7 @@ function* loadAdvertiser(action) {
                 }));
             }
 
-            yield put(adServerActions.dfpLoadAdvertiser({
+            yield put(adServerActions.loadAdvertiser({
                 customTargetingKeys,
                 customTargetingValues,
                 creativeFormats: sourceHandler.getAdvertiser().CREATIVE_FORMATS
@@ -145,6 +153,7 @@ function* loadAdvertiser(action) {
 }
 
 function* handleChangeAdServerType() {
+    // Change type of adServer
     yield takeEvery(adServerActions.setSwitcher, setSourceHandler);
 
     yield takeEvery(adServerActions.setSourceHandler, setSourceHandlerAfter);
@@ -152,10 +161,15 @@ function* handleChangeAdServerType() {
     yield takeEvery(adServerActions.setSourceHandler, getAdUnits);
     yield takeEvery(adServerActions.setSourceHandler, loadAdvertiser);
 
+    // Set up a new network code in modal
     yield takeEvery(adServerActions.setNetworkCode, setNetworkCode);
+    // Gave permission for google account
     yield takeEvery(adServerActions.dfpLogIn, setNetworkCode);
-
+    // Changed advertiser in create order modal
     yield takeEvery(adServerActions.setAdvertiser, loadAdvertiser);
+
+    // Refresh Orders list after some changes
+    yield takeEvery(adServerActions.refreshOrders, getOrders);
 }
 
 function* rootSaga() {

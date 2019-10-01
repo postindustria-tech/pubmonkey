@@ -1,14 +1,15 @@
 import React, {Component} from "react";
 import classnames from "classnames";
-import {Link} from "react-router-dom";
 import {Table} from "reactstrap";
 import bind from "bind-decorator";
 import adServerActions from "../../../redux/actions/adServer";
 import {connect} from "react-redux";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {AD_SERVER_DFP} from "../../constants/source";
+import CreateOrderModal from "../Popups/CreateOrder";
 
 class OrdersTable extends Component {
+
     state = {
         allSelected: false,
         orderKey: null,
@@ -27,20 +28,6 @@ class OrdersTable extends Component {
             this.toggleAll(false)
         }
     };
-
-    // static getDerivedStateFromProps = (props, state) => {
-    //   if (props.updatedFiltersAt !== state.updatedFiltersAt) {
-    //     this.toggleAll(false)
-
-    //     return {
-    //       ...state,
-    //       updatedFiltersAt: props.updatedFiltersAt,
-    //     };
-
-    //   }
-
-    //   return state;
-    // };
 
     openModal = () => {
         this.orderModal.ask();
@@ -68,62 +55,57 @@ class OrdersTable extends Component {
                     <th>Actions</th>
                 </tr>
                 </thead>
+                <CreateOrderModal
+                    withButton={false}
+                    adServer={this.props.type}
+                    ref={orderModal => this.orderModal = orderModal}
+                    toUpdate={this.loadOrders}
+                />
                 <tbody>
                 {orders
                     .filter(filter)
-                    .map(
-                        (
-                            {
-                                name,
-                                status,
-                                advertiser,
-                                lineItemCount,
-                                key,
-                                checked = false
-                            },
-                            index
-                        ) => (
-                            <tr key={key} className="order">
-                                <td className="select">
-                                    <input
-                                        type="checkbox"
-                                        checked={checked}
-                                        onChange={() => this.toggleSelected(key)}
-                                    />
-                                </td>
-                                <td>
-                                    <a target="_blank" href={this.getOrderUrl(key)}>
-                                        {name}
-                                    </a>
-                                </td>
-                                <td>{advertiser}</td>
-                                <td>{lineItemCount}</td>
-                                <td>{status}</td>
-                                <td className="actions">
-                                    <i
-                                        className={classnames("fa", "fa-archive", {
-                                            archived: status === "archived"
-                                        })}
-                                        title={status === "archived" ? "Unarchive" : "Archive"}
-                                        onClick={() => this.toggleArchive(status, key)}
-                                    ></i>
-                                    <i
-                                        className={classnames("fa", {
-                                            "fa-pause": status === "running",
-                                            "fa-play": status === "paused"
-                                        })}
-                                        title={status === "running" ? "Disable" : "Enable"}
-                                        onClick={() => this.togglePause(status, key)}
-                                    ></i>
-                                    <i
-                                        className={classnames("fa", "fa-copy")}
-                                        title={"Duplicate Order"}
-                                        onClick={() => this.toggleCopy(key)}
-                                    ></i>
-                                </td>
-                            </tr>
-                        )
-                    )}
+                    .map(({name, status, advertiser, lineItemCount, key, checked = false}, index) => (
+                        <tr key={key} className="order">
+                            <td className="select">
+                                <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => this.toggleSelected(key)}
+                                />
+                            </td>
+                            <td>
+                                <a target="_blank" href={this.getOrderUrl(key)}>
+                                    {name}
+                                </a>
+                            </td>
+                            <td>{advertiser}</td>
+                            <td>{lineItemCount}</td>
+                            <td>{status}</td>
+                            <td className="actions">
+                                <i
+                                    className={classnames("fa", "fa-archive", {
+                                        archived: status === "archived"
+                                    })}
+                                    title={status === "archived" ? "Unarchive" : "Archive"}
+                                    onClick={() => this.toggleArchive(status, key)}
+                                ></i>
+                                <i
+                                    className={classnames("fa", {
+                                        "fa-pause": status === "running",
+                                        "fa-play": status === "paused"
+                                    })}
+                                    title={status === "running" ? "Disable" : "Enable"}
+                                    onClick={() => this.togglePause(status, key)}
+                                ></i>
+                                <i
+                                    className={classnames("fa", "fa-copy")}
+                                    title={"Duplicate Order"}
+                                    onClick={() => this.toggleCopy(key)}
+                                ></i>
+                            </td>
+                        </tr>
+                    ))
+                }
                 </tbody>
             </Table>
         );

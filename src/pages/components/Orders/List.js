@@ -56,7 +56,8 @@ class OrdersList extends Component {
     };
 
     componentDidMount() {
-        this.loadOrders();
+        this.props.setSwitcher(this.props.type);
+        // this.loadOrders();
     }
 
     componentWillUnmount() {
@@ -316,7 +317,7 @@ class OrdersList extends Component {
     @bind
     loadOrders() {
         console.log('loadOrders: ' + this.props.type);
-        this.props.setSwitcher(this.props.type)
+        this.props.refreshOrders();
     }
 
     @bind
@@ -459,7 +460,8 @@ class OrdersList extends Component {
 }
 
 const mapDispatchToProps = {
-    setSwitcher: adServerActions.setSwitcher
+    setSwitcher: adServerActions.setSwitcher,
+    refreshOrders: adServerActions.refreshOrders,
 };
 
 const mapStateToProps = state => ({

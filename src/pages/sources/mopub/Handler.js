@@ -58,6 +58,25 @@ class Handler extends AbstractHandler {
         this.setAdvertiserFactory(new AdvertiserFactory());
     }
 
+    async isReady() {
+        console.log('isReady');
+
+        // await this.getAccount();
+        return true;
+
+        return new Promise((resolve, reject) => {
+            console.log(window.MopubAutomation.loggedIn);
+            window.MopubAutomation.loggedIn
+                .then(loggedIn => {
+                    console.log(loggedIn);
+                    resolve(loggedIn);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        })
+    }
+
     getAdvertiserByName(advertiserName) {
         let advertiser = null;
         Object.keys(this.ADVERTISER_DEFAULT_NAME).map((key, i) => {
@@ -66,6 +85,10 @@ class Handler extends AbstractHandler {
             }
         });
         return advertiser;
+    }
+
+    getAccount() {
+        return HTTPService.GET(`${WEB_URL}/account/`);
     }
 
     getAdUnits() {

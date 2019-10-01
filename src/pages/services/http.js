@@ -1,23 +1,23 @@
 import axios from "ex-axios";
 import Promise from "bluebird";
 
-// Promise.config({
-//     cancellation: true
-// })
-
-// axios.Promise = Promise
-
 let csrftoken = null;
 
-chrome.cookies.get(
-    {url: "https://app.mopub.com", name: "csrftoken"},
-    ({value}) => {
-        csrftoken = value;
-        // console.log(value);
-    }
-);
+export function GetValidCSRFToken() {
+    chrome.cookies.get(
+        {url: "https://app.mopub.com", name: "csrftoken"},
+        ({value}) => {
+            csrftoken = value;
+            // console.log(value);
+            console.log("got a new CSRF token");
+        }
+    );
+}
+
+GetValidCSRFToken();
 
 export const HTTPService = new (class {
+
     GET(url, config = {}) {
         return axios
             .get(url, {
@@ -48,27 +48,53 @@ export const HTTPService = new (class {
             return;
         }
 
-        let {tabId, frameId} = window.MopubAutomation.request,
-            payload = {
-                isFormData,
-                url,
-                data,
-                method: "post",
-                // xsrfCookieName: 'csrftoken',
-                // xsrfHeaderName: 'x-csrftoken',
-                headers: {
-                    // 'x-requested-with': 'XMLHttpRequest',
-                    // referer: 'https://app.mopub.com/orders',
-                    // origin: 'https://app.mopub.com',
-                    "x-csrftoken": csrftoken
-                },
-                ...config
-            };
+        return new Promise((resolve, reject) => {
+            let mopubSessionUpdatedAt = localStorage.getItem("mopubSessionUpdatedAt") || 0;
+            if ((Number(mopubSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
+                console.log('mopub CSRF token has expired');
+                mopubSessionUpdatedAt = Date.now();
+                localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
 
-        // console.log(payload);
+                let {tabId, frameId} = window.MopubAutomation.request;
 
-        return new Promise((resolve, reject) =>
-            chrome.tabs.sendMessage(tabId, {action: "request", payload}, {frameId}, (result = {}) => {
+                chrome.tabs.reload(tabId, {}, function () {
+                    setTimeout(function () {
+                        chrome.cookies.get(
+                            {url: "https://app.mopub.com", name: "csrftoken"},
+                            ({value}) => {
+                                csrftoken = value;
+                                console.log("got a new CSRF token");
+                                resolve();
+                            }
+                        );
+                    }, 3000);
+                });
+            } else {
+                resolve();
+            }
+        })
+        .then(() => {
+
+            return new Promise((resolve, reject) => {
+
+                let {tabId, frameId} = window.MopubAutomation.request,
+                    payload = {
+                        isFormData,
+                        url,
+                        data,
+                        method: "post",
+                        // xsrfCookieName: 'csrftoken',
+                        // xsrfHeaderName: 'x-csrftoken',
+                        headers: {
+                            // 'x-requested-with': 'XMLHttpRequest',
+                            // referer: 'https://app.mopub.com/orders',
+                            // origin: 'https://app.mopub.com',
+                            "x-csrftoken": csrftoken
+                        },
+                        ...config
+                    };
+
+                chrome.tabs.sendMessage(tabId, {action: "request", payload}, {frameId}, (result = {}) => {
                     // console.log('payload: ', payload)
                     let {ok, data, error} = result;
                     if (ok) {
@@ -93,10 +119,8 @@ export const HTTPService = new (class {
                             }
                         });
                     }
-                }
-            )
-        );
-
-        // return axios(data).then(({ data }) => data)
+                })
+            });
+        });
     }
 })();

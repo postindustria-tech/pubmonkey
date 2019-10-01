@@ -82,13 +82,13 @@ const adServerReduces = handleActions(
                 return order;
             })
         }),
-        [adServerActions.dfpLoadInventory]: (state, action) => ({
+        [adServerActions.loadInventory]: (state, action) => ({
             ...state,
             ...action.payload,
             advertiserId: action.payload.sourceAdvertisers && action.payload.sourceAdvertisers.length > 0 ? action.payload.sourceAdvertisers[0].id : null,
             sourceHandlerReady: true
         }),
-        [adServerActions.dfpLoadAdvertiser]: (state, action) => ({
+        [adServerActions.loadAdvertiser]: (state, action) => ({
             ...state,
             ...action.payload
         })

@@ -6,6 +6,7 @@ const setSourceHandlerStatus = createAction('adServer--setSourceHandlerStatus', 
 const setAdvertiser = createAction('adServer--setAdvertiser', advertiser => ({advertiser}));
 const setNetworkCode = createAction('adServer--setNetworkCode', networkCode => ({networkCode}));
 const setOrders = createAction('adServer--setOrders', orders => ({orders}));
+const refreshOrders = createAction("adServer--refreshOrders");
 const setOrdersAfter = createAction('adServer--setOrdersAfter', orders => ({orders}));
 const setAdUnits = createAction('adServer--setAdUnits', adunits => ({adunits}));
 const updateOrderStatus = createAction("adServer--updateOrderStatus", (status, key) => ({status, key}));
@@ -14,8 +15,8 @@ const dfpLogOut = createAction("adServer--dfpLogOut");
 const dfpAuthModalToggle = createAction("adServer--dfpAuthModalToggle");
 const dfpLoggedIn = createAction('adServer--dfpLoggedIn', dfpLoggedIn => ({dfpLoggedIn}));
 
-const dfpLoadInventory = createAction('adServer--dfpLoadInventory', payload => (payload));
-const dfpLoadAdvertiser = createAction('adServer--dfpLoadAdvertiser', payload => (payload));
+const loadInventory = createAction('adServer--loadInventory', payload => (payload));
+const loadAdvertiser = createAction('adServer--loadAdvertiser', payload => (payload));
 
 const adServerActions = {
     setSwitcher,
@@ -25,14 +26,15 @@ const adServerActions = {
     setNetworkCode,
     setOrders,
     setOrdersAfter,
+    refreshOrders,
     setAdUnits,
     updateOrderStatus,
     dfpLogIn,
     dfpLogOut,
     dfpAuthModalToggle,
     dfpLoggedIn,
-    dfpLoadInventory,
-    dfpLoadAdvertiser
+    loadInventory,
+    loadAdvertiser
 };
 
 export default adServerActions;

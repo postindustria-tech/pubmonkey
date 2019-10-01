@@ -19,6 +19,8 @@ chrome.tabs.query({ active:false }, function (tabs) {
         return domain === "app.mopub.com";
     });
 
+    let mopubSessionUpdatedAt = localStorage.getItem("mopubSessionUpdatedAt") || 0;
+
     if (mopub.length === 0) {
         chrome.tabs.create({ url: "https://app.mopub.com/account", active: false }, function (tab) {
             // console.log(tab);
@@ -26,6 +28,8 @@ chrome.tabs.query({ active:false }, function (tabs) {
                 frameId: 0,
                 tabId: tab.id
             };
+
+            mopubSessionUpdatedAt = Date.now();
         });
     } else {
         let tabId = mopub[0].id;
@@ -50,6 +54,14 @@ chrome.tabs.query({ active:false }, function (tabs) {
             resolveName(name);
         });
     }
+
+    // Refresh mopub's tab every 5 minutes for a valid csrf token
+    if ((Number(mopubSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
+        mopubSessionUpdatedAt = Date.now();
+        localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+        chrome.tabs.reload(CJ.request.tabId);
+    }
+
 });
 
 chrome.webRequest.onHeadersReceived.addListener(
@@ -77,10 +89,10 @@ CJ.loggedIn = new Promise(resolve => (resolveLoggedIn = resolve));
 
 chrome.webRequest.onHeadersReceived.addListener(
     ({statusCode}) => {
-        if (statusCode === 302) {
-            resolveLoggedIn(false);
-        } else {
+        if (statusCode === 200) {
             resolveLoggedIn(true);
+        } else {
+            resolveLoggedIn(false);
         }
     },
     {

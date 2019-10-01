@@ -53,7 +53,8 @@ class CreateOrderModal extends Component {
     progress = null;
 
     static defaultProps = {
-        onClose: () => {},
+        onClose: () => {
+        },
         withButton: true,
         sourceAdvertisers: [],
         sourceHandlerReady: false,
@@ -288,7 +289,8 @@ class CreateOrderModal extends Component {
                                             )}
                                         </Input>
                                     </FormGroup>
-                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0" hidden={this.props.type !== AD_SERVER_DFP}>
+                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0"
+                                               hidden={this.props.type !== AD_SERVER_DFP}>
                                         <Label for="advertiserId" className="mr-sm-2 mp-label">
                                             Advertiser DFP:
                                         </Label>
@@ -302,7 +304,7 @@ class CreateOrderModal extends Component {
                                         >
                                             {this.props.sourceAdvertisers.map(
                                                 ({id, name}) => (
-                                            <option key={id} value={id}>{name}</option>
+                                                    <option key={id} value={id}>{name}</option>
                                                 )
                                             )}
                                         </Input>
@@ -579,7 +581,8 @@ class CreateOrderModal extends Component {
                         </Row>
                     </ModalBody>
                     <ModalFooter>
-                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning" hidden={this.props.type === AD_SERVER_DFP}>
+                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning"
+                                hidden={this.props.type === AD_SERVER_DFP}>
                             Download JSON
                         </Button>
 
@@ -879,7 +882,7 @@ class CreateOrderModal extends Component {
             this.props.type === AD_SERVER_DFP ? advertiserId : this.props.ADVERTISER_DEFAULT_NAME[advertiser],
             orderName
         );
-        console.log(order);
+        // console.log(order);
 
         let params = {
             adunits,
@@ -929,9 +932,12 @@ class CreateOrderModal extends Component {
             .then(ModalWindowService.ProgressModal.hideModal)
             .then(() => {
                 this.close();
-                this.props.toUpdate && this.props.toUpdate();
+                if (this.props.toUpdate) {
+                    this.props.toUpdate();
+                }
             })
             .catch(error => {
+                console.error(error);
                 ModalWindowService.ProgressModal.cancel();
 
                 let close = true;

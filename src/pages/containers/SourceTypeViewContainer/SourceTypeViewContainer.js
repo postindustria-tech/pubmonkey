@@ -40,6 +40,7 @@ class SourceTypeViewContainer extends PureComponent {
     render() {
 
         const {username, loggedIn} = this.state;
+        // console.log(loggedIn);
 
         return (
             <div className={"username"}>
