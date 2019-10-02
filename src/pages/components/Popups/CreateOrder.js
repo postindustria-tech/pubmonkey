@@ -48,6 +48,49 @@ const ONLY_NUMBERS = /^[0-9\b\.]+$/;
 let progress = null,
     defaultAdvertiser = "pubnative";
 
+const initialState = {
+    executor: "create",
+    backdrop: true,
+    showCreativeFormat: false,
+    advertiser: defaultAdvertiser,
+    adunitsSelected: [],
+    order: {},
+    orderName: "",
+    defaultFields: [],
+    lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
+    keywordTemplate:
+        localStorage.getItem(defaultAdvertiser) ||
+        KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
+    step: 0.1,
+    keywordStepMin: 0.01,
+    keywordStep: 0.01,
+    rangeFrom: 0.1,
+    rangeTo: 10,
+    formErrors: {
+        orderName: "",
+        lineItemsNaming: "",
+        step: "",
+        keywordStep: "",
+        rangeFrom: "",
+        rangeTo: ""
+    },
+    formValid: true,
+    willGenerateKeywords: 0,
+    willGenerateLineItems: 0,
+    creativeFormat: "",
+    tooltipOpen: false,
+    selectedAdvertiser: defaultAdvertiser,
+    Ad_ZONE_ID: 2,
+    os: "",
+    networkClass: "",
+    adServerDomain: "",
+    keyword: "",
+    rangeMeasure: "$",
+    granularity: "",
+
+    advertiserId: null
+};
+
 class CreateOrderModal extends Component {
 
     progress = null;
@@ -65,48 +108,12 @@ class CreateOrderModal extends Component {
         orderKey: null
     };
 
-    state = {
-        executor: "create",
-        backdrop: true,
-        showCreativeFormat: false,
-        advertiser: defaultAdvertiser,
-        adunitsSelected: [],
-        order: {},
-        orderName: "",
-        defaultFields: [],
-        lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
-        keywordTemplate:
-            localStorage.getItem(defaultAdvertiser) ||
-            KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
-        step: 0.1,
-        keywordStepMin: 0.01,
-        keywordStep: 0.01,
-        rangeFrom: 0.1,
-        rangeTo: 10,
-        formErrors: {
-            orderName: "",
-            lineItemsNaming: "",
-            step: "",
-            keywordStep: "",
-            rangeFrom: "",
-            rangeTo: ""
-        },
-        formValid: true,
-        willGenerateKeywords: 0,
-        willGenerateLineItems: 0,
-        creativeFormat: "",
-        tooltipOpen: false,
-        selectedAdvertiser: defaultAdvertiser,
-        Ad_ZONE_ID: 2,
-        os: "",
-        networkClass: "",
-        adServerDomain: "",
-        keyword: "",
-        rangeMeasure: "$",
-        granularity: "",
+    state = initialState;
 
-        advertiserId: null
-    };
+    reset() {
+        console.log('reset state');
+        this.setState(initialState);
+    }
 
     @bind
     tooltipToggle() {
@@ -150,6 +157,9 @@ class CreateOrderModal extends Component {
 
         if (prevState.advertiser !== this.state.advertiser && this.state.advertiser) {
             this.changeAdvertiser(this.state.advertiser);
+        }
+        if (prevProps.type !== this.props.type) {
+            this.reset();
         }
     }
 
@@ -927,6 +937,7 @@ class CreateOrderModal extends Component {
                 if (this.props.toUpdate) {
                     this.props.toUpdate();
                 }
+                this.reset();
             })
             .catch(error => {
                 console.error(error);
