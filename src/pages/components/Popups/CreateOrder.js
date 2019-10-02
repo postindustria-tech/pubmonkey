@@ -53,8 +53,7 @@ class CreateOrderModal extends Component {
     progress = null;
 
     static defaultProps = {
-        onClose: () => {
-        },
+        onClose: () => {},
         withButton: true,
         sourceAdvertisers: [],
         sourceHandlerReady: false,
@@ -678,6 +677,7 @@ class CreateOrderModal extends Component {
 
     @bind
     open() {
+        this.changeAdvertiser(this.props.type === AD_SERVER_DFP ? "openx" : "pubnative");
         this.setState({isOpen: true});
     }
 
