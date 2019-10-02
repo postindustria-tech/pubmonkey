@@ -947,9 +947,7 @@ class Handler extends AbstractHandler {
     collectOrderDataFromSet(orders, step, canceled) {
         return Promise.mapSeries(orders, ({key}, idx, orderCount) => {
             if (window.canceledExport) return;
-            return this.collectOrderData(
-                key,
-                progress =>
+            return this.collectOrderData(key, progress =>
                     step({
                         ...progress,
                         ordersDone: idx + 1,
@@ -975,14 +973,15 @@ class Handler extends AbstractHandler {
                 return id;
             });
 
-            let creativeAssociations = await this._getByStatement('LineItemCreativeAssociationService', {
-                query: 'WHERE lineItemId IN (' + ids.join(',') + ')'
-            });
+            let creativeAssociations = [];
+            if (ids.length > 0) {
+                let creativeAssociationsResult = await this._getByStatement('LineItemCreativeAssociationService', {
+                    query: 'WHERE lineItemId IN (' + ids.join(',') + ')'
+                });
 
-            if (creativeAssociations.totalResultSetSize > 0) {
-                creativeAssociations = creativeAssociations.results;
-            } else {
-                creativeAssociations = [];
+                if (creativeAssociationsResult.totalResultSetSize > 0) {
+                    creativeAssociations = creativeAssociationsResult.results;
+                }
             }
 
             return Promise.mapSeries(lineItems, (lineItem, idx, lineItemCount) => {
