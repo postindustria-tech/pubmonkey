@@ -55,12 +55,6 @@ class OrdersTable extends Component {
                     <th>Actions</th>
                 </tr>
                 </thead>
-                <CreateOrderModal
-                    withButton={false}
-                    adServer={this.props.type}
-                    ref={orderModal => this.orderModal = orderModal}
-                    toUpdate={this.loadOrders}
-                />
                 <tbody>
                 {orders
                     .filter(filter)
