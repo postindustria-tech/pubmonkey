@@ -564,15 +564,19 @@ class Handler extends AbstractHandler {
                 const to = +toValidUI(bidDecimal + s).toFixed(2);
                 for (let i = bidDecimal; i < to; i += keywordStep) {
                     i = toValidUI(i);
-                    keywords.push(i.toFixed(2));
+                    if (i < to) {
+                        keywords.push(i.toFixed(2));
+                    }
                 }
             } else {
                 const to = +toValidUI(bidDecimal + s).toFixed(2);
                 for (let i = bidDecimal; i < to; i += keywordStep) {
                     i = toValidUI(i);
-                    const value = i.toFixed(keywordStepDecimalPartLength),
-                        keyword = keywordTemplate.replace(mask, value);
-                    keywords.push(keyword);
+                    if (i < to) {
+                        const value = i.toFixed(keywordStepDecimalPartLength),
+                            keyword = keywordTemplate.replace(mask, value);
+                        keywords.push(keyword);
+                    }
                 }
             }
         }
@@ -627,15 +631,19 @@ class Handler extends AbstractHandler {
                 const to = +toValidUI(bidDecimal + s).toFixed(2);
                 for (let i = bidDecimal; i < to; i += keywordStep) {
                     i = toValidUI(i);
-                    keywords.push(i.toFixed(2));
+                    if (i < to) {
+                        keywords.push(i.toFixed(2));
+                    }
                 }
             } else {
                 const to = +toValidUI(bidDecimal + s).toFixed(2);
                 for (let i = bidDecimal; i < to; i += keywordStep) {
                     i = toValidUI(i);
-                    const value = i.toFixed(keywordStepDecimalPartLength),
-                        keyword = keywordTemplate.replace(mask, value);
-                    keywords.push(keyword);
+                    if (i < to) {
+                        const value = i.toFixed(keywordStepDecimalPartLength),
+                            keyword = keywordTemplate.replace(mask, value);
+                        keywords.push(keyword);
+                    }
                 }
             }
 
