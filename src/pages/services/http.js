@@ -3,18 +3,18 @@ import Promise from "bluebird";
 
 let csrftoken = null;
 
-export function GetValidCSRFToken() {
-    chrome.cookies.get(
-        {url: "https://app.mopub.com", name: "csrftoken"},
-        ({value}) => {
-            csrftoken = value;
-            // console.log(value);
-            console.log("got a new CSRF token");
-        }
-    );
-}
-
-GetValidCSRFToken();
+// export function GetValidCSRFToken() {
+//     chrome.cookies.get(
+//         {url: "https://app.mopub.com", name: "csrftoken"},
+//         ({value}) => {
+//             csrftoken = value;
+//             // console.log(value);
+//             console.log("got a new CSRF token");
+//         }
+//     );
+// }
+//
+// GetValidCSRFToken();
 
 export const HTTPService = new (class {
 
@@ -59,14 +59,15 @@ export const HTTPService = new (class {
 
                 chrome.tabs.reload(tabId, {}, function () {
                     setTimeout(function () {
-                        chrome.cookies.get(
-                            {url: "https://app.mopub.com", name: "csrftoken"},
-                            ({value}) => {
-                                csrftoken = value;
-                                console.log("got a new CSRF token");
-                                resolve();
-                            }
-                        );
+                        resolve();
+                        // chrome.cookies.get(
+                        //     {url: "https://app.mopub.com", name: "csrftoken"},
+                        //     ({value}) => {
+                        //         csrftoken = value;
+                        //         console.log("got a new CSRF token");
+                        //         resolve();
+                        //     }
+                        // );
                     }, 3000);
                 });
             } else {
@@ -89,13 +90,13 @@ export const HTTPService = new (class {
                             // 'x-requested-with': 'XMLHttpRequest',
                             // referer: 'https://app.mopub.com/orders',
                             // origin: 'https://app.mopub.com',
-                            "x-csrftoken": csrftoken
+                            // "x-csrftoken": csrftoken
                         },
                         ...config
                     };
 
                 chrome.tabs.sendMessage(tabId, {action: "request", payload}, {frameId}, (result = {}) => {
-                    // console.log('payload: ', payload)
+                    // console.log('payload: ', payload);
                     let {ok, data, error} = result;
                     if (ok) {
                         resolve(data);

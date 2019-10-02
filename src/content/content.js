@@ -4,8 +4,8 @@ const isLoadedByFrame = window.self !== window.top
 
 let headers = {
     'x-requested-with': 'XMLHttpRequest',
-    'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;.*/g, '$1')
-}
+    'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;?.*/g, '$1')
+};
 
 // if(isLoadedByFrame) {
     chrome.runtime.onMessage.addListener(({ action, payload }, { id }, sendResponse) => {
