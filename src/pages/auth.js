@@ -22,7 +22,7 @@ chrome.tabs.query({ active:false }, function (tabs) {
     let mopubSessionUpdatedAt = localStorage.getItem("mopubSessionUpdatedAt") || 0;
 
     if (mopub.length === 0) {
-        chrome.tabs.create({ url: "https://app.mopub.com/account", active: false }, function (tab) {
+        chrome.tabs.create({ url: "https://app.mopub.com/dashboard", active: false }, function (tab) {
             // console.log(tab);
             CJ.request = {
                 frameId: 0,
@@ -117,20 +117,30 @@ chrome.webRequest.onHeadersReceived.addListener(
 );
 
 CJ.openLoginPage = function () {
-    chrome.tabs.create(
-        {url: "https://app.mopub.com/account/login/"},
-        ({id}) => {
+
+    chrome.tabs.query({active: false}, function (tabs) {
+        const mopub = tabs.filter(tab => {
+            const url = new URL(tab.url);
+            const domain = url.hostname;
+            return domain === "app.mopub.com";
+        });
+
+        let tabId = mopub[0].id;
+
+        chrome.tabs.update(tabId, {selected: true}, function () {
             chrome.tabs.onUpdated.addListener(function handler(
-                tabId,
+                _tabId,
                 {status, url}
             ) {
+                console.log(tabId, _tabId, status, url);
                 if (
-                    tabId === id &&
+                    tabId === _tabId &&
                     status === "loading" &&
-                    (url === "https://app.mopub.com/dashboard/" ||
+                    (url === "https://app.mopub.com/dashboard" ||
+                        url === "https://app.mopub.com/dashboard/" ||
                         url === "https://app.mopub.com/new-app")
                 ) {
-                    chrome.tabs.remove(id);
+                    // chrome.tabs.remove(tabId);
                     chrome.tabs.onUpdated.removeListener(handler);
 
                     let url = EXTENSION_URL;
@@ -140,6 +150,7 @@ CJ.openLoginPage = function () {
                     );
                 }
             });
-        }
-    );
+        });
+
+    });
 };

@@ -163,7 +163,6 @@ class CreateOrderModal extends Component {
     };
 
     setCheckedStatus(key) {
-        console.log(this.state.adunitsSelected, key, this.state.adunitsSelected.indexOf(key) !== -1);
         return this.state.adunitsSelected.indexOf(key) !== -1;
     }
 
@@ -782,7 +781,6 @@ class CreateOrderModal extends Component {
     @bind
     handleAdunitsCheckboxChange(event) {
         const {checked, name} = event.target;
-        console.log({checked, name});
         if (checked) {
             this.setState(state => ({
                 adunitsSelected: [...new Set([...state.adunitsSelected, name])]
