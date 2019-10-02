@@ -28,7 +28,6 @@ class AuthModal extends Component {
     };
 
     toggle = () => {
-        // this.setState(state => ({open: !state.open}));
         this.props.dfpAuthModalToggle();
     };
 

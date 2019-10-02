@@ -11,6 +11,7 @@ export const adServerInitialState = {
     sourceHandlerReady: false,
     orders: [],
     adunits: [],
+    createOrderModalOpen: false,
     dfpAuthModalOpen: false,
     dfpLoggedIn: false,
     dfpToken: null,
@@ -54,6 +55,11 @@ const adServerReduces = handleActions(
         [adServerActions.dfpAuthModalToggle]: (state, action) => ({
             ...state,
             dfpAuthModalOpen: !state.dfpAuthModalOpen,
+        }),
+        [adServerActions.createOrderModalToggle]: (state, action) => ({
+            ...state,
+            orderKey: action.payload.orderKey || null,
+            createOrderModalOpen: !state.createOrderModalOpen,
         }),
         [adServerActions.setSourceHandler]: (state, action) => ({
             ...state,

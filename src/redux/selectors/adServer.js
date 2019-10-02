@@ -27,6 +27,11 @@ const dfpAuthModalOpen = createSelector(
     adServer => adServer.dfpAuthModalOpen
 );
 
+const createOrderModalOpen = createSelector(
+    rootSelector,
+    adServer => adServer.createOrderModalOpen
+);
+
 const orders = createSelector(
     rootSelector,
     adServer => adServer.orders
@@ -64,6 +69,7 @@ const adServerSelectors = {
     sourceHandler,
     sourceHandlerStatus,
     networkCode,
+    createOrderModalOpen,
     dfpAuthModalOpen,
     dfpLoggedIn,
     dfpToken,

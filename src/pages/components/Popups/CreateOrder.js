@@ -66,7 +66,6 @@ class CreateOrderModal extends Component {
     state = {
         executor: "create",
         title: "Create New Order",
-        isOpen: false,
         backdrop: true,
         showCreativeFormat: false,
         advertiser: defaultAdvertiser,
@@ -156,12 +155,6 @@ class CreateOrderModal extends Component {
                 advertiserId: props.advertiserId
             }
         }
-        if (props.isOpen !== undefined) {
-            return {
-                ...state,
-                isOpen: props.isOpen
-            };
-        }
         return state;
     };
 
@@ -231,7 +224,7 @@ class CreateOrderModal extends Component {
                     ref={helperModal => (this.helperModal = helperModal)}
                 />
                 <Modal
-                    isOpen={this.state.isOpen}
+                    isOpen={this.props.createOrderModalOpen}
                     toggle={this.toggle}
                     size="lg"
                     backdrop={this.state.backdrop}
@@ -678,12 +671,12 @@ class CreateOrderModal extends Component {
     @bind
     open() {
         this.changeAdvertiser(this.props.type === AD_SERVER_DFP ? "openx" : "pubnative");
-        this.setState({isOpen: true});
+        this.props.createOrderModalToggle();
     }
 
     @bind
     close() {
-        this.setState({isOpen: false});
+        this.props.createOrderModalToggle();
     }
 
     @bind
@@ -1143,16 +1136,19 @@ class CreateOrderModal extends Component {
                 }));
             });
         } else {
+            this.props.createOrderModalToggle();
             this.setState(state => ({isOpen: !state.isOpen}));
         }
     }
 }
 
 const mapDispatchToProps = {
-    setAdvertiser: adServerActions.setAdvertiser
+    setAdvertiser: adServerActions.setAdvertiser,
+    createOrderModalToggle: adServerActions.createOrderModalToggle
 };
 
 const mapStateToProps = state => ({
+    createOrderModalOpen: adServerSelectors.createOrderModalOpen(state),
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
     adunits: adServerSelectors.adunits(state),

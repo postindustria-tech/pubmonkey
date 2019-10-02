@@ -18,6 +18,8 @@ const dfpLoggedIn = createAction('adServer--dfpLoggedIn', dfpLoggedIn => ({dfpLo
 const loadInventory = createAction('adServer--loadInventory', payload => (payload));
 const loadAdvertiser = createAction('adServer--loadAdvertiser', payload => (payload));
 
+const createOrderModalToggle = createAction("adServer--createOrderModalToggle", orderKey => ({orderKey}));
+
 const adServerActions = {
     setSwitcher,
     setSourceHandler,
@@ -34,7 +36,8 @@ const adServerActions = {
     dfpAuthModalToggle,
     dfpLoggedIn,
     loadInventory,
-    loadAdvertiser
+    loadAdvertiser,
+    createOrderModalToggle
 };
 
 export default adServerActions;

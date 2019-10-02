@@ -100,7 +100,7 @@ class OrdersTable extends Component {
                                 <i
                                     className={classnames("fa", "fa-copy")}
                                     title={"Duplicate Order"}
-                                    onClick={() => this.toggleCopy(key)}
+                                    onClick={() => this.props.createOrderModalToggle(key)}
                                 ></i>
                             </td>
                         </tr>
@@ -117,10 +117,6 @@ class OrdersTable extends Component {
         }
         return null;
     }
-
-    toggleCopy = key => {
-        this.orderModal.toggle(null, key);
-    };
 
     togglePause(status, key) {
         status = status === "running" ? "paused" : "running";
@@ -186,7 +182,8 @@ class OrdersTable extends Component {
 const mapDispatchToProps = {
     updateOrderStatus: adServerActions.updateOrderStatus,
     setSwitcher: adServerActions.setSwitcher,
-    setOrders: adServerActions.setOrders
+    setOrders: adServerActions.setOrders,
+    createOrderModalToggle: adServerActions.createOrderModalToggle
 };
 
 const mapStateToProps = state => ({
