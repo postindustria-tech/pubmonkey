@@ -60,12 +60,13 @@ class CreateOrderModal extends Component {
         customTargetingKeys: [],
         customTargetingValues: [],
         ADVERTISER_DEFAULT_NAME: {},
-        creativeFormats: {}
+        creativeFormats: {},
+        title: "Create New Order",
+        orderKey: null
     };
 
     state = {
         executor: "create",
-        title: "Create New Order",
         backdrop: true,
         showCreativeFormat: false,
         advertiser: defaultAdvertiser,
@@ -146,6 +147,10 @@ class CreateOrderModal extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         ModalWindowService.ProgressModal.onCancel(this.onCancel);
+
+        if (prevState.advertiser !== this.state.advertiser && this.state.advertiser) {
+            this.changeAdvertiser(this.state.advertiser);
+        }
     }
 
     static getDerivedStateFromProps = (props, state) => {
@@ -153,6 +158,19 @@ class CreateOrderModal extends Component {
             return {
                 ...state,
                 advertiserId: props.advertiserId
+            }
+        }
+        // Opened duplicate order modal
+        if (props.orderName !== undefined && props.orderName !== state.orderName) {
+            return {
+                ...state,
+                orderName: props.orderName,
+                lineItemInfo: props.lineItemInfo,
+                defaultFields: props.defaultFields,
+                rangeFrom: props.rangeFrom,
+                rangeTo: props.rangeTo,
+                adunitsSelected: props.adunitsSelected,
+                advertiser: props.advertiser,
             }
         }
         return state;
@@ -229,7 +247,7 @@ class CreateOrderModal extends Component {
                     size="lg"
                     backdrop={this.state.backdrop}
                 >
-                    <ModalHeader>{this.state.title}</ModalHeader>
+                    <ModalHeader>{this.props.title}</ModalHeader>
                     <ModalBody className="mp-order-form">
                         <div className="panel panel-default">
                             <FormErrors
@@ -680,6 +698,11 @@ class CreateOrderModal extends Component {
     }
 
     @bind
+    toggle() {
+        this.props.createOrderModalToggle();
+    }
+
+    @bind
     handleInputChange(event) {
         const {value, name} = event.target;
         if (['rangeFrom', 'rangeTo'].includes(name)) {
@@ -687,9 +710,9 @@ class CreateOrderModal extends Component {
                 return;
             }
         }
-        if (name === "advertiser") {
-            this.changeAdvertiser(value);
-        }
+        // if (name === "advertiser") {
+        //     this.changeAdvertiser(value);
+        // }
         if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
             let lineItemsNaming = KEYWORD_PLACEHOLDER["amazon"];
             if (value.indexOf("x") !== -1) {
@@ -736,30 +759,6 @@ class CreateOrderModal extends Component {
             rangeMeasure: advertiser === "amazon" ? "position" : "$",
             rangeFrom: advertiser === "amazon" ? 1 : 0.1
         });
-
-        // if (this.props.type === AD_SERVER_DFP) {
-        //     this.props.sourceHandler.getCustomTargetingKeys(this.props.sourceHandler.getAdvertiser().customTargetingKey)
-        //         .then(keys => {
-        //             keys = keys.map(({id}) => {
-        //                 return id;
-        //             });
-        //             return keys;
-        //         })
-        //         .then(keys => {
-        //             keys.map(id => {
-        //                 this.props.sourceHandler.getCustomTargetingValues(id)
-        //                     .then(values => {
-        //                         values = values.map(({id, name}) => {
-        //                             return {id, name};
-        //                         });
-        //                         return values;
-        //                     })
-        //                     .then(values => this.setState({customTargetingValues: values}));
-        //             });
-        //             return keys;
-        //         })
-        //         .then(keys => this.setState({customTargetingKeys: keys}));
-        // }
     }
 
     static getKeywordTemplate = (value, creativeFormat) => {
@@ -1042,103 +1041,6 @@ class CreateOrderModal extends Component {
                 });
             });
     }
-
-    @bind
-    toggle(event, orderKey = null) {
-        if (orderKey) {
-            this.props.sourceHandler.getOrderWithLineItems(orderKey).then(order => {
-                // console.log(order);
-                let {lineItemInfo, rangeFrom, rangeTo} = this.state,
-                    adUnitKeys = [],
-                    defaultLineItemInfo = lineItemInfo,
-                    values = {},
-                    defaultFields = [],
-                    arrays = [];
-                if (!isEmpty(order.lineItems)) {
-                    for (let key in defaultLineItemInfo) {
-                        values[key] = [];
-                    }
-
-                    order.lineItems.forEach(lineItem => {
-                        for (let key in defaultLineItemInfo) {
-                            if (!lineItem.hasOwnProperty(key)) {
-                                continue;
-                            }
-                            let value = lineItem[key];
-                            if (Array.isArray(value)) {
-                                if (arrays.indexOf(key) === -1) {
-                                    arrays.push(key);
-                                }
-                                value = value.join('###');
-                            }
-                            if (values[key].indexOf(value) === -1) {
-                                values[key].push(value);
-                            }
-                        }
-                    });
-
-                    for (let key in defaultLineItemInfo) {
-                        if (values.hasOwnProperty(key) && values[key].length === 1) {
-                            values[key] = values[key].shift();
-                        } else {
-                            values[key] = defaultLineItemInfo[key];
-                            defaultFields.push(key);
-                        }
-                    }
-
-                    rangeFrom = 999999999;
-                    rangeTo = 0;
-                    order.lineItems.forEach(lineItem => {
-                        if (lineItem.bid > rangeTo) {
-                            rangeTo = lineItem.bid;
-                        }
-                        if (lineItem.bid < rangeFrom) {
-                            rangeFrom = lineItem.bid;
-                        }
-                        adUnitKeys = [...adUnitKeys, ...lineItem.adUnitKeys].unique();
-                    });
-                }
-
-                if (isEmpty(values)) {
-                    values = lineItemInfo;
-                } else {
-                    for (let i in arrays) {
-                        const key = arrays[i];
-                        if (!isEmpty(values[key])) {
-                            values[key] = values[key].split('###');
-                        } else {
-                            values[key] = [];
-                        }
-                    }
-                }
-
-                let params = {};
-                switch (this.props.type) {
-                    case AD_SERVER_MOPUB:
-                        params['advertiser'] = this.props.sourceHandler.getAdvertiserByName(order.advertiser);
-                        this.changeAdvertiser(params.advertiser);
-                        break;
-                    case AD_SERVER_DFP:
-                        params['advertiserId'] = order.advertiserId;
-                        break;
-                }
-
-                this.setState(state => ({
-                    isOpen: !state.isOpen,
-                    orderName: order.name,
-                    lineItemInfo: values,
-                    defaultFields: defaultFields,
-                    rangeFrom: rangeFrom,
-                    rangeTo: rangeTo,
-                    adunitsSelected: adUnitKeys,
-                    title: "Duplicate Order",
-                    ...params
-                }));
-            });
-        } else {
-            this.props.createOrderModalToggle();
-        }
-    }
 }
 
 const mapDispatchToProps = {
@@ -1154,6 +1056,7 @@ const mapStateToProps = state => ({
     sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
 
     ...adServerSelectors.dfpInventory(state),
+    ...adServerSelectors.duplicateOrder(state),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateOrderModal)

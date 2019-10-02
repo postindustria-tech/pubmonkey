@@ -64,6 +64,21 @@ const dfpInventory = createSelector(
     })
 );
 
+const duplicateOrder = createSelector(
+    rootSelector,
+    adServer => ({
+        orderName: adServer.orderName,
+        lineItemInfo: adServer.lineItemInfo,
+        defaultFields: adServer.defaultFields,
+        rangeFrom: adServer.rangeFrom,
+        rangeTo: adServer.rangeTo,
+        adunitsSelected: adServer.adunitsSelected,
+        title: adServer.title,
+        advertiser: adServer.advertiser,
+        advertiserId: adServer.advertiserId
+    })
+);
+
 const adServerSelectors = {
     switcherType,
     sourceHandler,
@@ -75,7 +90,8 @@ const adServerSelectors = {
     dfpToken,
     dfpInventory,
     orders,
-    adunits
+    adunits,
+    duplicateOrder
 };
 
 export default adServerSelectors;

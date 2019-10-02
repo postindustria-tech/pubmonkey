@@ -80,10 +80,6 @@ class SourceTypeViewContainer extends PureComponent {
         this.props.dfpLogOut();
         this.props.setDFPLoggedIn(false);
         localStorage.removeItem("dfpToken");
-        // localStorage.removeItem("dfpNetworkCode");
-        // this.setState({
-        //     networkCode: ""
-        // })
     }
 
     @bind

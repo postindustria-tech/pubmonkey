@@ -56,11 +56,11 @@ const adServerReduces = handleActions(
             ...state,
             dfpAuthModalOpen: !state.dfpAuthModalOpen,
         }),
-        [adServerActions.createOrderModalToggle]: (state, action) => ({
-            ...state,
-            orderKey: action.payload.orderKey || null,
-            createOrderModalOpen: !state.createOrderModalOpen,
-        }),
+        // [adServerActions.createOrderModalToggle]: (state, action) => ({
+        //     ...state,
+        //     orderKey: action.payload.orderKey || null,
+        //     createOrderModalOpen: !state.createOrderModalOpen,
+        // }),
         [adServerActions.setSourceHandler]: (state, action) => ({
             ...state,
             orders: [],
@@ -95,6 +95,10 @@ const adServerReduces = handleActions(
             sourceHandlerReady: true
         }),
         [adServerActions.loadAdvertiser]: (state, action) => ({
+            ...state,
+            ...action.payload
+        }),
+        [adServerActions.setCreateOrderModalToggle]: (state, action) => ({
             ...state,
             ...action.payload
         })
