@@ -161,16 +161,12 @@ class CreateOrderModal extends Component {
         if (prevProps.type !== this.props.type) {
             this.reset();
         }
+        if (prevProps.advertiserId !== this.props.advertiserId) {
+            this.setState({advertiserId: this.props.advertiserId});
+        }
     }
 
     static getDerivedStateFromProps = (props, state) => {
-        if (props.advertiserId !== state.advertiserId) {
-            return {
-                ...state,
-                advertiserId: props.advertiserId
-            }
-        }
-        // Opened duplicate order modal
         if (props.orderName !== undefined && props.orderName !== state.orderName) {
             return {
                 ...state,
@@ -461,11 +457,11 @@ class CreateOrderModal extends Component {
                                         </option>
                                     ))}
                                 </Input>
-
                                 <div
                                     hidden={this.state.selectedAdvertiser !== "openx"}
                                     style={{display: "inline-block", width: "auto"}}
                                 >
+                                    {" "}
                                     <span className={"mp-label"}> AdServer Domain: </span>
                                     <CustomInput
                                         invalid={!isEmpty(this.state.formErrors.adServerDomain)}
