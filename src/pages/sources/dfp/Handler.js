@@ -962,6 +962,12 @@ class Handler extends AbstractHandler {
         if (window.canceledExport) return;
         return this.getOrder(id).then(async order => {
             const lineItems = await this.getAllLineItems([order.id]);
+
+            delete order.creatorId;
+            delete order.traffickerId;
+            delete order.isArchived;
+            delete order.totalBudget;
+
             return {
                 ...order,
                 lineItems
@@ -989,6 +995,9 @@ class Handler extends AbstractHandler {
                 let timestamp = Date.now();
 
                 lineItem.creativeAssociations = creativeAssociations.filter(({lineItemId}) => lineItemId === lineItem.id);
+                delete lineItem.isArchived;
+                delete lineItem.lastModifiedDateTime;
+                delete lineItem.creationDateTime;
 
                 timestamp = Date.now() - timestamp;
 
