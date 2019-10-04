@@ -3,7 +3,7 @@ import AbstractHandler from '../../sources/AbstractHandler'
 import {AdvertiserFactory} from "./Factory";
 import {FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
-import {wrapSeries} from "../helpers";
+import {wrapSeries, delay} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
 import {AD_SERVER_MOPUB} from "../../constants/source";
 import axios from "ex-axios";
@@ -351,26 +351,32 @@ class Handler extends AbstractHandler {
 
     collectOrderData(id, step, canceled) {
         if (window.canceledExport) return;
-        return this.getOrder(id).then(order => {
+        return this.getOrder(id).then(async order => {
             let {lineItems} = order;
+
+            await delay(1000);
 
             return Promise.mapSeries(lineItems, ({key}, idx, lineItemCount) => {
                 if (window.canceledExport) return;
                 let timestamp = Date.now();
 
-                return this.getLineItem(key).then(result => {
-                    timestamp = Date.now() - timestamp;
+                return this.getLineItem(key)
+                    .then(async result => {
 
-                    if (step) {
-                        step({
-                            lineItemCount,
-                            timestamp,
-                            lineItemsDone: idx + 1
-                        });
-                    }
+                        await delay(500);
 
-                    return result;
-                });
+                        timestamp = Date.now() - timestamp;
+
+                        if (step) {
+                            step({
+                                lineItemCount,
+                                timestamp,
+                                lineItemsDone: idx + 1
+                            });
+                        }
+
+                        return result;
+                    });
             }).then(lineItems => ({...order, lineItems}));
         });
     }

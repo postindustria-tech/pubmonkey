@@ -14,3 +14,5 @@ export function wrapSeries(collection, method, step, times = 1) {
         )
     );
 }
+
+export const delay = (ms) => new Promise(res => setTimeout(() => res(ms), ms));
