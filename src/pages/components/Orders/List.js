@@ -14,7 +14,6 @@ import {FileService, ModalWindowService} from "../../services";
 import {MainController, OrderController} from "../../controllers";
 import CreateOrderModal from "../Popups/CreateOrder";
 import {AD_SERVER_DFP} from "../../constants/source";
-import AdServerSwitcherContainer from '../../containers/adServerSwitcherContainer/adServerSwitcherContainer'
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 

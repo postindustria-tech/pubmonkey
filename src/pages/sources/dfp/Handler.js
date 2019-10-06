@@ -1032,12 +1032,17 @@ class Handler extends AbstractHandler {
     updateOrderStatus(status, id) {
         let mappedStatus = null;
         switch (status) {
+            case 'Resume':
+                mappedStatus = 'ResumeOrders';
+                break;
             case 'running':
                 mappedStatus = 'ApproveOrders';
                 break;
+            case 'Pause':
             case 'paused':
                 mappedStatus = 'PauseOrders';
                 break;
+            case 'Archive':
             case 'archived':
                 mappedStatus = 'ArchiveOrders';
                 break;

@@ -24,8 +24,7 @@ function* getOrders(action) {
 function* getOrdersAfter(sourceHandler) {
     try {
         const ordersOriginal = yield select(adServerSelectors.orders);
-        const orders = yield sourceHandler.getOrdersAfter(ordersOriginal) ||
-        ordersOriginal;
+        const orders = yield sourceHandler.getOrdersAfter(ordersOriginal) || ordersOriginal;
         yield put(adServerActions.setOrdersAfter(orders));
     } catch (error) {
         console.log(error);

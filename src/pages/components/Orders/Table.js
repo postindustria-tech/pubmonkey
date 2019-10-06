@@ -6,6 +6,9 @@ import adServerActions from "../../../redux/actions/adServer";
 import {connect} from "react-redux";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {AD_SERVER_DFP} from "../../constants/source";
+import {StatusSelect} from "../Select";
+
+const workerOptions = ['Pause', 'Resume', 'Archive'];
 
 class OrdersTable extends Component {
 
@@ -69,7 +72,13 @@ class OrdersTable extends Component {
                             </td>
                             <td>{advertiser}</td>
                             <td>{lineItemCount}</td>
-                            <td>{status}</td>
+                            <td>{this.props.type === AD_SERVER_DFP ?
+                                <StatusSelect
+                                    options={workerOptions}
+                                    status={status}
+                                    onSelect={status => this.changeOrderStatus(key, status)}
+                                /> : status}
+                            </td>
                             <td className="actions">
                                 <i
                                     className={classnames("fa", "fa-archive", {
@@ -105,6 +114,12 @@ class OrdersTable extends Component {
             return this.props.sourceHandler.getOrderUrl(key);
         }
         return null;
+    }
+
+    changeOrderStatus(key, status) {
+        this.props.sourceHandler.updateOrderStatus(status, key).then(() => {
+            this.props.updateOrderStatus(status, key);
+        });
     }
 
     togglePause(status, key) {
