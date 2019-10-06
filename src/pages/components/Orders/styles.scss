@@ -1,8 +1,5 @@
 
 .orders-list-layout {
-    .btn {
-        margin: 0 6px;
-    }
 
     .list-filter {
         padding: 6px;
@@ -11,6 +8,12 @@
             display: inline-block;
             width: auto;
         }
+    }
+}
+
+.orders-list-actions {
+    .btn {
+        margin: 0 6px;
     }
 }
 

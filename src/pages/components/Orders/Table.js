@@ -73,9 +73,9 @@ class OrdersTable extends Component {
                             <td className="actions">
                                 <i
                                     className={classnames("fa", "fa-archive", {
-                                        archived: status === "archived"
+                                        archived: status.toLowerCase() === "archived"
                                     })}
-                                    title={status === "archived" ? "Unarchive" : "Archive"}
+                                    title={status.toLowerCase() === "archived" ? "Unarchive" : "Archive"}
                                     onClick={() => this.toggleArchive(status, key)}
                                 ></i>
                                 <i
@@ -115,7 +115,7 @@ class OrdersTable extends Component {
 
     toggleArchive(status, key) {
         status =
-            status === "archived"
+            status.toLowerCase() === "archived"
                 ? this.props.type === AD_SERVER_DFP ? "unarchived" : "running"
                 : "archived";
 

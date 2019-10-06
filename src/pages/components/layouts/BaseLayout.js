@@ -8,6 +8,7 @@ import { version } from '../../../misc.json'
 import SourceTypeViewContainer from '../../containers/SourceTypeViewContainer/SourceTypeViewContainer';
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
+import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
 
 class BaseLayout extends Component {
 
@@ -79,6 +80,9 @@ class BaseLayout extends Component {
                 <div id="page-content-wrapper" className={"border-left"}>
 
                     <Navbar className="header sticky-top">
+
+                        <AdServerSwitcherContainer/>
+
                         <NavbarBrand>
                             {/*PubMonkey <small>v. { version }</small>*/}
                         </NavbarBrand>

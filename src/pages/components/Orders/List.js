@@ -66,43 +66,43 @@ class OrdersList extends Component {
         return (
             <BaseLayout className="orders-list-layout">
 
-                <AdServerSwitcherContainer/>
-
                 <h2>Orders</h2>
-                <Button
-                    color="primary"
-                    onClick={this.exportSelected}
-                    disabled={!orderCount || !this.props.sourceHandlerReady}
-                >
-                    <i className="fa fa-cloud-download"/>
-                    &nbsp; Export
-                </Button>
-                <Button
-                    color="primary"
-                    onClick={this.importSelected}
-                    hidden={this.props.type === AD_SERVER_DFP}
-                    disabled={!this.props.sourceHandlerReady}
-                >
-                    <i className="fa fa-cloud-upload"/>
-                    &nbsp; Import
-                </Button>
-                <CreateOrderModal
-                    toUpdate={this.loadOrders}
-                />
-                {/*<Button
+                <div className={"orders-list-actions"}>
+                    <Button
+                        color="primary"
+                        onClick={this.exportSelected}
+                        disabled={!orderCount || !this.props.sourceHandlerReady}
+                    >
+                        <i className="fa fa-cloud-download"/>
+                        &nbsp; Export
+                    </Button>
+                    <Button
+                        color="primary"
+                        onClick={this.importSelected}
+                        hidden={this.props.type === AD_SERVER_DFP}
+                        disabled={!this.props.sourceHandlerReady}
+                    >
+                        <i className="fa fa-cloud-upload"/>
+                        &nbsp; Import
+                    </Button>
+                    <CreateOrderModal
+                        toUpdate={this.loadOrders}
+                    />
+                    {/*<Button
                     color="primary"
                     onClick={this.backupSelected}
                     disabled={!orderCount}
                 >
                     Create Backup
                 </Button>*/}
-                {/* <Button
+                    {/* <Button
                     color="primary"
                     onClick={ this.archiveSelected }
                     disabled={ !orderCount }
                 >
                     Archive/Unarchive
                 </Button> */}
+                </div>
 
                 <Row className="list-filter">
                     <Col className={"col-sm-12"}>
