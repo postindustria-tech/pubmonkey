@@ -27,6 +27,20 @@ class Handler extends AbstractHandler {
         amazon: "Amazon HB"
     };
 
+    FILTER_FN = [
+        ({status}) => status !== "archived",
+        ({status}) => status === "running",
+        ({status}) => status === "PAUSED",
+        ({status}) => status === "archived"
+    ];
+
+    STATUS_OPTIONS = [
+        {value: 0, label: "all except archived"},
+        {value: 1, label: "running"},
+        {value: 2, label: "paused"},
+        {value: 3, label: "archived"}
+    ];
+
     lineItemInfo = {
         allocationPercentage: 100,
         bidStrategy: "cpm",

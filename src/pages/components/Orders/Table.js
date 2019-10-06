@@ -6,7 +6,6 @@ import adServerActions from "../../../redux/actions/adServer";
 import {connect} from "react-redux";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {AD_SERVER_DFP} from "../../constants/source";
-import CreateOrderModal from "../Popups/CreateOrder";
 
 class OrdersTable extends Component {
 
@@ -27,10 +26,6 @@ class OrdersTable extends Component {
             this.setState({updatedFiltersAt: props.updatedFiltersAt});
             this.toggleAll(false)
         }
-    };
-
-    openModal = () => {
-        this.orderModal.ask();
     };
 
     render() {
@@ -182,7 +177,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = state => ({
     type: adServerSelectors.switcherType(state),
-    sourceHandler: adServerSelectors.sourceHandler(state)
+    sourceHandler: adServerSelectors.sourceHandler(state),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrdersTable);

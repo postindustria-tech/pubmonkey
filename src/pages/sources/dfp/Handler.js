@@ -41,6 +41,30 @@ class Handler extends AbstractHandler {
         amazon: "Amazon HB"
     };
 
+    FILTER_FN = [
+        ({status}) => status !== "ARCHIVED",
+        ({status}) => status === "DRAFT",
+        ({status}) => status === "APPROVED",
+        ({status}) => status === "DISAPPROVED",
+        ({status}) => status === "PENDING_APPROVAL",
+        ({status}) => status === "PAUSED",
+        ({status}) => status === "ARCHIVED",
+        ({status}) => status === "CANCELED",
+        ({status}) => status === "DELETED",
+    ];
+
+    STATUS_OPTIONS = [
+        {value: 0, label: "all except archived"},
+        {value: 1, label: "DRAFT"},
+        {value: 2, label: "APPROVED"},
+        {value: 3, label: "DISAPPROVED"},
+        {value: 4, label: "PENDING_APPROVAL"},
+        {value: 5, label: "PAUSED"},
+        {value: 6, label: "ARCHIVED"},
+        {value: 7, label: "CANCELED"},
+        {value: 8, label: "DELETED"},
+    ];
+
     dfp = null;
     networkCode = null;
     token = null;
@@ -261,21 +285,12 @@ class Handler extends AbstractHandler {
     }
 
     async getAllOrders() {
-        return this.getOrders();
-    }
-
-    async getOrders() {
         return new Promise(async (resolve, reject) => {
             try {
                 let orders = await this._getByStatement('OrderService', {});
 
                 if (orders.totalResultSetSize > 0) {
-                    orders = orders.results.map(order => {
-                        return {
-                            ...order,
-                            status: order.isArchived ? 'archived' : order.status
-                        }
-                    });
+                    orders = orders.results;
                     // console.log(orders);
                 } else {
                     orders = [];
@@ -290,7 +305,7 @@ class Handler extends AbstractHandler {
                 return {
                     key: order.id,
                     name: order.name,
-                    status: order.status,
+                    status: order.isArchived ? 'ARCHIVED' : order.status,
                     advertiser: "Calculating...",
                     advertiserId: order.advertiserId,
                     lineItemCount: "Calculating..."

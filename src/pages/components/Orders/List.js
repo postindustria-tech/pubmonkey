@@ -13,27 +13,11 @@ import BaseLayout from "../layouts/BaseLayout";
 import {FileService, ModalWindowService} from "../../services";
 import {MainController, OrderController} from "../../controllers";
 import CreateOrderModal from "../Popups/CreateOrder";
-import {
-    AD_SERVERS,
-    AD_SERVER_DFP,
-    AD_SERVER_MOPUB
-} from "../../constants/source";
+import {AD_SERVER_DFP} from "../../constants/source";
 import AdServerSwitcherContainer from '../../containers/adServerSwitcherContainer/adServerSwitcherContainer'
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 
-const FILTER_FN = [
-        ({status}) => status !== "archived",
-        ({status}) => status === "running",
-        ({status}) => status === "paused",
-        ({status}) => status === "archived"
-    ],
-    STATUS_OPTIONS = [
-        {value: 0, label: "all except archived"},
-        {value: 1, label: "running"},
-        {value: 2, label: "paused"},
-        {value: 3, label: "archived"}
-    ];
 window.canceledExport = false;
 
 class OrdersList extends Component {
@@ -41,7 +25,8 @@ class OrdersList extends Component {
     timer = null;
 
     static defaultProps = {
-        sourceHandlerReady: false
+        sourceHandlerReady: false,
+        STATUS_OPTIONS: []
     };
 
     state = {
@@ -49,16 +34,13 @@ class OrdersList extends Component {
         selected: [],
         orderCount: 0,
         lineItemCount: 0,
-        filter: 0,
-        filterFn: FILTER_FN[0],
+        filter: undefined,
+        filterFn: () => true,
         canceled: false,
-        adServer: Object.keys(AD_SERVERS)[0],
-        updatedFiltersAt: null
     };
 
     componentDidMount() {
         this.props.setSwitcher(this.props.type);
-        // this.loadOrders();
     }
 
     componentWillUnmount() {
@@ -67,9 +49,15 @@ class OrdersList extends Component {
         }
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.filter !== this.state.filter ||
+            this.props.type !== prevProps.type) {
+            this.filterChange(this.props.filter);
+        }
+    }
+
     render() {
         let {
-            progress,
             orderCount,
             filter,
             filterFn
@@ -78,7 +66,7 @@ class OrdersList extends Component {
         return (
             <BaseLayout className="orders-list-layout">
 
-                <AdServerSwitcherContainer />
+                <AdServerSwitcherContainer/>
 
                 <h2>Orders</h2>
                 <Button
@@ -126,7 +114,7 @@ class OrdersList extends Component {
                             value={filter}
                             className={"mp-form-control"}
                         >
-                            {STATUS_OPTIONS.map(
+                            {this.props.STATUS_OPTIONS.map(
                                 (item, index) => (
                                     <option key={index} value={item.value}>
                                         {item.label}
@@ -305,7 +293,7 @@ class OrdersList extends Component {
         ModalWindowService.ProgressModal.onCancel(() => {
             this.setState({canceled: true});
             ModalWindowService.ProgressModal.hideModal();
-            window.canceledExport = true
+            window.canceledExport = true;
             promise.cancel("canceled by user");
 
             this.timer = setTimeout(() => {
@@ -452,24 +440,32 @@ class OrdersList extends Component {
     onFilterChange(event) {
         const {value, name} = event.target;
 
+        this.filterChange(value);
+    }
+
+    filterChange(filter) {
         this.setState({
-            filter: value,
-            filterFn: FILTER_FN[value],
-            updatedFiltersAt: Date.now()
+            filter: filter,
+            filterFn: this.props.sourceHandler.FILTER_FN[filter]
         });
+
+        this.props.filterOrderStatus(filter);
     }
 }
 
 const mapDispatchToProps = {
     setSwitcher: adServerActions.setSwitcher,
     refreshOrders: adServerActions.refreshOrders,
+    filterOrderStatus: adServerActions.filterOrderStatus,
 };
 
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
-    sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state)
+    sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
+
+    ...adServerSelectors.filterOrderStatus(state)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)

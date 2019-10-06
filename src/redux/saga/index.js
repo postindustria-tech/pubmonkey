@@ -66,6 +66,11 @@ function* setSourceHandlerAfter() {
         const sourceHandler = yield select(adServerSelectors.sourceHandler);
         const type = yield select(adServerSelectors.switcherType);
 
+        const params = {
+            ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME,
+            STATUS_OPTIONS: sourceHandler.STATUS_OPTIONS
+        };
+
         if (type === AD_SERVER_DFP) {
             const dfpLoggedIn = sourceHandler.getToken() !== null;
             yield put(adServerActions.dfpLoggedIn(dfpLoggedIn));
@@ -74,7 +79,7 @@ function* setSourceHandlerAfter() {
                 const sourceAdvertisers = yield sourceHandler.getAllAdvertisers() || [];
                 yield put(adServerActions.loadInventory({
                     sourceAdvertisers,
-                    ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME
+                    ...params
                 }));
             }
         }
@@ -82,7 +87,7 @@ function* setSourceHandlerAfter() {
             const ready = yield sourceHandler.isReady();
             if (ready) {
                 yield put(adServerActions.loadInventory({
-                    ADVERTISER_DEFAULT_NAME: sourceHandler.ADVERTISER_DEFAULT_NAME
+                    ...params
                 }));
                 yield put(adServerActions.setSourceHandlerStatus(true));
             }

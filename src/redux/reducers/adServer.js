@@ -16,7 +16,9 @@ export const adServerInitialState = {
     dfpLoggedIn: false,
     dfpToken: null,
     customTargetingKeys: [],
-    customTargetingValues: []
+    customTargetingValues: [],
+    filter: 0,
+    updatedFiltersAt: null
 };
 
 const adServerReduces = handleActions(
@@ -65,6 +67,7 @@ const adServerReduces = handleActions(
             ...state,
             orders: [],
             adunits: [],
+            filter: 0,
             sourceHandler: action.payload.sourceHandler
         }),
         [adServerActions.setOrders]: (state, action) => ({
@@ -78,6 +81,11 @@ const adServerReduces = handleActions(
         [adServerActions.setAdUnits]: (state, action) => ({
             ...state,
             adunits: action.payload.adunits
+        }),
+        [adServerActions.filterOrderStatus]: (state, action) => ({
+            ...state,
+            filter: action.payload.filter,
+            updatedFiltersAt: Date.now()
         }),
         [adServerActions.updateOrderStatus]: (state, action) => ({
             ...state,

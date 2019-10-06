@@ -7,6 +7,8 @@ export default class AbstractHandler {
     advertiser = null;
 
     ADVERTISER_DEFAULT_NAME = {};
+    FILTER_FN = [];
+    STATUS_OPTIONS = [];
 
     setAdvertiserFactory(advertiserFactory) {
         this.advertiserFactory = advertiserFactory;

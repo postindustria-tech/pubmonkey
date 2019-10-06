@@ -21,6 +21,8 @@ const setCreateOrderModalToggle = createAction('adServer--setCreateOrderModalTog
 
 const createOrderModalToggle = createAction("adServer--createOrderModalToggle", orderKey => ({orderKey}));
 
+const filterOrderStatus = createAction('adServer--filterOrderStatus', filter => ({filter}));
+
 const adServerActions = {
     setSwitcher,
     setSourceHandler,
@@ -39,7 +41,8 @@ const adServerActions = {
     loadInventory,
     loadAdvertiser,
     createOrderModalToggle,
-    setCreateOrderModalToggle
+    setCreateOrderModalToggle,
+    filterOrderStatus,
 };
 
 export default adServerActions;

@@ -58,9 +58,18 @@ const dfpInventory = createSelector(
         sourceAdvertisers: adServer.sourceAdvertisers,
         customTargetingKeys: adServer.customTargetingKeys,
         customTargetingValues: adServer.customTargetingValues,
-        ADVERTISER_DEFAULT_NAME: adServer.ADVERTISER_DEFAULT_NAME,
         creativeFormats: adServer.creativeFormats,
-        advertiserId: adServer.advertiserId
+        advertiserId: adServer.advertiserId,
+        ADVERTISER_DEFAULT_NAME: adServer.ADVERTISER_DEFAULT_NAME
+    })
+);
+
+const filterOrderStatus = createSelector(
+    rootSelector,
+    adServer => ({
+        filter: adServer.filter,
+        updatedFiltersAt: adServer.updatedFiltersAt,
+        STATUS_OPTIONS: adServer.STATUS_OPTIONS,
     })
 );
 
@@ -91,7 +100,8 @@ const adServerSelectors = {
     dfpInventory,
     orders,
     adunits,
-    duplicateOrder
+    duplicateOrder,
+    filterOrderStatus,
 };
 
 export default adServerSelectors;
