@@ -1,0 +1,23 @@
+.status-select {
+  position: relative;
+
+  &__list {
+    background: #fff;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 2;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+  }
+
+  &__items {
+    padding: 5px 0;
+    cursor: pointer;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #eee;
+    }
+  }
+}
