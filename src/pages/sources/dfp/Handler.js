@@ -485,30 +485,41 @@ class Handler extends AbstractHandler {
         });
     }
 
-    async performOrderAction(status, orderId) {
+    async performOrderAction(status, mappedStatus, orderId) {
         return new Promise(async (resolve, reject) => {
+
+            let resultStatus = status;
 
             const Service = await this.getDfp().then(dfp => dfp.getService("OrderService"));
             Service.setToken(this.token);
 
             let result = await Service.performOrderAction({
                 orderAction: {
-                    attributes: {'xsi:type': status}
+                    attributes: {'xsi:type': mappedStatus}
                 },
                 filterStatement: {query: 'WHERE id = ' + orderId}
             });
-            if (status === "UnarchiveOrders") { // Hot fix, to do unarchive we need to send two request
-                result = await Service.performOrderAction({
-                    orderAction: {
-                        attributes: {'xsi:type': "ApproveOrders"}
-                    },
-                    filterStatement: {query: 'WHERE id = ' + orderId}
-                });
+            if (mappedStatus === "UnarchiveOrders") { // Hot fix, to do unarchive we need to send two request
+                try {
+                    result = await Service.performOrderAction({
+                        orderAction: {
+                            attributes: {'xsi:type': "ApproveOrders"}
+                        },
+                        filterStatement: {query: 'WHERE id = ' + orderId}
+                    });
+                    resultStatus = 'APPROVED';
+                } catch (e) {
+                    resultStatus = 'DRAFT';
+                }
             }
 
-            console.log(result);
+            if (result.hasOwnProperty('numChanges') && result.numChanges === 1) {
+                return resolve({status: resultStatus.toUpperCase()});
+            }
 
-            resolve(result);
+            // console.log(result);
+
+            reject(result);
         });
     }
 
@@ -1061,7 +1072,7 @@ class Handler extends AbstractHandler {
                 throw `Wrong order status ${status}`;
         }
 
-        return this.performOrderAction(mappedStatus, id);
+        return this.performOrderAction(status, mappedStatus, id);
     }
 
     getOrderUrl(key) {

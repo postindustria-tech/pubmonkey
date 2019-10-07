@@ -77,12 +77,12 @@ class OrdersTable extends Component {
                                 }) :
                                 lineItemCount}
                             </td>
-                            <td>{this.props.type === AD_SERVER_DFP ?
+                            <td>{status}{/*{this.props.type === AD_SERVER_DFP ?
                                 <StatusSelect
                                     options={workerOptions}
                                     status={status}
                                     onSelect={status => this.changeOrderStatus(key, status)}
-                                /> : status}
+                                /> : status}*/}
                             </td>
                             <td className="actions">
                                 <i
@@ -94,7 +94,7 @@ class OrdersTable extends Component {
                                 ></i>
                                 <i
                                     className={classnames("fa", {
-                                        "fa-pause": status === "running",
+                                        "fa-pause": status === "running" || status === "",
                                         "fa-play": status === "paused"
                                     })}
                                     title={status === "running" ? "Disable" : "Enable"}
@@ -143,8 +143,8 @@ class OrdersTable extends Component {
     }
 
     updateStatus(status, key) {
-        this.props.sourceHandler.updateOrderStatus(status, key).then(() => {
-            this.props.updateOrderStatus(status, key);
+        this.props.sourceHandler.updateOrderStatus(status, key).then((updatedOrder) => {
+            this.props.updateOrderStatus(updatedOrder.status, key);
         });
     }
 
