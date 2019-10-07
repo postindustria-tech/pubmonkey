@@ -324,10 +324,18 @@ class Handler extends AbstractHandler {
         const lineItems = await this.getAllLineItems(ids);
 
         return ordersOriginal.map(order => {
+
+            let statuses = {};
+            lineItems
+                .filter(({orderId}) => orderId === order.key)
+                .forEach(lineItem => {
+                    statuses[lineItem.status] ? statuses[lineItem.status]++ : statuses[lineItem.status] = 1;
+                });
+
             return {
                 ...order,
                 advertiser: advertisers.find(advertiser => advertiser.id === order.advertiserId).name,
-                lineItemCount: lineItems.filter(({orderId}) => orderId === order.key).length
+                lineItemCount: Object.entries(statuses).map(x => `${x[0]} (${x[1]})`) //lineItems.filter(({orderId}) => orderId === order.key).length
             }
         });
     }

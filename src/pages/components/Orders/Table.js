@@ -71,7 +71,12 @@ class OrdersTable extends Component {
                                 </a>
                             </td>
                             <td>{advertiser}</td>
-                            <td>{lineItemCount}</td>
+                            <td>{Array.isArray(lineItemCount) ?
+                                lineItemCount.map((item, i) => {
+                                    return <p key={i}>{item}</p>;
+                                }) :
+                                lineItemCount}
+                            </td>
                             <td>{this.props.type === AD_SERVER_DFP ?
                                 <StatusSelect
                                     options={workerOptions}
