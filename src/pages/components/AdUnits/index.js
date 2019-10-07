@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router'
 import { Table } from 'reactstrap'
 import BaseLayout from '../layouts/BaseLayout'
-import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 import {connect} from "react-redux";
@@ -35,8 +34,6 @@ class AdUnitsList extends Component {
             <BaseLayout
                 className="adunits-list-layout"
             >
-
-                <AdServerSwitcherContainer />
 
                 <h2>Ad Units</h2>
                 <Table className="adunits-table">
