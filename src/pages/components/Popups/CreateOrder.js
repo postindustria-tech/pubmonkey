@@ -204,21 +204,16 @@ class CreateOrderModal extends Component {
             os
         } = this.state;
 
-        if (this.props.type !== AD_SERVER_MOPUB) {
-            return appName.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
-                name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
-                key.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
-        }
-
         let adUnitFormat = true;
-
-        if (advertiser === "pubnative") {
-            if (typeof NETWORK_CLASS_TO_DIMENSION[networkClass] !== "undefined" &&
-                !isEmpty(NETWORK_CLASS_TO_DIMENSION[networkClass])) {
-                adUnitFormat = NETWORK_CLASS_TO_DIMENSION[networkClass] === format;
+        if (!isEmpty(format)) {
+            if (advertiser === "pubnative") {
+                if (typeof NETWORK_CLASS_TO_DIMENSION[networkClass] !== "undefined" &&
+                    !isEmpty(NETWORK_CLASS_TO_DIMENSION[networkClass])) {
+                    adUnitFormat = NETWORK_CLASS_TO_DIMENSION[networkClass] === format;
+                }
+            } else if (!isEmpty(creativeFormat)) {
+                adUnitFormat = creativeFormat === format;
             }
-        } else if (!isEmpty(creativeFormat)) {
-            adUnitFormat = creativeFormat === format;
         }
 
         os = os !== "" ? os === appType : true;
