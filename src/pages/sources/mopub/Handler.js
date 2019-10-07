@@ -30,7 +30,7 @@ class Handler extends AbstractHandler {
     FILTER_FN = [
         ({status}) => status !== "archived",
         ({status}) => status === "running",
-        ({status}) => status === "PAUSED",
+        ({status}) => status === "paused",
         ({status}) => status === "archived"
     ];
 

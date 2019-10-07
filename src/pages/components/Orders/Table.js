@@ -94,7 +94,7 @@ class OrdersTable extends Component {
                                 ></i>
                                 <i
                                     className={classnames("fa", {
-                                        "fa-pause": status === "running" || status === "",
+                                        "fa-pause": status === "running",
                                         "fa-play": status === "paused"
                                     })}
                                     title={status === "running" ? "Disable" : "Enable"}
