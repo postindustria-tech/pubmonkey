@@ -350,9 +350,7 @@ class Handler extends AbstractHandler {
     collectOrderDataFromSet(orders, step, canceled) {
         return Promise.mapSeries(orders, ({key}, idx, orderCount) => {
             if (window.canceledExport) return;
-            return this.collectOrderData(
-                key,
-                progress =>
+            return this.collectOrderData(key, progress =>
                     step({
                         ...progress,
                         ordersDone: idx + 1,
