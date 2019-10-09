@@ -781,7 +781,7 @@ class Handler extends AbstractHandler {
                 }
             }
 
-            await this.performOrderAction('ApproveOrders', order.id);
+            await this.performOrderAction('running', 'ApproveOrders', order.id);
 
             return this.createLineItems(lineItems)
                 .then(lineItems => {
