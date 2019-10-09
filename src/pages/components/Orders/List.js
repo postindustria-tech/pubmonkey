@@ -243,8 +243,11 @@ class OrdersList extends Component {
 
         let promise = this.props.sourceHandler.collectOrderDataFromSet(
             selected,
-            ({lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp}) => {
+            ({lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp, lineItemsTotal}) => {
                 if (this.state.canceled) return;
+                if (lineItemsTotal) {
+                    total = lineItemsTotal;
+                }
                 if (average == null) {
                     average = timestamp;
                 } else {

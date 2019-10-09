@@ -15,6 +15,7 @@ import {
     LineItemCreativeAssociation
 } from "./DataTypes";
 import {DOMParser} from "xmldom";
+import {delay} from "../helpers";
 
 Promise.config({
     // Enable cancellation
@@ -1024,9 +1025,11 @@ class Handler extends AbstractHandler {
                 }
             }
 
-            return Promise.mapSeries(lineItems, (lineItem, idx, lineItemCount) => {
+            return Promise.mapSeries(lineItems, async (lineItem, idx, lineItemCount) => {
                 if (window.canceledExport) return;
                 let timestamp = Date.now();
+
+                await delay(50);
 
                 lineItem.creativeAssociations = creativeAssociations.filter(({lineItemId}) => lineItemId === lineItem.id);
                 delete lineItem.isArchived;
@@ -1039,7 +1042,8 @@ class Handler extends AbstractHandler {
                     step({
                         lineItemCount,
                         timestamp,
-                        lineItemsDone: idx + 1
+                        lineItemsDone: idx + 1,
+                        lineItemsTotal: ids.length
                     });
                 }
 
