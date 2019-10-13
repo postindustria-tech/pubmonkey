@@ -1016,21 +1016,27 @@ class CreateOrderModal extends Component {
                 console.error(error);
                 ModalWindowService.ProgressModal.cancel();
 
-                let close = true;
-                let errorName = JSON.stringify(error);
+                let close = true,
+                    trace = true,
+                    errorName = JSON.stringify(error);
                 if (errorName.length) {
                     errorName = error.name;
                     if (error.hasOwnProperty('close')) {
                         close = error.close;
+                    }
+                    if (error.hasOwnProperty('trace')) {
+                        trace = error.trace;
+                    }
+                    if (error.hasOwnProperty('message')) {
+                        errorName = error.message;
                     }
                 }
                 if (close) {
                     this.close();
                     this.props.toUpdate && this.props.toUpdate();
                 }
-
                 this.helperModal.open({
-                    text: errorName + '<br/>' + error.stack.replace(/\r?\n/g, '<br/>')
+                    text: errorName + '<br/>' + (trace ? error.stack.replace(/\r?\n/g, '<br/>') : '')
                 });
             });
     }

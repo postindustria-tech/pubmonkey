@@ -22,13 +22,17 @@ Promise.config({
     cancellation: true
 });
 
-function OrderError(message, close) {
+function OrderError(message, close, trace) {
     this.name = "OrderError";
     this.message = (message || "");
     if (typeof close == "undefined") {
         close = true;
     }
     this.close = close;
+    if (typeof trace == "undefined") {
+        trace = true;
+    }
+    this.trace = trace;
 }
 
 OrderError.prototype = Error.prototype;
@@ -968,7 +972,7 @@ class Handler extends AbstractHandler {
                         if (errorString.length > 0) {
                             const nodeValue = errorString[0].childNodes[0].nodeValue
                             if (nodeValue === "UniqueError.NOT_UNIQUE") {
-                                message = new OrderError("Order with specified name already exists", false);
+                                message = new OrderError("Order with specified name already exists", false, false);
                             } else {
                                 message = new Error(nodeValue);
                             }
