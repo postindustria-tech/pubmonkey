@@ -5,6 +5,8 @@ import bind from "bind-decorator";
 import adServerActions from "../../../redux/actions/adServer";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
+import FormErrors from "../../components/FormErrors";
+import {ONLY_NUMBERS} from "../../constants/common";
 
 class AuthModal extends Component {
 
@@ -16,15 +18,33 @@ class AuthModal extends Component {
         networkCode: localStorage.getItem("dfpNetworkCode") || "",
         formErrors: {
             networkCode: ""
-        }
+        },
+        formValid: true
     };
 
     submit = () => {
+
+        if (isEmpty(this.state.networkCode)) {
+            this.setState({
+                formErrors: {
+                    networkCode: "Network Code is required!"
+                },
+                formValid: false
+            });
+            return;
+        }
+
         this.toggle();
 
         localStorage.setItem("dfpNetworkCode", this.state.networkCode);
 
         this.props.setNetworkCode(this.state.networkCode);
+        this.setState({
+            formErrors: {
+                networkCode: ""
+            },
+            formValid: true
+        });
     };
 
     toggle = () => {
@@ -36,6 +56,12 @@ class AuthModal extends Component {
             <Modal isOpen={this.props.dfpAuthModalOpen} toggle={this.toggle}>
                 <ModalHeader>Google Ad Manager (DFP)</ModalHeader>
                 <ModalBody>
+                    <div className="panel panel-default">
+                        <FormErrors
+                            formErrors={this.state.formErrors}
+                            formValid={this.state.formValid}
+                        />
+                    </div>
                     <Row>
                         <Col className={"col-sm-12"}>
                             <Form inline>
@@ -67,7 +93,9 @@ class AuthModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
-        this.setState({[name]: value});
+        if (ONLY_NUMBERS.test(value)) {
+            this.setState({[name]: value});
+        }
     }
 }
 

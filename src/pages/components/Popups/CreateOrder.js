@@ -29,12 +29,13 @@ import ConfirmModal from "./ConfirmModal";
 import _ from "underscore";
 import HelperModal from "./HelperModal";
 import {
+    ONLY_NUMBERS,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
     NETWORK_CLASS,
     NETWORK_CLASS_TO_DIMENSION
 } from '../../constants/common';
-import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
+import {AD_SERVER_DFP, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
@@ -42,8 +43,6 @@ import {connect} from "react-redux";
 const helperText =
     "{bid} macro is replaced with a corresponding bid value\n" +
     "{position} macro is replaced with a position number (natural values starting from 1)";
-
-const ONLY_NUMBERS = /^[0-9\b\.]+$/;
 
 let progress = null,
     defaultAdvertiser = "pubnative";

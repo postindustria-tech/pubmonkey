@@ -1,3 +1,5 @@
+export const ONLY_NUMBERS = /^[0-9\b\.]+$/;
+
 export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   pubnative: "pn_bid:{bid}",
   openx: "hb_pb:{bid}",
