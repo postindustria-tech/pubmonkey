@@ -534,7 +534,8 @@ class Handler extends AbstractHandler {
             lineItemsNaming,
             advertiser,
             customTargetingKeys,
-            customTargetingValues
+            customTargetingValues,
+            granularity
         } = params;
 
         let lineItems = [],
@@ -571,50 +572,141 @@ class Handler extends AbstractHandler {
                 displayName: this.advertiser.customTargetingKey,
                 type: "FREEFORM"
             }]);
-            console.log(newKeys);
+            // console.log(newKeys);
             keyId = newKeys[0].id;
         }
 
-        let line = 1;
         const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length,
             stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
 
-
-        let bids = [],
+        let line = 1,
+            bids = [],
             keywords = [];
-        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-            bids.push(bid);
 
-            const bidDecimal = toDecimal(bid),
-                s = toDecimal(step);
+        if (advertiser === "openx") {
 
-            if (advertiser === "amazon") {
-                for (let i = 0; i < keywordStep; i += 1) {
-                    i = toValidUI(i);
-                    const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "");
-                    keywords.push(keyword);
-                }
-                line++;
-            } else if (advertiser === "openx") {
-                const to = +toValidUI(bidDecimal + s).toFixed(2);
-                for (let i = bidDecimal; i < to; i += keywordStep) {
-                    i = toValidUI(i);
-                    if (i < to) {
-                        keywords.push(i.toFixed(2));
+            switch (granularity) {
+                case 'low':
+                    step = rangeFrom = toInteger(0.5);
+                    rangeTo = toInteger(5);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
                     }
-                }
-            } else {
-                const to = +toValidUI(bidDecimal + s).toFixed(2);
-                for (let i = bidDecimal; i < to; i += keywordStep) {
-                    i = toValidUI(i);
-                    if (i < to) {
-                        const value = i.toFixed(keywordStepDecimalPartLength),
-                            keyword = keywordTemplate.replace(mask, value);
+                    break;
+                case 'med':
+                    step = rangeFrom = toInteger(0.1);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    break;
+                case 'high':
+                    step = rangeFrom = toInteger(0.01);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    break;
+                case 'auto':
+                    // 0.05 ... 5 (0.05)
+                    step = rangeFrom = toInteger(0.05);
+                    rangeTo = toInteger(5);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    // 5.1 ... 10 (0.1)
+                    step = toInteger(0.1);
+                    rangeFrom = toInteger(5.1);
+                    rangeTo = toInteger(10);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    // 10.5 ... 20 (0.5)
+                    step = toInteger(0.5);
+                    rangeFrom = toInteger(10.5);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    break;
+                case 'dense':
+                    // 0.01 ... 3 (0.01)
+                    step = rangeFrom = toInteger(0.01);
+                    rangeTo = toInteger(3);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    // 3.05 ... 8 (0.05)
+                    step = toInteger(0.1);
+                    rangeFrom = toInteger(3.05);
+                    rangeTo = toInteger(8);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    // 8.5 ... 20 (0.5)
+                    step = toInteger(0.5);
+                    rangeFrom = toInteger(8.5);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(bid);
+                        const bidDecimal = toDecimal(bid);
+                        keywords.push(bidDecimal.toFixed(2));
+                    }
+                    break;
+            }
+        } else {
+
+            for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                bids.push(bid);
+
+                const bidDecimal = toDecimal(bid),
+                    s = toDecimal(step);
+
+                if (advertiser === "amazon") {
+                    for (let i = 0; i < keywordStep; i += 1) {
+                        i = toValidUI(i);
+                        const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "");
                         keywords.push(keyword);
+                    }
+                    line++;
+                } else if (advertiser === "openx") {
+                    const to = +toValidUI(bidDecimal + s).toFixed(2);
+                    for (let i = bidDecimal; i < to; i += keywordStep) {
+                        i = toValidUI(i);
+                        if (i < to) {
+                            keywords.push(i.toFixed(2));
+                        }
+                    }
+                } else {
+                    const to = +toValidUI(bidDecimal + s).toFixed(2);
+                    for (let i = bidDecimal; i < to; i += keywordStep) {
+                        i = toValidUI(i);
+                        if (i < to) {
+                            const value = i.toFixed(keywordStepDecimalPartLength),
+                                keyword = keywordTemplate.replace(mask, value);
+                            keywords.push(keyword);
+                        }
                     }
                 }
             }
         }
+
         let newKeywords = keywords.filter(
             function (e) {
                 return !this.find(keyword => keyword.name === e);
@@ -663,12 +755,21 @@ class Handler extends AbstractHandler {
                 name = name.replace("{position}", line);
                 line++;
             } else if (advertiser === "openx") {
-                const to = +toValidUI(bidDecimal + s).toFixed(2);
-                for (let i = bidDecimal; i < to; i += keywordStep) {
-                    i = toValidUI(i);
-                    if (i < to) {
-                        keywords.push(i.toFixed(2));
-                    }
+                // const to = +toValidUI(bidDecimal + s).toFixed(2);
+                // for (let i = bidDecimal; i < to; i += keywordStep) {
+                //     i = toValidUI(i);
+                //     if (i < to) {
+                //         keywords.push(i.toFixed(2));
+                //     }
+                // }
+                switch (granularity) {
+                    case 'low':
+                    case 'med':
+                    case 'high':
+                    case 'auto':
+                    case 'dense':
+                        keywords.push(bidValue);
+                        break;
                 }
             } else {
                 const to = +toValidUI(bidDecimal + s).toFixed(2);

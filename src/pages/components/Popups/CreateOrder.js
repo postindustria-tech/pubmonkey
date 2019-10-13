@@ -24,7 +24,7 @@ import {
 } from "reactstrap";
 import InputNumber from "rc-input-number";
 import FormErrors from "../FormErrors";
-import {isEmpty, toInteger, toDecimal} from "../../helpers";
+import {isEmpty, toInteger, toDecimal, toValidUI} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
 import _ from "underscore";
 import HelperModal from "./HelperModal";
@@ -88,7 +88,8 @@ const initialState = {
     rangeMeasure: "$",
     granularity: "",
 
-    advertiserId: null
+    advertiserId: null,
+    isDfpPrebid: false,
 };
 
 class CreateOrderModal extends Component {
@@ -323,7 +324,30 @@ class CreateOrderModal extends Component {
                                 </Form>
                             </Col>
                         </Row>
-                        <Row>
+                        <Row hidden={!this.state.isDfpPrebid}>
+                            <Col className={"col-sm-12"}>
+                                <span className={"mp-label"}>
+                                      Granularity:{" "}
+                                    </span>
+                                <Input
+                                    type="select"
+                                    name={"granularity"}
+                                    onChange={this.handleInputChange}
+                                    id="granularity"
+                                    value={this.state.granularity}
+                                    className={"mp-form-control"}
+                                    style={{display: "inline-block", width: "auto"}}
+                                >
+                                    <option value={""}>{""}</option>
+                                    <option value={"low"}>{"low"}</option>
+                                    <option value={"med"}>{"med"}</option>
+                                    <option value={"high"}>{"high"}</option>
+                                    <option value={"auto"}>{"auto"}</option>
+                                    <option value={"dense"}>{"dense"}</option>
+                                </Input>
+                            </Col>
+                        </Row>
+                        <Row hidden={this.state.isDfpPrebid}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items Range:</span> from [
                                 <CustomInput
@@ -378,7 +402,7 @@ class CreateOrderModal extends Component {
                                 </Tooltip>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser === "amazon"}>
+                        <Row hidden={this.state.selectedAdvertiser === "amazon" || this.state.isDfpPrebid}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Step: </span>
                                 <InputNumber
@@ -406,26 +430,6 @@ class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                     parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />
-                                {/*{" "}
-                                <span className={"mp-label"}>
-                                  Granularity:{" "}
-                                </span>
-                                <Input
-                                    type="select"
-                                    name={"granularity"}
-                                    onChange={this.handleInputChange}
-                                    id="granularity"
-                                    value={this.state.granularity}
-                                    className={"mp-form-control"}
-                                    style={{display: "inline-block", width: "auto"}}
-                                >
-                                    <option value={""}>{""}</option>
-                                    <option value={"low"}>{"low"}</option>
-                                    <option value={"med"}>{"med"}</option>
-                                    <option value={"high"}>{"high"}</option>
-                                    <option value={"auto"}>{"auto"}</option>
-                                    <option value={"dense"}>{"dense"}</option>
-                                </Input>*/}
                             </Col>
                         </Row>
                         <Row>
@@ -627,7 +631,8 @@ class CreateOrderModal extends Component {
             rangeTo: "",
             networkClass: "",
             Ad_ZONE_ID: "",
-            adunits: ""
+            adunits: "",
+            granularity: ""
         };
         let isValid = true;
 
@@ -676,6 +681,10 @@ class CreateOrderModal extends Component {
         }
         if (isEmpty(this.state.adunitsSelected)) {
             fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
+            isValid = false;
+        }
+        if (isEmpty(this.state.granularity) && this.state.isDfpPrebid) {
+            fieldValidationErrors.granularity = "Granularity is required!";
             isValid = false;
         }
 
@@ -758,7 +767,8 @@ class CreateOrderModal extends Component {
             os: "",
             formValid: true,
             rangeMeasure: advertiser === "amazon" ? "position" : "$",
-            rangeFrom: advertiser === "amazon" ? 1 : 0.1
+            rangeFrom: advertiser === "amazon" ? 1 : 0.1,
+            isDfpPrebid: this.props.type === AD_SERVER_DFP && advertiser === "openx"
         });
     }
 
@@ -799,7 +809,8 @@ class CreateOrderModal extends Component {
             keywordStep,
             rangeFrom,
             rangeTo,
-            advertiser
+            advertiser,
+            granularity
         } = this.state;
 
         const formValid = this.formValidator();
@@ -814,16 +825,88 @@ class CreateOrderModal extends Component {
         let items = 0,
             keywords = 0;
 
-        for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
-            items++;
-            if (items == 1) {
-                if (advertiser === "amazon") {
-                    for (let i = 0; i < keywordStep; i += 1) {
-                        keywords++;
+        if (this.props.type === AD_SERVER_DFP && advertiser === "openx") {
+            let bid;
+            switch (granularity) {
+                case 'low':
+                    step = rangeFrom = toInteger(0.5);
+                    rangeTo = toInteger(5);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
                     }
-                } else {
-                    for (let i = bid; i < bid + step; i += toInteger(keywordStep)) {
-                        keywords++;
+                    break;
+                case 'med':
+                    step = rangeFrom = toInteger(0.1);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    break;
+                case 'high':
+                    step = rangeFrom = toInteger(0.01);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    break;
+                case 'auto':
+                    // 0.05 ... 5 (0.05)
+                    step = rangeFrom = toInteger(0.05);
+                    rangeTo = toInteger(5);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    // 5.1 ... 10 (0.1)
+                    step = toInteger(0.1);
+                    rangeFrom = toInteger(5.1);
+                    rangeTo = toInteger(10);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    // 10.5 ... 20 (0.5)
+                    step = toInteger(0.5);
+                    rangeFrom = toInteger(10.5);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    break;
+                case 'dense':
+                    // 0.01 ... 3 (0.01)
+                    step = rangeFrom = toInteger(0.01);
+                    rangeTo = toInteger(3);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    // 3.05 ... 8 (0.05)
+                    step = toInteger(0.1);
+                    rangeFrom = toInteger(3.05);
+                    rangeTo = toInteger(8);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    // 8.5 ... 20 (0.5)
+                    step = toInteger(0.5);
+                    rangeFrom = toInteger(8.5);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        items++;
+                    }
+                    break;
+            }
+            keywords = items;
+        } else {
+            for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
+                items++;
+                if (items == 1) {
+                    if (advertiser === "amazon") {
+                        for (let i = 0; i < keywordStep; i += 1) {
+                            keywords++;
+                        }
+                    } else {
+                        for (let i = bid; i < bid + step; i += toInteger(keywordStep)) {
+                            keywords++;
+                        }
                     }
                 }
             }
