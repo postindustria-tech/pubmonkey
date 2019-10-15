@@ -93,7 +93,7 @@ class AuthModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
-        if (ONLY_NUMBERS.test(value)) {
+        if (value === '' || (ONLY_NUMBERS.test(value) && value.length <= 15)) {
             this.setState({[name]: value});
         }
     }
