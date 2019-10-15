@@ -1018,7 +1018,8 @@ class CreateOrderModal extends Component {
 
                 let close = true,
                     trace = true,
-                    errorName = JSON.stringify(error);
+                    errorName = JSON.stringify(error),
+                    errorPopup = false;
                 if (errorName.length) {
                     errorName = error.name;
                     if (error.hasOwnProperty('close')) {
@@ -1029,15 +1030,20 @@ class CreateOrderModal extends Component {
                     }
                     if (error.hasOwnProperty('message')) {
                         errorName = error.message;
+                        errorPopup = true;
                     }
                 }
                 if (close) {
                     this.close();
                     this.props.toUpdate && this.props.toUpdate();
                 }
-                this.helperModal.open({
-                    text: errorName + '<br/>' + (trace ? error.stack.replace(/\r?\n/g, '<br/>') : '')
-                });
+                if (errorPopup) {
+                    ModalWindowService.ErrorPopup.showMessage(errorName);
+                } else {
+                    this.helperModal.open({
+                        text: errorName + '<br/>' + (trace ? error.stack.replace(/\r?\n/g, '<br/>') : '')
+                    });
+                }
             });
     }
 
