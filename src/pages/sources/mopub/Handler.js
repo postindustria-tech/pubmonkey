@@ -449,7 +449,8 @@ class Handler extends AbstractHandler {
             lineItemsNaming,
             advertiser,
             networkClass,
-            Ad_ZONE_ID
+            Ad_ZONE_ID,
+            granularity
         } = params;
 
         let lineItemInfo = this.lineItemInfo,
@@ -476,57 +477,139 @@ class Handler extends AbstractHandler {
         }
 
         let line = 1;
-        const keywordStepDecimalPartLength = (keywordStep + "").replace(
-            /^[-\d]+\./,
-            ""
-            ).length,
+        const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length,
             stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
 
-        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-            const bidDecimal = toDecimal(bid),
-                s = toDecimal(step),
-                bidValue = bidDecimal.toFixed(stepDecimalPartLength);
-
-            let name = lineItemsNaming.replace("{bid}", bidValue),
-                keywords = [];
-
-            if (advertiser == "amazon") {
-                for (let i = 0; i < keywordStep; i += 1) {
-                    i = toValidUI(i);
-                    const keyword = keywordTemplate.replace(mask, i + line);
-                    keywords.push(keyword);
-                }
-                name = name.replace("{position}", line);
-                line++;
-            } else {
-                const to = +toValidUI(bidDecimal + s).toFixed(2);
-
-                for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
-                    const key = toDecimal(i);
-                    const value = key.toFixed(keywordStepDecimalPartLength),
-                        keyword = keywordTemplate.replace(mask, value);
-                    keywords.push(keyword);
-                }
+        if (advertiser === "openx") {
+            let bids = [];
+            switch (granularity) {
+                case 'low':
+                    step = rangeFrom = toInteger(0.5);
+                    rangeTo = toInteger(5);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    break;
+                case 'med':
+                    step = rangeFrom = toInteger(0.1);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    break;
+                case 'high':
+                    step = rangeFrom = toInteger(0.01);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    break;
+                case 'auto':
+                    // 0.05 ... 5 (0.05)
+                    step = rangeFrom = toInteger(0.05);
+                    rangeTo = toInteger(5);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    // 5.1 ... 10 (0.1)
+                    step = toInteger(0.1);
+                    rangeFrom = toInteger(5.1);
+                    rangeTo = toInteger(10);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    // 10.5 ... 20 (0.5)
+                    step = toInteger(0.5);
+                    rangeFrom = toInteger(10.5);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    break;
+                case 'dense':
+                    // 0.01 ... 3 (0.01)
+                    step = rangeFrom = toInteger(0.01);
+                    rangeTo = toInteger(3);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    // 3.05 ... 8 (0.05)
+                    step = toInteger(0.1);
+                    rangeFrom = toInteger(3.05);
+                    rangeTo = toInteger(8);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    // 8.5 ... 20 (0.5)
+                    step = toInteger(0.5);
+                    rangeFrom = toInteger(8.5);
+                    rangeTo = toInteger(20);
+                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                        bids.push(toDecimal(bid).toFixed(2));
+                    }
+                    break;
             }
 
-            if (advertiser == "pubnative") {
-                lineItemInfo.type = "network";
-                lineItemInfo["networkType"] = "custom_native";
-                lineItemInfo["enableOverrides"] = true;
-                lineItemInfo["overrideFields"] = {
-                    custom_event_class_name: networkClass,
-                    custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
-                };
-            }
-
-            lineItems.push({
-                adUnitKeys: adunits,
-                bid: bidDecimal,
-                name: name,
-                orderKey: orderKey,
-                keywords: keywords,
-                ...lineItemInfo
+            lineItems = bids.map(bid => {
+                return {
+                    adUnitKeys: adunits,
+                    bid: bid,
+                    name: lineItemsNaming.replace("{bid}", bid),
+                    orderKey: orderKey,
+                    keywords: [bid],
+                    ...lineItemInfo
+                }
             });
+
+        } else {
+
+            for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                const bidDecimal = toDecimal(bid),
+                    s = toDecimal(step),
+                    bidValue = bidDecimal.toFixed(stepDecimalPartLength);
+
+                let name = lineItemsNaming.replace("{bid}", bidValue),
+                    keywords = [];
+
+                if (advertiser == "amazon") {
+                    for (let i = 0; i < keywordStep; i += 1) {
+                        i = toValidUI(i);
+                        const keyword = keywordTemplate.replace(mask, i + line);
+                        keywords.push(keyword);
+                    }
+                    name = name.replace("{position}", line);
+                    line++;
+                } else {
+                    // openx, remove?
+                    const to = +toValidUI(bidDecimal + s).toFixed(2);
+
+                    for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
+                        const key = toDecimal(i);
+                        const value = key.toFixed(keywordStepDecimalPartLength),
+                            keyword = keywordTemplate.replace(mask, value);
+                        keywords.push(keyword);
+                    }
+                }
+
+                if (advertiser == "pubnative") {
+                    lineItemInfo.type = "network";
+                    lineItemInfo["networkType"] = "custom_native";
+                    lineItemInfo["enableOverrides"] = true;
+                    lineItemInfo["overrideFields"] = {
+                        custom_event_class_name: networkClass,
+                        custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
+                    };
+                }
+
+                lineItems.push({
+                    adUnitKeys: adunits,
+                    bid: bidDecimal,
+                    name: name,
+                    orderKey: orderKey,
+                    keywords: keywords,
+                    ...lineItemInfo
+                });
+            }
         }
 
         return lineItems;

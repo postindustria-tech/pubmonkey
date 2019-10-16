@@ -88,7 +88,6 @@ const initialState = {
     granularity: "",
 
     advertiserId: null,
-    isDfpPrebid: false,
 };
 
 class CreateOrderModal extends Component {
@@ -323,7 +322,7 @@ class CreateOrderModal extends Component {
                                 </Form>
                             </Col>
                         </Row>
-                        <Row hidden={!this.state.isDfpPrebid}>
+                        <Row hidden={this.state.selectedAdvertiser !== 'openx'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>
                                       Granularity:{" "}
@@ -346,7 +345,7 @@ class CreateOrderModal extends Component {
                                 </Input>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.isDfpPrebid}>
+                        <Row hidden={this.state.selectedAdvertiser === 'openx'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items Range:</span> from [
                                 <CustomInput
@@ -401,7 +400,7 @@ class CreateOrderModal extends Component {
                                 </Tooltip>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser === "amazon" || this.state.isDfpPrebid}>
+                        <Row hidden={this.state.selectedAdvertiser === "amazon" || this.state.selectedAdvertiser === 'openx'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Step: </span>
                                 <InputNumber
@@ -682,7 +681,7 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
             isValid = false;
         }
-        if (isEmpty(this.state.granularity) && this.state.isDfpPrebid) {
+        if (isEmpty(this.state.granularity) && this.state.selectedAdvertiser === 'openx') {
             fieldValidationErrors.granularity = "Granularity is required!";
             isValid = false;
         }
@@ -767,7 +766,6 @@ class CreateOrderModal extends Component {
             formValid: true,
             rangeMeasure: advertiser === "amazon" ? "position" : "$",
             rangeFrom: advertiser === "amazon" ? 1 : 0.1,
-            isDfpPrebid: this.props.type === AD_SERVER_DFP && advertiser === "openx"
         });
     }
 
@@ -824,7 +822,7 @@ class CreateOrderModal extends Component {
         let items = 0,
             keywords = 0;
 
-        if (this.props.type === AD_SERVER_DFP && advertiser === "openx") {
+        if (advertiser === "openx") {
             let bid;
             switch (granularity) {
                 case 'low':
