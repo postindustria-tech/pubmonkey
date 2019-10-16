@@ -339,7 +339,7 @@ class CreateOrderModal extends Component {
                                     <option value={""}>{""}</option>
                                     <option value={"low"}>{"low"}</option>
                                     <option value={"med"}>{"med"}</option>
-                                    <option value={"high"}>{"high"}</option>
+                                    {/*<option value={"high"}>{"high"}</option>*/}
                                     <option value={"auto"}>{"auto"}</option>
                                     <option value={"dense"}>{"dense"}</option>
                                 </Input>
