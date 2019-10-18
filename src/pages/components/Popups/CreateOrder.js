@@ -339,7 +339,7 @@ class CreateOrderModal extends Component {
                                     <option value={""}>{""}</option>
                                     <option value={"low"}>{"low"}</option>
                                     <option value={"med"}>{"med"}</option>
-                                    {/*<option value={"high"}>{"high"}</option>*/}
+                                    <option value={"high"}>{"high"}</option>
                                     <option value={"auto"}>{"auto"}</option>
                                     <option value={"dense"}>{"dense"}</option>
                                 </Input>
@@ -831,6 +831,7 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
+                    keywords = items;
                     break;
                 case 'med':
                     step = rangeFrom = toInteger(0.1);
@@ -838,12 +839,19 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
+                    keywords = items;
                     break;
                 case 'high':
-                    step = rangeFrom = toInteger(0.01);
+                    step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
+                    keywordStep = 0.01;
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
+                        const bidDecimal = toDecimal(bid).toFixed(2);
+                        const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
+                        for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
+                            keywords++;
+                        }
                     }
                     break;
                 case 'auto':
@@ -867,6 +875,7 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
+                    keywords = items;
                     break;
                 case 'dense':
                     // 0.01 ... 3 (0.01)
@@ -889,9 +898,9 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
+                    keywords = items;
                     break;
             }
-            keywords = items;
         } else {
             for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
                 items++;

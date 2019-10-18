@@ -481,7 +481,7 @@ class Handler extends AbstractHandler {
             stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
 
         if (advertiser === "openx") {
-            let bids = [];
+            let bids = [], skip = false;
             switch (granularity) {
                 case 'low':
                     step = rangeFrom = toInteger(0.5);
@@ -498,10 +498,32 @@ class Handler extends AbstractHandler {
                     }
                     break;
                 case 'high':
-                    step = rangeFrom = toInteger(0.01);
+                    skip = true;
+                    step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
+                    keywordStep = 0.01;
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
+
+                        const bidDecimal = toDecimal(bid).toFixed(2);
+
+                        let keywords = [];
+                        const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
+
+                        for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
+                            const key = toDecimal(i);
+                            const value = key.toFixed(keywordStepDecimalPartLength),
+                                keyword = keywordTemplate.replace(mask, value);
+                            keywords.push(keyword);
+                        }
+
+                        lineItems.push({
+                            adUnitKeys: adunits,
+                            bid: bidDecimal,
+                            name: lineItemsNaming.replace("{bid}", bidDecimal),
+                            orderKey: orderKey,
+                            keywords: keywords,
+                            ...lineItemInfo
+                        });
                     }
                     break;
                 case 'auto':
@@ -550,16 +572,18 @@ class Handler extends AbstractHandler {
                     break;
             }
 
-            lineItems = bids.map(bid => {
-                return {
-                    adUnitKeys: adunits,
-                    bid: bid,
-                    name: lineItemsNaming.replace("{bid}", bid),
-                    orderKey: orderKey,
-                    keywords: [bid],
-                    ...lineItemInfo
-                }
-            });
+            if (!skip) {
+                lineItems = bids.map(bid => {
+                    return {
+                        adUnitKeys: adunits,
+                        bid: bid,
+                        name: lineItemsNaming.replace("{bid}", bid),
+                        orderKey: orderKey,
+                        keywords: [bid],
+                        ...lineItemInfo
+                    }
+                });
+            }
 
         } else {
 

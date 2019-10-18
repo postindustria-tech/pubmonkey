@@ -585,7 +585,8 @@ class Handler extends AbstractHandler {
 
         let line = 1,
             bids = [],
-            keywords = [];
+            keywords = [],
+            skip = false;
 
         if (advertiser === "openx") {
 
@@ -609,12 +610,30 @@ class Handler extends AbstractHandler {
                     }
                     break;
                 case 'high':
-                    step = rangeFrom = toInteger(0.01);
+                    // step = rangeFrom = toInteger(0.01);
+                    // rangeTo = toInteger(20);
+                    // for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                    //     bids.push(bid);
+                    //     const bidDecimal = toDecimal(bid);
+                    //     keywords.push(bidDecimal.toFixed(2));
+                    // }
+
+                    skip = true;
+                    step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
+                    keywordStep = 0.01;
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(bid);
-                        const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
+
+                        const bidDecimal = toDecimal(bid).toFixed(2);
+
+                        const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
+
+                        for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
+                            const key = toDecimal(i);
+                            const value = key.toFixed(keywordStepDecimalPartLength),
+                                keyword = keywordTemplate.replace(mask, value);
+                            keywords.push(keyword);
+                        }
                     }
                     break;
                 case 'auto':
@@ -767,9 +786,17 @@ class Handler extends AbstractHandler {
                 //     }
                 // }
                 switch (granularity) {
+                    case 'high':
+                        const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
+                        for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
+                            const key = toDecimal(i);
+                            const value = key.toFixed(keywordStepDecimalPartLength),
+                                keyword = keywordTemplate.replace(mask, value);
+                            keywords.push(keyword);
+                        }
+                        break;
                     case 'low':
                     case 'med':
-                    case 'high':
                     case 'auto':
                     case 'dense':
                         keywords.push(bidValue);

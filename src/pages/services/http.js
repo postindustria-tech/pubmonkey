@@ -114,6 +114,12 @@ export const HTTPService = new (class {
                                 return;
                             } else {
                                 error = error || {errors: ["Fatal error"]};
+                                error.errors = error.errors.map(error => {
+                                    return typeof error === 'object' && error.hasOwnProperty('message') ?
+                                        error.message :
+                                        error
+                                });
+                                console.log(error);
                                 let err = new Error(error.errors);
                                 err.data = error;
                                 reject(err);
