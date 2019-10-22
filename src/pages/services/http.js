@@ -68,7 +68,7 @@ export const HTTPService = new (class {
                         //         resolve();
                         //     }
                         // );
-                    }, 3000);
+                    }, 5000);
                 });
             } else {
                 resolve();
@@ -119,7 +119,7 @@ export const HTTPService = new (class {
                                         error.message :
                                         error
                                 });
-                                console.log(error);
+                                // console.log(error);
                                 let err = new Error(error.errors);
                                 err.data = error;
                                 reject(err);

@@ -639,7 +639,16 @@ class Handler extends AbstractHandler {
         return lineItems;
     }
 
-    createOrderDataFromSet(order, params, stepCallback) {
+    async createOrderDataFromSet(order, params, stepCallback) {
+
+        let mopubSessionUpdatedAt = Date.now();
+        localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+        let {tabId, frameId} = window.MopubAutomation.request;
+        chrome.tabs.reload(tabId, {}, function () {
+            console.log('reloading mopub page');
+        });
+        await delay(5000);
+
         return this.createOrder(order).then(order => {
             const lineItems = this.composerLineItems(order.key, params);
 
@@ -669,7 +678,26 @@ class Handler extends AbstractHandler {
                             });
                         }
                     })
-                    .then(result => {
+                    .then(async result => {
+
+                        // console.log(idx);
+                        if (idx > 0 && idx % 50 === 0) {
+
+                            // wait for last request
+                            await delay(1000);
+                            let mopubSessionUpdatedAt = Date.now();
+                            localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+                            let {tabId, frameId} = window.MopubAutomation.request;
+                            chrome.tabs.reload(tabId, {}, function () {
+                                console.log('reloading mopub page');
+                            });
+                            // console.log('10000');
+                            await delay(10000);
+                        } else {
+                            // console.log('50');
+                            await delay(50);
+                        }
+
                         if (stepCallback) {
                             stepCallback({
                                 ordersDone: 1,
