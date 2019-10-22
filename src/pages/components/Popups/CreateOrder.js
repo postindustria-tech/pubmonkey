@@ -666,7 +666,8 @@ class CreateOrderModal extends Component {
             isValid = false;
         }
         if (
-            this.state.rangeTo != this.state.rangeFrom &&
+            this.state.advertiser !== "openx" &&
+            this.state.rangeTo !== this.state.rangeFrom &&
             this.state.rangeTo - this.state.rangeFrom < this.state.step
         ) {
             fieldValidationErrors.step = "Range too short!";
