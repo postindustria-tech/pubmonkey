@@ -623,7 +623,7 @@ class Handler extends AbstractHandler {
                     rangeTo = toInteger(20);
                     keywordStep = 0.01;
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-
+                        bids.push(bid);
                         const bidDecimal = toDecimal(bid).toFixed(2);
 
                         const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
