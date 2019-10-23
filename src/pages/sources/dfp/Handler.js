@@ -322,10 +322,11 @@ class Handler extends AbstractHandler {
     async getOrdersAfter(ordersOriginal) {
 
         const advertisers = await this.getAllAdvertisers();
-
-        const ids = ordersOriginal.map(({key}) => {
-            return key;
-        });
+        const ids = ordersOriginal
+            .filter(({ status }) => status !== 'ARCHIVED')
+            .map(({key}) => {
+                return key;
+            });
         const lineItems = await this.getAllLineItems(ids);
 
         return ordersOriginal.map(order => {
