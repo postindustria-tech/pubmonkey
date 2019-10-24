@@ -177,7 +177,8 @@ function* setCreateOrderModalToggle(action) {
                         defaultFields = [],
                         arrays = [],
                         rangeFrom = 999999999,
-                        rangeTo = 0;
+                        rangeTo = 0,
+                        isAmazon = false;
                     if (!isEmpty(order.lineItems)) {
                         for (let key in defaultLineItemInfo) {
                             values[key] = [];
@@ -218,6 +219,7 @@ function* setCreateOrderModalToggle(action) {
                                 rangeFrom = lineItem.bid;
                             }
                             adUnitKeys = [...adUnitKeys, ...lineItem.adUnitKeys].unique();
+                            isAmazon = Number.isInteger(lineItem.bid);
                         });
                     }
 
@@ -242,6 +244,7 @@ function* setCreateOrderModalToggle(action) {
                             break;
                         case AD_SERVER_DFP:
                             advertiser['advertiserId'] = order.advertiserId;
+                            advertiser['advertiser'] = isAmazon ? 'amazon' : 'openx';
                             break;
                     }
 
