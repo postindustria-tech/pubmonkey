@@ -703,6 +703,7 @@ class CreateOrderModal extends Component {
 
     @bind
     toggle() {
+        this.setState(initialState);
         this.props.createOrderModalToggle();
     }
 
