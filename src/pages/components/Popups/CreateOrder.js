@@ -163,23 +163,18 @@ class CreateOrderModal extends Component {
         if (prevProps.advertiserId !== this.props.advertiserId) {
             this.setState({advertiserId: this.props.advertiserId});
         }
-    }
-
-    static getDerivedStateFromProps = (props, state) => {
-        if (props.orderName !== undefined && props.orderName !== state.orderName) {
-            return {
-                ...state,
-                orderName: props.orderName,
-                lineItemInfo: props.lineItemInfo,
-                defaultFields: props.defaultFields,
-                rangeFrom: props.rangeFrom,
-                rangeTo: props.rangeTo,
-                adunitsSelected: props.adunitsSelected,
-                advertiser: props.advertiser,
-            }
+        if (this.props.orderName !== prevProps.orderName) {
+            this.setState({
+                orderName: this.props.orderName,
+                lineItemInfo: this.props.lineItemInfo,
+                defaultFields: this.props.defaultFields,
+                rangeFrom: this.props.rangeFrom,
+                rangeTo: this.props.rangeTo,
+                adunitsSelected: this.props.adunitsSelected,
+                advertiser: this.props.advertiser,
+            });
         }
-        return state;
-    };
+    }
 
     ask = () => {
         this.confirmModal.toggle();
