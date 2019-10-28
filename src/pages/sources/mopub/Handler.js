@@ -677,6 +677,7 @@ class Handler extends AbstractHandler {
                                 name: "Creative"
                             });
                         }
+                        return lineItem;
                     })
                     .then(async result => {
 
