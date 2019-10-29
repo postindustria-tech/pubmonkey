@@ -48,6 +48,7 @@ let progress = null,
     defaultAdvertiser = "pubnative";
 
 const initialState = {
+    title: "Create New Order",
     executor: "create",
     backdrop: true,
     showCreativeFormat: false,
@@ -103,7 +104,6 @@ class CreateOrderModal extends Component {
         customTargetingValues: [],
         ADVERTISER_DEFAULT_NAME: {},
         creativeFormats: {},
-        title: "Create New Order",
         orderKey: null
     };
 
@@ -172,6 +172,7 @@ class CreateOrderModal extends Component {
                 rangeTo: this.props.rangeTo,
                 adunitsSelected: this.props.adunitsSelected,
                 advertiser: this.props.advertiser,
+                title: this.props.title
             });
         }
     }
@@ -242,7 +243,7 @@ class CreateOrderModal extends Component {
                     size="lg"
                     backdrop={this.state.backdrop}
                 >
-                    <ModalHeader>{this.props.title}</ModalHeader>
+                    <ModalHeader>{this.state.title}</ModalHeader>
                     <ModalBody className="mp-order-form">
                         <div className="panel panel-default">
                             <FormErrors
