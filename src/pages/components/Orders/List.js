@@ -197,11 +197,12 @@ class OrdersList extends Component {
                     .catch(({data: {errors}}) => {
                         let fields = Object.keys(errors);
                         ModalWindowService.ErrorPopup.showMessage(
-                            fields.map((field, idx) => (
-                                <div key={idx}>
-                                    <strong>{field}:</strong>&nbsp;{errors[field]}
-                                </div>
-                            ))
+                            "Import failed. File is damaged or invalid"
+                            // fields.map((field, idx) => (
+                            //     <div key={idx}>
+                            //         <strong>{field}:</strong>&nbsp;{errors[field]}
+                            //     </div>
+                            // ))
                         );
                     })
                     .finally(() => {
