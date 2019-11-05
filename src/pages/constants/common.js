@@ -10,7 +10,7 @@ export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
   amazon: "m{width}x{height}p{position}",
-  smaato: "smaato_cpm {bid}",
+  smaato: "Smaato UB {bid}",
 };
 export const NETWORK_CLASS_TO_DIMENSION = {
   "HyBidMoPubLeaderboardCustomEvent": "728x90",
