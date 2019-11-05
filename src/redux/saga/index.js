@@ -149,7 +149,8 @@ function* loadAdvertiser(action) {
             yield put(adServerActions.loadAdvertiser({
                 customTargetingKeys,
                 customTargetingValues,
-                creativeFormats: sourceHandler.getAdvertiser().CREATIVE_FORMATS
+                creativeFormats: sourceHandler.getAdvertiser().CREATIVE_FORMATS,
+                networkClasses: sourceHandler.getAdvertiser().NETWORK_CLASS,
             }));
         }
     } catch (error) {

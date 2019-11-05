@@ -59,6 +59,7 @@ const dfpInventory = createSelector(
         customTargetingKeys: adServer.customTargetingKeys,
         customTargetingValues: adServer.customTargetingValues,
         creativeFormats: adServer.creativeFormats,
+        networkClasses: adServer.networkClasses,
         advertiserId: adServer.advertiserId,
         ADVERTISER_DEFAULT_NAME: adServer.ADVERTISER_DEFAULT_NAME
     })

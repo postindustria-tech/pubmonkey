@@ -24,7 +24,8 @@ class Handler extends AbstractHandler {
     ADVERTISER_DEFAULT_NAME = {
         pubnative: "PubNative",
         openx: "Prebid.org",
-        amazon: "Amazon HB"
+        amazon: "Amazon HB",
+        smaato: "Smaato",
     };
 
     FILTER_FN = [
@@ -450,7 +451,9 @@ class Handler extends AbstractHandler {
             advertiser,
             networkClass,
             Ad_ZONE_ID,
-            granularity
+            granularity,
+            smaato_AdspaceId,
+            smaato_PublisherId,
         } = params;
 
         let lineItemInfo = this.lineItemInfo,
@@ -595,7 +598,7 @@ class Handler extends AbstractHandler {
                 let name = lineItemsNaming.replace("{bid}", bidValue),
                     keywords = [];
 
-                if (advertiser == "amazon") {
+                if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
                         const keyword = keywordTemplate.replace(mask, i + line);
@@ -603,6 +606,8 @@ class Handler extends AbstractHandler {
                     }
                     name = name.replace("{position}", line);
                     line++;
+                } else if (advertiser === "smaato") {
+                    keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));
                 } else {
                     // openx, remove?
                     const to = +toValidUI(bidDecimal + s).toFixed(2);
@@ -615,13 +620,21 @@ class Handler extends AbstractHandler {
                     }
                 }
 
-                if (advertiser == "pubnative") {
+                if (advertiser === "pubnative") {
                     lineItemInfo.type = "network";
                     lineItemInfo["networkType"] = "custom_native";
                     lineItemInfo["enableOverrides"] = true;
                     lineItemInfo["overrideFields"] = {
                         custom_event_class_name: networkClass,
                         custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
+                    };
+                } else if (advertiser === "smaato") {
+                    lineItemInfo.type = "network";
+                    lineItemInfo["networkType"] = "custom_native";
+                    lineItemInfo["enableOverrides"] = true;
+                    lineItemInfo["overrideFields"] = {
+                        custom_event_class_name: networkClass,
+                        custom_event_class_data: '{"publisherid": "' + smaato_PublisherId + '", "adspaceid": "' + smaato_AdspaceId + '"}'
                     };
                 }
 

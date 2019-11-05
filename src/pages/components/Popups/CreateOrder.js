@@ -32,7 +32,6 @@ import {
     ONLY_NUMBERS,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
-    NETWORK_CLASS,
     NETWORK_CLASS_TO_DIMENSION
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVERS} from '../../constants/source';
@@ -89,6 +88,8 @@ const initialState = {
     granularity: "",
 
     advertiserId: null,
+    smaato_AdspaceId: "",
+    smaato_PublisherId: "",
 };
 
 class CreateOrderModal extends Component {
@@ -104,6 +105,7 @@ class CreateOrderModal extends Component {
         customTargetingValues: [],
         ADVERTISER_DEFAULT_NAME: {},
         creativeFormats: {},
+        networkClasses: {},
         orderKey: null
     };
 
@@ -410,6 +412,10 @@ class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                     parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />{" "}
+                                <div
+                                    hidden={this.state.selectedAdvertiser === 'smaato'}
+                                    style={{display: "inline-block", width: "auto"}}
+                                >
                                 <span className={"mp-label"}>
                                   Keyword Step:{" "}
                                 </span>
@@ -424,6 +430,7 @@ class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                     parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />
+                                </div>
                             </Col>
                         </Row>
                         <Row>
@@ -470,7 +477,7 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser !== "pubnative"}>
+                        <Row hidden={this.state.selectedAdvertiser !== "pubnative" && this.state.selectedAdvertiser !== 'smaato'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>OS: </span>
                                 <Input
@@ -497,25 +504,59 @@ class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                     invalid={!isEmpty(this.state.formErrors.networkClass)}
                                 >
-                                    {Object.keys(NETWORK_CLASS[this.state.os]).map(
+                                    {Object.keys(this.props.networkClasses[this.state.os] || {}).map(
                                         (option, index) => (
                                             <option key={index} value={option}>
-                                                {NETWORK_CLASS[this.state.os][option]}
+                                                {this.props.networkClasses[this.state.os][option]}
                                             </option>
                                         )
                                     )}
-                                </Input>{" "}
-                                <span className={"mp-label"}>Ad_ZONE_ID:</span>
+                                </Input>
+                                <div
+                                    hidden={this.state.selectedAdvertiser === 'smaato'}
+                                    style={{display: "inline-block", width: "auto"}}
+                                >{" "}
+                                    <span className={"mp-label"}>Ad_ZONE_ID:</span>
+                                    <CustomInput
+                                        invalid={!isEmpty(this.state.formErrors.Ad_ZONE_ID)}
+                                        inline
+                                        type="text"
+                                        id={"Ad_ZONE_ID"}
+                                        name={"Ad_ZONE_ID"}
+                                        value={this.state.Ad_ZONE_ID}
+                                        onChange={this.handleInputChange}
+                                        className={"mp-form-control"}
+                                        style={{width: "50px"}}
+                                    />
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row hidden={this.state.selectedAdvertiser !== 'smaato'}>
+                            <Col className={"col-sm-12"}>
+                                <span className={"mp-label"}>Adspace ID: </span>
                                 <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.Ad_ZONE_ID)}
+                                    invalid={!isEmpty(this.state.formErrors.smaato_AdspaceId)}
                                     inline
                                     type="text"
-                                    id={"Ad_ZONE_ID"}
-                                    name={"Ad_ZONE_ID"}
-                                    value={this.state.Ad_ZONE_ID}
+                                    id={"smaato_AdspaceId"}
+                                    name={"smaato_AdspaceId"}
+                                    value={this.state.smaato_AdspaceId}
                                     onChange={this.handleInputChange}
                                     className={"mp-form-control"}
-                                    style={{width: "50px"}}
+                                    style={{width: "200px"}}
+                                />
+                                {" "}
+                                <span className={"mp-label"}>Publisher ID: </span>
+                                <CustomInput
+                                    invalid={!isEmpty(this.state.formErrors.smaato_PublisherId)}
+                                    inline
+                                    type="text"
+                                    id={"smaato_PublisherId"}
+                                    name={"smaato_PublisherId"}
+                                    value={this.state.smaato_PublisherId}
+                                    onChange={this.handleInputChange}
+                                    className={"mp-form-control"}
+                                    style={{width: "200px"}}
                                 />
                             </Col>
                         </Row>
@@ -626,7 +667,9 @@ class CreateOrderModal extends Component {
             networkClass: "",
             Ad_ZONE_ID: "",
             adunits: "",
-            granularity: ""
+            granularity: "",
+            smaato_AdspaceId: "",
+            smaato_PublisherId: ""
         };
         let isValid = true;
 
@@ -682,6 +725,16 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.granularity = "Granularity is required!";
             isValid = false;
         }
+        if (this.state.advertiser === "smaato") {
+            if (isEmpty(this.state.smaato_AdspaceId)) {
+                fieldValidationErrors.smaato_AdspaceId = "Adspace Id is required!";
+                isValid = false;
+            }
+            if (isEmpty(this.state.smaato_PublisherId)) {
+                fieldValidationErrors.smaato_PublisherId = "Publisher Id is required!";
+                isValid = false;
+            }
+        }
 
         this.setState({
             formErrors: fieldValidationErrors,
@@ -733,7 +786,7 @@ class CreateOrderModal extends Component {
         if (name === "os") {
             this.setState({
                 adunitsSelected: [],
-                networkClass: Object.keys(NETWORK_CLASS[value])[0]
+                networkClass: Object.keys(this.props.networkClasses[value])[0]
             });
         }
         this.setState({[name]: value});
@@ -914,6 +967,9 @@ class CreateOrderModal extends Component {
                     }
                 }
             }
+            if (advertiser === "smaato") {
+                keywords = items;
+            }
         }
 
         this.setState(() => ({
@@ -955,7 +1011,9 @@ class CreateOrderModal extends Component {
             Ad_ZONE_ID,
             adServerDomain,
             advertiserId,
-            granularity
+            granularity,
+            smaato_AdspaceId,
+            smaato_PublisherId,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -979,7 +1037,9 @@ class CreateOrderModal extends Component {
             adServerDomain,
             customTargetingKeys: this.props.customTargetingKeys,
             customTargetingValues: this.props.customTargetingValues,
-            granularity
+            granularity,
+            smaato_AdspaceId,
+            smaato_PublisherId,
         };
 
         ModalWindowService.ProgressModal.setProgress([

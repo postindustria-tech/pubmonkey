@@ -11,6 +11,7 @@ export default class AbstractAdvertiser {
     }
 
     CREATIVE_FORMATS = {};
+    NETWORK_CLASS = {};
 
     customTargetingKey = null;
 

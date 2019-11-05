@@ -3,30 +3,14 @@ export const ONLY_NUMBERS = /^[0-9\b\.]+$/;
 export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   pubnative: "pn_bid:{bid}",
   openx: "hb_pb:{bid}",
-  amazon: "amznslots:m{format}p{position}"
+  amazon: "amznslots:m{format}p{position}",
+  smaato: "smaato_cpm:{bid}",
 };
 export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
-  amazon: "m{width}x{height}p{position}"
-};
-export const NETWORK_CLASS = {
-  "": {
-    "": "Please select OS"
-  },
-  iphone: {
-    "": "All",
-    HyBidMoPubLeaderboardCustomEvent: "728x90 Leaderboard",
-    HyBidMoPubBannerCustomEvent: "320x50 Banner",
-    HyBidMoPubMRectCustomEvent: "300x250 MRect",
-    HyBidMoPubInterstitialCustomEvent: "Interstitial"
-  },
-  android: {
-    "": "All",
-    "net.pubnative.lite.adapters.mopub.PNLiteMoPubBannerCustomEvent": "320x50 Banner",
-    "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250 Banner",
-    "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": "Interstitial"
-  }
+  amazon: "m{width}x{height}p{position}",
+  smaato: "smaato_cpm {bid}",
 };
 export const NETWORK_CLASS_TO_DIMENSION = {
   "HyBidMoPubLeaderboardCustomEvent": "728x90",
