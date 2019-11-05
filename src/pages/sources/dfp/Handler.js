@@ -43,7 +43,7 @@ class Handler extends AbstractHandler {
 
     ADVERTISER_DEFAULT_NAME = {
         openx: "Prebid.org",
-        amazon: "Amazon HB"
+        amazon: "Amazon Publisher Services (TAM)"
     };
 
     FILTER_FN = [
