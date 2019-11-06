@@ -88,8 +88,7 @@ const initialState = {
     granularity: "",
 
     advertiserId: null,
-    smaato_AdspaceId: "",
-    smaato_PublisherId: "",
+    smaato_CustomEventData: "{\"publisherId\":\"\", \"adspaceId\":\"\"}",
 };
 
 class CreateOrderModal extends Component {
@@ -533,30 +532,17 @@ class CreateOrderModal extends Component {
                         </Row>
                         <Row hidden={this.state.selectedAdvertiser !== 'smaato'}>
                             <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>Adspace ID: </span>
+                                <span className={"mp-label"}>Custom Event Data: </span>
                                 <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.smaato_AdspaceId)}
+                                    invalid={!isEmpty(this.state.formErrors.smaato_CustomEventData)}
                                     inline
                                     type="text"
-                                    id={"smaato_AdspaceId"}
-                                    name={"smaato_AdspaceId"}
-                                    value={this.state.smaato_AdspaceId}
+                                    id={"smaato_CustomEventData"}
+                                    name={"smaato_CustomEventData"}
+                                    value={this.state.smaato_CustomEventData}
                                     onChange={this.handleInputChange}
                                     className={"mp-form-control"}
-                                    style={{width: "200px"}}
-                                />
-                                {" "}
-                                <span className={"mp-label"}>Publisher ID: </span>
-                                <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.smaato_PublisherId)}
-                                    inline
-                                    type="text"
-                                    id={"smaato_PublisherId"}
-                                    name={"smaato_PublisherId"}
-                                    value={this.state.smaato_PublisherId}
-                                    onChange={this.handleInputChange}
-                                    className={"mp-form-control"}
-                                    style={{width: "200px"}}
+                                    style={{width: "400px"}}
                                 />
                             </Col>
                         </Row>
@@ -668,8 +654,7 @@ class CreateOrderModal extends Component {
             Ad_ZONE_ID: "",
             adunits: "",
             granularity: "",
-            smaato_AdspaceId: "",
-            smaato_PublisherId: ""
+            smaato_CustomEventData: "",
         };
         let isValid = true;
 
@@ -726,13 +711,21 @@ class CreateOrderModal extends Component {
             isValid = false;
         }
         if (this.state.advertiser === "smaato") {
-            if (isEmpty(this.state.smaato_AdspaceId)) {
-                fieldValidationErrors.smaato_AdspaceId = "Adspace Id is required!";
+            if (isEmpty(this.state.smaato_CustomEventData)) {
+                fieldValidationErrors.smaato_CustomEventData = "Custom Event Data is required!";
                 isValid = false;
-            }
-            if (isEmpty(this.state.smaato_PublisherId)) {
-                fieldValidationErrors.smaato_PublisherId = "Publisher Id is required!";
-                isValid = false;
+            } else {
+                if (/^[\],:{}\s]*$/.test(
+                    this.state.smaato_CustomEventData
+                        .replace(/\\["\\\/bfnrtu]/g, '@')
+                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+                        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))
+                ) {
+
+                } else {
+                    fieldValidationErrors.smaato_CustomEventData = "Custom Event Data should have valid JSON format";
+                    isValid = false;
+                }
             }
         }
 
@@ -1012,8 +1005,7 @@ class CreateOrderModal extends Component {
             adServerDomain,
             advertiserId,
             granularity,
-            smaato_AdspaceId,
-            smaato_PublisherId,
+            smaato_CustomEventData,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -1038,8 +1030,7 @@ class CreateOrderModal extends Component {
             customTargetingKeys: this.props.customTargetingKeys,
             customTargetingValues: this.props.customTargetingValues,
             granularity,
-            smaato_AdspaceId,
-            smaato_PublisherId,
+            smaato_CustomEventData,
         };
 
         ModalWindowService.ProgressModal.setProgress([

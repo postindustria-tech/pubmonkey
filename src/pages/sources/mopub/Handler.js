@@ -452,8 +452,7 @@ class Handler extends AbstractHandler {
             networkClass,
             Ad_ZONE_ID,
             granularity,
-            smaato_AdspaceId,
-            smaato_PublisherId,
+            smaato_CustomEventData,
         } = params;
 
         let lineItemInfo = this.lineItemInfo,
@@ -634,7 +633,7 @@ class Handler extends AbstractHandler {
                     lineItemInfo["enableOverrides"] = true;
                     lineItemInfo["overrideFields"] = {
                         custom_event_class_name: networkClass,
-                        custom_event_class_data: '{"publisherid": "' + smaato_PublisherId + '", "adspaceid": "' + smaato_AdspaceId + '"}'
+                        custom_event_class_data: smaato_CustomEventData
                     };
                 }
 
