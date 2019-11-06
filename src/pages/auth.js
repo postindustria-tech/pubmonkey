@@ -23,12 +23,10 @@ chrome.tabs.query({ active:false }, function (tabs) {
 
     if (mopub.length === 0) {
         chrome.tabs.create({ url: "https://app.mopub.com/dashboard", active: false }, function (tab) {
-            // console.log(tab);
             CJ.request = {
                 frameId: 0,
                 tabId: tab.id
             };
-
             mopubSessionUpdatedAt = Date.now();
         });
     } else {
