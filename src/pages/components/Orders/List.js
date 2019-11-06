@@ -13,7 +13,7 @@ import BaseLayout from "../layouts/BaseLayout";
 import {FileService, ModalWindowService} from "../../services";
 import {MainController, OrderController} from "../../controllers";
 import CreateOrderModal from "../Popups/CreateOrder";
-import {AD_SERVER_DFP} from "../../constants/source";
+import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 
@@ -36,10 +36,12 @@ class OrdersList extends Component {
         filter: undefined,
         filterFn: () => true,
         canceled: false,
+        loggedIn: null
     };
 
     componentDidMount() {
         this.props.setSwitcher(this.props.type);
+        window.MopubAutomation.loggedIn.then(loggedIn => this.setState({loggedIn}));
     }
 
     componentWillUnmount() {
@@ -59,7 +61,8 @@ class OrdersList extends Component {
         let {
             orderCount,
             filter,
-            filterFn
+            filterFn,
+            loggedIn
         } = this.state;
 
         return (
@@ -130,6 +133,13 @@ class OrdersList extends Component {
                     filter={filterFn}
                     onUpdate={this.onOrdersListUpdate}
                 />
+                {this.props.type === AD_SERVER_MOPUB ?
+                    loggedIn != null && loggedIn
+                        ? (<React.Fragment></React.Fragment>)
+                        : (<div className={"please-log-in"}>
+                            <p>Please login to load orders</p>
+                        </div>)
+                : null}
             </BaseLayout>
         );
     }

@@ -34,3 +34,15 @@
         margin: 0;
     }
 }
+
+.please-log-in{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    p{
+        display: flex;
+        text-align: center;
+        margin-top: 100px;
+    }
+}
