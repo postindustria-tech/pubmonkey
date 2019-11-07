@@ -138,7 +138,13 @@ class OrdersList extends Component {
                     loggedIn != null && loggedIn
                         ? (
                             this.props.ordersLoaded
-                            ? null
+                            ? (
+                                !this.props.orders.length && (
+                                    <div className={"no-orders"}>
+                                        <p>No orders</p>
+                                    </div>
+                                )
+                            )
                             : (
                                 <div className={"loading-in-progress"}>
                                     <p>Loading...</p>
