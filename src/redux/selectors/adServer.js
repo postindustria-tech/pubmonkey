@@ -37,6 +37,11 @@ const orders = createSelector(
     adServer => adServer.orders
 );
 
+const ordersLoaded = createSelector(
+    rootSelector,
+    adServer => adServer.ordersLoaded
+);
+
 const adunits = createSelector(
     rootSelector,
     adServer => adServer.adunits
@@ -100,6 +105,7 @@ const adServerSelectors = {
     dfpToken,
     dfpInventory,
     orders,
+    ordersLoaded,
     adunits,
     duplicateOrder,
     filterOrderStatus,

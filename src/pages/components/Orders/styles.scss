@@ -46,3 +46,15 @@
         margin-top: 100px;
     }
 }
+
+.loading-in-progress{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 100px;
+
+    p, svg{
+        text-align: center;
+        margin: auto;
+    }
+}

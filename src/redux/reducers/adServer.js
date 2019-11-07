@@ -9,6 +9,7 @@ export const adServerInitialState = {
     networkCode: null,
     sourceHandler: null,
     sourceHandlerReady: false,
+    ordersLoaded: false,
     orders: [],
     adunits: [],
     createOrderModalOpen: false,
@@ -72,6 +73,7 @@ const adServerReduces = handleActions(
         }),
         [adServerActions.setOrders]: (state, action) => ({
             ...state,
+            ordersLoaded: true,
             orders: action.payload.orders
         }),
         [adServerActions.setOrdersAfter]: (state, action) => ({

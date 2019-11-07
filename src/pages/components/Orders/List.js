@@ -133,9 +133,19 @@ class OrdersList extends Component {
                     filter={filterFn}
                     onUpdate={this.onOrdersListUpdate}
                 />
+
                 {this.props.type === AD_SERVER_MOPUB ?
                     loggedIn != null && loggedIn
-                        ? (<React.Fragment></React.Fragment>)
+                        ? (
+                            this.props.ordersLoaded
+                            ? null
+                            : (
+                                <div className={"loading-in-progress"}>
+                                    <p>Loading...</p>
+                                    <svg width="100px"  height="100px"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" className="lds-rolling" style={{"background": "none"}}><circle cx="50" cy="50" fill="none"  stroke="#b3121e" strokeWidth="10" r="35" strokeDasharray="164.93361431346415 56.97787143782138" transform="rotate(68.8726 50 50)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="2.1s" begin="0s" repeatCount="indefinite"></animateTransform></circle></svg>
+                                </div>
+                                )
+                        )
                         : (<div className={"please-log-in"}>
                             <p>Please login to load orders</p>
                         </div>)
@@ -474,6 +484,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
+    ordersLoaded: adServerSelectors.ordersLoaded(state),
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
     sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
