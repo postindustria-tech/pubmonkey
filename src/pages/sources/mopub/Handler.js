@@ -98,6 +98,10 @@ class Handler extends AbstractHandler {
         }
     }
 
+    logout() {
+        return HTTPService.POST(`${WEB_URL}/account/logout/`);
+    }
+
     getAdvertiserByName(advertiserName) {
         let advertiser = null;
         Object.keys(this.ADVERTISER_DEFAULT_NAME).map((key, i) => {
@@ -145,9 +149,7 @@ class Handler extends AbstractHandler {
     }
 
     getCreatives(lineItemId) {
-        return HTTPService.GET(
-            `${WEB_URL}/web-client/api/creatives/query?lineItemKey=${lineItemId}`
-        );
+        return HTTPService.GET(`${WEB_URL}/web-client/api/creatives/query?lineItemKey=${lineItemId}`);
     }
 
     createCreatives(data) {

@@ -57,7 +57,13 @@ class SourceTypeViewContainer extends PureComponent {
                 ) : null}
                 {this.props.type === AD_SERVER_MOPUB ?
                     loggedIn != null && loggedIn
-                        ? (<a href="https://app.mopub.com/dashboard/" target="_blank">{username}</a>)
+                        ? (
+                            <div>
+                                <a href="https://app.mopub.com/dashboard/" target="_blank">Logged in.</a>
+                                &nbsp;
+                                <a style={{textDecoration: "underline"}} href="#" onClick={this.mopubLogOut}>Logout</a>
+                            </div>
+                        )
                         : (
                             <div className="login-link">Not logged in.&nbsp;
                                 <a href="#" onClick={window.MopubAutomation.openLoginPage}>Log in.</a>
@@ -66,6 +72,11 @@ class SourceTypeViewContainer extends PureComponent {
                     : null}
             </div>
         )
+    }
+
+    @bind
+    mopubLogOut() {
+        this.props.sourceHandler.logout();
     }
 
     @bind

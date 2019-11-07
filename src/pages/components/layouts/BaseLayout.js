@@ -80,27 +80,8 @@ class BaseLayout extends Component {
                 <div id="page-content-wrapper" className={"border-left"}>
 
                     <Navbar className="header sticky-top">
-
                         <AdServerSwitcherContainer/>
-
-                        <NavbarBrand>
-                            {/*PubMonkey <small>v. { version }</small>*/}
-                        </NavbarBrand>
-                        {/*<div id="downloadManual">
-                            <a href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf" target="_blank">Download manual</a>
-                        </div>*/}
-                        <Nav>
-                            <SourceTypeViewContainer />
-                            {/*<NavItem>
-                                <NavLink tag={ RRNavLink } activeClassName="active" to="/adunits">Ad Units</NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink tag={ RRNavLink } activeClassName="active" to="/orders">Orders</NavLink>
-                            </NavItem>*/}
-                            {/*<NavItem>
-                                <NavLink tag={ RRNavLink } activeClassName="active" to="/backups">Backups</NavLink>
-                            </NavItem>*/}
-                        </Nav>
+                        <SourceTypeViewContainer />
                     </Navbar>
                     <div className="container">
                         { children }
