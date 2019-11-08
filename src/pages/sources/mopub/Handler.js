@@ -244,7 +244,7 @@ class Handler extends AbstractHandler {
     restoreLineItem(data, orderId, advertiser) {
         let {creatives} = data;
 
-        if (advertiser.toLocaleLowerCase() !== "amazon" && advertiser.toLocaleLowerCase() !== "openx") {
+        if (advertiser.toLocaleLowerCase() === "pubnative hybid" || advertiser.toLocaleLowerCase() === "smaato unified bidding") {
             creatives = [];
         }
 
