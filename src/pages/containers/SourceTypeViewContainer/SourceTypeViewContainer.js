@@ -51,7 +51,13 @@ class SourceTypeViewContainer extends PureComponent {
                             style={{color: "#ffffff"}}
                             onClick={this.changeNetworkCode}>Network
                             Code: {this.state.networkCode}</a> {this.props.dfpLoggedIn ?
-                        (<a className="dfp-login-link" href="#" onClick={this.dfpLogOut}>Logout</a>) :
+                        (
+                            <div className="dfp-login-link" style={{display: "inline-block"}}>
+                                <a href="https://admanager.google.com/" target="_blank">Logged in.</a>
+                                &nbsp;
+                                <a style={{textDecoration: "underline"}} href="#" onClick={this.dfpLogOut}>Logout</a>
+                            </div>
+                        ) :
                         (<a className="dfp-login-link" href="#" onClick={this.dfpLogIn}>Login</a>)}
                     </div>
                 ) : null}
