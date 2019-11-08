@@ -506,16 +506,13 @@ class CreateOrderModal extends Component {
                                         />
                                     </div>
                                     <div hidden={this.state.selectedAdvertiser === 'smaato'}>
-                                    <Select
-                                        // className="basic-single"
-                                        // classNamePrefix="select"
-                                        isClearable={false}
-                                        name="color"
-                                        placeholder="Please select OS"
-                                        options={this.props.networkClasses[this.state.os] || []}
-                                        onChange={this.handleSelectNetworkClass}
-                                        value={this.state.networkClass}
-                                    />
+                                        <Select
+                                            isClearable={false}
+                                            placeholder="Please select OS"
+                                            options={this.props.networkClasses[this.state.os] || []}
+                                            onChange={this.handleSelectNetworkClass}
+                                            value={this.state.networkClass}
+                                        />
                                     </div>
                                 </div>
 
@@ -723,7 +720,11 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.step = "Range too short!";
             isValid = false;
         }
-        if ((["pubnative", "smaato"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.networkClass)) ||
+        if ((
+                ["pubnative", "smaato"].indexOf(this.state.advertiser) !== -1 &&
+                (isEmpty(this.state.networkClass) || (this.state.networkClass.hasOwnProperty('value') && isEmpty(this.state.networkClass.value)))
+            )
+            ||
             (["amazon", "openx"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.creativeFormat))) {
             fieldValidationErrors.networkClass = "Creative format is required!";
             isValid = false;
