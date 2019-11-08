@@ -25,7 +25,7 @@ class OrdersList extends Component {
 
     static defaultProps = {
         sourceHandlerReady: false,
-        STATUS_OPTIONS: []
+        STATUS_OPTIONS: [],
     };
 
     state = {
@@ -51,9 +51,18 @@ class OrdersList extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.props.filter !== this.state.filter ||
+        if (//this.props.filter !== this.state.filter ||
             this.props.type !== prevProps.type) {
             this.filterChange(this.props.filter);
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.filter !== this.props.filter || this.state.filter === undefined) {
+            this.setState({
+                filter: nextProps.filter,
+                filterFn: nextProps.sourceHandler.FILTER_FN[nextProps.filter],
+            });
         }
     }
 
@@ -472,6 +481,7 @@ class OrdersList extends Component {
     }
 
     filterChange(filter) {
+        filter = Number(filter);
         this.setState({
             filter: filter,
             filterFn: this.props.sourceHandler.FILTER_FN[filter],
