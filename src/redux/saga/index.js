@@ -10,6 +10,7 @@ function* getOrders(action) {
         const sourceHandler = yield select(adServerSelectors.sourceHandler);
         const ready = yield sourceHandler.isReady();
         if (ready) {
+            yield put(adServerActions.setOrdersStarted());
             const orders = yield sourceHandler.getAllOrders() || [];
             yield put(adServerActions.setOrders(orders));
             yield getOrdersAfter(sourceHandler);

@@ -71,6 +71,10 @@ const adServerReduces = handleActions(
             filter: 0,
             sourceHandler: action.payload.sourceHandler
         }),
+        [adServerActions.setOrdersStarted]: (state, action) => ({
+            ...state,
+            ordersLoaded: false,
+        }),
         [adServerActions.setOrders]: (state, action) => ({
             ...state,
             ordersLoaded: true,

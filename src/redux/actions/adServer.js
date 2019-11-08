@@ -5,6 +5,7 @@ const setSourceHandler = createAction('adServer--setSourceHandler', sourceHandle
 const setSourceHandlerStatus = createAction('adServer--setSourceHandlerStatus', sourceHandlerReady => ({sourceHandlerReady}));
 const setAdvertiser = createAction('adServer--setAdvertiser', advertiser => ({advertiser}));
 const setNetworkCode = createAction('adServer--setNetworkCode', networkCode => ({networkCode}));
+const setOrdersStarted = createAction('adServer--setOrdersStarted', ordersLoaded => ({ordersLoaded}));
 const setOrders = createAction('adServer--setOrders', orders => ({orders}));
 const refreshOrders = createAction("adServer--refreshOrders");
 const setOrdersAfter = createAction('adServer--setOrdersAfter', orders => ({orders}));
@@ -29,6 +30,7 @@ const adServerActions = {
     setSourceHandlerStatus,
     setAdvertiser,
     setNetworkCode,
+    setOrdersStarted,
     setOrders,
     setOrdersAfter,
     refreshOrders,

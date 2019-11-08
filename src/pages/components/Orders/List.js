@@ -134,8 +134,7 @@ class OrdersList extends Component {
                     onUpdate={this.onOrdersListUpdate}
                 />
 
-                {this.props.type === AD_SERVER_MOPUB ?
-                    loggedIn != null && loggedIn
+                {((this.props.type == AD_SERVER_MOPUB && loggedIn != null && loggedIn) || (this.props.type == AD_SERVER_DFP && this.props.dfpLoggedIn != null && this.props.dfpLoggedIn))
                         ? (
                             this.props.ordersLoaded
                             ? (
@@ -155,7 +154,7 @@ class OrdersList extends Component {
                         : (<div className={"please-log-in"}>
                             <p>Please login to load orders</p>
                         </div>)
-                : null}
+                }
             </BaseLayout>
         );
     }
@@ -475,10 +474,10 @@ class OrdersList extends Component {
     filterChange(filter) {
         this.setState({
             filter: filter,
-            filterFn: this.props.sourceHandler.FILTER_FN[filter]
+            filterFn: this.props.sourceHandler.FILTER_FN[filter],
+        }, () => {
+            this.props.filterOrderStatus(filter)
         });
-
-        this.props.filterOrderStatus(filter);
     }
 }
 
@@ -491,6 +490,7 @@ const mapDispatchToProps = {
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
     ordersLoaded: adServerSelectors.ordersLoaded(state),
+    dfpLoggedIn: adServerSelectors.dfpLoggedIn(state),
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
     sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
