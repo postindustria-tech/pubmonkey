@@ -963,7 +963,7 @@ class Handler extends AbstractHandler {
 
             data = JSON.stringify(data, null, "  ");
 
-            FileService.saveFile(data, order.name);
+            FileService.saveFile(data, `${order.name}.json`);
 
             resolve();
         });
