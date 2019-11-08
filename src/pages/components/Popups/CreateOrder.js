@@ -205,9 +205,11 @@ class CreateOrderModal extends Component {
         let adUnitFormat = true;
         if (!isEmpty(format)) {
             if (advertiser === "pubnative") {
-                if (typeof NETWORK_CLASS_TO_DIMENSION[networkClass] !== "undefined" &&
-                    !isEmpty(NETWORK_CLASS_TO_DIMENSION[networkClass])) {
-                    adUnitFormat = NETWORK_CLASS_TO_DIMENSION[networkClass] === format;
+                if (networkClass.hasOwnProperty('value') && !isEmpty(networkClass.value)) {
+                    if (typeof NETWORK_CLASS_TO_DIMENSION[networkClass.value] !== "undefined" &&
+                        !isEmpty(NETWORK_CLASS_TO_DIMENSION[networkClass.value])) {
+                        adUnitFormat = NETWORK_CLASS_TO_DIMENSION[networkClass.value] === format;
+                    }
                 }
             } else if (!isEmpty(creativeFormat)) {
                 adUnitFormat = creativeFormat === format;
@@ -804,7 +806,6 @@ class CreateOrderModal extends Component {
             });
         }
         if (name === "os") {
-            console.log(this.props.networkClasses[value][0]);
             this.setState({
                 adunitsSelected: [],
                 networkClass: this.props.networkClasses[value][0]
