@@ -58,7 +58,11 @@ class SourceTypeViewContainer extends PureComponent {
                                 <a style={{textDecoration: "underline"}} href="#" onClick={this.dfpLogOut}>Logout</a>
                             </div>
                         ) :
-                        (<a className="dfp-login-link" href="#" onClick={this.dfpLogIn}>Login</a>)}
+                        (
+                            <div className="dfp-login-link" style={{display: "inline-block"}}>Not logged in.&nbsp;
+                                <a style={{textDecoration: "underline"}} href="#" onClick={this.dfpLogIn}>Login</a>
+                            </div>
+                        )}
                     </div>
                 ) : null}
                 {this.props.type === AD_SERVER_MOPUB ?
