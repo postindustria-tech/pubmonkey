@@ -138,7 +138,7 @@ class OrdersList extends Component {
                         ? (
                             this.props.ordersLoaded
                             ? (
-                                !this.props.orders.length && (
+                                !this.props.orders.filter(filterFn).length && (
                                     <div className={"no-orders"}>
                                         <p>No orders</p>
                                     </div>
