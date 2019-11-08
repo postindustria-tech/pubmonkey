@@ -626,7 +626,7 @@ class Handler extends AbstractHandler {
                     lineItemInfo["networkType"] = "custom_native";
                     lineItemInfo["enableOverrides"] = true;
                     lineItemInfo["overrideFields"] = {
-                        custom_event_class_name: networkClass,
+                        custom_event_class_name: networkClass.value,
                         custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
                     };
                 } else if (advertiser === "smaato") {
@@ -634,7 +634,7 @@ class Handler extends AbstractHandler {
                     lineItemInfo["networkType"] = "custom_native";
                     lineItemInfo["enableOverrides"] = true;
                     lineItemInfo["overrideFields"] = {
-                        custom_event_class_name: networkClass,
+                        custom_event_class_name: networkClass.value,
                         custom_event_class_data: smaato_CustomEventData
                     };
                 }

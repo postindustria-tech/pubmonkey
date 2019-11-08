@@ -5,20 +5,16 @@ export class Smaato extends AbstractAdvertiser {
     static advertiser = "smaato";
 
     NETWORK_CLASS = {
-        "": {
-            "": "Please select OS"
-        },
-        iphone: {
-            "": "All",
-            "SMAMoPubSmaatoBannerAdapter": "Banner",
-            "SMAMoPubSmaatoInterstitialAdapter": "Interstitial",
-            "SMAMoPubSmaatoRewardedVideoAdapter": "Rewarded Video"
-        },
-        android: {
-            "": "All",
-            "SMAMoPubSmaatoBannerAdapter": "Banner",
-            "SMAMoPubSmaatoInterstitialAdapter": "Interstitial",
-            "SMAMoPubSmaatoRewardedVideoAdapter": "Rewarded Video"
-        }
+        "": [],
+        iphone: [
+            {value: 'SMAMoPubSmaatoBannerAdapter', label: 'Banner'},
+            {value: 'SMAMoPubSmaatoInterstitialAdapter', label: 'Interstitial'},
+            {value: 'SMAMoPubSmaatoRewardedVideoAdapter', label: 'Rewarded Video'},
+        ],
+        android: [
+            {value: 'SMAMoPubSmaatoBannerAdapter', label: 'Banner'},
+            {value: 'SMAMoPubSmaatoInterstitialAdapter', label: 'Interstitial'},
+            {value: 'SMAMoPubSmaatoRewardedVideoAdapter', label: 'Rewarded Video'},
+        ]
     };
 }

@@ -38,6 +38,8 @@ import {AD_SERVER_DFP, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
+import {CreatableSingle} from "../Select";
+import Select from 'react-select';
 
 const helperText =
     "{bid} macro is replaced with a corresponding bid value\n" +
@@ -493,7 +495,31 @@ class CreateOrderModal extends Component {
                                     <option value={"android"}>Android</option>
                                 </Input>{" "}
                                 <span className={"mp-label"}>Creative format: </span>
-                                <Input
+                                <div style={{width: "200px", display: "inline-block"}}>
+                                    <div hidden={this.state.selectedAdvertiser === 'pubnative'}>
+                                        <CreatableSingle
+                                            options={this.props.networkClasses[this.state.os] || []}
+                                            // defaultValue={this.props.networkClasses[this.state.os][0]}
+                                            onSelect={this.handleSelectNetworkClass}
+                                            placeholder="Please select OS"
+                                            value={this.state.networkClass}
+                                        />
+                                    </div>
+                                    <div hidden={this.state.selectedAdvertiser === 'smaato'}>
+                                    <Select
+                                        // className="basic-single"
+                                        // classNamePrefix="select"
+                                        isClearable={false}
+                                        name="color"
+                                        placeholder="Please select OS"
+                                        options={this.props.networkClasses[this.state.os] || []}
+                                        onChange={this.handleSelectNetworkClass}
+                                        value={this.state.networkClass}
+                                    />
+                                    </div>
+                                </div>
+
+                                {/*<Input
                                     type="select"
                                     name={"networkClass"}
                                     id="networkClass"
@@ -510,7 +536,7 @@ class CreateOrderModal extends Component {
                                             </option>
                                         )
                                     )}
-                                </Input>
+                                </Input>*/}
                                 <div
                                     hidden={this.state.selectedAdvertiser === 'smaato'}
                                     style={{display: "inline-block", width: "auto"}}
@@ -697,7 +723,7 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.step = "Range too short!";
             isValid = false;
         }
-        if ((this.state.advertiser === "pubnative" && isEmpty(this.state.networkClass)) ||
+        if ((["pubnative", "smaato"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.networkClass)) ||
             (["amazon", "openx"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.creativeFormat))) {
             fieldValidationErrors.networkClass = "Creative format is required!";
             isValid = false;
@@ -777,12 +803,18 @@ class CreateOrderModal extends Component {
             });
         }
         if (name === "os") {
+            console.log(this.props.networkClasses[value][0]);
             this.setState({
                 adunitsSelected: [],
-                networkClass: Object.keys(this.props.networkClasses[value])[0]
+                networkClass: this.props.networkClasses[value][0]
             });
         }
         this.setState({[name]: value});
+    }
+
+    @bind
+    handleSelectNetworkClass(value) {
+        this.setState({networkClass: value});
     }
 
     changeAdvertiser(advertiser) {
@@ -807,6 +839,7 @@ class CreateOrderModal extends Component {
             advertiser: advertiser,
             selectedAdvertiser: advertiser,
             os: "",
+            networkClass: "",
             formValid: true,
             rangeMeasure: advertiser === "amazon" ? "position" : "$",
             rangeFrom: advertiser === "amazon" ? 1 : 0.1,
@@ -1118,8 +1151,10 @@ class CreateOrderModal extends Component {
             creativeFormat,
             networkClass,
             Ad_ZONE_ID,
+            advertiserId,
             adServerDomain,
-            granularity
+            granularity,
+            smaato_CustomEventData,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -1142,7 +1177,8 @@ class CreateOrderModal extends Component {
             adServerDomain,
             customTargetingKeys: this.props.customTargetingKeys,
             customTargetingValues: this.props.customTargetingValues,
-            granularity
+            granularity,
+            smaato_CustomEventData,
         };
 
         ModalWindowService.ProgressModal.setProgress([
