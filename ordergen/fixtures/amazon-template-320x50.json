@@ -92,6 +92,7 @@
               },
               "name": "Creative",
               "format": "320x50",
+              "dimensions": "320x50",
               "clickUrl": "",
               "trackingUrl": "",
               "customHeight": null,

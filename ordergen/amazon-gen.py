@@ -39,10 +39,12 @@ for [k,v] in kvs:
      lineitem['bid'] = v
 
      #distinct order per format:
-     #lineitem['keywords'] = ['amznslots:'+k]
+     lineitem['keywords'] = ['amznslots:'+k]
 
      #compact order mode:
-     lineitem['keywords'] = ['amznslots:m320x50' + k, 'amznslots:m728x90' + k]
+     #note you need to use keys like 'p1', not 'm320x50p1' 
+     #because of the concatenation prefix
+     #lineitem['keywords'] = ['amznslots:m320x50' + k, 'amznslots:m728x90' + k]
 
      lineitems.append(lineitem)
 
