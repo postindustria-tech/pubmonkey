@@ -1213,7 +1213,7 @@ class CreateOrderModal extends Component {
         )
             .then(ModalWindowService.ProgressModal.hideModal)
             .then(() => {
-                this.close();
+                // this.close();
                 // this.props.toUpdate && this.props.toUpdate();
             })
             .catch(error => {
