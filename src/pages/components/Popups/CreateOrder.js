@@ -90,7 +90,7 @@ const initialState = {
     granularity: "",
 
     advertiserId: null,
-    smaato_CustomEventData: "{\"publisherId\":\"\", \"adspaceId\":\"\"}",
+    smaato_CustomEventData: "{\"publisherId\":\"\", \"spaceId\":\"\"}",
 };
 
 class CreateOrderModal extends Component {
