@@ -26,6 +26,7 @@ class Handler extends AbstractHandler {
         openx: "Prebid.org",
         amazon: "Amazon Publisher Services (TAM)",
         smaato: "Smaato Unified Bidding",
+        clearbid: "ClearBid",
     };
 
     FILTER_FN = [

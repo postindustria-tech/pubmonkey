@@ -5,12 +5,14 @@ export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   openx: "hb_pb:{bid}",
   amazon: "amznslots:m{format}p{position}",
   smaato: "smaato_cpm:{bid}",
+  clearbid: "um_price:{bid}",
 };
 export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
   amazon: "m{width}x{height}p{position}",
   smaato: "Smaato UB {bid}",
+  clearbid: "um_price {bid}",
 };
 export const NETWORK_CLASS_TO_DIMENSION = {
   "HyBidMoPubLeaderboardCustomEvent": "728x90",

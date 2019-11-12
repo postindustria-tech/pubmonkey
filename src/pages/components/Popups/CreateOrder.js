@@ -91,6 +91,7 @@ const initialState = {
 
     advertiserId: null,
     smaato_CustomEventData: "{\"publisherId\":\"\", \"spaceId\":\"\"}",
+    clearbid_CustomEventData: "{\"w\":\"\", \"h\":\"\"}",
 };
 
 class CreateOrderModal extends Component {
@@ -480,7 +481,7 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser !== "pubnative" && this.state.selectedAdvertiser !== 'smaato'}>
+                        <Row hidden={this.state.selectedAdvertiser !== "pubnative" && this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>OS: </span>
                                 <Input
@@ -555,7 +556,7 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser !== 'smaato'}>
+                        <Row hidden={this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Custom Event Data: </span>
                                 <CustomInput

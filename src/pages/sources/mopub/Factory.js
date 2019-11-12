@@ -3,7 +3,7 @@ import {
     OpenX,
     Amazon,
     PubNative,
-    Smaato
+    Smaato, ClearBid
 } from './advertisers';
 
 export class AdvertiserFactory {
@@ -18,6 +18,8 @@ export class AdvertiserFactory {
                 return new PubNative();
             case Smaato.ADVERTISER:
                 return new Smaato();
+            case ClearBid.ADVERTISER:
+                return new ClearBid();
             default:
                 throw `Wrong advertiser ${advertiser}`;
         }
