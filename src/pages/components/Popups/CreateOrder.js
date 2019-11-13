@@ -90,8 +90,7 @@ const initialState = {
     granularity: "",
 
     advertiserId: null,
-    smaato_CustomEventData: "{\"publisherId\":\"\", \"spaceId\":\"\"}",
-    clearbid_CustomEventData: "{\"w\":\"\", \"h\":\"\"}",
+    customEventData: "",
 };
 
 class CreateOrderModal extends Component {
@@ -417,7 +416,7 @@ class CreateOrderModal extends Component {
                                     parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />{" "}
                                 <div
-                                    hidden={this.state.selectedAdvertiser === 'smaato'}
+                                    hidden={this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid'}
                                     style={{display: "inline-block", width: "auto"}}
                                 >
                                 <span className={"mp-label"}>
@@ -508,7 +507,7 @@ class CreateOrderModal extends Component {
                                             value={this.state.networkClass}
                                         />
                                     </div>
-                                    <div hidden={this.state.selectedAdvertiser === 'smaato'}>
+                                    <div hidden={this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid'}>
                                         <Select
                                             isClearable={false}
                                             placeholder="Please select OS"
@@ -560,12 +559,12 @@ class CreateOrderModal extends Component {
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Custom Event Data: </span>
                                 <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.smaato_CustomEventData)}
+                                    invalid={!isEmpty(this.state.formErrors.customEventData)}
                                     inline
                                     type="text"
-                                    id={"smaato_CustomEventData"}
-                                    name={"smaato_CustomEventData"}
-                                    value={this.state.smaato_CustomEventData}
+                                    id={"customEventData"}
+                                    name={"customEventData"}
+                                    value={this.state.customEventData}
                                     onChange={this.handleInputChange}
                                     className={"mp-form-control"}
                                     style={{width: "400px"}}
@@ -680,7 +679,7 @@ class CreateOrderModal extends Component {
             Ad_ZONE_ID: "",
             adunits: "",
             granularity: "",
-            smaato_CustomEventData: "",
+            customEventData: "",
         };
         let isValid = true;
 
@@ -740,20 +739,21 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.granularity = "Granularity is required!";
             isValid = false;
         }
-        if (this.state.advertiser === "smaato") {
-            if (isEmpty(this.state.smaato_CustomEventData)) {
-                fieldValidationErrors.smaato_CustomEventData = "Custom Event Data is required!";
+        if (["smaato", "clearbid"].indexOf(this.state.advertiser) !== -1) {
+            if (isEmpty(this.state.customEventData)) {
+                fieldValidationErrors.customEventData = "Custom Event Data is required!";
                 isValid = false;
             } else {
+                // check if json valid
                 if (/^[\],:{}\s]*$/.test(
-                    this.state.smaato_CustomEventData
+                    this.state.customEventData
                         .replace(/\\["\\\/bfnrtu]/g, '@')
                         .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
                         .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))
                 ) {
 
                 } else {
-                    fieldValidationErrors.smaato_CustomEventData = "Custom Event Data should have valid JSON format";
+                    fieldValidationErrors.customEventData = "Custom Event Data should have valid JSON format";
                     isValid = false;
                 }
             }
@@ -826,6 +826,16 @@ class CreateOrderModal extends Component {
             keywordStep = advertiser === "amazon" ? 1 : 0.01,
             showCreativeFormat = advertiser === "amazon" || advertiser === "openx";
 
+        const customEventData = ((advertiser) => {
+            switch (advertiser) {
+                case "smaato":
+                    return "{\"publisherId\":\"\", \"spaceId\":\"\"}";
+                case "clearbid":
+                    return "{\"w\":\"\", \"h\":\"\", \"ad_unit_id\":\"\"}";
+                default:
+                    return "";
+            }})(advertiser);
+
         this.props.sourceHandler.setAdvertiser(advertiser);
         this.props.setAdvertiser(advertiser);
 
@@ -846,6 +856,7 @@ class CreateOrderModal extends Component {
             formValid: true,
             rangeMeasure: advertiser === "amazon" ? "position" : "$",
             rangeFrom: advertiser === "amazon" ? 1 : 0.1,
+            customEventData: customEventData
         });
     }
 
@@ -996,7 +1007,7 @@ class CreateOrderModal extends Component {
                     }
                 }
             }
-            if (advertiser === "smaato") {
+            if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                 keywords = items;
             }
         }
@@ -1041,7 +1052,7 @@ class CreateOrderModal extends Component {
             adServerDomain,
             advertiserId,
             granularity,
-            smaato_CustomEventData,
+            customEventData,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -1066,7 +1077,7 @@ class CreateOrderModal extends Component {
             customTargetingKeys: this.props.customTargetingKeys,
             customTargetingValues: this.props.customTargetingValues,
             granularity,
-            smaato_CustomEventData,
+            customEventData,
         };
 
         ModalWindowService.ProgressModal.setProgress([
@@ -1137,6 +1148,18 @@ class CreateOrderModal extends Component {
                     });
                 }
             });
+
+        ModalWindowService.ProgressModal.onCancel(() => {
+            this.setState({canceled: true});
+            ModalWindowService.ProgressModal.hideModal();
+            window.canceledExport = true;
+            progress.cancel("canceled by user");
+
+            this.timer = setTimeout(() => {
+                this.setState({canceled: false});
+                window.canceledExport = false
+            }, 1000)
+        });
     }
 
     @bind
@@ -1157,7 +1180,7 @@ class CreateOrderModal extends Component {
             advertiserId,
             adServerDomain,
             granularity,
-            smaato_CustomEventData,
+            customEventData,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -1181,7 +1204,7 @@ class CreateOrderModal extends Component {
             customTargetingKeys: this.props.customTargetingKeys,
             customTargetingValues: this.props.customTargetingValues,
             granularity,
-            smaato_CustomEventData,
+            customEventData,
         };
 
         ModalWindowService.ProgressModal.setProgress([

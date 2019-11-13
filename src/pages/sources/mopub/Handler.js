@@ -245,7 +245,7 @@ class Handler extends AbstractHandler {
     restoreLineItem(data, orderId, advertiser) {
         let {creatives} = data;
 
-        if (advertiser.toLocaleLowerCase() === "pubnative hybid" || advertiser.toLocaleLowerCase() === "smaato unified bidding") {
+        if (["pubnative hybid", "smaato unified bidding", "clearbid"].indexOf(advertiser.toLocaleLowerCase()) !== -1) {
             creatives = [];
         }
 
@@ -455,7 +455,7 @@ class Handler extends AbstractHandler {
             networkClass,
             Ad_ZONE_ID,
             granularity,
-            smaato_CustomEventData,
+            customEventData,
         } = params;
 
         let lineItemInfo = this.lineItemInfo,
@@ -608,7 +608,7 @@ class Handler extends AbstractHandler {
                     }
                     name = name.replace("{position}", line);
                     line++;
-                } else if (advertiser === "smaato") {
+                } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));
                 } else {
                     // openx, remove?
@@ -630,13 +630,13 @@ class Handler extends AbstractHandler {
                         custom_event_class_name: networkClass.value,
                         custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
                     };
-                } else if (advertiser === "smaato") {
+                } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     lineItemInfo.type = "network";
                     lineItemInfo["networkType"] = "custom_native";
                     lineItemInfo["enableOverrides"] = true;
                     lineItemInfo["overrideFields"] = {
                         custom_event_class_name: networkClass.value,
-                        custom_event_class_data: smaato_CustomEventData
+                        custom_event_class_data: customEventData
                     };
                 }
 
