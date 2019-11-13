@@ -46,11 +46,7 @@ class SourceTypeViewContainer extends PureComponent {
                 <AuthModal/>
                 {this.props.type === AD_SERVER_DFP ? (
                     <div>
-                        <a
-                            href="#"
-                            style={{color: "#ffffff"}}
-                            onClick={this.changeNetworkCode}>Network
-                            Code: {this.state.networkCode}</a> {this.props.dfpLoggedIn ?
+                        {this.props.dfpLoggedIn ?
                         (
                             <div className="dfp-login-link" style={{display: "inline-block"}}>
                                 <a href="https://admanager.google.com/" target="_blank">Logged in.</a>
@@ -63,6 +59,12 @@ class SourceTypeViewContainer extends PureComponent {
                                 <a style={{textDecoration: "underline"}} href="#" onClick={this.dfpLogIn}>Login</a>
                             </div>
                         )}
+                        <a
+                            href="#"
+                            style={{color: "#ffffff"}}
+                            onClick={this.changeNetworkCode}>
+                                Network Code: {this.state.networkCode}
+                        </a>
                     </div>
                 ) : null}
                 {this.props.type === AD_SERVER_MOPUB ?
