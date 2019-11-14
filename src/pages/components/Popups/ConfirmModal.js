@@ -37,8 +37,7 @@ export default class ConfirmModal extends Component {
                 <ModalHeader>{this.props.title}</ModalHeader>
                 <ModalBody>
                     Will generate:<br/>
-                    {this.props.willGenerateLineItems} line item(s) - {this.props.willGenerateKeywords} keyword(s) each
-
+                    {this.props.willGenerateLineItems} line item(s), {this.props.willGenerateKeywords} keyword(s) per line item.
                     <br/>
                     {this.props.willGenerateLineItems > 100 ? 'It will take some time. Are you sure?' : 'Are you sure?'}
                 </ModalBody>
