@@ -1,5 +1,5 @@
 import adServerActions from "../actions/adServer";
-import {put, takeEvery, all, select} from "redux-saga/effects";
+import {put, takeEvery, takeLatest, all, select} from "redux-saga/effects";
 import SourceFactory from "../../pages/sources/Factory";
 import adServerSelectors from "../selectors/adServer";
 import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../pages/constants/source";
@@ -278,7 +278,7 @@ function* handleChangeAdServerType() {
     yield takeEvery(adServerActions.setSwitcher, setSourceHandler);
 
     yield takeEvery(adServerActions.setSourceHandler, setSourceHandlerAfter);
-    yield takeEvery(adServerActions.setSourceHandler, getOrders);
+    yield takeLatest(adServerActions.setSourceHandler, getOrders);
     yield takeEvery(adServerActions.setSourceHandler, getAdUnits);
     yield takeEvery(adServerActions.setSourceHandler, loadAdvertiser);
 
