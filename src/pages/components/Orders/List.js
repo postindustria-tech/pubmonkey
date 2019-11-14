@@ -228,6 +228,12 @@ class OrdersList extends Component {
                         ]);
                     }
                 )
+                    .then(() => {
+                        ModalWindowService.AlertPopup.showMessage(
+                            'Import ' + this.props.type + ' has finished successfully.',
+                            'Success!'
+                        );
+                    })
                     .catch(({data: {errors}}) => {
                         let fields = Object.keys(errors);
                         ModalWindowService.ErrorPopup.showMessage(
