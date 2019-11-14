@@ -71,13 +71,27 @@ const ErrorPopup = new class extends ModalBase {
     }
 };
 
+const AlertPopup = new class extends ModalBase {
+    message = "";
+    header = "";
+
+    @bind
+    showMessage(message, header) {
+        this.message = message;
+        this.header = header;
+
+        this.showModal()
+    }
+};
+
 function onUpdate() {
     ModalWindowService.onUpdate && ModalWindowService.onUpdate()
 }
 
 export const ModalWindowService = {
     ErrorPopup,
-    ProgressModal
+    ProgressModal,
+    AlertPopup
 };
 
 window.ModalWindowService = ModalWindowService;

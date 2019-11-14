@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import {Navbar, NavbarBrand, Nav, NavItem, NavLink, Button} from 'reactstrap'
 import { NavLink as RRNavLink } from 'react-router-dom'
 import classnames from 'classnames'
-import { ProgressModal, ErrorPopup } from '../Popups'
+import { ProgressModal, ErrorPopup, AlertPopup } from '../Popups'
 import { ModalWindowService } from '../../services'
 import { version } from '../../../misc.json'
 import SourceTypeViewContainer from '../../containers/SourceTypeViewContainer/SourceTypeViewContainer';
@@ -98,6 +98,13 @@ class BaseLayout extends Component {
                     header={ ModalWindowService.ErrorPopup.header }
                     message={ ModalWindowService.ErrorPopup.message }
                     toggleModal={ ModalWindowService.ErrorPopup.hideModal }
+                />
+
+                <AlertPopup
+                    isOpen={ ModalWindowService.AlertPopup.isOpen }
+                    header={ ModalWindowService.AlertPopup.header }
+                    message={ ModalWindowService.AlertPopup.message }
+                    toggleModal={ ModalWindowService.AlertPopup.hideModal }
                 />
 
                 <ProgressModal
