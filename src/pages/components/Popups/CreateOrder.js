@@ -507,7 +507,7 @@ class CreateOrderModal extends Component {
                                             value={this.state.networkClass}
                                         />
                                     </div>
-                                    <div hidden={this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid'}>
+                                    <div hidden={["smaato", "clearbid"].indexOf(this.state.selectedAdvertiser) !== -1}>
                                         <Select
                                             isClearable={false}
                                             placeholder="Please select OS"
@@ -517,30 +517,11 @@ class CreateOrderModal extends Component {
                                         />
                                     </div>
                                 </div>
-
-                                {/*<Input
-                                    type="select"
-                                    name={"networkClass"}
-                                    id="networkClass"
-                                    onChange={this.handleInputChange}
-                                    value={this.state.networkClass}
-                                    style={{display: "inline-block", width: "auto"}}
-                                    className={"mp-form-control"}
-                                    invalid={!isEmpty(this.state.formErrors.networkClass)}
-                                >
-                                    {Object.keys(this.props.networkClasses[this.state.os] || {}).map(
-                                        (option, index) => (
-                                            <option key={index} value={option}>
-                                                {this.props.networkClasses[this.state.os][option]}
-                                            </option>
-                                        )
-                                    )}
-                                </Input>*/}
                                 <div
-                                    hidden={this.state.selectedAdvertiser === 'smaato'}
+                                    hidden={["smaato", "clearbid"].indexOf(this.state.selectedAdvertiser) !== -1}
                                     style={{display: "inline-block", width: "auto"}}
                                 >{" "}
-                                    <span className={"mp-label"}>Ad_ZONE_ID:</span>
+                                    <span className={"mp-label"}>Ad_ZONE_ID: </span>
                                     <CustomInput
                                         invalid={!isEmpty(this.state.formErrors.Ad_ZONE_ID)}
                                         inline
