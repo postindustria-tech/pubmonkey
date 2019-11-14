@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PubMonkey",
-  "version": "2.4.0.4",
+  "version": "2.4.0.5",
   "icons": {
     "16": "images/16x16-favicon-PubMonkey.png",
     "32": "images/32x32-logo-PubMonkey.png",
