@@ -104,6 +104,26 @@
   }
 }
 
+.alert-popup{
+    .modal-body{
+        dl{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        dd{
+            margin-left: 5px;
+        }
+
+        i.fa {
+          color: green;
+          font-size: 42px;
+        }
+
+    }
+}
+
 .error-message {
   background-color: #fce4e4;
   border: 1px solid #fcc2c3;

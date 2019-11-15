@@ -1096,7 +1096,7 @@ class CreateOrderModal extends Component {
                 }
                 this.reset();
                 ModalWindowService.AlertPopup.showMessage(
-                    'Order ' + this.props.type + ' has been created successfully.',
+                    'Order has been created successfully.',
                     'Success!'
                 );
             })
