@@ -230,7 +230,7 @@ class OrdersList extends Component {
                 )
                     .then(() => {
                         ModalWindowService.AlertPopup.showMessage(
-                            'Import ' + this.props.type + ' has finished successfully.',
+                            'Import has finished successfully.',
                             'Success!'
                         );
                     })

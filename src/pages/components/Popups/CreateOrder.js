@@ -1138,7 +1138,7 @@ class CreateOrderModal extends Component {
             this.setState({canceled: true});
             ModalWindowService.ProgressModal.hideModal();
             window.canceledExport = true;
-            progress.cancel("canceled by user");
+            //progress.cancel("canceled by user");
 
             this.timer = setTimeout(() => {
                 this.setState({canceled: false});
