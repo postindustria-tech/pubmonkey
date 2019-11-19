@@ -35,11 +35,7 @@ export default class ConfirmModal extends Component {
         return (
             <Modal isOpen={this.state.open} toggle={this.toggle}>
                 <ModalHeader>{this.props.title}</ModalHeader>
-                <ModalBody>
-                    Will generate:<br/>
-                    {this.props.willGenerateLineItems} line item(s), {this.props.willGenerateKeywords} keyword(s) per line item.
-                    <br/>
-                    {this.props.willGenerateLineItems > 100 ? 'It will take some time. Are you sure?' : 'Are you sure?'}
+                <ModalBody dangerouslySetInnerHTML={{__html: this.props.message}}>
                 </ModalBody>
                 <ModalFooter>
                     <Button onClick={this.decline}>No</Button>

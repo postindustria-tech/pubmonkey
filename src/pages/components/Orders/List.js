@@ -16,6 +16,7 @@ import CreateOrderModal from "../Popups/CreateOrder";
 import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
+import ConfirmModal from "../Popups/ConfirmModal";
 
 window.canceledExport = false;
 
@@ -36,7 +37,9 @@ class OrdersList extends Component {
         filter: undefined,
         filterFn: () => true,
         canceled: false,
-        loggedIn: null
+        loggedIn: null,
+        ordersForImport: [],
+        confirmModalMessage: null,
     };
 
     componentDidMount() {
@@ -51,8 +54,7 @@ class OrdersList extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (//this.props.filter !== this.state.filter ||
-            this.props.type !== prevProps.type) {
+        if (this.props.type !== prevProps.type) {
             this.filterChange(this.props.filter);
         }
     }
@@ -164,6 +166,12 @@ class OrdersList extends Component {
                             <p>Please login to load orders</p>
                         </div>)
                 }
+
+                <ConfirmModal
+                    message={this.state.confirmModalMessage}
+                    ref={modal => (this.confirmModal = modal)}
+                    onConfirm={this.importOrders}
+                />
             </BaseLayout>
         );
     }
@@ -179,84 +187,106 @@ class OrdersList extends Component {
                     return Promise.reject("Import failed. File is damaged or invalid.");
                 }
 
-                let total = orders.reduce((sum, {lineItems}) => sum + lineItems.length, 0),
-                    n = 0,
-                    average;
+                this.setState({ordersForImport: orders});
 
-                ModalWindowService.ProgressModal.setProgress([
-                    {
-                        title: "orders:",
-                        progress: {value: 0}
-                    },
-                    {
-                        title: "line items:",
-                        progress: {value: 0}
+                if (this.props.type === AD_SERVER_MOPUB) {
+                    const total = orders.reduce((sum, {lineItems}) => sum + lineItems.length, 0),
+                        lineItemsCount = this.props.orders.reduce(function(sum, current) {
+                        return current.status !== "archived" ? sum + current.lineItemCount : sum;
+                    }, 0);
+
+                    if (total + lineItemsCount > 1000) {
+                        this.setState({confirmModalMessage: `You will exceed the number of line items available in MoPub, this import will create only ${1000 - lineItemsCount} line items out of requested ${total}, would you like to continue?`});
+                        this.confirmModal.toggle();
+                        return;
                     }
-                ]);
+                }
 
-                let promise = this.props.sourceHandler.restoreOrdersWithLineItems(
-                    orders,
-                    ({
-                         lineItemCount,
-                         lineItemsDone,
-                         orderCount,
-                         ordersDone,
-                         timestamp
-                     }) => {
-                        if (average == null) {
-                            average = timestamp;
-                        } else {
-                            average = (average + timestamp) / 2;
-                        }
-
-                        n++;
-
-                        ModalWindowService.ProgressModal.setProgress([
-                            {
-                                title: `orders: ${ordersDone}/${orderCount}`,
-                                progress: {value: (ordersDone / orderCount) * 100}
-                            },
-                            {
-                                title: `line items: ${lineItemsDone}/${lineItemCount}`,
-                                progress: {value: (lineItemsDone / lineItemCount) * 100}
-                            },
-                            {
-                                title: `time remaining: ${moment(average * (total - n)).format(
-                                    "mm:ss"
-                                )}`
-                            }
-                        ]);
-                    }
-                )
-                    .then(() => {
-                        ModalWindowService.AlertPopup.showMessage(
-                            'Import has finished successfully.',
-                            'Success!'
-                        );
-                    })
-                    .catch(({data: {errors}}) => {
-                        let fields = Object.keys(errors);
-                        ModalWindowService.ErrorPopup.showMessage(
-                            "Import failed. File is damaged or invalid"
-                            // fields.map((field, idx) => (
-                            //     <div key={idx}>
-                            //         <strong>{field}:</strong>&nbsp;{errors[field]}
-                            //     </div>
-                            // ))
-                        );
-                    })
-                    .finally(() => {
-                        this.loadOrders();
-                        ModalWindowService.ProgressModal.hideModal();
-                    });
-
-                ModalWindowService.ProgressModal.onCancel(() =>
-                    promise.cancel("canceled by user")
-                );
+                this.importOrders();
             }
         }).catch(err => {
             ModalWindowService.ErrorPopup.showMessage(err)
         });
+    }
+
+    @bind
+    importOrders() {
+
+        let orders = this.state.ordersForImport,
+            total = orders.reduce((sum, {lineItems}) => sum + lineItems.length, 0),
+            n = 0,
+            average;
+
+        ModalWindowService.ProgressModal.setProgress([
+            {
+                title: "orders:",
+                progress: {value: 0}
+            },
+            {
+                title: "line items:",
+                progress: {value: 0}
+            }
+        ]);
+
+        let promise = this.props.sourceHandler.restoreOrdersWithLineItems(
+            orders,
+            ({
+                 lineItemCount,
+                 lineItemsDone,
+                 orderCount,
+                 ordersDone,
+                 timestamp
+             }) => {
+                if (average == null) {
+                    average = timestamp;
+                } else {
+                    average = (average + timestamp) / 2;
+                }
+
+                n++;
+
+                ModalWindowService.ProgressModal.setProgress([
+                    {
+                        title: `orders: ${ordersDone}/${orderCount}`,
+                        progress: {value: (ordersDone / orderCount) * 100}
+                    },
+                    {
+                        title: `line items: ${lineItemsDone}/${lineItemCount}`,
+                        progress: {value: (lineItemsDone / lineItemCount) * 100}
+                    },
+                    {
+                        title: `time remaining: ${moment(average * (total - n)).format(
+                            "mm:ss"
+                        )}`
+                    }
+                ]);
+            }
+        )
+            .then(() => {
+                ModalWindowService.AlertPopup.showMessage(
+                    'Import has finished successfully.',
+                    'Success!'
+                );
+            })
+            .catch(({data: {errors}}) => {
+                let fields = Object.keys(errors);
+                ModalWindowService.ErrorPopup.showMessage(
+                    "Import failed. File is damaged or invalid"
+                    // fields.map((field, idx) => (
+                    //     <div key={idx}>
+                    //         <strong>{field}:</strong>&nbsp;{errors[field]}
+                    //     </div>
+                    // ))
+                );
+            })
+            .finally(() => {
+                this.loadOrders();
+                ModalWindowService.ProgressModal.hideModal();
+            });
+
+        ModalWindowService.ProgressModal.onCancel(() =>
+            promise.cancel("canceled by user")
+        );
     }
 
     @bind

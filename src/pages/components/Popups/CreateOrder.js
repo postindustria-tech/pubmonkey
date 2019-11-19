@@ -34,7 +34,7 @@ import {
     KEYWORD_PLACEHOLDER,
     NETWORK_CLASS_TO_DIMENSION
 } from '../../constants/common';
-import {AD_SERVER_DFP, AD_SERVERS} from '../../constants/source';
+import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
@@ -76,8 +76,7 @@ const initialState = {
         rangeTo: ""
     },
     formValid: true,
-    willGenerateKeywords: 0,
-    willGenerateLineItems: 0,
+    confirmModalMessage: null,
     creativeFormat: "",
     tooltipOpen: false,
     selectedAdvertiser: defaultAdvertiser,
@@ -98,7 +97,8 @@ class CreateOrderModal extends Component {
     progress = null;
 
     static defaultProps = {
-        onClose: () => {},
+        onClose: () => {
+        },
         withButton: true,
         sourceAdvertisers: [],
         sourceHandlerReady: false,
@@ -401,7 +401,8 @@ class CreateOrderModal extends Component {
                                 </Tooltip>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser === "amazon" || this.state.selectedAdvertiser === 'openx'}>
+                        <Row
+                            hidden={this.state.selectedAdvertiser === "amazon" || this.state.selectedAdvertiser === 'openx'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Step: </span>
                                 <InputNumber
@@ -422,17 +423,17 @@ class CreateOrderModal extends Component {
                                 <span className={"mp-label"}>
                                   Keyword Step:{" "}
                                 </span>
-                                <InputNumber
-                                    invalid={!isEmpty(this.state.formErrors.keywordStep)}
-                                    min={this.state.keywordStepMin}
-                                    max={1000}
-                                    step={this.state.keywordStepMin}
-                                    value={this.state.keywordStep}
-                                    onChange={this.onChangeKeywordStep}
-                                    style={{width: 65}}
-                                    className={"mp-form-control"}
-                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
-                                />
+                                    <InputNumber
+                                        invalid={!isEmpty(this.state.formErrors.keywordStep)}
+                                        min={this.state.keywordStepMin}
+                                        max={1000}
+                                        step={this.state.keywordStepMin}
+                                        value={this.state.keywordStep}
+                                        onChange={this.onChangeKeywordStep}
+                                        style={{width: 65}}
+                                        className={"mp-form-control"}
+                                        parser={(input) => input.replace(/[^\d\.]/g, '')}
+                                    />
                                 </div>
                             </Col>
                         </Row>
@@ -480,7 +481,8 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser !== "pubnative" && this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
+                        <Row
+                            hidden={this.state.selectedAdvertiser !== "pubnative" && this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>OS: </span>
                                 <Input
@@ -536,7 +538,8 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
+                        <Row
+                            hidden={this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Custom Event Data: </span>
                                 <CustomInput
@@ -637,9 +640,7 @@ class CreateOrderModal extends Component {
                     </ModalFooter>
                 </Modal>
                 <ConfirmModal
-                    message={"Are you sure?"}
-                    willGenerateLineItems={this.state.willGenerateLineItems}
-                    willGenerateKeywords={this.state.willGenerateKeywords}
+                    message={this.state.confirmModalMessage}
                     ref={modal => (this.confirmModal = modal)}
                     onConfirm={this.confirmed}
                 />
@@ -815,7 +816,8 @@ class CreateOrderModal extends Component {
                     return "{\"w\":\"\", \"h\":\"\", \"ad_unit_id\":\"\"}";
                 default:
                     return "";
-            }})(advertiser);
+            }
+        })(advertiser);
 
         this.props.sourceHandler.setAdvertiser(advertiser);
         this.props.setAdvertiser(advertiser);
@@ -993,9 +995,23 @@ class CreateOrderModal extends Component {
             }
         }
 
+        let lineItemsCount = 0;
+        if (this.props.type === AD_SERVER_MOPUB) {
+            lineItemsCount = this.props.orders.reduce(function (sum, current) {
+                return current.status !== "archived" ? sum + current.lineItemCount : sum;
+            }, 0);
+        }
+
+        let message = `Will generate:<br/>${items.toFixed(0)} line item(s), ${keywords.toFixed(0)} keyword(s) per line item.`;
+
+        if (this.props.type === AD_SERVER_MOPUB && items + lineItemsCount > 1000) {
+            message = `${message}<br/>You will exceed the number of line items available in MoPub, this import will create only ${1000 - lineItemsCount} line items out of requested ${items}, would you like to continue?`;
+        } else {
+            message = `${message}<br/>${items.toFixed(0) > 100 ? 'It will take some time. Are you sure?' : 'Are you sure?'}`;
+        }
+
         this.setState(() => ({
-            willGenerateLineItems: items.toFixed(0),
-            willGenerateKeywords: keywords.toFixed(0),
+            confirmModalMessage: message,
             executor: executor
         }));
 
@@ -1248,6 +1264,7 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = state => ({
+    orders: adServerSelectors.orders(state),
     createOrderModalOpen: adServerSelectors.createOrderModalOpen(state),
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
