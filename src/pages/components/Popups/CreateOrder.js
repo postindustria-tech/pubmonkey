@@ -260,28 +260,8 @@ class CreateOrderModal extends Component {
                             <Col className={"col-sm-12"}>
                                 <Form inline>
                                     <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                        <Label for="orderName" className="mr-sm-2 mp-label">
-                                            Order Name:
-                                        </Label>
-                                        <Input
-                                            invalid={!isEmpty(this.state.formErrors.orderName)}
-                                            type="text"
-                                            name={"orderName"}
-                                            id="orderName"
-                                            onChange={this.handleInputChange}
-                                            value={this.state.orderName}
-                                            className={"mp-form-control"}
-                                        />
-                                    </FormGroup>
-                                </Form>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col className={"col-sm-12"}>
-                                <Form inline>
-                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
                                         <Label for="Advertiser" className="mr-sm-2 mp-label">
-                                            Advertiser:
+                                            Header Bidding Service:
                                         </Label>
                                         <Input
                                             type="select"
@@ -303,7 +283,7 @@ class CreateOrderModal extends Component {
                                     <FormGroup className="mb-2 mr-sm-2 mb-sm-0"
                                                hidden={this.props.type !== AD_SERVER_DFP}>
                                         <Label for="advertiserId" className="mr-sm-2 mp-label">
-                                            Advertiser DFP:
+                                            Header Bidding Service DFP:
                                         </Label>
                                         <Input
                                             type="select"
@@ -319,6 +299,26 @@ class CreateOrderModal extends Component {
                                                 )
                                             )}
                                         </Input>
+                                    </FormGroup>
+                                </Form>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col className={"col-sm-12"}>
+                                <Form inline>
+                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                                        <Label for="orderName" className="mr-sm-2 mp-label">
+                                            Order Name:
+                                        </Label>
+                                        <Input
+                                            invalid={!isEmpty(this.state.formErrors.orderName)}
+                                            type="text"
+                                            name={"orderName"}
+                                            id="orderName"
+                                            onChange={this.handleInputChange}
+                                            value={this.state.orderName}
+                                            className={"mp-form-control"}
+                                        />
                                     </FormGroup>
                                 </Form>
                             </Col>

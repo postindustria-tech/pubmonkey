@@ -22,11 +22,11 @@ class Handler extends AbstractHandler {
     sessionChecked = false;
 
     ADVERTISER_DEFAULT_NAME = {
-        pubnative: "PubNative HyBid",
-        openx: "Prebid.org",
         amazon: "Amazon Publisher Services (TAM)",
-        smaato: "Smaato Unified Bidding",
         clearbid: "ClearBid",
+        openx: "Prebid.org",
+        pubnative: "PubNative HyBid",
+        smaato: "Smaato Unified Bidding",
     };
 
     FILTER_FN = [

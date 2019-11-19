@@ -42,8 +42,8 @@ class Handler extends AbstractHandler {
     static source = AD_SERVER_DFP;
 
     ADVERTISER_DEFAULT_NAME = {
-        openx: "Prebid.org",
-        amazon: "Amazon Publisher Services (TAM)"
+        amazon: "Amazon Publisher Services (TAM)",
+        openx: "Prebid.org"
     };
 
     FILTER_FN = [
