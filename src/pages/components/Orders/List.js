@@ -195,8 +195,6 @@ class OrdersList extends Component {
                         return current.status !== "archived" ? sum + current.lineItemCount : sum;
                     }, 0);
 
-                    console.log(lineItemsCount);
-
                     if (lineItemsCount >= 1000) {
                         return Promise.reject("Number of line items exceeded");
                     }

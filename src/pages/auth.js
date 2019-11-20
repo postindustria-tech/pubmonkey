@@ -130,7 +130,6 @@ CJ.openLoginPage = function () {
                 _tabId,
                 {status, url}
             ) {
-                console.log(tabId, _tabId, status, url);
                 if (
                     tabId === _tabId &&
                     status === "loading" &&
