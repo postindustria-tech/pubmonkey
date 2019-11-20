@@ -996,7 +996,7 @@ class CreateOrderModal extends Component {
         }
 
         let lineItemsCount = 0;
-        if (this.props.type === AD_SERVER_MOPUB) {
+        if (this.props.type === AD_SERVER_MOPUB && executor === "create") {
             lineItemsCount = this.props.orders.reduce(function (sum, current) {
                 return current.status !== "archived" ? sum + current.lineItemCount : sum;
             }, 0);
@@ -1004,7 +1004,7 @@ class CreateOrderModal extends Component {
 
         let message = `Will generate:<br/>${items.toFixed(0)} line item(s), ${keywords.toFixed(0)} keyword(s) per line item.`;
 
-        if (this.props.type === AD_SERVER_MOPUB && items + lineItemsCount > 1000) {
+        if (this.props.type === AD_SERVER_MOPUB && executor === "create" && items + lineItemsCount > 1000) {
             message = `${message}<br/>You will exceed the number of line items available in MoPub, this import will create only ${1000 - lineItemsCount} line items out of requested ${items}, would you like to continue?`;
         } else {
             message = `${message}<br/>${items.toFixed(0) > 100 ? 'It will take some time. Are you sure?' : 'Are you sure?'}`;
