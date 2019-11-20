@@ -25,6 +25,7 @@ class Handler extends AbstractHandler {
         amazon: "Amazon Publisher Services (TAM)",
         clearbid: "ClearBid",
         openx: "Prebid.org",
+        pubmatic: "PubMatic OpenBid",
         pubnative: "PubNative HyBid",
         smaato: "Smaato Unified Bidding",
     };
