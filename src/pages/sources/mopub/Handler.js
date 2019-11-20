@@ -631,7 +631,7 @@ class Handler extends AbstractHandler {
                         custom_event_class_name: networkClass.value,
                         custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
                     };
-                } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
+                } else if (["smaato", "clearbid", "pubmatic"].indexOf(advertiser) !== -1) {
                     lineItemInfo.type = "network";
                     lineItemInfo["networkType"] = "custom_native";
                     lineItemInfo["enableOverrides"] = true;
@@ -727,7 +727,7 @@ class Handler extends AbstractHandler {
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
                 return this.createLineItem(item)
                     .then(lineItem => {
-                        if (advertiser === "amazon" || advertiser === "openx") {
+                        if (["amazon", "openx", "pubmatic"].indexOf(advertiser) !== -1) {
                             this.createCreatives({
                                 adType: "html",
                                 extended: {

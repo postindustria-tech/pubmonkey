@@ -7,12 +7,12 @@ export class PubMatic extends AbstractAdvertiser {
     NETWORK_CLASS = {
         "": [],
         iphone: [
-            {value: '<YourAppName>.POBBannerCustomEvent', label: 'Banner'},
-            {value: '<YourAppName>.POBInterstitialCustomEvent', label: 'Interstitial'},
+            {value: 'POBBannerCustomEvent', label: 'Banner'},
+            {value: 'POBInterstitialCustomEvent', label: 'Interstitial'},
         ],
         android: [
-            {value: '<ClassPackageName>.POBBannerCustomEvent', label: 'Banner'},
-            {value: '<ClassPackageName>.POBInterstitialCustomEvent', label: 'Interstitial'},
+            {value: 'POBBannerCustomEvent', label: 'Banner'},
+            {value: 'POBInterstitialCustomEvent', label: 'Interstitial'},
         ]
     };
 }

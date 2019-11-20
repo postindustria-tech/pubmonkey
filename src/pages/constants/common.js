@@ -6,7 +6,7 @@ export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   amazon: "amznslots:m{format}p{position}",
   smaato: "smaato_cpm:{bid}",
   clearbid: "um_price:{bid}",
-  pubmatic: "pwtbst:1 and pwtplt:inapp and pwtpb:{bid}",
+  pubmatic: "pwtbst:1 AND pwtplt:inapp AND pwtpb:{bid}",
 };
 export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
@@ -14,6 +14,7 @@ export const KEYWORD_PLACEHOLDER = {
   amazon: "m{width}x{height}p{position}",
   smaato: "Smaato UB {bid}",
   clearbid: "um_price {bid}",
+  pubmatic: "pwtpb {bid}",
 };
 export const NETWORK_CLASS_TO_DIMENSION = {
   "HyBidMoPubLeaderboardCustomEvent": "728x90",

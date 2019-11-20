@@ -481,8 +481,7 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row
-                            hidden={this.state.selectedAdvertiser !== "pubnative" && this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
+                        <Row hidden={!(this.state.selectedAdvertiser === "pubnative" || this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid' || this.state.selectedAdvertiser === 'pubmatic')}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>OS: </span>
                                 <Input
@@ -509,7 +508,7 @@ class CreateOrderModal extends Component {
                                             value={this.state.networkClass}
                                         />
                                     </div>
-                                    <div hidden={["smaato", "clearbid"].indexOf(this.state.selectedAdvertiser) !== -1}>
+                                    <div hidden={["smaato", "clearbid", "pubmatic"].indexOf(this.state.selectedAdvertiser) !== -1}>
                                         <Select
                                             isClearable={false}
                                             placeholder="Please select OS"
@@ -520,7 +519,7 @@ class CreateOrderModal extends Component {
                                     </div>
                                 </div>
                                 <div
-                                    hidden={["smaato", "clearbid"].indexOf(this.state.selectedAdvertiser) !== -1}
+                                    hidden={["smaato", "clearbid", "pubmatic"].indexOf(this.state.selectedAdvertiser) !== -1}
                                     style={{display: "inline-block", width: "auto"}}
                                 >{" "}
                                     <span className={"mp-label"}>Ad_ZONE_ID: </span>
@@ -774,9 +773,6 @@ class CreateOrderModal extends Component {
                 return;
             }
         }
-        // if (name === "advertiser") {
-        //     this.changeAdvertiser(value);
-        // }
         if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
             let lineItemsNaming = KEYWORD_PLACEHOLDER["amazon"];
             if (value.indexOf("x") !== -1) {
@@ -814,6 +810,8 @@ class CreateOrderModal extends Component {
                     return "{\"publisherId\":\"\", \"spaceId\":\"\"}";
                 case "clearbid":
                     return "{\"w\":\"\", \"h\":\"\", \"ad_unit_id\":\"\"}";
+                case "pubmatic":
+                    return "{}";
                 default:
                     return "";
             }
