@@ -32,7 +32,8 @@ import {
     ONLY_NUMBERS,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
-    NETWORK_CLASS_TO_DIMENSION
+    NETWORK_CLASS_TO_DIMENSION,
+    AMAZON_PRICE_GRID
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
@@ -57,6 +58,9 @@ const initialState = {
     adunitsSelected: [],
     order: {},
     orderName: "",
+    amazonPriceGrid: AMAZON_PRICE_GRID.uniform,
+    amazonStartPrice: "",
+    amazonStep: "",
     defaultFields: [],
     lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
     keywordTemplate:
@@ -225,6 +229,93 @@ class CreateOrderModal extends Component {
         )
     };
 
+    renderAmazonOptions(){
+
+        console.log('renderAmazonOptions', this.state.amazonPriceGrid)
+        return (
+            <React.Fragment>
+                <Row>
+                    <Col className={"col-sm-12"}>
+                        <Form inline>
+                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+
+                                <CustomInput
+                                    type="radio"
+                                    name="amazonPriceGrid"
+                                    value={AMAZON_PRICE_GRID.uniform}
+                                    label="uniform price grid"
+                                    id="amazon-price-grid-uniform"
+                                    onChange={ this.handleInputChange }
+                                    checked={ this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
+                                />
+                                &nbsp;&nbsp;&nbsp;
+                                <CustomInput
+                                    type="radio"
+                                    name="amazonPriceGrid"
+                                    value={AMAZON_PRICE_GRID.non_uniform}
+                                    label="non-uniform price grid"
+                                    id="amazon-price-grid-non-uniform"
+                                    onChange={ this.handleInputChange }
+                                    checked={ this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
+                                />
+                            </FormGroup>
+                        </Form>
+                    </Col>
+                </Row>
+                { this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform ? <Row>
+                    <Col className={"col-sm-16"}>
+                        <Form inline>
+                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                                <Label for="amazonStartPrice" className="mr-sm-2 mp-label">
+                                    Start price:
+                                </Label>
+                                <Input
+                                    type="text"
+                                    name={"amazonStartPrice"}
+                                    style={{width: "50px"}}
+                                    id="amazonStartPrice"
+                                    onChange={this.handleInputChange}
+                                    value={this.state.amazonStartPrice}
+                                    className={"mp-form-control"}
+                                />
+                                &nbsp;&nbsp;&nbsp;
+                                <Label for="amazonStep" className="mr-sm-2 mp-label">
+                                    Step:
+                                </Label>
+                                <Input
+                                    type="text"
+                                    name={"amazonStep"}
+                                    id="amazonStep"
+                                    style={{width: "50px"}}
+                                    onChange={this.handleInputChange}
+                                    value={this.state.amazonStep}
+                                    className={"mp-form-control"}
+                                />
+                            </FormGroup>
+                        </Form>
+                    </Col>
+                </Row> : '' }
+                { this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform ? <Row>
+                    <Col className={"col-sm-12"}>
+                        <Form inline>
+                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{width: "50%"}}>
+                                <Label className="mr-sm-2 mp-label">
+                                    CSV:
+                                </Label>
+                                <textarea
+                                    className="mr-sm-2"
+                                    style={{width: "100%"}}
+                                >
+
+                                </textarea>
+                            </FormGroup>
+                        </Form>
+                    </Col>
+                </Row> : ''}
+            </React.Fragment>
+        )
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -375,6 +466,7 @@ class CreateOrderModal extends Component {
                                 ] {this.state.rangeMeasure}.
                             </Col>
                         </Row>
+                        {this.state.advertiser == 'amazon' && this.renderAmazonOptions()}
                         <Row>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items naming: </span>
@@ -661,6 +753,8 @@ class CreateOrderModal extends Component {
             adunits: "",
             granularity: "",
             customEventData: "",
+            amazonStartPrice: "",
+            amazonStep: "",
         };
         let isValid = true;
 
@@ -684,6 +778,15 @@ class CreateOrderModal extends Component {
         if (this.state.advertiser !== "amazon") {
             if (this.state.keywordStep > this.state.step) {
                 fieldValidationErrors.step = "Line items step can not be less than Keyword step!";
+                isValid = false;
+            }
+        }else if(AMAZON_PRICE_GRID.uniform == this.state.amazonPriceGrid){
+            if (this.state.amazonStartPrice <= 0) {
+                fieldValidationErrors.amazonStartPrice = "Amazon start price must be greater than 0";
+                isValid = false;
+            }
+            if (this.state.amazonStep <= 0) {
+                fieldValidationErrors.amazonStartPrice = "Amazon price step must be greater than 0";
                 isValid = false;
             }
         }
@@ -768,7 +871,7 @@ class CreateOrderModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
-        if (['rangeFrom', 'rangeTo'].includes(name)) {
+        if (['rangeFrom', 'rangeTo', 'amazonStartPrice', 'amazonStep'].includes(name)) {
             if (value !== "" && !ONLY_NUMBERS.test(value)) {
                 return;
             }
@@ -1052,6 +1155,9 @@ class CreateOrderModal extends Component {
             advertiserId,
             granularity,
             customEventData,
+            amazonStartPrice,
+            amazonStep,
+            amazonPriceGrid,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -1077,6 +1183,9 @@ class CreateOrderModal extends Component {
             customTargetingValues: this.props.customTargetingValues,
             granularity,
             customEventData,
+            amazonStartPrice,
+            amazonStep,
+            amazonPriceGrid,
         };
 
         ModalWindowService.ProgressModal.setProgress([

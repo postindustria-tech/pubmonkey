@@ -457,6 +457,9 @@ class Handler extends AbstractHandler {
             Ad_ZONE_ID,
             granularity,
             customEventData,
+            amazonStartPrice,
+            amazonStep,
+            amazonPriceGrid,
         } = params;
 
         let lineItemInfo = this.lineItemInfo,
@@ -468,7 +471,8 @@ class Handler extends AbstractHandler {
         step = toInteger(step);
 
         let keywordAdvertiser = null,
-            mask = "{bid}";
+            mask = "{bid}",
+            maskPrice = "{price}";
         switch (advertiser) {
             // case 'pubnative':
             // keywordAdvertiser = 'pn_bid';
@@ -479,6 +483,7 @@ class Handler extends AbstractHandler {
             case "amazon":
                 // keywordAdvertiser = 'amznslots:m320x50p';
                 mask = "{position}";
+                maskPrice = "{price}";
                 break;
         }
 
@@ -604,10 +609,10 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + line);
+                        const keyword = keywordTemplate.replace(mask, i + line).replace(maskPrice, parseFloat(amazonStartPrice) + (i + line) * parseFloat(amazonStep));
                         keywords.push(keyword);
                     }
-                    name = name.replace("{position}", line);
+                    name = name.replace("{position}", line).replace(maskPrice, parseFloat(amazonStartPrice) + line * parseFloat(amazonStep));
                     line++;
                 } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));

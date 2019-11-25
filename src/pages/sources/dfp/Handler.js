@@ -553,7 +553,7 @@ class Handler extends AbstractHandler {
         let lineItemInfo = this.lineItemInfo;
         lineItemInfo = this.advertiser.setupDefaultValues(lineItemInfo, params);
 
-        let mask = "{bid}";
+        let mask = "{bid}", maskPrice = "{price}";
         switch (advertiser) {
             // case 'pubnative':
             // keywordAdvertiser = 'pn_bid';
@@ -564,6 +564,7 @@ class Handler extends AbstractHandler {
             case "amazon":
                 // keywordAdvertiser = 'amznslots:m320x50p';
                 mask = "{position}";
+                maskPrice = "{price}";
                 break;
         }
 
@@ -705,7 +706,9 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "");
+                        const keyword = keywordTemplate.replace(mask, i + line)
+                            .replace("amznslots:", "")
+                            .replace(maskPrice, parseFloat(amazonStartPrice) + (i + line) * parseFloat(amazonStep));
                         keywords.push(keyword);
                     }
                     line++;
