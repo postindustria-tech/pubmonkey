@@ -247,7 +247,7 @@ class Handler extends AbstractHandler {
     restoreLineItem(data, orderId, advertiser) {
         let {creatives} = data;
 
-        if (["pubnative hybid", "smaato unified bidding", "clearbid"].indexOf(advertiser.toLocaleLowerCase()) !== -1) {
+        if (["pubnative hybid", "smaato unified bidding", "clearbid", "pubmatic openbid"].indexOf(advertiser.toLocaleLowerCase()) !== -1) {
             creatives = [];
         }
 
