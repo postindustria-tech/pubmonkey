@@ -6,6 +6,7 @@ import Promise from "bluebird";
 import {wrapSeries, delay} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
 import {AD_SERVER_MOPUB} from "../../constants/source";
+import {AMAZON_PRICE_GRID} from '../../constants/common';
 import axios from "ex-axios";
 
 const WEB_URL = "https://app.mopub.com";
@@ -460,6 +461,7 @@ class Handler extends AbstractHandler {
             amazonStartPrice,
             amazonStep,
             amazonPriceGrid,
+            amazonCSVItems,
         } = params;
 
         let lineItemInfo = this.lineItemInfo,
@@ -595,9 +597,23 @@ class Handler extends AbstractHandler {
                     }
                 });
             }
+        } else if (
+            advertiser === "amazon"
+            && AMAZON_PRICE_GRID.non_uniform == amazonPriceGrid
+        ){
+            for(const line of amazonCSVItems.split("\n")){
+                const bidDecimal = parseFloat(line.substr(line.indexOf(':')))
 
+                lineItems.push({
+                    adUnitKeys: adunits,
+                    bid: bidDecimal,
+                    name: line,
+                    orderKey: orderKey,
+                    keywords: [line],
+                    ...lineItemInfo
+                });
+            }
         } else {
-
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                 const bidDecimal = toDecimal(bid),
                     s = toDecimal(step),

@@ -60,6 +60,7 @@ const initialState = {
     orderName: "",
     amazonPriceGrid: AMAZON_PRICE_GRID.uniform,
     amazonStartPrice: "",
+    amazonCSVItems: "",
     amazonStep: "",
     defaultFields: [],
     lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
@@ -230,8 +231,6 @@ class CreateOrderModal extends Component {
     };
 
     renderAmazonOptions(){
-
-        console.log('renderAmazonOptions', this.state.amazonPriceGrid)
         return (
             <React.Fragment>
                 <Row>
@@ -305,9 +304,7 @@ class CreateOrderModal extends Component {
                                 <textarea
                                     className="mr-sm-2"
                                     style={{width: "100%"}}
-                                >
-
-                                </textarea>
+                                >{this.state.amazonCSVItems}</textarea>
                             </FormGroup>
                         </Form>
                     </Col>
@@ -437,7 +434,7 @@ class CreateOrderModal extends Component {
                                 </Input>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.selectedAdvertiser === 'openx'}>
+                        <Row hidden={(this.state.selectedAdvertiser === 'openx') || (this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid)}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items Range:</span> from [
                                 <CustomInput
@@ -467,7 +464,7 @@ class CreateOrderModal extends Component {
                             </Col>
                         </Row>
                         {this.state.advertiser == 'amazon' && this.renderAmazonOptions()}
-                        <Row>
+                        <Row hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items naming: </span>
                                 <CustomInput
@@ -529,7 +526,7 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row>
+                        <Row hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Keywords template: </span>
                                 {this.state.keywordTemplate}
@@ -754,6 +751,7 @@ class CreateOrderModal extends Component {
             granularity: "",
             customEventData: "",
             amazonStartPrice: "",
+            amazonCSVItems: "",
             amazonStep: "",
         };
         let isValid = true;
@@ -1156,6 +1154,7 @@ class CreateOrderModal extends Component {
             granularity,
             customEventData,
             amazonStartPrice,
+            amazonCSVItems,
             amazonStep,
             amazonPriceGrid,
         } = this.state;
@@ -1184,6 +1183,7 @@ class CreateOrderModal extends Component {
             granularity,
             customEventData,
             amazonStartPrice,
+            amazonCSVItems,
             amazonStep,
             amazonPriceGrid,
         };
