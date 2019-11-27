@@ -1293,6 +1293,10 @@ class CreateOrderModal extends Component {
             adServerDomain,
             granularity,
             customEventData,
+            amazonStartPrice,
+            amazonCSVItems,
+            amazonStep,
+            amazonPriceGrid,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -1317,6 +1321,10 @@ class CreateOrderModal extends Component {
             customTargetingValues: this.props.customTargetingValues,
             granularity,
             customEventData,
+            amazonStartPrice,
+            amazonCSVItems,
+            amazonStep,
+            amazonPriceGrid,
         };
 
         ModalWindowService.ProgressModal.setProgress([
