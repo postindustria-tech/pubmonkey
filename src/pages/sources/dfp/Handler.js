@@ -590,8 +590,7 @@ class Handler extends AbstractHandler {
         const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length,
             stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
 
-        let line = 1,
-            bids = [],
+        let bids = [],
             keywords = [],
             skip = false;
 
@@ -701,7 +700,7 @@ class Handler extends AbstractHandler {
                     break;
             }
         } else {
-
+            let startPriceIndex = 0
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                 bids.push(bid);
 
@@ -711,12 +710,11 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + line)
+                        const keyword = keywordTemplate.replace(mask, i + bid/100)
                             .replace("amznslots:", "")
-                            .replace(maskPrice, (parseFloat(amazonStartPrice) + (i + line - 1) * parseFloat(amazonStep)).toFixed(2));
+                            .replace(maskPrice, (parseFloat(amazonStartPrice) + (i + startPriceIndex) * parseFloat(amazonStep)).toFixed(2));
                         keywords.push(keyword);
                     }
-                    line++;
                 } else if (advertiser === "openx") {
                     const to = +toValidUI(bidDecimal + s).toFixed(2);
                     for (let i = bidDecimal; i < to; i += keywordStep) {
@@ -736,6 +734,7 @@ class Handler extends AbstractHandler {
                         }
                     }
                 }
+                startPriceIndex++
             }
         }
 
