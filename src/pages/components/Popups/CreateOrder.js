@@ -59,9 +59,9 @@ const initialState = {
     order: {},
     orderName: "",
     amazonPriceGrid: AMAZON_PRICE_GRID.uniform,
-    amazonStartPrice: "",
+    amazonStartPrice: 0.01,
     amazonCSVItems: "",
-    amazonStep: "",
+    amazonStep: 0.01,
     defaultFields: [],
     lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
     keywordTemplate:
@@ -268,27 +268,29 @@ class CreateOrderModal extends Component {
                                 <Label for="amazonStartPrice" className="mr-sm-2 mp-label">
                                     Start price:
                                 </Label>
-                                <Input
-                                    type="text"
-                                    name={"amazonStartPrice"}
-                                    style={{width: "50px"}}
-                                    id="amazonStartPrice"
-                                    onChange={this.handleInputChange}
+                                <InputNumber
+                                    min={0.1}
+                                    max={1000}
+                                    step={0.1}
                                     value={this.state.amazonStartPrice}
+                                    onChange={event => this.handleInputChange({target: {name: 'amazonStartPrice', value: event}})}
+                                    style={{width: 65}}
                                     className={"mp-form-control"}
+                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />
                                 &nbsp;&nbsp;&nbsp;
                                 <Label for="amazonStep" className="mr-sm-2 mp-label">
                                     Step:
                                 </Label>
-                                <Input
-                                    type="text"
-                                    name={"amazonStep"}
-                                    id="amazonStep"
-                                    style={{width: "50px"}}
-                                    onChange={this.handleInputChange}
+                                <InputNumber
+                                    min={0.1}
+                                    max={1000}
+                                    step={0.1}
                                     value={this.state.amazonStep}
+                                    onChange={event => this.handleInputChange({target: {name: 'amazonStep', value: event}})}
+                                    style={{width: 65}}
                                     className={"mp-form-control"}
+                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
                                 />
                             </FormGroup>
                         </Form>
