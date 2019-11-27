@@ -713,7 +713,7 @@ class Handler extends AbstractHandler {
                         i = toValidUI(i);
                         const keyword = keywordTemplate.replace(mask, i + line)
                             .replace("amznslots:", "")
-                            .replace(maskPrice, (parseFloat(amazonStartPrice) + (i + line) * parseFloat(amazonStep)).toFixed(2));
+                            .replace(maskPrice, (parseFloat(amazonStartPrice) + (i + line - 1) * parseFloat(amazonStep)).toFixed(2));
                         keywords.push(keyword);
                     }
                     line++;
