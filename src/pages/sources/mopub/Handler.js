@@ -489,7 +489,6 @@ class Handler extends AbstractHandler {
                 break;
         }
 
-        let line = 1;
         const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length,
             stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
 
@@ -614,6 +613,7 @@ class Handler extends AbstractHandler {
                 });
             }
         } else {
+            let startPriceIndex = 0
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                 const bidDecimal = toDecimal(bid),
                     s = toDecimal(step),
@@ -625,11 +625,10 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + line).replace(maskPrice, (parseFloat(amazonStartPrice) + (i + line -1) * parseFloat(amazonStep)).toFixed(2));
+                        const keyword = keywordTemplate.replace(mask, i + bid/100).replace(maskPrice, (parseFloat(amazonStartPrice) + (i + startPriceIndex) * parseFloat(amazonStep)).toFixed(2));
                         keywords.push(keyword);
                     }
-                    name = name.replace("{position}", line).replace(maskPrice, (parseFloat(amazonStartPrice) + (line - 1) * parseFloat(amazonStep)).toFixed(2));
-                    line++;
+                    name = name.replace("{position}", bid/100).replace(maskPrice, (parseFloat(amazonStartPrice) + startPriceIndex * parseFloat(amazonStep)).toFixed(2));
                 } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));
                 } else {
@@ -670,6 +669,7 @@ class Handler extends AbstractHandler {
                     keywords: keywords,
                     ...lineItemInfo
                 });
+                startPriceIndex++
             }
         }
 
