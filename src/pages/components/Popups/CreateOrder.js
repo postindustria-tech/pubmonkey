@@ -1138,8 +1138,10 @@ class CreateOrderModal extends Component {
                         }
                     }
                 }
-                if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
+                if ("clearbid" == advertiser) {
                     keywords = items;
+                }else if("smaato" == advertiser){
+                    keywords = 1
                 }
             }
         }
