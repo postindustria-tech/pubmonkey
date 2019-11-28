@@ -47,7 +47,7 @@ const helperText =
     "{position} macro is replaced with a position number (natural values starting from 1)";
 
 let progress = null,
-    defaultAdvertiser = "pubnative";
+    defaultAdvertiser = "amazon";
 
 const initialState = {
     title: "Create New Order",
@@ -853,7 +853,7 @@ class CreateOrderModal extends Component {
 
     @bind
     open() {
-        this.changeAdvertiser(this.props.type === AD_SERVER_DFP ? "openx" : "pubnative");
+        this.changeAdvertiser(defaultAdvertiser);
         this.props.createOrderModalToggle();
     }
 
