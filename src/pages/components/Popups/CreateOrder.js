@@ -30,6 +30,7 @@ import _ from "underscore";
 import HelperModal from "./HelperModal";
 import {
     ONLY_NUMBERS,
+    AMAZON_KVP_FORMAT,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
     NETWORK_CLASS_TO_DIMENSION,
@@ -230,7 +231,7 @@ class CreateOrderModal extends Component {
         )
     };
 
-    renderAmazonOptions(){
+    renderAmazonOptions() {
         return (
             <React.Fragment>
                 <Row>
@@ -244,8 +245,8 @@ class CreateOrderModal extends Component {
                                     value={AMAZON_PRICE_GRID.uniform}
                                     label="uniform price grid"
                                     id="amazon-price-grid-uniform"
-                                    onChange={ this.handleInputChange }
-                                    checked={ this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
+                                    onChange={this.handleInputChange}
+                                    checked={this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
                                 />
                                 &nbsp;&nbsp;&nbsp;
                                 <CustomInput
@@ -254,14 +255,14 @@ class CreateOrderModal extends Component {
                                     value={AMAZON_PRICE_GRID.non_uniform}
                                     label="non-uniform price grid"
                                     id="amazon-price-grid-non-uniform"
-                                    onChange={ this.handleInputChange }
-                                    checked={ this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
+                                    onChange={this.handleInputChange}
+                                    checked={this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
                                 />
                             </FormGroup>
                         </Form>
                     </Col>
                 </Row>
-                { this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform ? <Row>
+                {this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform ? <Row>
                     <Col className={"col-sm-16"}>
                         <Form inline>
                             <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
@@ -295,8 +296,8 @@ class CreateOrderModal extends Component {
                             </FormGroup>
                         </Form>
                     </Col>
-                </Row> : '' }
-                { this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform ? <Row>
+                </Row> : ''}
+                {this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform ? <Row>
                     <Col className={"col-sm-12"}>
                         <Form inline>
                             <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{width: "50%"}}>
@@ -306,6 +307,7 @@ class CreateOrderModal extends Component {
                                 <textarea
                                     className="mr-sm-2"
                                     style={{width: "100%"}}
+                                    onChange={this.handleCSVChange}
                                 >{this.state.amazonCSVItems}</textarea>
                             </FormGroup>
                         </Form>
@@ -436,7 +438,8 @@ class CreateOrderModal extends Component {
                                 </Input>
                             </Col>
                         </Row>
-                        <Row hidden={(this.state.selectedAdvertiser === 'openx') || (this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid)}>
+                        <Row
+                            hidden={(this.state.selectedAdvertiser === 'openx') || (this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid)}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items Range:</span> from [
                                 <CustomInput
@@ -466,7 +469,8 @@ class CreateOrderModal extends Component {
                             </Col>
                         </Row>
                         {this.state.advertiser == 'amazon' && this.renderAmazonOptions()}
-                        <Row hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
+                        <Row
+                            hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items naming: </span>
                                 <CustomInput
@@ -528,7 +532,8 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
+                        <Row
+                            hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Keywords template: </span>
                                 {this.state.keywordTemplate}
@@ -572,7 +577,8 @@ class CreateOrderModal extends Component {
                                 </div>
                             </Col>
                         </Row>
-                        <Row hidden={!(this.state.selectedAdvertiser === "pubnative" || this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid' || this.state.selectedAdvertiser === 'pubmatic')}>
+                        <Row
+                            hidden={!(this.state.selectedAdvertiser === "pubnative" || this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid' || this.state.selectedAdvertiser === 'pubmatic')}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>OS: </span>
                                 <Input
@@ -599,7 +605,8 @@ class CreateOrderModal extends Component {
                                             value={this.state.networkClass}
                                         />
                                     </div>
-                                    <div hidden={["smaato", "clearbid", "pubmatic"].indexOf(this.state.selectedAdvertiser) !== -1}>
+                                    <div
+                                        hidden={["smaato", "clearbid", "pubmatic"].indexOf(this.state.selectedAdvertiser) !== -1}>
                                         <Select
                                             isClearable={false}
                                             placeholder="Please select OS"
@@ -780,7 +787,7 @@ class CreateOrderModal extends Component {
                 fieldValidationErrors.step = "Line items step can not be less than Keyword step!";
                 isValid = false;
             }
-        }else if(AMAZON_PRICE_GRID.uniform == this.state.amazonPriceGrid){
+        } else if (AMAZON_PRICE_GRID.uniform == this.state.amazonPriceGrid) {
             if (this.state.amazonStartPrice <= 0) {
                 fieldValidationErrors.amazonStartPrice = "Amazon start price must be greater than 0";
                 isValid = false;
@@ -788,6 +795,23 @@ class CreateOrderModal extends Component {
             if (this.state.amazonStep <= 0) {
                 fieldValidationErrors.amazonStartPrice = "Amazon price step must be greater than 0";
                 isValid = false;
+            }
+        } else if (AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid) {
+            if (isEmpty(this.state.amazonCSVItems)) {
+                fieldValidationErrors.amazonCSVItems = "CSV is required";
+                isValid = false;
+            } else {
+                let broken = [];
+                this.state.amazonCSVItems.map((item, index) => {
+                    const trimmed = item.trim();
+                    if (!AMAZON_KVP_FORMAT.test(trimmed)) {
+                        broken.push(`#${index+1} "${trimmed}"`);
+                    }
+                    return trimmed;
+                });
+                if (!isEmpty(broken)) {
+                    fieldValidationErrors.amazonCSVItems = `CSV: can't parse line(s) ${broken.join(' ')}`;
+                }
             }
         }
         if (this.state.Ad_ZONE_ID < 1) {
@@ -897,6 +921,24 @@ class CreateOrderModal extends Component {
     }
 
     @bind
+    handleCSVChange(event) {
+        const {value, name} = event.target;
+        let items = value.split("\n");
+        let broken = [];
+        items = items.map((item, index) => {
+            const trimmed = item.trim();
+            if (!AMAZON_KVP_FORMAT.test(trimmed)) {
+                broken.push(`can't parse line #${index+1} "${trimmed}"`);
+            }
+            return trimmed;
+        });
+        if (!isEmpty(broken)) {
+            ModalWindowService.ErrorPopup.showMessage(broken.join("<br>"));
+        }
+        this.setState({amazonCSVItems: items});
+    }
+
+    @bind
     handleSelectNetworkClass(value) {
         this.setState({networkClass: value});
     }
@@ -982,7 +1024,8 @@ class CreateOrderModal extends Component {
             rangeFrom,
             rangeTo,
             advertiser,
-            granularity
+            granularity,
+            amazonPriceGrid
         } = this.state;
 
         const formValid = this.formValidator();
@@ -1077,22 +1120,27 @@ class CreateOrderModal extends Component {
                     break;
             }
         } else {
-            for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
-                items++;
-                if (items == 1) {
-                    if (advertiser === "amazon") {
-                        for (let i = 0; i < keywordStep; i += 1) {
-                            keywords++;
-                        }
-                    } else {
-                        for (let i = bid; i < bid + step; i += toInteger(keywordStep)) {
-                            keywords++;
+            if (advertiser === "amazon" && amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform) {
+                items = this.state.amazonCSVItems.length;
+                keywords = 1;
+            } else {
+                for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
+                    items++;
+                    if (items == 1) {
+                        if (advertiser === "amazon") {
+                            for (let i = 0; i < keywordStep; i += 1) {
+                                keywords++;
+                            }
+                        } else {
+                            for (let i = bid; i < bid + step; i += toInteger(keywordStep)) {
+                                keywords++;
+                            }
                         }
                     }
                 }
-            }
-            if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
-                keywords = items;
+                if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
+                    keywords = items;
+                }
             }
         }
 

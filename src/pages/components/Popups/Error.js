@@ -3,7 +3,6 @@ import {Button, Modal, ModalHeader, ModalBody, ModalFooter} from 'reactstrap'
 
 export class ErrorPopup extends Component {
 
-
     render() {
         let {toggleModal, isOpen, header, message} = this.props;
         if (typeof header === "undefined") {
@@ -21,11 +20,8 @@ export class ErrorPopup extends Component {
                         <dt>
                             <i className="fa fa-exclamation-triangle"></i>&nbsp;
                         </dt>
-                        <dd>
-                            {message}
-                        </dd>
+                        <dd dangerouslySetInnerHTML={{__html: message}}/>
                     </dl>
-
                 </ModalBody>
                 <ModalFooter>
                     <Button color="secondary" onClick={toggleModal}>Ok</Button>

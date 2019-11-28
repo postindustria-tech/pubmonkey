@@ -1,4 +1,5 @@
 export const ONLY_NUMBERS = /^[0-9\b\.]+$/;
+export const AMAZON_KVP_FORMAT = /(^[^:]+):{1}([^:]+)$/;
 
 export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   pubnative: "pn_bid:{bid}",
@@ -11,7 +12,7 @@ export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
 export const AMAZON_PRICE_GRID = {
   uniform: 'uniform',
   non_uniform: 'non-uniform'
-}
+};
 export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",

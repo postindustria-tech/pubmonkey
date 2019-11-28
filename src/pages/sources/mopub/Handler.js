@@ -6,7 +6,7 @@ import Promise from "bluebird";
 import {wrapSeries, delay} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
 import {AD_SERVER_MOPUB} from "../../constants/source";
-import {AMAZON_PRICE_GRID} from '../../constants/common';
+import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from '../../constants/common';
 import axios from "ex-axios";
 
 const WEB_URL = "https://app.mopub.com";
@@ -599,19 +599,19 @@ class Handler extends AbstractHandler {
         } else if (
             advertiser === "amazon"
             && AMAZON_PRICE_GRID.non_uniform == amazonPriceGrid
-        ){
-            for(const line of amazonCSVItems.split("\n")){
-                const bidDecimal = parseFloat(line.substr(line.indexOf(':')))
-
+        ) {
+            amazonCSVItems.map(line => {
+                const match = line.match(AMAZON_KVP_FORMAT);
+                const bidDecimal = parseFloat(match[2]);
                 lineItems.push({
                     adUnitKeys: adunits,
                     bid: bidDecimal,
-                    name: line,
+                    name: match[1],
                     orderKey: orderKey,
                     keywords: [line],
                     ...lineItemInfo
                 });
-            }
+            });
         } else {
             let startPriceIndex = 0
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -693,10 +693,10 @@ class Handler extends AbstractHandler {
         localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
         let {tabId, frameId} = window.MopubAutomation.request;
 
-        tabId = await this.promiseQuery({ index:tabId })
+        tabId = await this.promiseQuery({index: tabId})
             .then(tabs => {
                 if (!tabs.length) {
-                    return this.promiseQuery({ active:false })
+                    return this.promiseQuery({active: false})
                         .then(tabs => {
                             const mopub = tabs.filter(tab => {
                                 const url = new URL(tab.url);
@@ -705,7 +705,7 @@ class Handler extends AbstractHandler {
                             });
                             if (mopub.length === 0) {
                                 // open new tab
-                                return this.promiseCreate({ url: "https://app.mopub.com/dashboard", active: false })
+                                return this.promiseCreate({url: "https://app.mopub.com/dashboard", active: false})
                                     .then(tab => {
                                         return tab.id;
                                     });
