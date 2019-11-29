@@ -489,8 +489,11 @@ class Handler extends AbstractHandler {
                 break;
         }
 
-        const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length,
-            stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
+        const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length;
+        let stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
+        if (step >= 100) {
+            stepDecimalPartLength--;
+        }
 
         if (advertiser === "openx") {
             let bids = [], skip = false;
@@ -613,7 +616,7 @@ class Handler extends AbstractHandler {
                 });
             });
         } else {
-            let startPriceIndex = 0
+            let startPriceIndex = 0;
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                 const bidDecimal = toDecimal(bid),
                     s = toDecimal(step),
