@@ -594,7 +594,7 @@ class Handler extends AbstractHandler {
                         bid: bid,
                         name: lineItemsNaming.replace("{bid}", bid),
                         orderKey: orderKey,
-                        keywords: [bid],
+                        keywords: [keywordTemplate.replace(mask, bid)],
                         ...lineItemInfo
                     }
                 });
