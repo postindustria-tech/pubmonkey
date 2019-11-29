@@ -464,7 +464,7 @@ class Handler extends AbstractHandler {
             amazonCSVItems,
         } = params;
 
-        let lineItemInfo = this.lineItemInfo,
+        let lineItemInfo = {...this.lineItemInfo},
             lineItems = [],
             bid;
 
