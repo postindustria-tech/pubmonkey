@@ -1063,7 +1063,7 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
-                    keywords = items;
+                    keywords = 1;
                     break;
                 case 'med':
                     step = rangeFrom = toInteger(0.1);
@@ -1071,7 +1071,7 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
-                    keywords = items;
+                    keywords = 1;
                     break;
                 case 'high':
                     step = rangeFrom = toInteger(0.1);
@@ -1107,7 +1107,7 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
-                    keywords = items;
+                    keywords = 1;
                     break;
                 case 'dense':
                     // 0.01 ... 3 (0.01)
@@ -1130,14 +1130,16 @@ class CreateOrderModal extends Component {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
-                    keywords = items;
+                    keywords = 1;
                     break;
             }
         } else {
             if (advertiser === "amazon" && amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform) {
                 items = this.state.amazonCSVItems.length;
                 keywords = 1;
-            } else {
+            } else  if (["clearbid", "smaato"].includes(advertiser)){
+                keywords = 1;
+            }else{
                 for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
                     items++;
                     if (items == 1) {
@@ -1151,11 +1153,6 @@ class CreateOrderModal extends Component {
                             }
                         }
                     }
-                }
-                if ("clearbid" == advertiser) {
-                    keywords = items;
-                } else if ("smaato" == advertiser) {
-                    keywords = 1
                 }
             }
         }
