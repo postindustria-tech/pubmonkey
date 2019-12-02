@@ -19,9 +19,13 @@ class File {
             { type: 'application/json;charset=utf-8' }
         )
 
-        this.anchor.download = name
-        this.anchor.href = URL.createObjectURL(blob)
-        this.anchor.click()
+        if (window.navigator && window.navigator.msSaveBlob) {
+            window.navigator.msSaveBlob(blob, name);
+        }else{
+            this.anchor.download = name
+            this.anchor.href = URL.createObjectURL(blob)
+            this.anchor.click()
+        }
     }
 
     openFile() {
