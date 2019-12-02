@@ -274,7 +274,12 @@ class CreateOrderModal extends Component {
                                     max={1000}
                                     step={0.1}
                                     value={this.state.amazonStartPrice}
-                                    onChange={event => this.handleInputChange({target: {name: 'amazonStartPrice', value: event}})}
+                                    onChange={event => this.handleInputChange({
+                                        target: {
+                                            name: 'amazonStartPrice',
+                                            value: event
+                                        }
+                                    })}
                                     style={{width: 65}}
                                     className={"mp-form-control"}
                                     parser={(input) => input.replace(/[^\d\.]/g, '')}
@@ -288,7 +293,12 @@ class CreateOrderModal extends Component {
                                     max={1000}
                                     step={0.1}
                                     value={this.state.amazonStep}
-                                    onChange={event => this.handleInputChange({target: {name: 'amazonStep', value: event}})}
+                                    onChange={event => this.handleInputChange({
+                                        target: {
+                                            name: 'amazonStep',
+                                            value: event
+                                        }
+                                    })}
                                     style={{width: 65}}
                                     className={"mp-form-control"}
                                     parser={(input) => input.replace(/[^\d\.]/g, '')}
@@ -805,7 +815,7 @@ class CreateOrderModal extends Component {
                 this.state.amazonCSVItems.map((item, index) => {
                     const trimmed = item.trim();
                     if (!AMAZON_KVP_FORMAT.test(trimmed)) {
-                        broken.push(`#${index+1} "${trimmed}"`);
+                        broken.push(`#${index + 1} "${trimmed}"`);
                     }
                     return trimmed;
                 });
@@ -922,20 +932,24 @@ class CreateOrderModal extends Component {
 
     @bind
     handleCSVChange(event) {
-        const {value, name} = event.target;
-        let items = value.split("\n");
-        let broken = [];
-        items = items.map((item, index) => {
-            const trimmed = item.trim();
-            if (!AMAZON_KVP_FORMAT.test(trimmed)) {
-                broken.push(`can't parse line #${index+1} "${trimmed}"`);
+        let {value, name} = event.target;
+        if (!isEmpty(value)) {
+            value = value.split("\n");
+            let broken = [];
+            value = value.map((item, index) => {
+                const trimmed = item.trim();
+                if (!isEmpty(trimmed) && !AMAZON_KVP_FORMAT.test(trimmed)) {
+                    broken.push(`can't parse line #${index + 1} "${trimmed}"`);
+                }
+                return trimmed;
+            }).filter((item) => {
+                return !isEmpty(item);
+            });
+            if (!isEmpty(broken)) {
+                ModalWindowService.ErrorPopup.showMessage(broken.join("<br>"));
             }
-            return trimmed;
-        });
-        if (!isEmpty(broken)) {
-            ModalWindowService.ErrorPopup.showMessage(broken.join("<br>"));
         }
-        this.setState({amazonCSVItems: items});
+        this.setState({amazonCSVItems: value});
     }
 
     @bind
@@ -1140,7 +1154,7 @@ class CreateOrderModal extends Component {
                 }
                 if ("clearbid" == advertiser) {
                     keywords = items;
-                }else if("smaato" == advertiser){
+                } else if ("smaato" == advertiser) {
                     keywords = 1
                 }
             }
