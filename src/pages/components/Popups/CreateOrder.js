@@ -1137,9 +1137,7 @@ class CreateOrderModal extends Component {
             if (advertiser === "amazon" && amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform) {
                 items = this.state.amazonCSVItems.length;
                 keywords = 1;
-            } else  if (["clearbid", "smaato"].includes(advertiser)){
-                keywords = 1;
-            }else{
+            } else{
                 for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
                     items++;
                     if (items == 1) {
@@ -1153,6 +1151,9 @@ class CreateOrderModal extends Component {
                             }
                         }
                     }
+                }
+                if (["clearbid", "smaato"].includes(advertiser)){
+                    keywords = 1;
                 }
             }
         }
