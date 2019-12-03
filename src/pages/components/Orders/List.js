@@ -361,7 +361,7 @@ class OrdersList extends Component {
                 let data = JSON.stringify(result, null, "  "),
                     name = result.name;
 
-                FileService.saveFile(data, name);
+                FileService.saveFile(data, `${name}.json`);
             })
             .finally(() => {
                 ModalWindowService.ProgressModal.hideModal();
