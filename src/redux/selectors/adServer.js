@@ -83,6 +83,7 @@ const duplicateOrder = createSelector(
     rootSelector,
     adServer => ({
         orderName: adServer.orderName,
+        timestamp: adServer.timestamp,
         lineItemInfo: adServer.lineItemInfo,
         defaultFields: adServer.defaultFields,
         rangeFrom: adServer.rangeFrom,

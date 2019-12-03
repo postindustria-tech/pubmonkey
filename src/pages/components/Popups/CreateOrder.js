@@ -172,7 +172,10 @@ class CreateOrderModal extends Component {
         if (prevProps.advertiserId !== this.props.advertiserId) {
             this.setState({advertiserId: this.props.advertiserId});
         }
-        if (this.props.orderName !== prevProps.orderName) {
+        if (
+            this.props.orderName !== prevProps.orderName
+            || (this.props.timestamp && this.props.timestamp != prevProps.timestamp)
+        ) {
             this.setState({
                 orderName: this.props.orderName,
                 lineItemInfo: this.props.lineItemInfo,

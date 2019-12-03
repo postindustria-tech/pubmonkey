@@ -251,6 +251,7 @@ function* setCreateOrderModalToggle(action) {
                     }
 
                     return {
+                        timestamp: (new Date()).getTime(),
                         orderName: order.name,
                         lineItemInfo: values,
                         defaultFields: defaultFields,
