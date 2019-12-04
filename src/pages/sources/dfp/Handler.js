@@ -763,7 +763,7 @@ class Handler extends AbstractHandler {
             customTargetingValues = [...customTargetingValues, ...newValues];
         }
 
-        line = 1;
+        let line = 1;
         await Promise.all(Array(bids.length).fill().map(async (item, index) => {
 
             const bid = bids[index];
