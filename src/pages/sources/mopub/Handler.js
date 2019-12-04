@@ -495,7 +495,7 @@ class Handler extends AbstractHandler {
             stepDecimalPartLength--;
         }
 
-        if (advertiser === "openx") {
+        if (advertiser === "openx" || advertiser === "pubmatic") {
             let bids = [], skip = false;
             switch (granularity) {
                 case 'low':

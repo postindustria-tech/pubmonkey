@@ -475,7 +475,7 @@ class CreateOrderModal extends Component {
                             </Col>
                         </Row>
                         <Row
-                            hidden={(this.state.selectedAdvertiser === 'openx') || (this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid)}>
+                            hidden={(this.state.selectedAdvertiser === 'openx') || (this.state.selectedAdvertiser === 'pubmatic') || (this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid)}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Line Items Range:</span> from [
                                 <CustomInput
@@ -533,7 +533,7 @@ class CreateOrderModal extends Component {
                             </Col>
                         </Row>
                         <Row
-                            hidden={this.state.selectedAdvertiser === "amazon" || this.state.selectedAdvertiser === 'openx'}>
+                            hidden={this.state.selectedAdvertiser === "amazon" || this.state.selectedAdvertiser === 'openx' || this.state.selectedAdvertiser === 'pubmatic'}>
                             <Col className={"col-sm-12"}>
                                 <span className={"mp-label"}>Step: </span>
                                 <InputNumber
@@ -1023,7 +1023,8 @@ class CreateOrderModal extends Component {
             formValid: true,
             rangeMeasure: advertiser === "amazon" ? "position" : "$",
             rangeFrom: advertiser === "amazon" ? 1 : 0.1,
-            customEventData: customEventData
+            customEventData: customEventData,
+            granularity: advertiser === "pubmatic" ? "auto" : ""
         });
     }
 
@@ -1079,10 +1080,10 @@ class CreateOrderModal extends Component {
         step = toInteger(step);
 
         let items = 0,
-            keywords = 0;
+            keywords = 0,
+            bid;
 
-        if (advertiser === "openx") {
-            let bid;
+        if (advertiser === "openx" || advertiser === "pubmatic") {
             switch (granularity) {
                 case 'low':
                     step = rangeFrom = toInteger(0.5);
