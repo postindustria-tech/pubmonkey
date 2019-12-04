@@ -336,8 +336,14 @@ class CreateOrderModal extends Component {
                                 <textarea
                                     className="mr-sm-2"
                                     style={{width: "100%"}}
-                                    onChange={this.handleCSVChange}
+                                    onBlur={this.handleCSVChange}
+                                    onKeyDown={event => {
+                                        if(13 == event.keyCode){
+                                            this.handleCSVChange(event)
+                                        }
+                                    }}
                                     placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
+                                    onChange={() => {}}
                                 >{this.state.amazonCSVItems}</textarea>
                             </FormGroup>
                         </Form>
