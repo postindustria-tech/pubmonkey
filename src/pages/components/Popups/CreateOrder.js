@@ -130,6 +130,13 @@ class CreateOrderModal extends Component {
         });
     }
 
+    @bind
+    tooltipKVPairsToggle() {
+        this.setState({
+            tooltipKVPairsOpen: !this.state.tooltipKVPairsOpen
+        });
+    }
+
     onChangeStep = value => {
         if (value === "" || ONLY_NUMBERS.test(value)) {
             this.setState({
@@ -315,12 +322,22 @@ class CreateOrderModal extends Component {
                         <Form inline>
                             <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{width: "50%"}}>
                                 <Label className="mr-sm-2 mp-label">
-                                    CSV:
+                                    KV Pairs:
                                 </Label>
+                                <i className="fa fa-question-circle" id={"Tooltip-1"}/>
+                                <Tooltip
+                                    placement="top"
+                                    isOpen={this.state.tooltipKVPairsOpen}
+                                    target={"Tooltip-1"}
+                                    toggle={this.tooltipKVPairsToggle}
+                                >
+                                    Copy the key-value pairs from the spreadsheet sent to you by the account manager. One line per line item in the format "key:value" (without quotes), where key denotes the line item targeting keyword, and value is the line item price.
+                                </Tooltip>
                                 <textarea
                                     className="mr-sm-2"
                                     style={{width: "100%"}}
                                     onChange={this.handleCSVChange}
+                                    placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
                                 >{this.state.amazonCSVItems}</textarea>
                             </FormGroup>
                         </Form>
