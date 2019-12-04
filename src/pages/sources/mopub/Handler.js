@@ -628,7 +628,7 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + bid/100).replace(maskPrice, (parseFloat(amazonStartPrice) + (i + startPriceIndex) * parseFloat(amazonStep)).toFixed(2));
+                        const keyword = keywordTemplate.replace(mask, i + bid/100).replace(':' + maskPrice, '');
                         keywords.push(keyword);
                     }
                     name = name.replace("{position}", bid/100).replace(maskPrice, (parseFloat(amazonStartPrice) + startPriceIndex * parseFloat(amazonStep)).toFixed(2));
