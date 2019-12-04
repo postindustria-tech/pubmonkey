@@ -1079,14 +1079,9 @@ class CreateOrderModal extends Component {
                 case 'high':
                     step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
-                    keywordStep = 0.01;
+                    keywords = 10
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
-                        const bidDecimal = toDecimal(bid).toFixed(2);
-                        const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
-                        for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
-                            keywords++;
-                        }
                     }
                     break;
                 case 'auto':
