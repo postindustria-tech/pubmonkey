@@ -834,7 +834,7 @@ class CreateOrderModal extends Component {
             }
         } else if (AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid) {
             if (isEmpty(this.state.amazonCSVItems)) {
-                fieldValidationErrors.amazonCSVItems = "CSV is required";
+                fieldValidationErrors.amazonCSVItems = "KV pairs is required";
                 isValid = false;
             } else {
                 let broken = [];
