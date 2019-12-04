@@ -611,7 +611,7 @@ class Handler extends AbstractHandler {
                     bid: bidDecimal,
                     name: match[1],
                     orderKey: orderKey,
-                    keywords: [line],
+                    keywords: ["amznslots:" + line.substring(0, line.indexOf(':'))],
                     ...lineItemInfo
                 });
             });
