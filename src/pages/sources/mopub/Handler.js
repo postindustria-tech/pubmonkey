@@ -628,10 +628,10 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + bid/100).replace(':' + maskPrice, '');
+                        const keyword = keywordTemplate.replace(mask, i + bid / 100).replace(':' + maskPrice, '');
                         keywords.push(keyword);
                     }
-                    name = name.replace("{position}", bid/100).replace(maskPrice, (parseFloat(amazonStartPrice) + startPriceIndex * parseFloat(amazonStep)).toFixed(2));
+                    name = name.replace("{position}", bid / 100).replace(maskPrice, (parseFloat(amazonStartPrice) + startPriceIndex * parseFloat(amazonStep)).toFixed(2));
                 } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));
                 } else {
@@ -809,7 +809,22 @@ class Handler extends AbstractHandler {
                 orderCount: 1
             };
 
-            const lineItems = this.composerLineItems(null, params);
+            let lineItems = this.composerLineItems(null, params);
+            if (["amazon", "openx", "pubmatic"].indexOf(params.advertiser) !== -1) {
+                lineItems = lineItems.map(lineItem => {
+                    lineItem.creatives = [{
+                        adType: "html",
+                        extended: {
+                            htmlData: this.advertiser.getCreativeHtmlData(params),
+                            isMraid: params.advertiser === "amazon"
+                        },
+                        format: params.creativeFormat,
+                        imageKeys: [],
+                        name: "Creative"
+                    }];
+                    return lineItem;
+                });
+            }
 
             data.lineItemCount = lineItems.length;
             order.lineItems = lineItems;
