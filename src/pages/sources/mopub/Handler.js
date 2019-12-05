@@ -609,7 +609,7 @@ class Handler extends AbstractHandler {
                 lineItems.push({
                     adUnitKeys: adunits,
                     bid: bidDecimal,
-                    name: match[1],
+                    name: line,
                     orderKey: orderKey,
                     keywords: ["amznslots:" + line.substring(0, line.indexOf(':'))],
                     ...lineItemInfo
