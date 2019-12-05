@@ -60,9 +60,9 @@ const initialState = {
     order: {},
     orderName: "",
     amazonPriceGrid: AMAZON_PRICE_GRID.uniform,
-    amazonStartPrice: 0.01,
+    amazonStartPrice: 0.1,
     amazonCSVItems: "",
-    amazonStep: 0.01,
+    amazonStep: 0.1,
     defaultFields: [],
     lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
     keywordTemplate:
