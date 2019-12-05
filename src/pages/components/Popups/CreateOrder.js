@@ -846,7 +846,8 @@ class CreateOrderModal extends Component {
                     return trimmed;
                 });
                 if (!isEmpty(broken)) {
-                    fieldValidationErrors.amazonCSVItems = `CSV: can't parse line(s) ${broken.join(' ')}`;
+                    fieldValidationErrors.amazonCSVItems = `KV pairs: can't parse line(s) ${broken.join(' ')}`;
+                    isValid = false;
                 }
             }
         }
