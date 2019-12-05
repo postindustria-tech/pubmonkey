@@ -780,10 +780,12 @@ class Handler extends AbstractHandler {
             if (advertiser === "amazon") {
                 for (let i = 0; i < keywordStep; i += 1) {
                     i = toValidUI(i);
-                    const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "");
+                    const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "").replace(maskPrice, '');
                     keywords.push(keyword);
                 }
-                name = name.replace("{position}", line);
+                name = name
+                    .replace("{position}", line)
+                    .replace(maskPrice, (parseFloat(amazonStartPrice) + index * parseFloat(amazonStep)).toFixed(2));
                 line++;
             } else if (advertiser === "openx") {
                 // const to = +toValidUI(bidDecimal + s).toFixed(2);
