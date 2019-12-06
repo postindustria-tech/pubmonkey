@@ -345,8 +345,7 @@ class CreateOrderModal extends Component {
                                         }
                                     }}
                                     placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
-                                    onChange={() => {
-                                    }}
+                                    onChange={() => {}}
                                 >{this.state.amazonCSVItems}</textarea>
                             </FormGroup>
                         </Form>

@@ -2,7 +2,7 @@ import Factory from '../../sources/Factory';
 import AbstractHandler from '../../sources/AbstractHandler';
 import {AdvertiserFactory} from "./Factory";
 import {AD_SERVER_DFP, DFP_API_VERSION} from "../../constants/source";
-import {AMAZON_PRICE_GRID} from '../../constants/common';
+import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from '../../constants/common';
 import {DFP, FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {isEmpty, toDecimal, toInteger, toValidUI, deepClone} from "../../helpers";
@@ -75,6 +75,8 @@ class Handler extends AbstractHandler {
     networkCode = null;
     token = null;
     loggedIn = false;
+
+    customTargetingValues = [];
 
     static user = null;
 
@@ -548,6 +550,8 @@ class Handler extends AbstractHandler {
             amazonCSVItems,
         } = params;
 
+        this.customTargetingValues = customTargetingValues;
+
         let lineItems = [],
             bid;
 
@@ -742,13 +746,13 @@ class Handler extends AbstractHandler {
             function (e) {
                 return !this.find(keyword => keyword.name === e);
             },
-            customTargetingValues
+            this.customTargetingValues
         );
         newKeywords = newKeywords.filter(function (value, index, self) {
             return self.indexOf(value) === index;
         });
 
-        // console.log(customTargetingValues, keywords, newKeywords);
+        // console.log(this.customTargetingValues, keywords, newKeywords);
 
         if (!isEmpty(newKeywords)) {
             newKeywords = newKeywords.map(keyword => {
@@ -760,129 +764,161 @@ class Handler extends AbstractHandler {
             });
 
             let newValues = await this.createCustomTargetingValues(newKeywords);
-            customTargetingValues = [...customTargetingValues, ...newValues];
+            this.customTargetingValues = [...this.customTargetingValues, ...newValues];
         }
 
-        let line = 1;
-        await Promise.all(Array(bids.length).fill().map(async (item, index) => {
+        if (advertiser === "amazon" && AMAZON_PRICE_GRID.non_uniform == amazonPriceGrid) {
 
-            const bid = bids[index];
+            await Promise.all(amazonCSVItems.map(async line => {
+                const match = line.match(AMAZON_KVP_FORMAT);
+                const bidDecimal = parseFloat(match[2]);
 
-            let _lineItemInfo = deepClone(lineItemInfo);
+                let _lineItemInfo = deepClone(lineItemInfo);
 
-            const bidDecimal = toDecimal(bid),
-                s = toDecimal(step),
-                bidValue = bidDecimal.toFixed(stepDecimalPartLength);
+                const values = await this.findOrCreateKeywords([line.substring(0, line.indexOf(':'))]);
 
-            let name = lineItemsNaming.replace("{bid}", bidValue),
-                keywords = [];
+                console.log(values);
 
-            if (advertiser === "amazon") {
-                for (let i = 0; i < keywordStep; i += 1) {
-                    i = toValidUI(i);
-                    const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "").replace(maskPrice, '');
-                    keywords.push(keyword);
-                }
-                name = name
-                    .replace("{position}", line)
-                    .replace(maskPrice, (parseFloat(amazonStartPrice) + index * parseFloat(amazonStep)).toFixed(2));
-                line++;
-            } else if (advertiser === "openx") {
-                // const to = +toValidUI(bidDecimal + s).toFixed(2);
-                // for (let i = bidDecimal; i < to; i += keywordStep) {
-                //     i = toValidUI(i);
-                //     if (i < to) {
-                //         keywords.push(i.toFixed(2));
-                //     }
-                // }
-                switch (granularity) {
-                    case 'high':
-                        const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
-                        for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
-                            const key = toDecimal(i);
-                            const value = key.toFixed(keywordStepDecimalPartLength),
+                _lineItemInfo.targeting.customTargeting = CustomCriteriaSet(
+                    [CustomCriteria(keyId, values)]
+                );
+
+                console.log({..._lineItemInfo});
+
+                _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
+
+                lineItems = [...lineItems, {
+                    orderId: orderKey,
+                    name: line,
+                    // keywords: keywords,
+                    ..._lineItemInfo
+                }];
+            }));
+        } else {
+
+            let line = 1;
+            await Promise.all(Array(bids.length).fill().map(async (item, index) => {
+
+                const bid = bids[index];
+
+                let _lineItemInfo = deepClone(lineItemInfo);
+
+                const bidDecimal = toDecimal(bid),
+                    s = toDecimal(step),
+                    bidValue = bidDecimal.toFixed(stepDecimalPartLength);
+
+                let name = lineItemsNaming.replace("{bid}", bidValue),
+                    keywords = [];
+
+                if (advertiser === "amazon") {
+                    for (let i = 0; i < keywordStep; i += 1) {
+                        i = toValidUI(i);
+                        const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "").replace(maskPrice, '');
+                        keywords.push(keyword);
+                    }
+                    name = name
+                        .replace("{position}", line)
+                        .replace(maskPrice, (parseFloat(amazonStartPrice) + index * parseFloat(amazonStep)).toFixed(2));
+                    line++;
+                } else if (advertiser === "openx") {
+                    // const to = +toValidUI(bidDecimal + s).toFixed(2);
+                    // for (let i = bidDecimal; i < to; i += keywordStep) {
+                    //     i = toValidUI(i);
+                    //     if (i < to) {
+                    //         keywords.push(i.toFixed(2));
+                    //     }
+                    // }
+                    switch (granularity) {
+                        case 'high':
+                            const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
+                            for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
+                                const key = toDecimal(i);
+                                const value = key.toFixed(keywordStepDecimalPartLength),
+                                    keyword = keywordTemplate.replace(mask, value);
+                                keywords.push(keyword);
+                            }
+                            break;
+                        case 'low':
+                        case 'med':
+                        case 'auto':
+                        case 'dense':
+                            keywords.push(bidValue);
+                            break;
+                    }
+                } else {
+                    const to = +toValidUI(bidDecimal + s).toFixed(2);
+                    for (let i = bidDecimal; i < to; i += keywordStep) {
+                        i = toValidUI(i);
+                        if (i < to) {
+                            const value = i.toFixed(keywordStepDecimalPartLength),
                                 keyword = keywordTemplate.replace(mask, value);
                             keywords.push(keyword);
                         }
-                        break;
-                    case 'low':
-                    case 'med':
-                    case 'auto':
-                    case 'dense':
-                        keywords.push(bidValue);
-                        break;
-                }
-            } else {
-                const to = +toValidUI(bidDecimal + s).toFixed(2);
-                for (let i = bidDecimal; i < to; i += keywordStep) {
-                    i = toValidUI(i);
-                    if (i < to) {
-                        const value = i.toFixed(keywordStepDecimalPartLength),
-                            keyword = keywordTemplate.replace(mask, value);
-                        keywords.push(keyword);
                     }
                 }
-            }
 
+                const values = await this.findOrCreateKeywords(keywords);
 
-            let newKeywords = keywords.filter(
-                function (e) {
-                    return !this.find(keyword => keyword.name === e);
-                },
-                customTargetingValues
-            );
-            let values = customTargetingValues.filter(
-                function (e) {
-                    return this.indexOf(e.name) >= 0;
-                },
-                keywords
-            );
+                console.log(values);
 
-            if (!isEmpty(newKeywords)) {
+                _lineItemInfo.targeting.customTargeting = CustomCriteriaSet(
+                    [CustomCriteria(keyId, values)]
+                );
 
-                newKeywords = newKeywords.map(keyword => {
-                    return {
-                        customTargetingKeyId: keyId,
-                        name: keyword,
-                        matchType: "EXACT"
-                    }
-                });
+                console.log({..._lineItemInfo});
 
-                let newValues = await this.createCustomTargetingValues(newKeywords);
+                _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
 
-                customTargetingValues = [...customTargetingValues, ...newValues];
-
-                values = [...values, ...newValues]
-            }
-
-            values = values.map(({id}) => {
-                return id;
-            });
-
-            console.log(values);
-
-            _lineItemInfo.targeting.customTargeting = CustomCriteriaSet(
-                [CustomCriteria(keyId, values)]
-            );
-
-            // console.log(_lineItemInfo);
-
-
-            console.log({..._lineItemInfo});
-
-            _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
-
-            lineItems = [...lineItems, {
-                orderId: orderKey,
-                name: name,
-                // keywords: keywords,
-                ..._lineItemInfo
-            }];
-        }));
+                lineItems = [...lineItems, {
+                    orderId: orderKey,
+                    name: name,
+                    // keywords: keywords,
+                    ..._lineItemInfo
+                }];
+            }));
+        }
 
         console.log(lineItems);
 
         return lineItems;
+    }
+
+    async findOrCreateKeywords(keywords) {
+        let newKeywords = keywords.filter(
+            function (e) {
+                return !this.find(keyword => keyword.name === e);
+            },
+            this.customTargetingValues
+        );
+        let values = this.customTargetingValues.filter(
+            function (e) {
+                return this.indexOf(e.name) >= 0;
+            },
+            keywords
+        );
+
+        if (!isEmpty(newKeywords)) {
+
+            newKeywords = newKeywords.map(keyword => {
+                return {
+                    customTargetingKeyId: keyId,
+                    name: keyword,
+                    matchType: "EXACT"
+                }
+            });
+
+            let newValues = await this.createCustomTargetingValues(newKeywords);
+
+            this.customTargetingValues = [...this.customTargetingValues, ...newValues];
+
+            values = [...values, ...newValues]
+        }
+
+        values = values.map(({id}) => {
+            return id;
+        });
+
+        return values;
     }
 
     createOrderDataFromSet(order, params, stepCallback) {
