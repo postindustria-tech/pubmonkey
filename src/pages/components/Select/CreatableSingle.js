@@ -30,7 +30,7 @@ export class CreatableSingle extends Component {
         // console.log(`action: ${actionMeta.action}`);
         // console.groupEnd();
 
-        this.setState({ value: newValue });
+        this.setState({value: newValue});
 
         if (this.props.onSelect) {
             this.props.onSelect(newValue);
@@ -48,8 +48,15 @@ export class CreatableSingle extends Component {
 
         let {options, placeholder} = this.props,
             {value} = this.state;
+
         return (
             <CreatableSelect
+                styles={{
+                    container: base => {
+                        const {zIndex, ...rest} = base;
+                        return {...rest, zIndex: 9999};
+                    }
+                }}
                 isClearable={false}
                 onChange={this.handleChange}
                 onInputChange={this.handleInputChange}

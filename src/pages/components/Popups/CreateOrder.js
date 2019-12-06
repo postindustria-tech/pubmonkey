@@ -331,19 +331,22 @@ class CreateOrderModal extends Component {
                                     target={"Tooltip-1"}
                                     toggle={this.tooltipKVPairsToggle}
                                 >
-                                    Copy the key-value pairs from the spreadsheet sent to you by the account manager. One line per line item in the format "key:value" (without quotes), where key denotes the line item targeting keyword, and value is the line item price.
+                                    Copy the key-value pairs from the spreadsheet sent to you by the account manager.
+                                    One line per line item in the format "key:value" (without quotes), where key denotes
+                                    the line item targeting keyword, and value is the line item price.
                                 </Tooltip>
                                 <textarea
                                     className="mr-sm-2"
                                     style={{width: "100%"}}
                                     onBlur={this.handleCSVChange}
                                     onKeyDown={event => {
-                                        if(13 == event.keyCode){
+                                        if (13 == event.keyCode) {
                                             this.handleCSVChange(event)
                                         }
                                     }}
                                     placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
-                                    onChange={() => {}}
+                                    onChange={() => {
+                                    }}
                                 >{this.state.amazonCSVItems}</textarea>
                             </FormGroup>
                         </Form>
@@ -649,6 +652,12 @@ class CreateOrderModal extends Component {
                                             options={this.props.networkClasses[this.state.os] || []}
                                             onChange={this.handleSelectNetworkClass}
                                             value={this.state.networkClass}
+                                            styles={{
+                                                container: base => {
+                                                    const {zIndex, ...rest} = base;
+                                                    return {...rest, zIndex: 9999};
+                                                }
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -1160,7 +1169,7 @@ class CreateOrderModal extends Component {
             if (advertiser === "amazon" && amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform) {
                 items = this.state.amazonCSVItems.length;
                 keywords = 1;
-            } else{
+            } else {
                 for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
                     items++;
                     if (items == 1) {
@@ -1175,7 +1184,7 @@ class CreateOrderModal extends Component {
                         }
                     }
                 }
-                if (["clearbid", "smaato"].includes(advertiser)){
+                if (["clearbid", "smaato"].includes(advertiser)) {
                     keywords = 1;
                 }
             }
