@@ -588,6 +588,17 @@ class Handler extends AbstractHandler {
             }
 
             if (!skip) {
+
+                if (advertiser === "pubmatic") {
+                    lineItemInfo.type = "network";
+                    lineItemInfo["networkType"] = "custom_native";
+                    lineItemInfo["enableOverrides"] = true;
+                    lineItemInfo["overrideFields"] = {
+                        custom_event_class_name: networkClass.value,
+                        custom_event_class_data: customEventData
+                    };
+                }
+
                 lineItems = bids.map(bid => {
                     return {
                         adUnitKeys: adunits,
@@ -654,7 +665,7 @@ class Handler extends AbstractHandler {
                         custom_event_class_name: networkClass.value,
                         custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
                     };
-                } else if (["smaato", "clearbid", "pubmatic"].indexOf(advertiser) !== -1) {
+                } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     lineItemInfo.type = "network";
                     lineItemInfo["networkType"] = "custom_native";
                     lineItemInfo["enableOverrides"] = true;
