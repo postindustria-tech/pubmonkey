@@ -176,7 +176,7 @@ class CreateOrderModal extends Component {
         if (prevProps.type !== this.props.type) {
             this.reset();
         }
-        if (prevProps.advertiserId !== this.props.advertiserId) {
+        if (prevProps.advertiserId !== this.props.advertiserId && this.props.advertiserId) {
             this.setState({advertiserId: this.props.advertiserId});
         }
         if (
@@ -423,6 +423,7 @@ class CreateOrderModal extends Component {
                                             id="advertiserId"
                                             className={"mp-form-control"}
                                         >
+                                            <option>--</option>
                                             {this.props.sourceAdvertisers.map(
                                                 ({id, name}) => (
                                                     <option key={id} value={id}>{name}</option>
