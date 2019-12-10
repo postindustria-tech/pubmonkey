@@ -59,7 +59,7 @@ const initialState = {
     adunitsSelected: [],
     order: {},
     orderName: "",
-    amazonPriceGrid: AMAZON_PRICE_GRID.uniform,
+    amazonPriceGrid: AMAZON_PRICE_GRID.non_uniform,
     amazonStartPrice: 0.1,
     amazonCSVItems: "",
     amazonStep: 0.1,
