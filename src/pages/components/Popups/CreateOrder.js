@@ -248,17 +248,6 @@ class CreateOrderModal extends Component {
                     <Col className={"col-sm-12"}>
                         <Form inline>
                             <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-
-                                <CustomInput
-                                    type="radio"
-                                    name="amazonPriceGrid"
-                                    value={AMAZON_PRICE_GRID.uniform}
-                                    label="uniform price grid"
-                                    id="amazon-price-grid-uniform"
-                                    onChange={this.handleInputChange}
-                                    checked={this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
-                                />
-                                &nbsp;&nbsp;&nbsp;
                                 <CustomInput
                                     type="radio"
                                     name="amazonPriceGrid"
@@ -267,6 +256,16 @@ class CreateOrderModal extends Component {
                                     id="amazon-price-grid-non-uniform"
                                     onChange={this.handleInputChange}
                                     checked={this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
+                                />
+                                &nbsp;&nbsp;&nbsp;
+                                <CustomInput
+                                    type="radio"
+                                    name="amazonPriceGrid"
+                                    value={AMAZON_PRICE_GRID.uniform}
+                                    label="uniform price grid"
+                                    id="amazon-price-grid-uniform"
+                                    onChange={this.handleInputChange}
+                                    checked={this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
                                 />
                             </FormGroup>
                         </Form>
