@@ -1192,7 +1192,9 @@ class Handler extends AbstractHandler {
                 return id;
             });
 
-            let creativeAssociations = [];
+            let creativeAssociations = [],
+                creativeIDs = [],
+                creatives = [];
             if (ids.length > 0) {
                 let creativeAssociationsResult = await this._getByStatement('LineItemCreativeAssociationService', {
                     query: 'WHERE lineItemId IN (' + ids.join(',') + ')'
@@ -1200,6 +1202,20 @@ class Handler extends AbstractHandler {
 
                 if (creativeAssociationsResult.totalResultSetSize > 0) {
                     creativeAssociations = creativeAssociationsResult.results;
+                    creativeIDs = creativeAssociations.map(({creativeId}) => {
+                        return creativeId;
+                    });
+                    creativeIDs = [...new Set(creativeIDs)];
+                }
+
+                if (creativeIDs.length > 0) {
+                    let creativesResult = await this._getByStatement('CreativeService', {
+                        query: 'WHERE creativeId IN (' + creativeIDs.join(',') + ')'
+                    });
+
+                    if (creativesResult.totalResultSetSize > 0) {
+                        creatives = creativesResult.results;
+                    }
                 }
             }
 
@@ -1209,10 +1225,14 @@ class Handler extends AbstractHandler {
 
                 await delay(50);
 
-                lineItem.creativeAssociations = creativeAssociations.filter(({lineItemId}) => lineItemId === lineItem.id);
-                delete lineItem.isArchived;
-                delete lineItem.lastModifiedDateTime;
-                delete lineItem.creationDateTime;
+                const creativeIDs = creativeAssociations
+                    .filter(({lineItemId}) => lineItemId === lineItem.id)
+                    .map(({creativeId}) => creativeId);
+
+                lineItem.creatives = creatives.filter(({id}) => creativeIDs.indexOf(id) !== -1);
+                delete lineItem['isArchived'];
+                delete lineItem['lastModifiedDateTime'];
+                delete lineItem['creationDateTime'];
 
                 timestamp = Date.now() - timestamp;
 
