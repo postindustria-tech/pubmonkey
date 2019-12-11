@@ -9,6 +9,7 @@ import SourceTypeViewContainer from '../../containers/SourceTypeViewContainer/So
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
+import adServerActions from '../../../redux/actions/adServer'
 
 class BaseLayout extends Component {
 
@@ -47,7 +48,12 @@ class BaseLayout extends Component {
                             isActive={isActive}
                         >
                             <i className="fas fa-truck"/>
-                            &nbsp; Orders
+                            &nbsp; Orders<br />
+                            {this.props.ordersLoaded ?
+                                this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).length + ' orders, ' +
+                                this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).map(o => o.lineItemCount).reduce((a,b) => a + b, 0) + ' line items'
+                                : ''
+                            }
                         </NavLink>
                         <NavLink
                             tag={ RRNavLink }
@@ -56,7 +62,9 @@ class BaseLayout extends Component {
                             to="/adunits"
                         >
                             <i className="fas fa-boxes"/>
-                            &nbsp; Ad Units
+                            &nbsp; Ad Units<br />
+                            {[...new Set(this.props.adunits.map(u => u.appKey))].length} apps,
+                            {this.props.adunits.length} ad units
                         </NavLink>
                         <a
                             className={"list-group-item list-group-item-action bg-light"}
@@ -119,8 +127,16 @@ class BaseLayout extends Component {
     }
 }
 
+const mapDispatchToProps = {
+    refreshOrders: adServerActions.refreshOrders,
+};
+
 const mapStateToProps = state => ({
-    type: adServerSelectors.switcherType(state)
+    type: adServerSelectors.switcherType(state),
+    orders: adServerSelectors.orders(state),
+    ordersLoaded: adServerSelectors.ordersLoaded(state),
+    sourceHandler: adServerSelectors.sourceHandler(state),
+    adunits: adServerSelectors.adunits(state),
 });
 
 export default connect(mapStateToProps)(BaseLayout)
