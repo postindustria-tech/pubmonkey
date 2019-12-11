@@ -137,17 +137,6 @@ class OrdersList extends Component {
                         </Input>
                     </Col>
                 </Row>
-                {this.props.ordersLoaded ?
-                <Row className="list-filter">
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>
-                            {
-                                this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).length + ' orders, ' +
-                                this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).map(o => o.lineItemCount).reduce((a,b) => a + b, 0) + ' line items'
-                            }
-                         </span>
-                    </Col>
-                </Row> : ''}
                 <OrdersTable
                     updatedFiltersAt={this.state.updatedFiltersAt}
                     orders={this.props.orders}

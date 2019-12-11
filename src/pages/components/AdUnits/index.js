@@ -36,10 +36,6 @@ class AdUnitsList extends Component {
             >
 
                 <h2>Ad Units</h2>
-                <p>
-                    {[...new Set(this.props.adunits.map(u => u.appKey))].length} apps,
-                    {this.props.adunits.length} ad units
-                </p>
                 <Table className="adunits-table">
                     <thead>
                         <tr>
