@@ -63,8 +63,11 @@ class BaseLayout extends Component {
                         >
                             <i className="fas fa-boxes"/>
                             &nbsp; Ad Units<br />
-                            {[...new Set(this.props.adunits.map(u => u.appKey))].length} apps,
-                            {this.props.adunits.length} ad units
+                            {this.props.adunits ?
+                                {[...new Set(this.props.adunits.map(u => u.appKey))].length} apps,
+                                {this.props.adunits.length} ad units
+                                : ''
+                            }
                         </NavLink>
                         <a
                             className={"list-group-item list-group-item-action bg-light"}
