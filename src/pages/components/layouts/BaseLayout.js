@@ -49,7 +49,7 @@ class BaseLayout extends Component {
                         >
                             <i className="fas fa-truck"/>
                             &nbsp; Orders<br />
-                            {this.props.ordersLoaded && this.props.orders?
+                            {this.props.ordersLoaded && this.props.orders ?
                                 this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).length + ' orders, ' +
                                 this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).map(o => o.lineItemCount).reduce((a,b) => a + b, 0) + ' line items'
                                 : ''
@@ -64,8 +64,8 @@ class BaseLayout extends Component {
                             <i className="fas fa-boxes"/>
                             &nbsp; Ad Units<br />
                             {this.props.adunits ?
-                                {[...new Set(this.props.adunits.map(u => u.appKey))].length} apps,
-                                {this.props.adunits.length} ad units
+                                [...new Set(this.props.adunits.map(u => u.appKey))].length + ' apps, ' +
+                                this.props.adunits.length + ' ad units'
                                 : ''
                             }
                         </NavLink>
