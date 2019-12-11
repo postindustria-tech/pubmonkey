@@ -143,7 +143,7 @@ class OrdersList extends Component {
                         <span className={"mp-label"}>
                             {
                                 this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).length + ' orders, ' +
-                                this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).map(o => o.lineItemCount).reduce((a,b) => a + b, 0) + ' line items'
+                                this.props.orders.filter(this.props.sourceHandler.FILTER_FN[0]).map(o => parseInt(o.lineItemCount)).reduce((a,b) => a + b, 0) + ' line items'
                             }
                          </span>
                     </Col>
