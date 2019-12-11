@@ -137,7 +137,7 @@ class OrdersList extends Component {
                         </Input>
                     </Col>
                 </Row>
-                {this.props.ordersLoaded && this.props.orders ?
+                {this.props.ordersLoaded ?
                 <Row className="list-filter">
                     <Col className={"col-sm-12"}>
                         <span className={"mp-label"}>
