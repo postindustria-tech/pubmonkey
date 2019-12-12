@@ -9,6 +9,8 @@ import SourceTypeViewContainer from '../../containers/SourceTypeViewContainer/So
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
+import OrdersStats from '../Orders/Stats'
+import AdUnitsStats from '../AdUnits/Stats'
 
 class BaseLayout extends Component {
 
@@ -47,7 +49,8 @@ class BaseLayout extends Component {
                             isActive={isActive}
                         >
                             <i className="fas fa-truck"/>
-                            &nbsp; Orders
+                            &nbsp; Orders<br />
+                            <OrdersStats />
                         </NavLink>
                         <NavLink
                             tag={ RRNavLink }
@@ -56,7 +59,8 @@ class BaseLayout extends Component {
                             to="/adunits"
                         >
                             <i className="fas fa-boxes"/>
-                            &nbsp; Ad Units
+                            &nbsp; Ad Units<br />
+                            <AdUnitsStats />
                         </NavLink>
                         <a
                             className={"list-group-item list-group-item-action bg-light"}

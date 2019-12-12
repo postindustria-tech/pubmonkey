@@ -17,6 +17,7 @@ import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 import ConfirmModal from "../Popups/ConfirmModal";
+import OrdersStats from './Stats'
 
 window.canceledExport = false;
 
@@ -135,6 +136,13 @@ class OrdersList extends Component {
                                 )
                             )}
                         </Input>
+                    </Col>
+                </Row>
+                <Row className="list-filter">
+                    <Col className={"col-sm-12"}>
+                        <span className={"mp-label"}>
+                            <OrdersStats />
+                        </span>
                     </Col>
                 </Row>
                 <OrdersTable

@@ -6,6 +6,7 @@ import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 import {connect} from "react-redux";
 import SourceFactory from "../../sources/Factory";
+import AdUnitsStats from './Stats'
 
 class AdUnitsList extends Component {
     state = {
@@ -36,6 +37,7 @@ class AdUnitsList extends Component {
             >
 
                 <h2>Ad Units</h2>
+                <p><AdUnitsStats /></p>
                 <Table className="adunits-table">
                     <thead>
                         <tr>
