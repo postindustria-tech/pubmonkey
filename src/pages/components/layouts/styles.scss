@@ -142,3 +142,7 @@ body {
 .cursor-pointer {
     cursor: pointer;
 }
+
+.table thead th {
+   text-transform: uppercase;
+}
