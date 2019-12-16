@@ -609,6 +609,17 @@ class Handler extends AbstractHandler {
                         ...lineItemInfo
                     }
                 });
+
+                if (advertiser === "pubmatic") {
+                    lineItems.unshift({
+                        adUnitKeys: adunits,
+                        bid: 0.01,
+                        name: lineItemsNaming.replace("{bid}", 0.01),
+                        orderKey: orderKey,
+                        keywords: [keywordTemplate.replace(mask, 0.00)],
+                        ...lineItemInfo
+                    })
+                }
             }
         } else if (
             advertiser === "amazon"
