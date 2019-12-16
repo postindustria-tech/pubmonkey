@@ -614,9 +614,9 @@ class Handler extends AbstractHandler {
                     lineItems.unshift({
                         adUnitKeys: adunits,
                         bid: 0.01,
-                        name: lineItemsNaming.replace("{bid}", 0.01),
+                        name: lineItemsNaming.replace("{bid}", '0.01'),
                         orderKey: orderKey,
-                        keywords: [keywordTemplate.replace(mask, 0.00)],
+                        keywords: [keywordTemplate.replace(mask, '0.00')],
                         ...lineItemInfo
                     })
                 }
