@@ -818,7 +818,7 @@ class Handler extends AbstractHandler {
                     }
                     name = name
                         .replace("{position}", line)
-                        .replace(maskPrice, (parseFloat(amazonStartPrice) + index * parseFloat(amazonStep)).toFixed(2));
+                        .replace(':'+maskPrice, '');
                     line++;
                 } else if (advertiser === "openx") {
                     // const to = +toValidUI(bidDecimal + s).toFixed(2);

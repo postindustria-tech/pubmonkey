@@ -642,7 +642,7 @@ class Handler extends AbstractHandler {
                         const keyword = keywordTemplate.replace(mask, i + bid / 100).replace(':' + maskPrice, '');
                         keywords.push(keyword);
                     }
-                    name = name.replace("{position}", bid / 100).replace(maskPrice, (parseFloat(amazonStartPrice) + startPriceIndex * parseFloat(amazonStep)).toFixed(2));
+                    name = name.replace("{position}", bid / 100).replace(':' + maskPrice, '');
                 } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));
                 } else {
