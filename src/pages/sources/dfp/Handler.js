@@ -789,7 +789,7 @@ class Handler extends AbstractHandler {
 
                 lineItems = [...lineItems, {
                     orderId: orderKey,
-                    name: line,
+                    name: line.substring(0, line.indexOf(':')),,
                     // keywords: keywords,
                     ..._lineItemInfo
                 }];
