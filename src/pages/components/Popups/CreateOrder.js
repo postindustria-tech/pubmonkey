@@ -1092,6 +1092,9 @@ class CreateOrderModal extends Component {
             bid;
 
         if (advertiser === "openx" || advertiser === "pubmatic") {
+            if (advertiser === "pubmatic") {
+                items++
+            }
             switch (granularity) {
                 case 'low':
                     step = rangeFrom = toInteger(0.5);
