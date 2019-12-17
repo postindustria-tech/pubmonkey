@@ -3,7 +3,6 @@ import bind from "bind-decorator";
 import {ModalWindowService} from "../../services";
 import {
     Button,
-    Progress,
     Modal,
     ModalHeader,
     ModalBody,
@@ -12,40 +11,30 @@ import {
     Label,
     Row,
     Col,
-    Table,
     Form,
     FormGroup,
-    FormText,
-    CustomInput,
-    Card,
-    CardBody,
-    CardHeader,
-    Tooltip
 } from "reactstrap";
-import InputNumber from "rc-input-number";
 import FormErrors from "../FormErrors";
-import {isEmpty, toInteger, toDecimal, toValidUI} from "../../helpers";
+import {isEmpty, toInteger} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
-import _ from "underscore";
 import HelperModal from "./HelperModal";
 import {
     ONLY_NUMBERS,
     AMAZON_KVP_FORMAT,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
-    NETWORK_CLASS_TO_DIMENSION,
     AMAZON_PRICE_GRID
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
-import {CreatableSingle} from "../Select";
-import Select from 'react-select';
-
-const helperText =
-    "{bid} macro is replaced with a corresponding bid value\n" +
-    "{position} macro is replaced with a position number (natural values starting from 1)";
+import AmazonCreateOrder from "../../sources/forms/Amazon";
+import ClearBidCreateOrder from "../../sources/forms/ClearBid";
+import OpenXCreateOrder from "../../sources/forms/OpenX";
+import PubMaticCreateOrder from "../../sources/forms/PubMatic";
+import PubNativeCreateOrder from "../../sources/forms/PubNative";
+import SmaatoCreateOrder from "../../sources/forms/Smaato";
 
 let progress = null,
     defaultAdvertiser = "amazon";
@@ -56,7 +45,7 @@ const initialState = {
     backdrop: true,
     showCreativeFormat: false,
     advertiser: defaultAdvertiser,
-    adunitsSelected: [],
+    adUnitsSelected: [],
     order: {},
     orderName: "",
     amazonPriceGrid: AMAZON_PRICE_GRID.non_uniform,
@@ -69,7 +58,6 @@ const initialState = {
         localStorage.getItem(defaultAdvertiser) ||
         KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
     step: 0.1,
-    keywordStepMin: 0.01,
     keywordStep: 0.01,
     rangeFrom: 0.1,
     rangeTo: 10,
@@ -91,7 +79,6 @@ const initialState = {
     networkClass: "",
     adServerDomain: "",
     keyword: "",
-    rangeMeasure: "$",
     granularity: "",
 
     advertiserId: null,
@@ -103,8 +90,7 @@ class CreateOrderModal extends Component {
     progress = null;
 
     static defaultProps = {
-        onClose: () => {
-        },
+        onClose: () => {},
         withButton: true,
         sourceAdvertisers: [],
         sourceHandlerReady: false,
@@ -122,34 +108,6 @@ class CreateOrderModal extends Component {
         console.log('reset state');
         this.setState(initialState);
     }
-
-    @bind
-    tooltipToggle() {
-        this.setState({
-            tooltipOpen: !this.state.tooltipOpen
-        });
-    }
-
-    @bind
-    tooltipKVPairsToggle() {
-        this.setState({
-            tooltipKVPairsOpen: !this.state.tooltipKVPairsOpen
-        });
-    }
-
-    onChangeStep = value => {
-        if (value === "" || ONLY_NUMBERS.test(value)) {
-            this.setState({
-                step: value
-            });
-        }
-    };
-
-    onChangeKeywordStep = value => {
-        this.setState({
-            keywordStep: value
-        });
-    };
 
     onCancel = () => {
         if (progress && progress.cancel) progress.cancel();
@@ -189,7 +147,7 @@ class CreateOrderModal extends Component {
                 defaultFields: this.props.defaultFields,
                 rangeFrom: this.props.rangeFrom,
                 rangeTo: this.props.rangeTo,
-                adunitsSelected: this.props.adunitsSelected,
+                adUnitsSelected: this.props.adUnitsSelected,
                 advertiser: this.props.advertiser,
                 title: this.props.title
             });
@@ -199,160 +157,6 @@ class CreateOrderModal extends Component {
     ask = () => {
         this.confirmModal.toggle();
     };
-
-    setCheckedStatus(key) {
-        return this.state.adunitsSelected.indexOf(key) !== -1;
-    }
-
-    handleChangeKeyword = (event) => {
-        const {value} = event.target;
-        this.setState({keyword: value})
-    };
-
-    filterAdunits = ({name = '', format, key = '', appName, appType}) => {
-        let {
-            keyword,
-            advertiser,
-            networkClass,
-            creativeFormat,
-            os
-        } = this.state;
-
-        let adUnitFormat = true;
-        if (!isEmpty(format)) {
-            if (advertiser === "pubnative") {
-                if (networkClass.hasOwnProperty('value') && !isEmpty(networkClass.value)) {
-                    if (typeof NETWORK_CLASS_TO_DIMENSION[networkClass.value] !== "undefined" &&
-                        !isEmpty(NETWORK_CLASS_TO_DIMENSION[networkClass.value])) {
-                        adUnitFormat = NETWORK_CLASS_TO_DIMENSION[networkClass.value] === format;
-                    }
-                }
-            } else if (!isEmpty(creativeFormat)) {
-                adUnitFormat = creativeFormat === format;
-            }
-        }
-
-        os = os !== "" ? os === appType : true;
-
-        return adUnitFormat && os && (
-            appName.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
-            name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
-            key.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
-        )
-    };
-
-    renderAmazonOptions() {
-        return (
-            <React.Fragment>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <CustomInput
-                                    type="radio"
-                                    name="amazonPriceGrid"
-                                    value={AMAZON_PRICE_GRID.non_uniform}
-                                    label="non-uniform price grid"
-                                    id="amazon-price-grid-non-uniform"
-                                    onChange={this.handleInputChange}
-                                    checked={this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
-                                />
-                                &nbsp;&nbsp;&nbsp;
-                                <CustomInput
-                                    type="radio"
-                                    name="amazonPriceGrid"
-                                    value={AMAZON_PRICE_GRID.uniform}
-                                    label="uniform price grid"
-                                    id="amazon-price-grid-uniform"
-                                    onChange={this.handleInputChange}
-                                    checked={this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
-                                />
-                            </FormGroup>
-                        </Form>
-                    </Col>
-                </Row>
-                {this.state.amazonPriceGrid === AMAZON_PRICE_GRID.uniform ? <Row>
-                    <Col className={"col-sm-16"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <Label for="amazonStartPrice" className="mr-sm-2 mp-label">
-                                    Start price:
-                                </Label>
-                                <InputNumber
-                                    min={0.1}
-                                    max={1000}
-                                    step={0.1}
-                                    value={this.state.amazonStartPrice}
-                                    onChange={event => this.handleInputChange({
-                                        target: {
-                                            name: 'amazonStartPrice',
-                                            value: event
-                                        }
-                                    })}
-                                    style={{width: 65}}
-                                    className={"mp-form-control"}
-                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
-                                />
-                                &nbsp;&nbsp;&nbsp;
-                                <Label for="amazonStep" className="mr-sm-2 mp-label">
-                                    Step:
-                                </Label>
-                                <InputNumber
-                                    min={0.1}
-                                    max={1000}
-                                    step={0.1}
-                                    value={this.state.amazonStep}
-                                    onChange={event => this.handleInputChange({
-                                        target: {
-                                            name: 'amazonStep',
-                                            value: event
-                                        }
-                                    })}
-                                    style={{width: 65}}
-                                    className={"mp-form-control"}
-                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
-                                />
-                            </FormGroup>
-                        </Form>
-                    </Col>
-                </Row> : ''}
-                {this.state.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform ? <Row>
-                    <Col className={"col-sm-12"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{width: "50%"}}>
-                                <Label className="mr-sm-2 mp-label">
-                                    KV Pairs:
-                                </Label>
-                                <i className="fa fa-question-circle" id={"Tooltip-1"}/>
-                                <Tooltip
-                                    placement="top"
-                                    isOpen={this.state.tooltipKVPairsOpen}
-                                    target={"Tooltip-1"}
-                                    toggle={this.tooltipKVPairsToggle}
-                                >
-                                    Copy the key-value pairs from the spreadsheet sent to you by the account manager.
-                                    One line per line item in the format "key:value" (without quotes), where key denotes
-                                    the line item targeting keyword, and value is the line item price.
-                                </Tooltip>
-                                <textarea
-                                    className="mr-sm-2"
-                                    style={{width: "100%"}}
-                                    onBlur={this.handleCSVChange}
-                                    onKeyDown={event => {
-                                        if (13 == event.keyCode) {
-                                            this.handleCSVChange(event)
-                                        }
-                                    }}
-                                    placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
-                                    onChange={() => {}}
-                                >{this.state.amazonCSVItems}</textarea>
-                            </FormGroup>
-                        </Form>
-                    </Col>
-                </Row> : ''}
-            </React.Fragment>
-        )
-    }
 
     render() {
         return (
@@ -433,345 +237,141 @@ class CreateOrderModal extends Component {
                                 </Form>
                             </Col>
                         </Row>
-                        <Row>
-                            <Col className={"col-sm-12"}>
-                                <Form inline>
-                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                        <Label for="orderName" className="mr-sm-2 mp-label">
-                                            Order Name:
-                                        </Label>
-                                        <Input
-                                            invalid={!isEmpty(this.state.formErrors.orderName)}
-                                            type="text"
-                                            name={"orderName"}
-                                            id="orderName"
-                                            onChange={this.handleInputChange}
-                                            value={this.state.orderName}
-                                            className={"mp-form-control"}
-                                        />
-                                    </FormGroup>
-                                </Form>
-                            </Col>
-                        </Row>
-                        <Row hidden={this.state.selectedAdvertiser !== 'openx'}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>
-                                      Granularity:{" "}
-                                    </span>
-                                <Input
-                                    type="select"
-                                    name={"granularity"}
-                                    onChange={this.handleInputChange}
-                                    id="granularity"
-                                    value={this.state.granularity}
-                                    className={"mp-form-control"}
-                                    style={{display: "inline-block", width: "auto"}}
-                                >
-                                    <option value={""}>{""}</option>
-                                    <option value={"low"}>{"low"}</option>
-                                    <option value={"med"}>{"med"}</option>
-                                    <option value={"high"}>{"high"}</option>
-                                    <option value={"auto"}>{"auto"}</option>
-                                    <option value={"dense"}>{"dense"}</option>
-                                </Input>
-                            </Col>
-                        </Row>
-                        <Row
-                            hidden={(this.state.selectedAdvertiser === 'openx') || (this.state.selectedAdvertiser === 'pubmatic') || (this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid)}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>Line Items Range:</span> from [
-                                <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.rangeFrom)}
-                                    inline
-                                    style={{width: "50px"}}
-                                    type="text"
-                                    id={"rangeFrom"}
-                                    name={"rangeFrom"}
-                                    value={this.state.rangeFrom}
-                                    onChange={this.handleInputChange}
-                                    className={"mp-form-control"}
-                                />{" "}
-                                to{" "}
-                                <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.rangeTo)}
-                                    inline
-                                    style={{width: "50px"}}
-                                    type="text"
-                                    id={"rangeTo"}
-                                    name={"rangeTo"}
-                                    value={this.state.rangeTo}
-                                    onChange={this.handleInputChange}
-                                    className={"mp-form-control"}
-                                />
-                                ] {this.state.rangeMeasure}.
-                            </Col>
-                        </Row>
-                        {this.state.advertiser == 'amazon' && this.renderAmazonOptions()}
-                        <Row
-                            hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>Line Items naming: </span>
-                                <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.lineItemsNaming)}
-                                    inline
-                                    style={{width: "200px", display: "inline-block"}}
-                                    type="text"
-                                    id={"lineItemsNaming"}
-                                    name={"lineItemsNaming"}
-                                    onChange={this.handleInputChange}
-                                    value={this.state.lineItemsNaming}
-                                    placeholder="PN Hybib {bid}"
-                                    className={"mp-form-control"}
-                                />{" "}
-                                <i className="fa fa-question-circle" id={"Tooltip-1"}/>
-                                <Tooltip
-                                    placement="top"
-                                    isOpen={this.state.tooltipOpen}
-                                    target={"Tooltip-1"}
-                                    toggle={this.tooltipToggle}
-                                >
-                                    {helperText}
-                                </Tooltip>
-                            </Col>
-                        </Row>
-                        <Row
-                            hidden={this.state.selectedAdvertiser === "amazon" || this.state.selectedAdvertiser === 'openx' || this.state.selectedAdvertiser === 'pubmatic'}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>Step: </span>
-                                <InputNumber
-                                    invalid={!isEmpty(this.state.formErrors.step)}
-                                    min={0.1}
-                                    max={1000}
-                                    step={0.1}
-                                    value={this.state.step}
-                                    onChange={this.onChangeStep}
-                                    style={{width: 65}}
-                                    className={"mp-form-control"}
-                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
-                                />{" "}
-                                <div
-                                    hidden={this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid'}
-                                    style={{display: "inline-block", width: "auto"}}
-                                >
-                                <span className={"mp-label"}>
-                                  Keyword Step:{" "}
-                                </span>
-                                    <InputNumber
-                                        invalid={!isEmpty(this.state.formErrors.keywordStep)}
-                                        min={this.state.keywordStepMin}
-                                        max={1000}
-                                        step={this.state.keywordStepMin}
-                                        value={this.state.keywordStep}
-                                        onChange={this.onChangeKeywordStep}
-                                        style={{width: 65}}
-                                        className={"mp-form-control"}
-                                        parser={(input) => input.replace(/[^\d\.]/g, '')}
-                                    />
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row
-                            hidden={this.state.advertiser == 'amazon' && AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>Keywords template: </span>
-                                {this.state.keywordTemplate}
-                            </Col>
-                        </Row>
-                        <Row hidden={!this.state.showCreativeFormat}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>Creative format: </span>
-                                <Input
-                                    type="select"
-                                    name={"creativeFormat"}
-                                    id="creativeFormat"
-                                    onChange={this.handleInputChange}
-                                    value={this.state.creativeFormat}
-                                    style={{display: "inline-block", width: "auto"}}
-                                    className={"mp-form-control"}
-                                >
-                                    {Object.keys(this.props.creativeFormats).map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {this.props.creativeFormats[option]}
-                                        </option>
-                                    ))}
-                                </Input>
-                                <div
-                                    hidden={this.state.selectedAdvertiser !== "openx"}
-                                    style={{display: "inline-block", width: "auto"}}
-                                >
-                                    {" "}
-                                    <span className={"mp-label"}> AdServer Domain: </span>
-                                    <CustomInput
-                                        invalid={!isEmpty(this.state.formErrors.adServerDomain)}
-                                        inline
-                                        type="text"
-                                        id={"adServerDomain"}
-                                        name={"adServerDomain"}
-                                        value={this.state.adServerDomain}
-                                        onChange={this.handleInputChange}
-                                        className={"mp-form-control"}
-                                        style={{width: "200px"}}
-                                    />
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row
-                            hidden={!(this.state.selectedAdvertiser === "pubnative" || this.state.selectedAdvertiser === 'smaato' || this.state.selectedAdvertiser === 'clearbid' || this.state.selectedAdvertiser === 'pubmatic')}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>OS: </span>
-                                <Input
-                                    type="select"
-                                    name={"os"}
-                                    id="creativeFormat"
-                                    onChange={this.handleInputChange}
-                                    value={this.state.os}
-                                    style={{display: "inline-block", width: "auto"}}
-                                    className={"mp-form-control"}
-                                >
-                                    <option value={""}>Select OS</option>
-                                    <option value={"iphone"}>iOS</option>
-                                    <option value={"android"}>Android</option>
-                                </Input>{" "}
-                                <span className={"mp-label"}>Creative format: </span>
-                                <div style={{width: "200px", display: "inline-block"}}>
-                                    <div hidden={this.state.selectedAdvertiser === 'pubnative'}>
-                                        <CreatableSingle
-                                            options={this.props.networkClasses[this.state.os] || []}
-                                            // defaultValue={this.props.networkClasses[this.state.os][0]}
-                                            onSelect={this.handleSelectNetworkClass}
-                                            placeholder="Please select OS"
-                                            value={this.state.networkClass}
-                                        />
-                                    </div>
-                                    <div
-                                        hidden={["smaato", "clearbid", "pubmatic"].indexOf(this.state.selectedAdvertiser) !== -1}>
-                                        <Select
-                                            isClearable={false}
-                                            placeholder="Please select OS"
-                                            options={this.props.networkClasses[this.state.os] || []}
-                                            onChange={this.handleSelectNetworkClass}
-                                            value={this.state.networkClass}
-                                            styles={{
-                                                container: base => {
-                                                    const {zIndex, ...rest} = base;
-                                                    return {...rest, zIndex: 9999};
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div
-                                    hidden={["smaato", "clearbid", "pubmatic"].indexOf(this.state.selectedAdvertiser) !== -1}
-                                    style={{display: "inline-block", width: "auto"}}
-                                >{" "}
-                                    <span className={"mp-label"}>Ad_ZONE_ID: </span>
-                                    <CustomInput
-                                        invalid={!isEmpty(this.state.formErrors.Ad_ZONE_ID)}
-                                        inline
-                                        type="text"
-                                        id={"Ad_ZONE_ID"}
-                                        name={"Ad_ZONE_ID"}
-                                        value={this.state.Ad_ZONE_ID}
-                                        onChange={this.handleInputChange}
-                                        className={"mp-form-control"}
-                                        style={{width: "50px"}}
-                                    />
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row
-                            hidden={this.state.selectedAdvertiser !== 'smaato' && this.state.selectedAdvertiser !== 'clearbid'}>
-                            <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>Custom Event Data: </span>
-                                <CustomInput
-                                    invalid={!isEmpty(this.state.formErrors.customEventData)}
-                                    inline
-                                    type="text"
-                                    id={"customEventData"}
-                                    name={"customEventData"}
-                                    value={this.state.customEventData}
-                                    onChange={this.handleInputChange}
-                                    className={"mp-form-control"}
-                                    style={{width: "400px"}}
-                                />
-                            </Col>
-                        </Row>
-                        <br/>
-                        <Row>
-                            <Col className={"col-sm-12"}>
-                                <Card>
-                                    <CardHeader>Choose ad units:
-                                        <Input
-                                            placeholder="Type to find"
-                                            value={this.state.keyword}
-                                            onChange={this.handleChangeKeyword}
-                                            style={{display: "inline-block", width: "300px", float: "right"}}
-                                        />
-                                    </CardHeader>
-                                    <CardBody style={{height: "400px", overflowX: "scroll", paddingTop: 0}}>
 
-                                        <div className="table">
-                                            <div className="tr header">
-                                                <div className="td header">&nbsp;</div>
-                                                <div className="td header">App Name</div>
-                                                <div className="td header">AdUnit Name</div>
-                                                <div className="td header">Format</div>
-                                                <div className="td header">Key</div>
-                                            </div>
-
-                                            {this.props.adunits ? this.props.adunits.filter(this.filterAdunits).map(
-                                                ({name, format, key, appName, appType}) => (
-                                                    <div className="tr" key={key}>
-                                                        <div className="td">
-                                                            <div className="custom-control custom-checkbox">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    name={key}
-                                                                    onChange={this.handleAdunitsCheckboxChange}
-                                                                    className="custom-control-input"
-                                                                    id={`adUnit${key}`}
-                                                                    checked={this.setCheckedStatus(key)}
-                                                                />
-                                                                <label
-                                                                    className="custom-control-label"
-                                                                    htmlFor={`adUnit${key}`}
-                                                                >
-                                                                    &nbsp;
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <div className="td" style={{wordBreak: "break-all"}}>
-                                                            {appName}
-                                                        </div>
-                                                        <div className="td"
-                                                             style={{wordBreak: "break-all"}}>{name}</div>
-                                                        <div className="td">{format}</div>
-                                                        <div className="td">{key}</div>
-                                                    </div>
-                                                )
-                                            ) : ""}
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                        </Row>
-                        <Row hidden={isEmpty(this.state.defaultFields)}>
-                            <Col className={"col-sm-12"}>
-                                <h4>Fields with default value:</h4>
-                                <ul>
-                                    {this.state.defaultFields.map(field => (
-                                        <li key={_.uniqueId("defaultField")}>{field}</li>
-                                    ))}
-                                </ul>
-                            </Col>
-                        </Row>
+                        {((advertiser) => {
+                            switch(advertiser) {
+                                case 'amazon':
+                                    return <AmazonCreateOrder
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            amazonPriceGrid: this.state.amazonPriceGrid,
+                                            amazonStartPrice: this.state.amazonStartPrice,
+                                            amazonCSVItems: this.state.amazonCSVItems,
+                                            amazonStep: this.state.amazonStep,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            creativeFormat: this.state.creativeFormat,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
+                                case 'clearbid':
+                                    return <ClearBidCreateOrder
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            step: this.state.step,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            os: this.state.os,
+                                            networkClass: this.state.networkClass,
+                                            customEventData: this.state.customEventData,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
+                                case 'openx':
+                                    return <OpenXCreateOrder
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            creativeFormat: this.state.creativeFormat,
+                                            adServerDomain: this.state.adServerDomain,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
+                                case 'pubmatic':
+                                    return <PubMaticCreateOrder
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            step: this.state.step,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            os: this.state.os,
+                                            networkClass: this.state.networkClass,
+                                            customEventData: this.state.customEventData,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
+                                case 'pubnative':
+                                    return <PubNativeCreateOrder
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            step: this.state.step,
+                                            keywordStep: this.state.keywordStep,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            os: this.state.os,
+                                            networkClass: this.state.networkClass,
+                                            Ad_ZONE_ID: this.state.Ad_ZONE_ID,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
+                                case 'smaato':
+                                    return <SmaatoCreateOrder
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            step: this.state.step,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            os: this.state.os,
+                                            networkClass: this.state.networkClass,
+                                            customEventData: this.state.customEventData,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
+                                default:
+                                    return null;
+                            }
+                        })(this.state.advertiser)}
                     </ModalBody>
                     <ModalFooter>
-                        <Button className={"mr-auto"} onClick={() => this.preOrder("download")} color="warning"
+                        <Button className={"mr-auto"}
+                                onClick={() => this.preOrder("download")}
+                                color="warning"
                                 hidden={this.props.type === AD_SERVER_DFP}>
                             Download JSON
                         </Button>
-
                         <Button onClick={this.close} color="secondary">
                             Cancel
                         </Button>
@@ -884,7 +484,7 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.networkClass = "Creative format is required!";
             isValid = false;
         }
-        if (isEmpty(this.state.adunitsSelected)) {
+        if (isEmpty(this.state.adUnitsSelected)) {
             fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
             isValid = false;
         }
@@ -958,7 +558,7 @@ class CreateOrderModal extends Component {
         }
         if (name === "os") {
             this.setState({
-                adunitsSelected: [],
+                adUnitsSelected: [],
                 networkClass: this.props.networkClasses[value][0]
             });
         }
@@ -966,25 +566,8 @@ class CreateOrderModal extends Component {
     }
 
     @bind
-    handleCSVChange(event) {
-        let {value, name} = event.target;
-        if (!isEmpty(value)) {
-            value = value.split("\n");
-            let broken = [];
-            value = value.map((item, index) => {
-                const trimmed = item.trim();
-                if (!isEmpty(trimmed) && !AMAZON_KVP_FORMAT.test(trimmed)) {
-                    broken.push(`can't parse line #${index + 1} "${trimmed}"`);
-                }
-                return trimmed;
-            }).filter((item) => {
-                return !isEmpty(item);
-            });
-            if (!isEmpty(broken)) {
-                ModalWindowService.ErrorPopup.showMessage(broken.join("<br>"));
-            }
-        }
-        this.setState({amazonCSVItems: value});
+    stateSetter(state) {
+        this.setState(state);
     }
 
     @bind
@@ -1021,7 +604,6 @@ class CreateOrderModal extends Component {
             ),
             step: step,
             keywordStep: keywordStep,
-            keywordStepMin: keywordStep,
             lineItemsNaming: lineItemsNaming,
             showCreativeFormat: showCreativeFormat,
             advertiser: advertiser,
@@ -1029,7 +611,6 @@ class CreateOrderModal extends Component {
             os: "",
             networkClass: "",
             formValid: true,
-            rangeMeasure: advertiser === "amazon" ? "position" : "$",
             rangeFrom: advertiser === "amazon" ? 1 : 0.1,
             customEventData: customEventData,
             granularity: advertiser === "pubmatic" ? "auto" : ""
@@ -1053,15 +634,15 @@ class CreateOrderModal extends Component {
     }
 
     @bind
-    handleAdunitsCheckboxChange(event) {
+    handleAdUnitsCheckboxChange(event) {
         const {checked, name} = event.target;
         if (checked) {
             this.setState(state => ({
-                adunitsSelected: [...new Set([...state.adunitsSelected, name])]
+                adUnitsSelected: [...new Set([...state.adUnitsSelected, name])]
             }));
         } else {
             this.setState(state => ({
-                adunitsSelected: state.adunitsSelected.filter(adunit => adunit !== name)
+                adUnitsSelected: state.adUnitsSelected.filter(adunit => adunit !== name)
             }));
         }
     }
@@ -1235,7 +816,7 @@ class CreateOrderModal extends Component {
     @bind
     async create() {
         let {
-            adunitsSelected: adunits,
+            adUnitsSelected: adunits,
             step,
             keywordStep,
             keywordTemplate,
@@ -1375,7 +956,7 @@ class CreateOrderModal extends Component {
     @bind
     async download() {
         let {
-            adunitsSelected: adunits,
+            adUnitsSelected: adunits,
             step,
             keywordStep,
             keywordTemplate,

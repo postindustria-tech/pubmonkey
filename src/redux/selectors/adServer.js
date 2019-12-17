@@ -88,7 +88,7 @@ const duplicateOrder = createSelector(
         defaultFields: adServer.defaultFields,
         rangeFrom: adServer.rangeFrom,
         rangeTo: adServer.rangeTo,
-        adunitsSelected: adServer.adunitsSelected,
+        adUnitsSelected: adServer.adUnitsSelected,
         title: adServer.title,
         advertiser: adServer.advertiser,
         advertiserId: adServer.advertiserId

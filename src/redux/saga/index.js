@@ -257,7 +257,7 @@ function* setCreateOrderModalToggle(action) {
                         defaultFields: defaultFields,
                         rangeFrom: rangeFrom,
                         rangeTo: rangeTo,
-                        adunitsSelected: adUnitKeys,
+                        adUnitsSelected: adUnitKeys,
                         title: "Duplicate Order",
                         ...advertiser
                     }
