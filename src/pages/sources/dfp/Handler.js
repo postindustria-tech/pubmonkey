@@ -703,7 +703,7 @@ class Handler extends AbstractHandler {
                     break;
             }
         } else if (advertiser === "amazon") {
-            let startPriceIndex = 0
+            let startPriceIndex = rangeFrom/100 - 1
             for (let index = rangeFrom; index <= rangeTo; index += step) {
                 bid = (amazonStartPrice + startPriceIndex*amazonStep)*100
                 bids.push(bid);
