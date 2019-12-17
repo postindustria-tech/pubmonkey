@@ -710,8 +710,7 @@ class Handler extends AbstractHandler {
 
                 for (let i = 0; i < keywordStep; i += 1) {
                     i = toValidUI(i);
-                    const keyword = keywordTemplate.replace(mask, i + bid/100)
-                        .replace("amznslots:", "");
+                    const keyword = keywordTemplate.replace(mask, i + bid/100).replace("amznslots:", "");
                     keywords.push(keyword);
                 }
                 startPriceIndex++
@@ -800,7 +799,7 @@ class Handler extends AbstractHandler {
             }));
         } else {
 
-            let line = 1;
+            let line = rangeFrom/100;
             await Promise.all(Array(bids.length).fill().map(async (item, index) => {
 
                 const bid = bids[index];
