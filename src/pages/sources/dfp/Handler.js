@@ -562,7 +562,7 @@ class Handler extends AbstractHandler {
         let lineItemInfo = this.lineItemInfo;
         lineItemInfo = this.advertiser.setupDefaultValues(lineItemInfo, params);
 
-        let mask = "{bid}", maskPrice = "{price}";
+        let mask = "{bid}";
         switch (advertiser) {
             // case 'pubnative':
             // keywordAdvertiser = 'pn_bid';
@@ -573,7 +573,6 @@ class Handler extends AbstractHandler {
             case "amazon":
                 // keywordAdvertiser = 'amznslots:m320x50p';
                 mask = "{position}";
-                maskPrice = "{price}";
                 break;
         }
 
@@ -706,7 +705,7 @@ class Handler extends AbstractHandler {
         } else {
             let startPriceIndex = 0
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                bids.push(bid);
+                bids.push(advertiser === "amazon" ? amazonStartPrice + startPriceIndex*amazonStep : bid);
 
                 const bidDecimal = toDecimal(bid),
                     s = toDecimal(step);
@@ -715,8 +714,7 @@ class Handler extends AbstractHandler {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
                         const keyword = keywordTemplate.replace(mask, i + bid/100)
-                            .replace("amznslots:", "")
-                            .replace(maskPrice, (parseFloat(amazonStartPrice) + (i + startPriceIndex) * parseFloat(amazonStep)).toFixed(2));
+                            .replace("amznslots:", "");
                         keywords.push(keyword);
                     }
                 } else if (advertiser === "openx") {
@@ -813,12 +811,11 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "").replace(':'+maskPrice, '');
+                        const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "");
                         keywords.push(keyword);
                     }
                     name = name
-                        .replace("{position}", line)
-                        .replace(':'+maskPrice, '');
+                        .replace("{position}", line);
                     line++;
                 } else if (advertiser === "openx") {
                     // const to = +toValidUI(bidDecimal + s).toFixed(2);

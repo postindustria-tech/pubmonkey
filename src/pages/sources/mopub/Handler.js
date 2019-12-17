@@ -472,9 +472,7 @@ class Handler extends AbstractHandler {
         rangeTo = toInteger(rangeTo);
         step = toInteger(step);
 
-        let keywordAdvertiser = null,
-            mask = "{bid}",
-            maskPrice = "{price}";
+        let keywordAdvertiser = null, mask = "{bid}"
         switch (advertiser) {
             // case 'pubnative':
             // keywordAdvertiser = 'pn_bid';
@@ -485,7 +483,6 @@ class Handler extends AbstractHandler {
             case "amazon":
                 // keywordAdvertiser = 'amznslots:m320x50p';
                 mask = "{position}";
-                maskPrice = "{price}";
                 break;
         }
 
@@ -640,7 +637,7 @@ class Handler extends AbstractHandler {
         } else {
             let startPriceIndex = 0;
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                const bidDecimal = toDecimal(bid),
+                const bidDecimal = advertiser === "amazon" ? amazonStartPrice + startPriceIndex*amazonStep : toDecimal(bid),
                     s = toDecimal(step),
                     bidValue = bidDecimal.toFixed(stepDecimalPartLength);
 
@@ -650,10 +647,10 @@ class Handler extends AbstractHandler {
                 if (advertiser === "amazon") {
                     for (let i = 0; i < keywordStep; i += 1) {
                         i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + bid / 100).replace(':' + maskPrice, '');
+                        const keyword = keywordTemplate.replace(mask, i + bid / 100);
                         keywords.push(keyword);
                     }
-                    name = name.replace("{position}", bid / 100).replace(':' + maskPrice, '');
+                    name = name.replace("{position}", bid / 100);
                 } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));
                 } else {

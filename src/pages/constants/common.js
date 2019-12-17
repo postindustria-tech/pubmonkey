@@ -4,7 +4,7 @@ export const AMAZON_KVP_FORMAT = /(^[^:]+):{1}([^:]+)$/;
 export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   pubnative: "pn_bid:{bid}",
   openx: "hb_pb:{bid}",
-  amazon: "amznslots:m{format}p{position}:{price}",
+  amazon: "amznslots:m{format}p{position}",
   smaato: "smaato_cpm:{bid}",
   clearbid: "um_price:{bid}",
   pubmatic: "pwtbst:1 AND pwtplt:inapp AND pwtpb:{bid}",
@@ -16,7 +16,7 @@ export const AMAZON_PRICE_GRID = {
 export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
-  amazon: "m{width}x{height}p{position}:{price}",
+  amazon: "m{width}x{height}p{position}",
   smaato: "Smaato UB {bid}",
   clearbid: "um_price {bid}",
   pubmatic: "pwtpb {bid}",
