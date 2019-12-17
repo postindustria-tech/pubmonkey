@@ -702,22 +702,29 @@ class Handler extends AbstractHandler {
                     }
                     break;
             }
+        } else if (advertiser === "amazon") {
+            let startPriceIndex = 0
+            for (let index = rangeFrom; index <= rangeTo; index += step) {
+                bid = (amazonStartPrice + startPriceIndex*amazonStep)*100
+                bids.push(bid);
+
+                for (let i = 0; i < keywordStep; i += 1) {
+                    i = toValidUI(i);
+                    const keyword = keywordTemplate.replace(mask, i + bid/100)
+                        .replace("amznslots:", "");
+                    keywords.push(keyword);
+                }
+                startPriceIndex++
+            }
         } else {
             let startPriceIndex = 0
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                bids.push(advertiser === "amazon" ? amazonStartPrice + startPriceIndex*amazonStep : bid);
+                bids.push(bid);
 
                 const bidDecimal = toDecimal(bid),
                     s = toDecimal(step);
 
-                if (advertiser === "amazon") {
-                    for (let i = 0; i < keywordStep; i += 1) {
-                        i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + bid/100)
-                            .replace("amznslots:", "");
-                        keywords.push(keyword);
-                    }
-                } else if (advertiser === "openx") {
+                if (advertiser === "openx") {
                     const to = +toValidUI(bidDecimal + s).toFixed(2);
                     for (let i = bidDecimal; i < to; i += keywordStep) {
                         i = toValidUI(i);
@@ -736,7 +743,6 @@ class Handler extends AbstractHandler {
                         }
                     }
                 }
-                startPriceIndex++
             }
         }
 
@@ -814,8 +820,7 @@ class Handler extends AbstractHandler {
                         const keyword = keywordTemplate.replace(mask, i + line).replace("amznslots:", "");
                         keywords.push(keyword);
                     }
-                    name = name
-                        .replace("{position}", line);
+                    name = name.replace("{position}", line);
                     line++;
                 } else if (advertiser === "openx") {
                     // const to = +toValidUI(bidDecimal + s).toFixed(2);
