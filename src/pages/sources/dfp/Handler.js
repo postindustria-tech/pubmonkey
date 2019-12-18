@@ -703,7 +703,7 @@ class Handler extends AbstractHandler {
                     break;
             }
         } else if (advertiser === "amazon") {
-            let startPriceIndex = rangeFrom/100 - 1
+            let startPriceIndex = 0
             for (let index = rangeFrom; index <= rangeTo; index += step) {
                 bid = (amazonStartPrice + startPriceIndex*amazonStep)*100
                 bids.push(bid);
@@ -799,7 +799,7 @@ class Handler extends AbstractHandler {
             }));
         } else {
 
-            let line = rangeFrom/100;
+            let line = 1;
             await Promise.all(Array(bids.length).fill().map(async (item, index) => {
 
                 const bid = bids[index];
