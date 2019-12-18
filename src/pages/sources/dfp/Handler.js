@@ -799,7 +799,7 @@ class Handler extends AbstractHandler {
             }));
         } else {
 
-            let line = 1;
+            let line = rangeFrom/100;
             await Promise.all(Array(bids.length).fill().map(async (item, index) => {
 
                 const bid = bids[index];
