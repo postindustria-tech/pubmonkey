@@ -35,6 +35,18 @@
     }
 }
 
+.list-filter{
+    i {
+        color: #999;
+        margin: 0 4px;
+        cursor: pointer;
+
+        &.fa-archive.archived {
+            color: #ffad1f;
+        }
+    }
+}
+
 .please-log-in,
 .no-orders{
     display: flex;

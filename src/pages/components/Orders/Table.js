@@ -8,7 +8,10 @@ import adServerSelectors from "../../../redux/selectors/adServer";
 import {AD_SERVER_DFP} from "../../constants/source";
 import {StatusSelect} from "../Select";
 import {FileService} from "../../services";
-
+import {
+    Col,
+    Row
+} from "reactstrap";
 const workerOptions = ['Pause', 'Resume', 'Archive'];
 
 class OrdersTable extends Component {
@@ -32,11 +35,79 @@ class OrdersTable extends Component {
         }
     };
 
+    resetChecked = () => {
+        this.props.setOrders(this.props.orders.map(order => {
+            order.checked = false
+            return order
+        }))
+
+    }
+
+    actionsForSelectedItems = () => {
+        const checked = this.props.orders.filter(this.props.filter).filter(order => order.checked)
+        if(!checked.length){
+            return (<React.Fragment></React.Fragment>)
+        }
+
+        const hasArchieved = checked.filter(order => order.status == "archived").length > 0
+        const hasRunning = checked.filter(order => order.status == "unarchived" || order.status == "running").length > 0
+
+        return (
+            <Row className="list-filter">
+                <Col className={"col-sm-12"}>
+                    <span className={"mp-label"}>
+                        {checked.length} selected
+                        {hasRunning && (
+                        <i
+                            className={classnames("fa", "fa-archive", {archived: false})}
+                            title="Archive"
+                            onClick={() => {
+                                checked.map(order => this.updateStatus("archived", order.key))
+                                this.resetChecked()
+                            }}
+                        ></i>)}
+                        {hasArchieved && (
+                        <i
+                            className={classnames("fa", "fa-archive", {archived: true})}
+                            title="Unarchive"
+                            onClick={() => {
+                                checked.map(order => this.updateStatus(this.props.type === AD_SERVER_DFP ? "unarchived" : "running", order.key))
+                                this.resetChecked()
+                            }}
+                        ></i>)}
+                        {this.props.type !== AD_SERVER_DFP && (
+                        <React.Fragment>
+                            <i
+                                className={classnames("fa", "fa-pause")}
+                                title="Disable"
+                                onClick={() => {
+                                    checked.map(order => this.updateStatus("paused", order.key))
+                                    this.resetChecked()
+                                }}
+                            ></i>
+                            <i
+                                className={classnames("fa", "fa-play")}
+                                title="Enable"
+                                onClick={() => {
+                                    checked.map(order => this.updateStatus("running", order.key))
+                                    this.resetChecked()
+                                }}
+                            ></i>
+                        </React.Fragment>
+                        )}
+                    </span>
+                </Col>
+            </Row>
+        )
+    }
+
     render() {
         let {orders = [], filter = () => true} = this.props,
             {allSelected} = this.state;
 
         return (
+        <React.Fragment>
+            {this.actionsForSelectedItems()}
             <Table className="orders-table">
                 <thead>
                 <tr>
@@ -117,6 +188,7 @@ class OrdersTable extends Component {
                 }
                 </tbody>
             </Table>
+        </React.Fragment>
         );
     }
 
