@@ -15,6 +15,36 @@ export default class AbstractAdvertiser {
 
     customTargetingKey = null;
 
+    lineItemInfo = {
+        allocationPercentage: 100,
+        bidStrategy: "cpm",
+        budget: null,
+        budgetStrategy: "allatonce",
+        budgetType: "unlimited",
+        dayPartTargeting: "alltime",
+        deviceTargeting: false,
+        end: null,
+        frequencyCapsEnabled: false,
+        includeConnectivityTargeting: "all",
+        includeGeoTargeting: "all",
+        maxAndroidVersion: "999",
+        maxIosVersion: "999",
+        minAndroidVersion: "1.5",
+        minIosVersion: "2.0",
+        priority: 12,
+        refreshInterval: 0,
+        start: "2019-05-01T00:00:00.000Z",
+        startImmediately: true,
+        targetAndroid: false,
+        targetIOS: "unchecked",
+        targetIpad: false,
+        targetIphone: false,
+        targetIpod: false,
+        type: "non_gtee",
+        userAppsTargeting: "include",
+        userAppsTargetingList: []
+    };
+
     setupDefaultValues(lineItemInfo, params) {
         const targetedAdUnits = params.adunits.map(id => ({
             adUnitId: id,
@@ -56,7 +86,15 @@ export default class AbstractAdvertiser {
         return lineItemInfo;
     }
 
+    createCreatives(lineItemKey, params, cb) {
+
+    }
+
     getCreativeHtmlData(params) {
         return "";
+    }
+
+    composerLineItems(orderKey, params) {
+        return [];
     }
 }

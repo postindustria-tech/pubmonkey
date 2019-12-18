@@ -1,4 +1,6 @@
 import AbstractAdvertiser from '../../../sources/AbstractAdvertiser'
+import {toDecimal, toInteger, toValidUI} from "../../../helpers";
+import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from "../../../constants/common";
 
 export class Amazon extends AbstractAdvertiser {
 
@@ -10,6 +12,94 @@ export class Amazon extends AbstractAdvertiser {
         "300x250": "300 x 250 (MRect)",
         "728x90": "728 x 90 (Tablet Leaderboard)",
     };
+
+    composerLineItems(orderKey, params) {
+        let {
+            adunits,
+            step,
+            keywordStep,
+            keywordTemplate,
+            rangeFrom,
+            rangeTo,
+            lineItemsNaming,
+            amazonStartPrice,
+            amazonStep,
+            amazonPriceGrid,
+            amazonCSVItems,
+        } = params;
+
+        let lineItemInfo = {...this.lineItemInfo},
+            lineItems = [],
+            bid;
+
+        rangeFrom = toInteger(rangeFrom);
+        rangeTo = toInteger(rangeTo);
+        step = toInteger(step);
+
+        const mask = "{position}";
+        let stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
+        if (step >= 100) {
+            stepDecimalPartLength--;
+        }
+
+        if (AMAZON_PRICE_GRID.non_uniform === amazonPriceGrid) {
+            amazonCSVItems.map(line => {
+                const match = line.match(AMAZON_KVP_FORMAT);
+                const bidDecimal = parseFloat(match[2]);
+                lineItems.push({
+                    adUnitKeys: adunits,
+                    bid: bidDecimal,
+                    name: line.substring(0, line.indexOf(':')),
+                    orderKey: orderKey,
+                    keywords: ["amznslots:" + line.substring(0, line.indexOf(':'))],
+                    ...lineItemInfo
+                });
+            });
+        } else {
+            let startPriceIndex = 0;
+            for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                const bidDecimal = amazonStartPrice + startPriceIndex * amazonStep,
+                    s = toDecimal(step),
+                    bidValue = bidDecimal.toFixed(stepDecimalPartLength);
+
+                let name = lineItemsNaming.replace("{bid}", bidValue),
+                    keywords = [];
+
+                for (let i = 0; i < keywordStep; i += 1) {
+                    i = toValidUI(i);
+                    const keyword = keywordTemplate.replace(mask, i + bid / 100);
+                    keywords.push(keyword);
+                }
+                name = name.replace("{position}", bid / 100);
+
+                lineItems.push({
+                    adUnitKeys: adunits,
+                    bid: bidDecimal,
+                    name: name,
+                    orderKey: orderKey,
+                    keywords: keywords,
+                    ...lineItemInfo
+                });
+                startPriceIndex++
+            }
+        }
+
+        return lineItems;
+    }
+
+    createCreatives(lineItemKey, params, cb) {
+        cb({
+            adType: "html",
+            extended: {
+                htmlData: this.getCreativeHtmlData(params),
+                isMraid: true
+            },
+            format: params.creativeFormat,
+            imageKeys: [],
+            lineItemKey: lineItemKey,
+            name: "Creative"
+        });
+    }
 
     getCreativeHtmlData(params) {
         const [width, height] = params.creativeFormat.split("x")

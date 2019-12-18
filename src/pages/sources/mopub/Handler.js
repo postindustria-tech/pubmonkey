@@ -45,36 +45,6 @@ class Handler extends AbstractHandler {
         {value: 3, label: "archived"}
     ];
 
-    lineItemInfo = {
-        allocationPercentage: 100,
-        bidStrategy: "cpm",
-        budget: null,
-        budgetStrategy: "allatonce",
-        budgetType: "unlimited",
-        dayPartTargeting: "alltime",
-        deviceTargeting: false,
-        end: null,
-        frequencyCapsEnabled: false,
-        includeConnectivityTargeting: "all",
-        includeGeoTargeting: "all",
-        maxAndroidVersion: "999",
-        maxIosVersion: "999",
-        minAndroidVersion: "1.5",
-        minIosVersion: "2.0",
-        priority: 12,
-        refreshInterval: 0,
-        start: "2019-05-01T00:00:00.000Z",
-        startImmediately: true,
-        targetAndroid: false,
-        targetIOS: "unchecked",
-        targetIpad: false,
-        targetIphone: false,
-        targetIpod: false,
-        type: "non_gtee",
-        userAppsTargeting: "include",
-        userAppsTargetingList: []
-    };
-
     constructor() {
         super();
         this.setAdvertiserFactory(new AdvertiserFactory());
@@ -91,8 +61,6 @@ class Handler extends AbstractHandler {
             this.sessionChecked = true;
             return axios.get(`${WEB_URL}/account/`, {responseType: 'text'})
                 .then(result => {
-                    // console.log(result);
-                    // console.log(window.MopubAutomation.loggedIn);
                     return window.MopubAutomation.loggedIn
                         .then(loggedIn => {
                             return loggedIn;
@@ -444,260 +412,6 @@ class Handler extends AbstractHandler {
         });
     }
 
-    composerLineItems(orderKey, params) {
-        let {
-            adunits,
-            step,
-            keywordStep,
-            keywordTemplate,
-            rangeFrom,
-            rangeTo,
-            lineItemsNaming,
-            advertiser,
-            networkClass,
-            Ad_ZONE_ID,
-            granularity,
-            customEventData,
-            amazonStartPrice,
-            amazonStep,
-            amazonPriceGrid,
-            amazonCSVItems,
-        } = params;
-
-        let lineItemInfo = {...this.lineItemInfo},
-            lineItems = [],
-            bid;
-
-        rangeFrom = toInteger(rangeFrom);
-        rangeTo = toInteger(rangeTo);
-        step = toInteger(step);
-
-        let keywordAdvertiser = null, mask = "{bid}"
-        switch (advertiser) {
-            // case 'pubnative':
-            // keywordAdvertiser = 'pn_bid';
-            // break;
-            // case 'openx':
-            // keywordAdvertiser = 'hb_pb';
-            // break;
-            case "amazon":
-                // keywordAdvertiser = 'amznslots:m320x50p';
-                mask = "{position}";
-                break;
-        }
-
-        const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length;
-        let stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
-        if (step >= 100) {
-            stepDecimalPartLength--;
-        }
-
-        if (advertiser === "openx" || advertiser === "pubmatic") {
-            let bids = [], skip = false;
-            switch (granularity) {
-                case 'low':
-                    step = rangeFrom = toInteger(0.5);
-                    rangeTo = toInteger(5);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    break;
-                case 'med':
-                    step = rangeFrom = toInteger(0.1);
-                    rangeTo = toInteger(20);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    break;
-                case 'high':
-                    skip = true;
-                    step = rangeFrom = toInteger(0.1);
-                    rangeTo = toInteger(20);
-                    keywordStep = 0.01;
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-
-                        const bidDecimal = toDecimal(bid).toFixed(2);
-
-                        let keywords = [];
-                        const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
-
-                        for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
-                            const key = toDecimal(i);
-                            const value = key.toFixed(keywordStepDecimalPartLength),
-                                keyword = keywordTemplate.replace(mask, value);
-                            keywords.push(keyword);
-                        }
-
-                        lineItems.push({
-                            adUnitKeys: adunits,
-                            bid: bidDecimal,
-                            name: lineItemsNaming.replace("{bid}", bidDecimal),
-                            orderKey: orderKey,
-                            keywords: keywords,
-                            ...lineItemInfo
-                        });
-                    }
-                    break;
-                case 'auto':
-                    // 0.05 ... 5 (0.05)
-                    step = rangeFrom = toInteger(0.05);
-                    rangeTo = toInteger(5);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    // 5.1 ... 10 (0.1)
-                    step = toInteger(0.1);
-                    rangeFrom = toInteger(5.1);
-                    rangeTo = toInteger(10);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    // 10.5 ... 20 (0.5)
-                    step = toInteger(0.5);
-                    rangeFrom = toInteger(10.5);
-                    rangeTo = toInteger(20);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    break;
-                case 'dense':
-                    // 0.01 ... 3 (0.01)
-                    step = rangeFrom = toInteger(0.01);
-                    rangeTo = toInteger(3);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    // 3.05 ... 8 (0.05)
-                    step = toInteger(0.1);
-                    rangeFrom = toInteger(3.05);
-                    rangeTo = toInteger(8);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    // 8.5 ... 20 (0.5)
-                    step = toInteger(0.5);
-                    rangeFrom = toInteger(8.5);
-                    rangeTo = toInteger(20);
-                    for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                        bids.push(toDecimal(bid).toFixed(2));
-                    }
-                    break;
-            }
-
-            if (!skip) {
-
-                if (advertiser === "pubmatic") {
-                    lineItemInfo.type = "network";
-                    lineItemInfo["networkType"] = "custom_native";
-                    lineItemInfo["enableOverrides"] = true;
-                    lineItemInfo["overrideFields"] = {
-                        custom_event_class_name: networkClass.value,
-                        custom_event_class_data: customEventData
-                    };
-                }
-
-                lineItems = bids.map(bid => {
-                    return {
-                        adUnitKeys: adunits,
-                        bid: bid,
-                        name: lineItemsNaming.replace("{bid}", bid),
-                        orderKey: orderKey,
-                        keywords: [keywordTemplate.replace(mask, bid)],
-                        ...lineItemInfo
-                    }
-                });
-
-                if (advertiser === "pubmatic") {
-                    lineItems.unshift({
-                        adUnitKeys: adunits,
-                        bid: 0.01,
-                        name: lineItemsNaming.replace("{bid}", '0.01'),
-                        orderKey: orderKey,
-                        keywords: [keywordTemplate.replace(mask, '0.00')],
-                        ...lineItemInfo
-                    })
-                }
-            }
-        } else if (
-            advertiser === "amazon"
-            && AMAZON_PRICE_GRID.non_uniform == amazonPriceGrid
-        ) {
-            amazonCSVItems.map(line => {
-                const match = line.match(AMAZON_KVP_FORMAT);
-                const bidDecimal = parseFloat(match[2]);
-                lineItems.push({
-                    adUnitKeys: adunits,
-                    bid: bidDecimal,
-                    name: line.substring(0, line.indexOf(':')),
-                    orderKey: orderKey,
-                    keywords: ["amznslots:" + line.substring(0, line.indexOf(':'))],
-                    ...lineItemInfo
-                });
-            });
-        } else {
-            let startPriceIndex = 0;
-            for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-                const bidDecimal = advertiser === "amazon" ? amazonStartPrice + startPriceIndex*amazonStep : toDecimal(bid),
-                    s = toDecimal(step),
-                    bidValue = bidDecimal.toFixed(stepDecimalPartLength);
-
-                let name = lineItemsNaming.replace("{bid}", bidValue),
-                    keywords = [];
-
-                if (advertiser === "amazon") {
-                    for (let i = 0; i < keywordStep; i += 1) {
-                        i = toValidUI(i);
-                        const keyword = keywordTemplate.replace(mask, i + bid / 100);
-                        keywords.push(keyword);
-                    }
-                    name = name.replace("{position}", bid / 100);
-                } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
-                    keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(keywordStepDecimalPartLength)));
-                } else {
-                    // openx, remove?
-                    const to = +toValidUI(bidDecimal + s).toFixed(2);
-
-                    for (let i = toInteger(bidDecimal); i < toInteger(to); i += toInteger(keywordStep)) {
-                        const key = toDecimal(i);
-                        const value = key.toFixed(keywordStepDecimalPartLength),
-                            keyword = keywordTemplate.replace(mask, value);
-                        keywords.push(keyword);
-                    }
-                }
-
-                if (advertiser === "pubnative") {
-                    lineItemInfo.type = "network";
-                    lineItemInfo["networkType"] = "custom_native";
-                    lineItemInfo["enableOverrides"] = true;
-                    lineItemInfo["overrideFields"] = {
-                        custom_event_class_name: networkClass.value,
-                        custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
-                    };
-                } else if (["smaato", "clearbid"].indexOf(advertiser) !== -1) {
-                    lineItemInfo.type = "network";
-                    lineItemInfo["networkType"] = "custom_native";
-                    lineItemInfo["enableOverrides"] = true;
-                    lineItemInfo["overrideFields"] = {
-                        custom_event_class_name: networkClass.value,
-                        custom_event_class_data: customEventData
-                    };
-                }
-
-                lineItems.push({
-                    adUnitKeys: adunits,
-                    bid: bidDecimal,
-                    name: name,
-                    orderKey: orderKey,
-                    keywords: keywords,
-                    ...lineItemInfo
-                });
-                startPriceIndex++
-            }
-        }
-
-        return lineItems;
-    }
-
     promiseQuery(options) {
         return new Promise(function (resolve, reject) {
             chrome.tabs.query(options, resolve);
@@ -756,7 +470,7 @@ class Handler extends AbstractHandler {
         await this.prepareMoPubTabForRequests();
 
         return this.createOrder(order).then(order => {
-            const lineItems = this.composerLineItems(order.key, params);
+            const lineItems = this.advertiser.composerLineItems(order.key, params);
 
             stepCallback({
                 ordersDone: 1,
@@ -765,31 +479,18 @@ class Handler extends AbstractHandler {
                 lineItemCount: lineItems.length
             });
 
-            const {creativeFormat, advertiser} = params;
-
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
                 return this.createLineItem(item)
                     .then(lineItem => {
-                        if (["amazon", "openx", "pubmatic"].indexOf(advertiser) !== -1) {
-                            this.createCreatives({
-                                adType: "html",
-                                extended: {
-                                    htmlData: this.advertiser.getCreativeHtmlData(params),
-                                    isMraid: advertiser === "amazon"
-                                },
-                                format: creativeFormat,
-                                imageKeys: [],
-                                lineItemKey: lineItem.key,
-                                name: "Creative"
-                            });
-                        }
+                        this.advertiser.createCreatives(
+                            lineItem.key,
+                            params,
+                            this.createCreatives
+                        );
                         return lineItem;
                     })
                     .then(async result => {
-
-                        // console.log(idx);
                         if (idx > 0 && idx % 50 === 0) {
-
                             // wait for last request
                             await delay(1000);
                             let mopubSessionUpdatedAt = Date.now();
@@ -798,10 +499,8 @@ class Handler extends AbstractHandler {
                             chrome.tabs.reload(tabId, {}, function () {
                                 console.log('reloading mopub page');
                             });
-                            // console.log('10000');
                             await delay(10000);
                         } else {
-                            // console.log('50');
                             await delay(50);
                         }
 
@@ -828,7 +527,8 @@ class Handler extends AbstractHandler {
                 orderCount: 1
             };
 
-            let lineItems = this.composerLineItems(null, params);
+            let lineItems = this.advertiser.composerLineItems(null, params);
+
             if (["amazon", "openx", "pubmatic"].indexOf(params.advertiser) !== -1) {
                 lineItems = lineItems.map(lineItem => {
                     lineItem.creatives = [{
