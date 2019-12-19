@@ -67,6 +67,9 @@ class OrdersList extends Component {
                 filterFn: nextProps.sourceHandler.FILTER_FN[nextProps.filter],
             });
         }
+        if (this.state.orders && (this.state.orders.filter(o => o.status == 'archived').length != nextProps.orders.filter(o => o.status == 'archived').length)){
+            setTimeout(() => this.calcSelected(), 1000)
+        }
     }
 
     render() {
@@ -102,20 +105,6 @@ class OrdersList extends Component {
                     <CreateOrderModal
                         toUpdate={this.loadOrders}
                     />
-                    {/*<Button
-                    color="primary"
-                    onClick={this.backupSelected}
-                    disabled={!orderCount}
-                >
-                    Create Backup
-                </Button>*/}
-                    {/* <Button
-                    color="primary"
-                    onClick={ this.archiveSelected }
-                    disabled={ !orderCount }
-                >
-                    Archive/Unarchive
-                </Button> */}
                 </div>
 
                 <Row className="list-filter">
