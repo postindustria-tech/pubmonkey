@@ -12,6 +12,7 @@ export class AdUnitsSelect extends Component {
         adUnitsSelected: [],
         keyword: '',
         os: '',
+        adType: '',
         networkClass: ''
     };
 
@@ -23,22 +24,22 @@ export class AdUnitsSelect extends Component {
         this.props.onChangeKeyword(event);
     };
 
-    filterAdunits = ({name = '', format, key = '', appName, appType}) => {
+    filterAdUnits = ({name = '', format, key = '', appName, appType}) => {
         let {
             keyword,
             advertiser,
-            networkClass,
             creativeFormat,
-            os
+            os,
+            adType
         } = this.props;
 
         let adUnitFormat = true;
         if (!isEmpty(format)) {
             if (advertiser === "pubnative") {
-                if (networkClass.hasOwnProperty('value') && !isEmpty(networkClass.value)) {
-                    if (typeof NETWORK_CLASS_TO_DIMENSION[networkClass.value] !== "undefined" &&
-                        !isEmpty(NETWORK_CLASS_TO_DIMENSION[networkClass.value])) {
-                        adUnitFormat = NETWORK_CLASS_TO_DIMENSION[networkClass.value] === format;
+                if (!isEmpty(adType)) {
+                    if (typeof NETWORK_CLASS_TO_DIMENSION[adType] !== "undefined" &&
+                        !isEmpty(NETWORK_CLASS_TO_DIMENSION[adType])) {
+                        adUnitFormat = NETWORK_CLASS_TO_DIMENSION[adType] === format;
                     }
                 }
             } else if (!isEmpty(creativeFormat)) {
@@ -81,7 +82,7 @@ export class AdUnitsSelect extends Component {
                             <div className="td header">Key</div>
                         </div>
 
-                        {this.props.adunits ? this.props.adunits.filter(this.filterAdunits).map(
+                        {this.props.adunits ? this.props.adunits.filter(this.filterAdUnits).map(
                             ({name, format, key, appName, appType}) => (
                                 <div className="tr" key={key}>
                                     <div className="td">

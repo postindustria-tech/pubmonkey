@@ -235,8 +235,10 @@ class SmaatoCreateOrder extends CreateOrderForm {
                             adunits={this.props.adunits}
                             adUnitsSelected={this.props.attributes.adUnitsSelected}
                             keyword={this.props.attributes.keyword}
-                            advertiser={'amazon'}
+                            advertiser={'smaato'}
                             creativeFormat={this.props.attributes.creativeFormat}
+                            os={this.props.attributes.os}
+                            adType={this.state.adType}
                             onAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
                             onChangeKeyword={this.handleChangeKeyword}
                         />
