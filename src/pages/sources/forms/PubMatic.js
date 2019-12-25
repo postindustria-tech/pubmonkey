@@ -59,11 +59,11 @@ class PubMaticCreateOrder extends CreateOrderForm {
             keywordTemplate:
                 localStorage.getItem(defaultAdvertiser) ||
                 KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
-            os: "",
-            networkClass: "",
+            os: '',
+            customEventClassName: '',
             customEventData: "{\"w\":\"\", \"h\":\"\", \"ad_unit_id\":\"\"}",
-            adServerDomain: "",
         },
+        networkClasses: {},
     };
 
     state = initialState;
@@ -129,9 +129,8 @@ class PubMaticCreateOrder extends CreateOrderForm {
                         <Input
                             type="select"
                             name={"os"}
-                            id="creativeFormat"
                             onChange={this.handleInputChange}
-                            value={this.state.os}
+                            value={this.props.attributes.os}
                             style={{display: "inline-block", width: "auto"}}
                             className={"mp-form-control"}
                         >
@@ -139,14 +138,38 @@ class PubMaticCreateOrder extends CreateOrderForm {
                             <option value={"iphone"}>iOS</option>
                             <option value={"android"}>Android</option>
                         </Input>{" "}
-                        <span className={"mp-label"}>Creative format: </span>
+                        <span className={"mp-label"}>Ad Type: </span>
                         <div style={{width: "200px", display: "inline-block"}}>
-                            <CreatableSingle
-                                options={this.props.networkClasses[this.state.os] || []}
-                                // defaultValue={this.props.networkClasses[this.state.os][0]}
-                                onSelect={this.handleSelectNetworkClass}
-                                placeholder="Please select OS"
-                                value={this.state.networkClass}
+                            <Input
+                                type="select"
+                                name={"adType"}
+                                onChange={this.onChangeAdType}
+                                value={this.state.adType}
+                                style={{display: "inline-block", width: "auto"}}
+                                className={"mp-form-control"}
+                            >
+                                {Object.keys(this.props.networkClasses[this.props.attributes.os] || []).map((option, index) => (
+                                    <option key={index} value={this.props.networkClasses[this.props.attributes.os][option]['value']}>
+                                        {this.props.networkClasses[this.props.attributes.os][option]['label']}
+                                    </option>
+                                ))}
+                            </Input>
+                        </div>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col className={"col-sm-12"}>
+                        <span className={"mp-label"}>Custom Event Class Name: </span>
+                        <div style={{width: "300px", display: "inline-block"}}>
+                            <CustomInput
+                                inline
+                                style={{width: "300px", display: "inline-block"}}
+                                type="text"
+                                id={"customEventClassName"}
+                                name={"customEventClassName"}
+                                onChange={this.handleInputChange}
+                                value={this.props.attributes.customEventClassName}
+                                className={"mp-form-control"}
                             />
                         </div>
                     </Col>
@@ -182,6 +205,7 @@ class PubMaticCreateOrder extends CreateOrderForm {
 
 const mapStateToProps = state => ({
     adunits: adServerSelectors.adunits(state),
+    sourceHandler: adServerSelectors.sourceHandler(state),
 
     ...adServerSelectors.dfpInventory(state),
     ...adServerSelectors.duplicateOrder(state),
