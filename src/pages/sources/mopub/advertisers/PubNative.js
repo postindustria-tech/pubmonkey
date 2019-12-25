@@ -6,7 +6,9 @@ export class PubNative extends AbstractAdvertiser {
     static advertiser = "pubnative";
 
     NETWORK_CLASS = {
-        "": [],
+        "": [
+            {value: '', label: 'Please select OS'},
+        ],
         iphone: [
             {value: '', label: 'All'},
             {value: 'HyBidMoPubLeaderboardCustomEvent', label: '728x90 Leaderboard'},
@@ -31,7 +33,7 @@ export class PubNative extends AbstractAdvertiser {
             rangeFrom,
             rangeTo,
             lineItemsNaming,
-            networkClass,
+            customEventClassName,
             Ad_ZONE_ID,
         } = params;
 
@@ -70,7 +72,7 @@ export class PubNative extends AbstractAdvertiser {
             lineItemInfo["networkType"] = "custom_native";
             lineItemInfo["enableOverrides"] = true;
             lineItemInfo["overrideFields"] = {
-                custom_event_class_name: networkClass.value,
+                custom_event_class_name: customEventClassName,
                 custom_event_class_data: '{"pn_zone_id": "' + Ad_ZONE_ID + '"}'
             };
 

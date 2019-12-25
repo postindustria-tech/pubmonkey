@@ -15,10 +15,9 @@ import {
 import InputNumber from "rc-input-number";
 import {isEmpty} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect} from "../components";
+import {AdTypeSelect, AdUnitsSelect} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
-import {CreatableSingle} from "../../components/Select";
 import CreateOrderForm from "./CreateOrderForm";
 
 const helperText =
@@ -61,8 +60,8 @@ class ClearBidCreateOrder extends CreateOrderForm {
                 localStorage.getItem(defaultAdvertiser) ||
                 KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
             step: 0.1,
-            os: "",
-            networkClass: "",
+            os: '',
+            customEventClassName: '',
             customEventData: "{\"w\":\"\", \"h\":\"\", \"ad_unit_id\":\"\"}",
         },
     };
@@ -185,14 +184,12 @@ class ClearBidCreateOrder extends CreateOrderForm {
                             <option value={"iphone"}>iOS</option>
                             <option value={"android"}>Android</option>
                         </Input>{" "}
-                        <span className={"mp-label"}>Creative format: </span>
+                        <span className={"mp-label"}>Ad Type: </span>
                         <div style={{width: "200px", display: "inline-block"}}>
-                            <CreatableSingle
-                                options={this.props.networkClasses[this.props.attributes.os] || []}
-                                // defaultValue={this.props.networkClasses[this.props.attributes.os][0]}
-                                onSelect={this.handleSelectNetworkClass}
-                                placeholder="Please select OS"
-                                value={this.props.attributes.networkClass}
+                            <AdTypeSelect
+                                onChange={this.onChangeAdType}
+                                os={this.props.attributes.os}
+                                networkClasses={this.props.networkClasses}
                             />
                         </div>
                     </Col>
@@ -211,6 +208,23 @@ class ClearBidCreateOrder extends CreateOrderForm {
                             className={"mp-form-control"}
                             style={{width: "400px"}}
                         />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col className={"col-sm-12"}>
+                        <span className={"mp-label"}>Custom Event Class Name: </span>
+                        <div style={{width: "300px", display: "inline-block"}}>
+                            <CustomInput
+                                inline
+                                style={{width: "300px", display: "inline-block"}}
+                                type="text"
+                                id={"customEventClassName"}
+                                name={"customEventClassName"}
+                                onChange={this.handleInputChange}
+                                value={this.props.attributes.customEventClassName}
+                                className={"mp-form-control"}
+                            />
+                        </div>
                     </Col>
                 </Row>
                 <br/>

@@ -17,8 +17,8 @@ import _ from "underscore";
 import {AdUnitsSelect} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
-import {CreatableSingle} from "../../components/Select";
 import CreateOrderForm from "./CreateOrderForm";
+import {AdTypeSelect} from '../components';
 
 const helperText =
     "{bid} macro is replaced with a corresponding bid value\n" +
@@ -140,20 +140,11 @@ class PubMaticCreateOrder extends CreateOrderForm {
                         </Input>{" "}
                         <span className={"mp-label"}>Ad Type: </span>
                         <div style={{width: "200px", display: "inline-block"}}>
-                            <Input
-                                type="select"
-                                name={"adType"}
+                            <AdTypeSelect
                                 onChange={this.onChangeAdType}
-                                value={this.state.adType}
-                                style={{display: "inline-block", width: "auto"}}
-                                className={"mp-form-control"}
-                            >
-                                {Object.keys(this.props.networkClasses[this.props.attributes.os] || []).map((option, index) => (
-                                    <option key={index} value={this.props.networkClasses[this.props.attributes.os][option]['value']}>
-                                        {this.props.networkClasses[this.props.attributes.os][option]['label']}
-                                    </option>
-                                ))}
-                            </Input>
+                                os={this.props.attributes.os}
+                                networkClasses={this.props.networkClasses}
+                            />
                         </div>
                     </Col>
                 </Row>

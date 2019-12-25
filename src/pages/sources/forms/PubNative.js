@@ -15,10 +15,9 @@ import {
 import InputNumber from "rc-input-number";
 import {isEmpty} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect} from "../components";
+import {AdTypeSelect, AdUnitsSelect} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
-import Select from "react-select";
 import CreateOrderForm from "./CreateOrderForm";
 
 const helperText =
@@ -62,8 +61,8 @@ class PubNativeCreateOrder extends CreateOrderForm {
                 KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
             step: 0.1,
             keywordStep: 0.01,
-            os: "",
-            networkClass: "",
+            os: '',
+            customEventClassName: '',
             Ad_ZONE_ID: 2,
         },
     };
@@ -202,9 +201,9 @@ class PubNativeCreateOrder extends CreateOrderForm {
                             <option value={"iphone"}>iOS</option>
                             <option value={"android"}>Android</option>
                         </Input>{" "}
-                        <span className={"mp-label"}>Creative format: </span>
+                        <span className={"mp-label"}>Ad Type: </span>
                         <div style={{width: "200px", display: "inline-block"}}>
-                            <div>
+                            {/*<div>
                                 <Select
                                     isClearable={false}
                                     placeholder="Please select OS"
@@ -218,7 +217,12 @@ class PubNativeCreateOrder extends CreateOrderForm {
                                         }
                                     }}
                                 />
-                            </div>
+                            </div>*/}
+                            <AdTypeSelect
+                                onChange={this.onChangeAdType}
+                                os={this.props.attributes.os}
+                                networkClasses={this.props.networkClasses}
+                            />
                         </div>
                         <div style={{display: "inline-block", width: "auto"}}>{" "}
                             <span className={"mp-label"}>Ad_ZONE_ID: </span>
@@ -232,6 +236,23 @@ class PubNativeCreateOrder extends CreateOrderForm {
                                 onChange={this.handleInputChange}
                                 className={"mp-form-control"}
                                 style={{width: "50px"}}
+                            />
+                        </div>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col className={"col-sm-12"}>
+                        <span className={"mp-label"}>Custom Event Class Name: </span>
+                        <div style={{width: "300px", display: "inline-block"}}>
+                            <CustomInput
+                                inline
+                                style={{width: "300px", display: "inline-block"}}
+                                type="text"
+                                id={"customEventClassName"}
+                                name={"customEventClassName"}
+                                onChange={this.handleInputChange}
+                                value={this.props.attributes.customEventClassName}
+                                className={"mp-form-control"}
                             />
                         </div>
                     </Col>
