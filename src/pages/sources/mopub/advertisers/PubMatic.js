@@ -6,7 +6,9 @@ export class PubMatic extends AbstractAdvertiser {
     static advertiser = "pubmatic";
 
     NETWORK_CLASS = {
-        "": [],
+        "": [
+            {value: '', label: 'Please select OS'},
+        ],
         iphone: [
             {value: 'POBBannerCustomEvent', label: 'Banner'},
             {value: 'POBInterstitialCustomEvent', label: 'Interstitial'},
@@ -26,7 +28,7 @@ export class PubMatic extends AbstractAdvertiser {
             rangeFrom,
             rangeTo,
             lineItemsNaming,
-            networkClass,
+            customEventClassName,
             granularity,
             customEventData,
         } = params;
@@ -144,7 +146,7 @@ export class PubMatic extends AbstractAdvertiser {
             lineItemInfo["networkType"] = "custom_native";
             lineItemInfo["enableOverrides"] = true;
             lineItemInfo["overrideFields"] = {
-                custom_event_class_name: networkClass.value,
+                custom_event_class_name: customEventClassName,
                 custom_event_class_data: customEventData
             };
 

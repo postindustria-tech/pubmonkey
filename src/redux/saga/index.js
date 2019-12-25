@@ -148,6 +148,7 @@ function* loadAdvertiser(action) {
             }
 
             yield put(adServerActions.loadAdvertiser({
+                advertiser,
                 customTargetingKeys,
                 customTargetingValues,
                 creativeFormats: sourceHandler.getAdvertiser().CREATIVE_FORMATS,

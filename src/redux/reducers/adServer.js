@@ -9,6 +9,7 @@ export const adServerInitialState = {
     networkCode: null,
     sourceHandler: null,
     sourceHandlerReady: false,
+    advertiser: null,
     ordersLoaded: false,
     orders: [],
     adunits: [],
@@ -107,6 +108,10 @@ const adServerReduces = handleActions(
             ...action.payload,
             advertiserId: action.payload.sourceAdvertisers && action.payload.sourceAdvertisers.length > 0 ? action.payload.sourceAdvertisers[0].id : null,
             sourceHandlerReady: true
+        }),
+        [adServerActions.setAdvertiser]: (state, action) => ({
+            ...state,
+            advertiser: action.payload.advertiser
         }),
         [adServerActions.loadAdvertiser]: (state, action) => ({
             ...state,

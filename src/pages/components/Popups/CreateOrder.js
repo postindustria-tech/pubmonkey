@@ -72,17 +72,19 @@ const initialState = {
     formValid: true,
     confirmModalMessage: null,
     creativeFormat: "",
+    creativeSnippet: "",
     tooltipOpen: false,
     selectedAdvertiser: defaultAdvertiser,
     Ad_ZONE_ID: 2,
-    os: "",
-    networkClass: "",
-    adServerDomain: "",
-    keyword: "",
-    granularity: "",
+    os: '',
+    networkClass: '',
+    customEventClassName: '',
+    adServerDomain: '',
+    keyword: '',
+    granularity: '',
 
     advertiserId: null,
-    customEventData: "",
+    customEventData: '',
 };
 
 class CreateOrderModal extends Component {
@@ -99,7 +101,8 @@ class CreateOrderModal extends Component {
         ADVERTISER_DEFAULT_NAME: {},
         creativeFormats: {},
         networkClasses: {},
-        orderKey: null
+        orderKey: null,
+        advertiser: defaultAdvertiser,
     };
 
     state = initialState;
@@ -293,6 +296,7 @@ class CreateOrderModal extends Component {
                                             lineItemsNaming: this.state.lineItemsNaming,
                                             keywordTemplate: this.state.keywordTemplate,
                                             creativeFormat: this.state.creativeFormat,
+                                            creativeSnippet: this.state.creativeSnippet,
                                             adServerDomain: this.state.adServerDomain,
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
@@ -312,7 +316,7 @@ class CreateOrderModal extends Component {
                                             step: this.state.step,
                                             keywordTemplate: this.state.keywordTemplate,
                                             os: this.state.os,
-                                            networkClass: this.state.networkClass,
+                                            customEventClassName: this.state.customEventClassName,
                                             customEventData: this.state.customEventData,
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
@@ -363,7 +367,7 @@ class CreateOrderModal extends Component {
                                 default:
                                     return null;
                             }
-                        })(this.state.advertiser)}
+                        })(this.props.advertiser)}
                     </ModalBody>
                     <ModalFooter>
                         <Button className={"mr-auto"}
@@ -559,7 +563,8 @@ class CreateOrderModal extends Component {
         if (name === "os") {
             this.setState({
                 adUnitsSelected: [],
-                networkClass: this.props.networkClasses[value][0]
+                networkClass: this.props.networkClasses[value][0],
+                customEventClassName: this.props.networkClasses[value][0].hasOwnProperty('value') ? this.props.networkClasses[value][0].value : ''
             });
         }
         this.setState({[name]: value});
@@ -613,7 +618,8 @@ class CreateOrderModal extends Component {
             formValid: true,
             rangeFrom: advertiser === "amazon" ? 1 : 0.1,
             customEventData: customEventData,
-            granularity: advertiser === "pubmatic" ? "auto" : ""
+            granularity: advertiser === "pubmatic" ? "auto" : "",
+            creativeSnippet: advertiser === "openx" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
         });
     }
 
@@ -696,7 +702,7 @@ class CreateOrderModal extends Component {
                 case 'high':
                     step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
-                    keywords = 10
+                    keywords = 10;
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         items++;
                     }
@@ -826,7 +832,9 @@ class CreateOrderModal extends Component {
             lineItemsNaming,
             advertiser,
             creativeFormat,
+            creativeSnippet,
             networkClass,
+            customEventClassName,
             Ad_ZONE_ID,
             adServerDomain,
             advertiserId,
@@ -842,7 +850,6 @@ class CreateOrderModal extends Component {
             this.props.type === AD_SERVER_DFP ? advertiserId : this.props.ADVERTISER_DEFAULT_NAME[advertiser],
             orderName
         );
-        // console.log(order);
 
         let params = {
             adunits,
@@ -854,7 +861,9 @@ class CreateOrderModal extends Component {
             lineItemsNaming,
             advertiser,
             creativeFormat,
+            creativeSnippet,
             networkClass,
+            customEventClassName,
             Ad_ZONE_ID,
             adServerDomain,
             customTargetingKeys: this.props.customTargetingKeys,
@@ -1068,6 +1077,7 @@ const mapStateToProps = state => ({
     sourceHandler: adServerSelectors.sourceHandler(state),
     adunits: adServerSelectors.adunits(state),
     sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
+    advertiser: adServerSelectors.getAdvertiser(state),
 
     ...adServerSelectors.dfpInventory(state),
     ...adServerSelectors.duplicateOrder(state),

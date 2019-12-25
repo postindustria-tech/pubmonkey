@@ -17,6 +17,7 @@ const initialState = {
 
     tooltipOpen: false,
     keyword: "",
+    adType: "",
 };
 
 export default class CreateOrderForm extends Component {
@@ -64,4 +65,10 @@ export default class CreateOrderForm extends Component {
     stateSetter = (state) => {
         this.props.stateSetter(state);
     };
+
+    onChangeAdType = (event) => {
+        const {value, name} = event.target;
+        this.setState({adType: value});
+        this.stateSetter({customEventClassName: value});
+    }
 }

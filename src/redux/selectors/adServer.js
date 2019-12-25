@@ -95,6 +95,13 @@ const duplicateOrder = createSelector(
     })
 );
 
+const getAdvertiser = createSelector(
+    rootSelector,
+    adServer => ({
+        advertiser: adServer.advertiser,
+    })
+);
+
 const adServerSelectors = {
     switcherType,
     sourceHandler,
@@ -110,6 +117,7 @@ const adServerSelectors = {
     adunits,
     duplicateOrder,
     filterOrderStatus,
+    getAdvertiser,
 };
 
 export default adServerSelectors;

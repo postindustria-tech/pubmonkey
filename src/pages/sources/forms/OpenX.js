@@ -14,7 +14,7 @@ import {
 } from "../../constants/common";
 import {isEmpty} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect} from "../components";
+import {AdUnitsSelect,CreativeSnippet} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
@@ -59,6 +59,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                 localStorage.getItem(defaultAdvertiser) ||
                 KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
             creativeFormat: "",
+            creativeSnippet: "",
             adServerDomain: "",
         },
     };
@@ -90,9 +91,9 @@ class OpenXCreateOrder extends CreateOrderForm {
                 </Row>
                 <Row>
                     <Col className={"col-sm-12"}>
-                                <span className={"mp-label"}>
-                                      Granularity:{" "}
-                                    </span>
+                        <span className={"mp-label"}>
+                          Granularity:{" "}
+                        </span>
                         <Input
                             type="select"
                             name={"granularity"}
@@ -161,7 +162,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                                 </option>
                             ))}
                         </Input>
-                        <div
+                        {/*<div
                             style={{display: "inline-block", width: "auto"}}
                         >
                             {" "}
@@ -177,7 +178,22 @@ class OpenXCreateOrder extends CreateOrderForm {
                                 className={"mp-form-control"}
                                 style={{width: "200px"}}
                             />
-                        </div>
+                        </div>*/}
+                    </Col>
+                </Row>
+                <Row>
+                    <Col className={"col-sm-12"}>
+                        <Form>
+                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                                <Label className="mr-sm-2 mp-label">
+                                    Creative Snippet:
+                                </Label>
+                                <CreativeSnippet
+                                    snippet={this.props.attributes.creativeSnippet}
+                                    onChange={(snippet) => {this.stateSetter({creativeSnippet: snippet})}}
+                                />
+                            </FormGroup>
+                        </Form>
                     </Col>
                 </Row>
                 <br/>
@@ -211,6 +227,7 @@ class OpenXCreateOrder extends CreateOrderForm {
 
 const mapStateToProps = state => ({
     adunits: adServerSelectors.adunits(state),
+    sourceHandler: adServerSelectors.sourceHandler(state),
 
     ...adServerSelectors.dfpInventory(state),
     ...adServerSelectors.duplicateOrder(state),

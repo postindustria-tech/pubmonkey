@@ -151,7 +151,7 @@ export class OpenX extends AbstractAdvertiser {
         cb({
             adType: "html",
             extended: {
-                htmlData: this.getCreativeHtmlData(params),
+                htmlData: params.creativeSnippet,//this.getCreativeHtmlData(params),
                 isMraid: false
             },
             format: params.creativeFormat,
@@ -165,7 +165,9 @@ export class OpenX extends AbstractAdvertiser {
         return '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
             "<script>\n" +
             "   var ucTagData = {};\n" +
-            '   ucTagData.adServerDomain = "' + params.adServerDomain + '";\n' +
+            '   ucTagData.adServerDomain = "";\n' +//' + params.adServerDomain + '
+            '   ucTagData.cacheHost = "";\n' +
+            '   ucTagData.cachePath = "";\n' +
             '   ucTagData.pubUrl = "%%KEYWORD:url%%";\n' +
             '   ucTagData.targetingKeywords = "%%KEYWORDS%%";\n' +
             '   ucTagData.hbPb = "%%KEYWORD:hb_pb%%";\n' +

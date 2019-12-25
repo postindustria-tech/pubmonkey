@@ -1,5 +1,4 @@
 import AbstractAdvertiser from '../../../sources/AbstractAdvertiser'
-import {CreativePlaceholder, Size, Targeting} from "../DataTypes";
 
 export class OpenX extends AbstractAdvertiser {
 
@@ -22,17 +21,19 @@ export class OpenX extends AbstractAdvertiser {
 
     getCreativeHtmlData(params) {
         return '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
-            '<script>\n' +
-            '   var ucTagData = {};\n' +
-            '       ucTagData.adServerDomain = "' + params.adServerDomain +'";\n' +
-            '       ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
-            '       ucTagData.targetingMap = %%PATTERN:TARGETINGMAP%%;\n' +
-            '       ucTagData.hbPb = "%%PATTERN:hb_pb%%";\n' +
-            '   try {\n' +
-            '       ucTag.renderAd(document, ucTagData);\n' +
-            '   } catch (e) {\n' +
-            '       console.log(e);\n' +
-            '   }\n' +
-            '</script>';
+            "<script>\n" +
+            "   var ucTagData = {};\n" +
+            '   ucTagData.adServerDomain = "";\n' +//' + params.adServerDomain + '
+            '   ucTagData.cacheHost = "";\n' +
+            '   ucTagData.cachePath = "";\n' +
+            '   ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
+            '   ucTagData.targetingMap = %%PATTERN:TARGETINGMAP%%;\n' +
+            '   ucTagData.hbPb = "%%PATTERN:hb_pb%%";\n' +
+            "   try {\n" +
+            "       ucTag.renderAd(document, ucTagData);\n" +
+            "   } catch (e) {\n" +
+            "       console.log(e);\n" +
+            "   }\n" +
+            "</script>";
     }
 }
