@@ -50,14 +50,16 @@ class OrdersTable extends Component {
         }
 
         const hasArchived = checked.filter(order => order.status.toLowerCase() == "archived").length > 0
-        const hasRunning = checked.filter(order => order.status.toLowerCase() != "archived").length > 0
+        const hasUnarchived = checked.filter(order => order.status.toLowerCase() != "archived").length > 0
+        const hasPaused = checked.filter(order => order.status.toLowerCase() == "paused").length > 0
+        const hasRunning = checked.filter(order => order.status.toLowerCase() == "running").length > 0
 
         return (
             <Row className="list-filter">
                 <Col className={"col-sm-12"}>
                     <span className={"mp-label"}>
                         {checked.length} selected
-                        {hasRunning && (
+                        {hasUnarchived && (
                         <i
                             className={classnames("fa", "fa-archive", {archived: false})}
                             title="Archive"
@@ -77,22 +79,22 @@ class OrdersTable extends Component {
                         ></i>)}
                         {this.props.type !== AD_SERVER_DFP && (
                         <React.Fragment>
-                            <i
+                            {hasRunning && <i
                                 className={classnames("fa", "fa-pause")}
                                 title="Disable"
                                 onClick={() => {
                                     checked.map(order => this.updateStatus("paused", order.key))
                                     this.resetChecked()
                                 }}
-                            ></i>
-                            <i
+                            ></i>}
+                            {hasPaused && <i
                                 className={classnames("fa", "fa-play")}
                                 title="Enable"
                                 onClick={() => {
                                     checked.map(order => this.updateStatus("running", order.key))
                                     this.resetChecked()
                                 }}
-                            ></i>
+                            ></i>}
                         </React.Fragment>
                         )}
                     </span>
