@@ -67,7 +67,7 @@ class OrdersList extends Component {
                 filterFn: nextProps.sourceHandler.FILTER_FN[nextProps.filter],
             });
         }
-        if (this.state.orders && (this.state.orders.filter(o => o.status == 'archived').length != nextProps.orders.filter(o => o.status == 'archived').length)){
+        if (this.state.orders && (this.state.orders.filter(o => o.status.toLowerCase() == 'archived').length != nextProps.orders.filter(o => o.status.toLowerCase() == 'archived').length)){
             setTimeout(() => this.calcSelected(), 1000)
         }
     }
