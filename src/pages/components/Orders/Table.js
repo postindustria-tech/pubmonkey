@@ -49,8 +49,8 @@ class OrdersTable extends Component {
             return (<React.Fragment></React.Fragment>)
         }
 
-        const hasArchieved = checked.filter(order => order.status == "archived").length > 0
-        const hasRunning = checked.filter(order => order.status == "unarchived" || order.status == "running").length > 0
+        const hasArchived = checked.filter(order => order.status.toLowerCase() == "archived").length > 0
+        const hasRunning = checked.filter(order => order.status.toLowerCase() != "archived").length > 0
 
         return (
             <Row className="list-filter">
@@ -66,7 +66,7 @@ class OrdersTable extends Component {
                                 this.resetChecked()
                             }}
                         ></i>)}
-                        {hasArchieved && (
+                        {hasArchived && (
                         <i
                             className={classnames("fa", "fa-archive", {archived: true})}
                             title="Unarchive"
