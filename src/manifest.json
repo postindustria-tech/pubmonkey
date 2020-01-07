@@ -17,13 +17,10 @@
   "permissions": [
     "tabs",
     "cookies",
-    "webNavigation",
     "webRequest",
     "webRequestBlocking",
     "https://app.mopub.com/*",
-    "storage",
     "identity",
-    "https://accounts.google.com/o/oauth2/token",
     "https://ads.google.com/apis/*"
   ],
   "content_scripts": [

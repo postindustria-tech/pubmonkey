@@ -1,3 +1,4 @@
+// Add "storage" permission on use
 const StorageService = new class Storage {
     get(...keys) {
         return new Promise(resolve =>

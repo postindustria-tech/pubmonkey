@@ -33,6 +33,7 @@ chrome.tabs.query({ active:false }, function (tabs) {
         let tabId = mopub[0].id;
         let frameId = 0;
 
+        // On enable need to add permission "webNavigation"
         // chrome.webNavigation.getAllFrames({ tabId: tabId }, function (details) {
         //     console.log(details);
         // });
