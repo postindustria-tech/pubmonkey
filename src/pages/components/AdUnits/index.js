@@ -7,6 +7,9 @@ import adServerActions from '../../../redux/actions/adServer'
 import {connect} from "react-redux";
 import SourceFactory from "../../sources/Factory";
 import AdUnitsStats from './Stats'
+import {FileService} from "../../services";
+import classnames from "classnames";
+import {AD_SERVER_DFP} from "../../constants/source";
 
 class AdUnitsList extends Component {
     state = {
@@ -45,16 +48,20 @@ class AdUnitsList extends Component {
                             <th>Ad Unit Name</th>
                             <th>Format</th>
                             <th>Ad Unit ID</th>
+                            {this.props.type !== AD_SERVER_DFP && <th>Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            adunits.map(({ name, format, key, appName}) =>(
-                                <tr key={ key }>
-                                    <td>{ appName }</td>
-                                    <td><a target="_blank" href={this.getAdUnitUrl(key)}>{name}</a></td>
-                                    <td>{ format }</td>
-                                    <td>{ key }</td>
+                            adunits.map(adunit =>(
+                                <tr key={ adunit.key }>
+                                    <td>{ adunit.appName }</td>
+                                    <td><a target="_blank" href={this.getAdUnitUrl(adunit.key)}>{adunit.name}</a></td>
+                                    <td>{ adunit.format }</td>
+                                    <td>{ adunit.key }</td>
+                                    {this.props.type !== AD_SERVER_DFP && <td>
+                                        <i className={classnames("fa", "fa-download")} title={"Export AdUnit"} onClick={() => this.export(adunit)}></i>
+                                    </td>}
                                 </tr>
                             ))
                         }
@@ -69,6 +76,27 @@ class AdUnitsList extends Component {
             return this.sourceHandler.getAdUnitUrl(key);
         }
         return null;
+    }
+
+    export(adUnit) {
+        if (this.sourceHandler) {
+            this.sourceHandler.getAdUnit(adUnit.key).then((adUnit) => {
+                let data = adUnit.adSources.map(adSource => {
+                    return [
+                        adSource.name,
+                        adSource.type,
+                        adSource.status,
+                        adSource.disabled ? 'disabled' : 'enabled',
+                        adSource.priority,
+                        adSource.bid,
+                        adSource.start,
+                        adSource.end,
+                        adSource.budgetType
+                    ].join('\t')
+                }).join('\n')
+                FileService.saveFile(data, `${adUnit.name}.csv`);
+            })
+        }
     }
 }
 

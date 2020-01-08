@@ -92,6 +92,10 @@ class Handler extends AbstractHandler {
         return HTTPService.GET(`${WEB_URL}/web-client/api/ad-units/query`);
     }
 
+    getAdUnit(key) {
+        return HTTPService.GET(`${WEB_URL}/web-client/api/ad-units/get?key=${key}&includeAdSources=true`);
+    }
+
     getAllOrders() {
         return HTTPService.GET(`${WEB_URL}/web-client/api/orders/query`);
     }
