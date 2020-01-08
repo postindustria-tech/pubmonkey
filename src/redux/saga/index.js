@@ -228,7 +228,7 @@ function* setCreateOrderModalToggle(action) {
                     }
 
                     if (isEmpty(values)) {
-                        values = lineItemInfo;
+                        values = defaultLineItemInfo;
                     } else {
                         for (let i in arrays) {
                             const key = arrays[i];
