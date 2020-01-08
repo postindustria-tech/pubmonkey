@@ -222,9 +222,8 @@ function* setCreateOrderModalToggle(action) {
                                 rangeFrom = lineItem.bid;
                             }
                             adUnitKeys = [...adUnitKeys, ...lineItem.adUnitKeys].unique();
+                            isAmazon = Number.isInteger(lineItem.bid);
                         });
-
-                        isAmazon = Object.keys(order).includes('totalImpressionsDelivered')
                     }
 
                     if (isEmpty(values)) {
