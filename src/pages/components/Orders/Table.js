@@ -7,7 +7,6 @@ import {connect} from "react-redux";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {AD_SERVER_DFP} from "../../constants/source";
 import {StatusSelect} from "../Select";
-import {FileService} from "../../services";
 import {
     Col,
     Row
@@ -179,11 +178,6 @@ class OrdersTable extends Component {
                                     title={"Duplicate Order"}
                                     onClick={() => this.props.createOrderModalToggle(key)}
                                 ></i>
-                                <i
-                                    className={classnames("fa", "fa-download")}
-                                    title={"Export Order"}
-                                    onClick={() => this.export(key)}
-                                ></i>
                             </td>
                         </tr>
                     ))
@@ -225,24 +219,6 @@ class OrdersTable extends Component {
     updateStatus(status, key) {
         this.props.sourceHandler.updateOrderStatus(status, key).then((updatedOrder) => {
             this.props.updateOrderStatus(updatedOrder.status, key);
-        });
-    }
-
-    export(key) {
-        this.props.sourceHandler.getOrder(key).then((order) => {
-            console.log(order)
-            let data = order.lineItems.map(lineItem => {
-                return [
-                    lineItem.name,
-                    lineItem.status,
-                    lineItem.started ? 'enabled' : '',
-                    lineItem.priority,
-                    lineItem.bid,
-                    lineItem.start,
-                    lineItem.budgetType,
-                ].join('\t')
-            }).join('\n')
-            FileService.saveFile(data, `${order.name}.csv`);
         });
     }
 
