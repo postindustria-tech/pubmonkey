@@ -222,7 +222,7 @@ function* setCreateOrderModalToggle(action) {
                                 rangeFrom = lineItem.bid;
                             }
                             adUnitKeys = [...adUnitKeys, ...lineItem.adUnitKeys].unique();
-                            isAmazon = Number.isInteger(lineItem.bid);
+                            isAmazon = isAmazon || !lineItem.name.includes('hb_pb');
                         });
                     }
 
