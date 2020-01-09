@@ -91,6 +91,8 @@ class CreateOrderModal extends Component {
 
     progress = null;
 
+    justCreatedOrder = null;
+
     static defaultProps = {
         onClose: () => {},
         withButton: true,
@@ -156,6 +158,27 @@ class CreateOrderModal extends Component {
             });
         }
     }
+
+    componentWillReceiveProps = (props, state) => {
+        if(
+            this.props.orders.length != props.orders.length
+            && props.orders.length - this.props.orders.length == 1
+        ){
+            this.justCreatedOrder = props.orders.map(o => o.key).filter(key => !this.props.orders.map(o => o.key).includes(key))[0]
+            ModalWindowService.AlertPopup.message = this.createModalMessage()
+            console.log('NEW ORDER IS', this.justCreatedOrder)
+        }
+    }
+
+
+    createModalMessage = () => (
+        <p style={{margin: 0}}>
+            Order has been created successfully.<br />
+            {this.justCreatedOrder && <a href={this.getOrderUrl(this.justCreatedOrder)} target="_blank">
+                View in {this.props.type === AD_SERVER_DFP ? 'DFP' : 'MoPub'}
+            </a>}
+        </p>
+    )
 
     ask = () => {
         this.confirmModal.toggle();
@@ -911,7 +934,7 @@ class CreateOrderModal extends Component {
                 }
                 this.reset();
                 ModalWindowService.AlertPopup.showMessage(
-                    'Order has been created successfully.',
+                    this.createModalMessage(),
                     'Success!'
                 );
             })
@@ -960,6 +983,13 @@ class CreateOrderModal extends Component {
                 window.canceledExport = false
             }, 1000)
         });
+    }
+
+    getOrderUrl(key) {
+        if (this.props.sourceHandler) {
+            return this.props.sourceHandler.getOrderUrl(key);
+        }
+        return null;
     }
 
     @bind
