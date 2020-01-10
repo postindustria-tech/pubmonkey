@@ -52,9 +52,9 @@ export default class AbstractAdvertiser {
         }));
         let size = null;
         if (params.advertiser === "pubnative") {
-            if (typeof NETWORK_CLASS_TO_DIMENSION[params.networkClass] !== "undefined" &&
-                !isEmpty(NETWORK_CLASS_TO_DIMENSION[params.networkClass])) {
-                size = NETWORK_CLASS_TO_DIMENSION[params.networkClass];
+            if (typeof NETWORK_CLASS_TO_DIMENSION[params.customEventClassName] !== "undefined" &&
+                !isEmpty(NETWORK_CLASS_TO_DIMENSION[params.customEventClassName])) {
+                size = NETWORK_CLASS_TO_DIMENSION[params.customEventClassName];
             }
         } else {
             size = params.creativeFormat;

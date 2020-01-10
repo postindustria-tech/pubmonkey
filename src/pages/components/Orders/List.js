@@ -11,7 +11,7 @@ import bind from "bind-decorator";
 import OrdersTable from "./Table";
 import BaseLayout from "../layouts/BaseLayout";
 import {FileService, ModalWindowService} from "../../services";
-import {MainController, OrderController} from "../../controllers";
+import {MainController} from "../../controllers";
 import CreateOrderModal from "../Popups/CreateOrder";
 import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
 import adServerSelectors from '../../../redux/selectors/adServer'
@@ -397,7 +397,7 @@ class OrdersList extends Component {
             }
         ]);
 
-        let promise = OrderController.updateOrderStatusInSet(
+        let promise = this.props.sourceHandler.updateOrderStatusInSet(
             selected,
             status,
             ({count, done}) => {
@@ -441,7 +441,7 @@ class OrdersList extends Component {
             }
         ]);
 
-        let promise = OrderController.collectOrderDataFromSet(
+        let promise = this.props.sourceHandler.collectOrderDataFromSet(
             selected,
             ({lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp}) => {
                 if (average == null) {

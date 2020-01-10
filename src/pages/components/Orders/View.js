@@ -1,30 +1,29 @@
-import React, { Component } from 'react'
-import { Button } from 'reactstrap'
+import React, {Component} from 'react'
+import {Button} from 'reactstrap'
 import Select from 'react-select'
 import bind from 'bind-decorator'
 import Promise from 'bluebird'
 import moment from 'moment'
 import BaseLayout from "../layouts/BaseLayout";
-import { LineItemsTable } from '../LineItems'
-import { ModalWindowService } from '../../services'
-import { OrderController } from '../../controllers'
-import { LineItemEditModal, CloneModal } from '../Popups'
+import {LineItemsTable} from '../LineItems'
+import {ModalWindowService} from '../../services'
+import {LineItemEditModal, CloneModal} from '../Popups'
 
 const
-      FILTER_FN = [
-          () => true,
-          ({ status }) => status !== 'archived',
-          ({ active }) => active,
-          ({ status }) => status === 'paused',
-          ({ status }) => status === 'archived'
-      ],
-      STATUS_OPTIONS = [
-          { value: 0, label: 'all' },
-          { value: 1, label: 'all except archived' },
-          { value: 2, label: 'enabled' },
-          { value: 3, label: 'paused' },
-          { value: 4, label: 'archived' }
-      ]
+    FILTER_FN = [
+        () => true,
+        ({status}) => status !== 'archived',
+        ({active}) => active,
+        ({status}) => status === 'paused',
+        ({status}) => status === 'archived'
+    ],
+    STATUS_OPTIONS = [
+        {value: 0, label: 'all'},
+        {value: 1, label: 'all except archived'},
+        {value: 2, label: 'enabled'},
+        {value: 3, label: 'paused'},
+        {value: 4, label: 'archived'}
+    ]
 
 export class OrderView extends Component {
     state = {
@@ -43,33 +42,33 @@ export class OrderView extends Component {
 
     @bind
     loadOrder() {
-        let { params: { key } } = this.props.match
+        let {params: {key}} = this.props.match
 
-        OrderController.getOrder(key)
+        this.props.sourceHandler.getOrder(key)
             .then(order =>
                 this.setState({
                     order,
-                    lineItems: order.lineItems.map(item => ({ ...item, checked: true }))
+                    lineItems: order.lineItems.map(item => ({...item, checked: true}))
                 }, () => this.calcSelected())
             )
     }
 
     render() {
-        let { order, isDirty, lineItems, filter, filterFn, updates, clones } = this.state
+        let {order, isDirty, lineItems, filter, filterFn, updates, clones} = this.state
 
         if (order == null) {
             return false
         }
 
-        let { name, advertiser, description } = order,
-            selected = lineItems.filter(({ checked }) => checked)
+        let {name, advertiser, description} = order,
+            selected = lineItems.filter(({checked}) => checked)
 
         return (
             <BaseLayout className="order-view-layout">
                 <h2>Order View</h2>
                 <Button
-                    onClick={ this.saveOrder }
-                    disabled={ !isDirty }
+                    onClick={this.saveOrder}
+                    disabled={!isDirty}
                 >
                     <i className="fa fa-save"/>&nbsp;Save
                 </Button>
@@ -77,88 +76,88 @@ export class OrderView extends Component {
                     <input
                         className="form-control"
                         type="text"
-                        defaultValue={ name }
-                        onChange={ e => this.updateOrder({ name: e.target.value })}
+                        defaultValue={name}
+                        onChange={e => this.updateOrder({name: e.target.value})}
                     />
                 </div>
                 <div>advertiser:
                     <input
                         className="form-control"
                         type="text"
-                        defaultValue={ advertiser }
-                        onChange={ e => this.updateOrder({ advertiser: e.target.value })}
+                        defaultValue={advertiser}
+                        onChange={e => this.updateOrder({advertiser: e.target.value})}
                     />
                 </div>
                 <div>description:
                     <input
                         className="form-control"
                         type="text"
-                        defaultValue={ description }
-                        onChange={ e => this.updateOrder({ description: e.target.value })}
+                        defaultValue={description}
+                        onChange={e => this.updateOrder({description: e.target.value})}
                     />
                 </div>
 
                 <hr/>
 
                 <Button
-                    disabled={ !selected.length }
-                    onClick={ () => this.enableSelected(true) }
+                    disabled={!selected.length}
+                    onClick={() => this.enableSelected(true)}
                 >
                     Enable
                 </Button>&nbsp;
                 <Button
-                    disabled={ !selected.length }
-                    onClick={ () => this.enableSelected(false) }
+                    disabled={!selected.length}
+                    onClick={() => this.enableSelected(false)}
                 >
                     Disable
                 </Button>&nbsp;
                 <Button
-                    disabled={ !selected.length }
-                    onClick={ this.archiveSelected }
+                    disabled={!selected.length}
+                    onClick={this.archiveSelected}
                 >
                     Archive/Unarchive
                 </Button>&nbsp;
                 <Button
-                    disabled={ !selected.length }
-                    onClick={ () => this.setState({ clones: [ selected.length ] }) }
+                    disabled={!selected.length}
+                    onClick={() => this.setState({clones: [selected.length]})}
                 >
                     Clone
                 </Button>&nbsp;
                 <Button
-                    disabled={ !selected.length }
-                    onClick={ () => this.setState({ updates: [ selected.length ] }) }
+                    disabled={!selected.length}
+                    onClick={() => this.setState({updates: [selected.length]})}
                 >
                     Edit
                 </Button>
                 <div className="list-filter">
                     show:<Select
-                        multi={ false }
-                        clearable={ false }
-                        value={ filter }
-                        options={ STATUS_OPTIONS }
-                        onChange={ this.onFilterChange }
-                    />
+                    multi={false}
+                    clearable={false}
+                    value={filter}
+                    options={STATUS_OPTIONS}
+                    onChange={this.onFilterChange}
+                />
                 </div>
 
                 <LineItemsTable
-                    lineItems={ lineItems }
-                    allSelected={ true }
-                    filter={ filterFn }
-                    onUpdate={ this.onLineItemsListUpdate }
+                    lineItems={lineItems}
+                    allSelected={true}
+                    filter={filterFn}
+                    onUpdate={this.onLineItemsListUpdate}
                 />
 
                 <LineItemEditModal
-                    isOpen={ !!updates.length }
-                    onUpdate={ this.onEditUpdate }
-                    onCancel={ this.hideUpdateModal }
-                    updates={ updates }
+                    isOpen={!!updates.length}
+                    onUpdate={this.onEditUpdate}
+                    onCancel={this.hideUpdateModal}
+                    updates={updates}
                 />
 
                 <CloneModal
-                    isOpen={ !!clones.length }
-                    onClone={ this.onClone }
-                    onCancel={ this.hideCloneModal }
-                    clones={ clones }
+                    isOpen={!!clones.length}
+                    onClone={this.onClone}
+                    onCancel={this.hideCloneModal}
+                    clones={clones}
                 />
             </BaseLayout>
         )
@@ -166,7 +165,7 @@ export class OrderView extends Component {
 
     @bind
     updateOrder(data) {
-        let { order } = this.state
+        let {order} = this.state
 
         Object.keys(data).forEach(key =>
             order[key] = data[key]
@@ -180,44 +179,44 @@ export class OrderView extends Component {
 
     @bind
     saveOrder() {
-        let { order: { name, advertiser, description, key } } = this.state
+        let {order: {name, advertiser, description, key}} = this.state
 
-        OrderController.updateOrder({
-                name, advertiser, description
-            }, key).then(() =>
-                this.setState({
-                    isDirty: false
-                })
-            )
+        this.props.sourceHandler.updateOrder({
+            name, advertiser, description
+        }, key).then(() =>
+            this.setState({
+                isDirty: false
+            })
+        )
     }
 
     @bind
     enableSelected(enabled) {
-        let { selected } = this.state
+        let {selected} = this.state
 
-        selected = selected.filter(({ active }) => enabled !== active)
+        selected = selected.filter(({active}) => enabled !== active)
 
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: `line items: ${selected.length}`,
-                progress: { value: 0 }
+                progress: {value: 0}
             }
         ])
 
-        let promise = OrderController.updateLineItems(selected, { enabled }, ({ done, count }) => {
-                ModalWindowService.ProgressModal.setProgress([
-                    {
-                        title: `line items: ${done}/${count}`,
-                        progress: { value: done / count *  100 }
-                    }
-                ])
-            })
+        let promise = this.props.sourceHandler.updateLineItems(selected, {enabled}, ({done, count}) => {
+            ModalWindowService.ProgressModal.setProgress([
+                {
+                    title: `line items: ${done}/${count}`,
+                    progress: {value: done / count * 100}
+                }
+            ])
+        })
             .catch(err => {
-                let { errors } = err.response.data
+                let {errors} = err.response.data
 
                 ModalWindowService.ErrorPopup.showMessage(
-                    errors.map(({ field, message }, idx) => (
-                        <div key={ idx }><strong>{ field }:</strong>&nbsp;{ message }</div>
+                    errors.map(({field, message}, idx) => (
+                        <div key={idx}><strong>{field}:</strong>&nbsp;{message}</div>
                     ))
                 )
             })
@@ -231,24 +230,24 @@ export class OrderView extends Component {
 
     @bind
     archiveSelected() {
-        let { selected, filter } = this.state,
+        let {selected, filter} = this.state,
             status = filter === 4 ? 'play' : 'archive'
 
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: `line items: ${selected.length}`,
-                progress: { value: 0 }
+                progress: {value: 0}
             }
         ])
 
-        let promise = OrderController.updateLineItemStatusInSet(selected, status, ({ done, count }) =>
-                ModalWindowService.ProgressModal.setProgress([
-                    {
-                        title: `line items: ${done}/${count}`,
-                        progress: { value: done / count * 100 }
-                    }
-                ])
-            )
+        let promise = this.props.sourceHandler.updateLineItemStatusInSet(selected, status, ({done, count}) =>
+            ModalWindowService.ProgressModal.setProgress([
+                {
+                    title: `line items: ${done}/${count}`,
+                    progress: {value: done / count * 100}
+                }
+            ])
+        )
             .finally(() => {
                 ModalWindowService.ProgressModal.hideModal()
                 this.loadOrder()
@@ -259,7 +258,7 @@ export class OrderView extends Component {
 
     @bind
     cloneSelected(number) {
-        let { selected } = this.state,
+        let {selected} = this.state,
             timestamp = Date.now(),
             average,
             promise
@@ -267,28 +266,28 @@ export class OrderView extends Component {
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: `line items: ${selected.length}`,
-                progress: { value: 0 }
+                progress: {value: 0}
             }
         ])
 
-        promise = OrderController.cloneLineItems(selected, number, ({ done, count }) => {
-                if (average) {
-                    average = (average + (Date.now() - timestamp)) / 2
-                } else {
-                    average = Date.now() - timestamp
+        promise = this.props.sourceHandler.cloneLineItems(selected, number, ({done, count}) => {
+            if (average) {
+                average = (average + (Date.now() - timestamp)) / 2
+            } else {
+                average = Date.now() - timestamp
+            }
+
+            timestamp = Date.now()
+
+            ModalWindowService.ProgressModal.setProgress([
+                {
+                    title: `line items: ${done}/${count}`,
+                    progress: {value: done / count * 100}
+                }, {
+                    title: `time remaining: ${moment(average * (count - done)).format('mm:ss')}`
                 }
-
-                timestamp = Date.now()
-
-                ModalWindowService.ProgressModal.setProgress([
-                    {
-                        title: `line items: ${done}/${count}`,
-                        progress: { value: done / count * 100 }
-                    }, {
-                        title: `time remaining: ${moment(average * (count - done)).format('mm:ss')}`
-                    }
-                ])
-            })
+            ])
+        })
             .finally(() => {
                 ModalWindowService.ProgressModal.hideModal()
                 this.loadOrder()
@@ -299,31 +298,31 @@ export class OrderView extends Component {
 
     @bind
     editSelected(updates) {
-        let { selected } = this.state,
+        let {selected} = this.state,
             promise
 
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: `line items: ${selected.length}`,
-                progress: { value: 0 }
+                progress: {value: 0}
             }
         ])
 
         if (updates.valueType === 'type-single') {
-            promise = OrderController.updateLineItems(selected, {
-                [updates.field]: updates.value.single
-            }, ({ done, count }) =>
-                ModalWindowService.ProgressModal.setProgress([
-                    {
-                        title: `line items: ${done}/${count}`,
-                        progress: { value: done / count * 100 }
-                    }
-                ])
+            promise = this.props.sourceHandler.updateLineItems(selected, {
+                    [updates.field]: updates.value.single
+                }, ({done, count}) =>
+                    ModalWindowService.ProgressModal.setProgress([
+                        {
+                            title: `line items: ${done}/${count}`,
+                            progress: {value: done / count * 100}
+                        }
+                    ])
             )
-            .finally(() => {
-                ModalWindowService.ProgressModal.hideModal()
-                this.loadOrder()
-            })
+                .finally(() => {
+                    ModalWindowService.ProgressModal.hideModal()
+                    this.loadOrder()
+                })
         }
 
         if (updates.valueType === 'type-step') {
@@ -331,19 +330,19 @@ export class OrderView extends Component {
                 step = Number(updates.value.step),
                 next = current
 
-            promise = Promise.mapSeries(selected, ({ key }, done, count) =>
-                    OrderController.updateLineItem({ [updates.field]: next }, key)
-                        .then(() => {
-                            next += step
+            promise = Promise.mapSeries(selected, ({key}, done, count) =>
+                this.props.sourceHandler.updateLineItem({[updates.field]: next}, key)
+                    .then(() => {
+                        next += step
 
-                            ModalWindowService.ProgressModal.setProgress([
-                                {
-                                    title: `line items: ${done + 1}/${count}`,
-                                    progress: { value: (done + 1) / count * 100 }
-                                }
-                            ])
-                        })
-                )
+                        ModalWindowService.ProgressModal.setProgress([
+                            {
+                                title: `line items: ${done + 1}/${count}`,
+                                progress: {value: (done + 1) / count * 100}
+                            }
+                        ])
+                    })
+            )
                 .finally(() => {
                     ModalWindowService.ProgressModal.hideModal()
                     this.loadOrder()
@@ -355,10 +354,10 @@ export class OrderView extends Component {
     }
 
     calcSelected() {
-        let { filterFn, lineItems } = this.state,
+        let {filterFn, lineItems} = this.state,
             selected = lineItems
                 .filter(filterFn)
-                .filter(({ checked }) => checked)
+                .filter(({checked}) => checked)
 
         this.setState({
             selected
@@ -385,11 +384,11 @@ export class OrderView extends Component {
     }
 
     @bind
-    onFilterChange({ value: filter }) {
+    onFilterChange({value: filter}) {
         this.setState({
             filter,
             filterFn: FILTER_FN[filter]
-         })
+        })
     }
 
     @bind

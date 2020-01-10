@@ -65,6 +65,7 @@ class PubNativeCreateOrder extends CreateOrderForm {
             customEventClassName: '',
             Ad_ZONE_ID: 2,
         },
+        networkClasses: {},
     };
 
     state = initialState;
@@ -203,21 +204,6 @@ class PubNativeCreateOrder extends CreateOrderForm {
                         </Input>{" "}
                         <span className={"mp-label"}>Ad Type: </span>
                         <div style={{width: "200px", display: "inline-block"}}>
-                            {/*<div>
-                                <Select
-                                    isClearable={false}
-                                    placeholder="Please select OS"
-                                    options={this.props.networkClasses[this.props.attributes.os] || []}
-                                    onChange={this.handleSelectNetworkClass}
-                                    value={this.props.attributes.networkClass}
-                                    styles={{
-                                        container: base => {
-                                            const {zIndex, ...rest} = base;
-                                            return {...rest, zIndex: 9999};
-                                        }
-                                    }}
-                                />
-                            </div>*/}
                             <AdTypeSelect
                                 onChange={this.onChangeAdType}
                                 os={this.props.attributes.os}

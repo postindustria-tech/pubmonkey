@@ -61,10 +61,10 @@ class SmaatoCreateOrder extends CreateOrderForm {
                 KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
             step: 0.1,
             os: '',
-            networkClass: '',
             customEventClassName: '',
             customEventData: "{\"publisherId\":\"\", \"spaceId\":\"\"}",
         },
+        networkClasses: {},
     };
 
     state = initialState;

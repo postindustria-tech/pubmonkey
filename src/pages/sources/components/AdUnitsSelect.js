@@ -13,7 +13,6 @@ export class AdUnitsSelect extends Component {
         keyword: '',
         os: '',
         adType: '',
-        networkClass: ''
     };
 
     onAdUnitsCheckboxChange = (event) => {

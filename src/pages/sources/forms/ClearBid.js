@@ -64,6 +64,7 @@ class ClearBidCreateOrder extends CreateOrderForm {
             customEventClassName: '',
             customEventData: "{\"w\":\"\", \"h\":\"\", \"ad_unit_id\":\"\"}",
         },
+        networkClasses: {},
     };
 
     state = initialState;

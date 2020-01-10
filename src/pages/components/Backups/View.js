@@ -6,7 +6,7 @@ import bind from 'bind-decorator'
 import BaseLayout from "../layouts/BaseLayout";
 import { OrdersTable } from '../Orders'
 import { FileService, ModalWindowService } from '../../services'
-import { MainController, OrderController } from '../../controllers'
+import { MainController } from '../../controllers'
 
 export class BackupView extends Component {
     state = {
@@ -151,7 +151,7 @@ export class BackupView extends Component {
             }
         ])
 
-        let promise = OrderController.restoreOrdersWithLineItems(orders,
+        let promise = this.props.sourceHandler.restoreOrdersWithLineItems(orders,
             ({ lineItemCount, lineItemsDone, orderCount, ordersDone, timestamp }) => {
                 if (average == null) {
                     average = timestamp
