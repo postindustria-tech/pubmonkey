@@ -29,7 +29,6 @@ export class AdTypeSelect extends Component {
                 name={"adType"}
                 onChange={this.onChange}
                 value={this.state.adType}
-                style={{display: "inline-block", width: "auto"}}
                 className={"mp-form-control"}
             >
                 {Object.keys(networkClasses[os] || []).map((option, index) => (

@@ -71,33 +71,13 @@ class PubMaticCreateOrder extends CreateOrderForm {
     render() {
         return (
             <React.Fragment>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <Label for="orderName" className="mr-sm-2 mp-label">
-                                    Order Name:
-                                </Label>
-                                <Input
-                                    invalid={!isEmpty(this.props.formErrors.orderName)}
-                                    type="text"
-                                    name={"orderName"}
-                                    id="orderName"
-                                    onChange={this.handleInputChange}
-                                    value={this.props.attributes.orderName}
-                                    className={"mp-form-control"}
-                                />
-                            </FormGroup>
-                        </Form>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>Line Items naming: </span>
+                <Row className={"main-form"}>
+                    <Col className={"col-sm-4"}>
+                        <Label className={"mp-label"}>Line Items naming: </Label>
                         <CustomInput
                             invalid={!isEmpty(this.props.formErrors.lineItemsNaming)}
                             inline
-                            style={{width: "200px", display: "inline-block"}}
+                            style={{width: "210px", display: "inline-block"}}
                             type="text"
                             id={"lineItemsNaming"}
                             name={"lineItemsNaming"}
@@ -116,56 +96,46 @@ class PubMaticCreateOrder extends CreateOrderForm {
                             {helperText}
                         </Tooltip>
                     </Col>
-                </Row>
-                <Row>
-                    <Col className={"col-sm-12"}>
+                    <Col className={"col-sm-4"}>
                         <span className={"mp-label"}>Keywords template: </span>
+                        <div>
                         {this.props.attributes.keywordTemplate}
+                        </div>
                     </Col>
-                </Row>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>OS: </span>
+                    <Col className={"col-sm-4"}>
+                        <Label className={"mp-label"}>OS: </Label>
                         <Input
                             type="select"
                             name={"os"}
                             onChange={this.handleInputChange}
                             value={this.props.attributes.os}
-                            style={{display: "inline-block", width: "auto"}}
                             className={"mp-form-control"}
                         >
                             <option value={""}>Select OS</option>
                             <option value={"iphone"}>iOS</option>
                             <option value={"android"}>Android</option>
-                        </Input>{" "}
-                        <span className={"mp-label"}>Ad Type: </span>
-                        <div style={{width: "200px", display: "inline-block"}}>
-                            <AdTypeSelect
-                                onChange={this.onChangeAdType}
-                                os={this.props.attributes.os}
-                                networkClasses={this.props.networkClasses}
-                            />
-                        </div>
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-4"}>
+                        <Label className={"mp-label"}>Ad Type: </Label>
+                        <AdTypeSelect
+                            onChange={this.onChangeAdType}
+                            os={this.props.attributes.os}
+                            networkClasses={this.props.networkClasses}
+                        />
+                    </Col>
+                    <Col className={"col-sm-4"}>
+                        <Label className={"mp-label"}>Custom Event Class Name: </Label>
+                        <CustomInput
+                            type="text"
+                            id={"customEventClassName"}
+                            name={"customEventClassName"}
+                            onChange={this.handleInputChange}
+                            value={this.props.attributes.customEventClassName}
+                            className={"mp-form-control"}
+                        />
                     </Col>
                 </Row>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>Custom Event Class Name: </span>
-                        <div style={{width: "300px", display: "inline-block"}}>
-                            <CustomInput
-                                inline
-                                style={{width: "300px", display: "inline-block"}}
-                                type="text"
-                                id={"customEventClassName"}
-                                name={"customEventClassName"}
-                                onChange={this.handleInputChange}
-                                value={this.props.attributes.customEventClassName}
-                                className={"mp-form-control"}
-                            />
-                        </div>
-                    </Col>
-                </Row>
-                <br/>
                 <Row>
                     <Col className={"col-sm-12"}>
                         <AdUnitsSelect

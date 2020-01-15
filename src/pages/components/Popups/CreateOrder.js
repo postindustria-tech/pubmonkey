@@ -185,6 +185,9 @@ class CreateOrderModal extends Component {
     };
 
     render() {
+
+        const classWidth = this.props.type === AD_SERVER_DFP ? 'col-sm-4' : 'col-sm-6';
+
         return (
             <React.Fragment>
                 {this.props.withButton ? (
@@ -216,51 +219,60 @@ class CreateOrderModal extends Component {
                             />
                         </div>
                         <Row>
-                            <Col className={"col-sm-12"}>
-                                <Form inline>
-                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                        <Label for="Advertiser" className="mr-sm-2 mp-label">
-                                            Header Bidding Service:
-                                        </Label>
-                                        <Input
-                                            type="select"
-                                            name={"advertiser"}
-                                            id="advertiser"
-                                            onChange={this.handleInputChange}
-                                            value={this.state.advertiser}
-                                            className={"mp-form-control"}
-                                        >
-                                            {Object.keys(this.props.ADVERTISER_DEFAULT_NAME).map(
-                                                (option, index) => (
-                                                    <option key={index} value={option}>
-                                                        {this.props.ADVERTISER_DEFAULT_NAME[option]}
-                                                    </option>
-                                                )
-                                            )}
-                                        </Input>
-                                    </FormGroup>
-                                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0"
-                                               hidden={this.props.type !== AD_SERVER_DFP}>
-                                        <Label for="advertiserId" className="mr-sm-2 mp-label">
-                                            Header Bidding Service DFP:
-                                        </Label>
-                                        <Input
-                                            type="select"
-                                            name={"advertiserId"}
-                                            onChange={this.handleInputChange}
-                                            value={this.state.advertiserId}
-                                            id="advertiserId"
-                                            className={"mp-form-control"}
-                                        >
-                                            <option>--</option>
-                                            {this.props.sourceAdvertisers.map(
-                                                ({id, name}) => (
-                                                    <option key={id} value={id}>{name}</option>
-                                                )
-                                            )}
-                                        </Input>
-                                    </FormGroup>
-                                </Form>
+                            <Col className={classWidth}>
+                                <Label for="orderName" className="mp-label">
+                                    Order Name:
+                                </Label>
+                                <Input
+                                    invalid={!isEmpty(this.state.formErrors.orderName)}
+                                    type="text"
+                                    name={"orderName"}
+                                    id="orderName"
+                                    onChange={this.handleInputChange}
+                                    value={this.state.orderName}
+                                    className={"mp-form-control"}
+                                />
+                            </Col>
+                            <Col className={classWidth}>
+                                <Label for="Advertiser" className="mp-label">
+                                    Header Bidding Service:
+                                </Label>
+                                <Input
+                                    type="select"
+                                    name={"advertiser"}
+                                    id="advertiser"
+                                    onChange={this.handleInputChange}
+                                    value={this.state.advertiser}
+                                    className={"mp-form-control"}
+                                >
+                                    {Object.keys(this.props.ADVERTISER_DEFAULT_NAME).map(
+                                        (option, index) => (
+                                            <option key={index} value={option}>
+                                                {this.props.ADVERTISER_DEFAULT_NAME[option]}
+                                            </option>
+                                        )
+                                    )}
+                                </Input>
+                            </Col>
+                            <Col className={classWidth} hidden={this.props.type !== AD_SERVER_DFP}>
+                                <Label for="advertiserId" className="mp-label">
+                                    Header Bidding Service DFP:
+                                </Label>
+                                <Input
+                                    type="select"
+                                    name={"advertiserId"}
+                                    onChange={this.handleInputChange}
+                                    value={this.state.advertiserId}
+                                    id="advertiserId"
+                                    className={"mp-form-control"}
+                                >
+                                    <option>--</option>
+                                    {this.props.sourceAdvertisers.map(
+                                        ({id, name}) => (
+                                            <option key={id} value={id}>{name}</option>
+                                        )
+                                    )}
+                                </Input>
                             </Col>
                         </Row>
 

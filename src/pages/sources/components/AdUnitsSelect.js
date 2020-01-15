@@ -61,13 +61,13 @@ export class AdUnitsSelect extends Component {
 
     render() {
         return (
-            <Card>
+            <Card className={"adUnitSelectBlock"}>
                 <CardHeader>Choose ad units:
                     <Input
+                        className={"find-input"}
                         placeholder="Type to find"
                         value={this.props.keyword}
                         onChange={this.onChangeKeyword}
-                        style={{display: "inline-block", width: "300px", float: "right"}}
                     />
                 </CardHeader>
                 <CardBody style={{height: "400px", overflowX: "scroll", paddingTop: 0}}>

@@ -105,169 +105,134 @@ class AmazonCreateOrder extends CreateOrderForm {
     render() {
         return (
             <React.Fragment>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <Label for="orderName" className="mr-sm-2 mp-label">
-                                    Order Name:
-                                </Label>
-                                <Input
-                                    invalid={!isEmpty(this.props.formErrors.orderName)}
-                                    type="text"
-                                    name={"orderName"}
-                                    id="orderName"
-                                    onChange={this.handleInputChange}
-                                    value={this.props.attributes.orderName}
-                                    className={"mp-form-control"}
-                                />
-                            </FormGroup>
-                        </Form>
-                    </Col>
-                </Row>
-                <Row hidden={(AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid)}>
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>Line Items Range:</span> from [
+                <Row className={"main-form"}>
+                    <Col className={"col-sm-4"}>
                         <CustomInput
-                            invalid={!isEmpty(this.props.formErrors.rangeFrom)}
-                            inline
-                            style={{width: "50px"}}
-                            type="text"
-                            id={"rangeFrom"}
-                            name={"rangeFrom"}
-                            value={this.props.attributes.rangeFrom}
+                            type="radio"
+                            name="amazonPriceGrid"
+                            value={AMAZON_PRICE_GRID.non_uniform}
+                            label="non-uniform price grid"
+                            id="amazon-price-grid-non-uniform"
                             onChange={this.handleInputChange}
-                            className={"mp-form-control"}
-                        />{" "}
-                        to{" "}
-                        <CustomInput
-                            invalid={!isEmpty(this.props.formErrors.rangeTo)}
-                            inline
-                            style={{width: "50px"}}
-                            type="text"
-                            id={"rangeTo"}
-                            name={"rangeTo"}
-                            value={this.props.attributes.rangeTo}
-                            onChange={this.handleInputChange}
-                            className={"mp-form-control"}
+                            checked={this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
                         />
-                        ] position.
+                        <CustomInput
+                            type="radio"
+                            name="amazonPriceGrid"
+                            value={AMAZON_PRICE_GRID.uniform}
+                            label="uniform price grid"
+                            id="amazon-price-grid-uniform"
+                            onChange={this.handleInputChange}
+                            checked={this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
+                        />
                     </Col>
-                </Row>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <CustomInput
-                                    type="radio"
-                                    name="amazonPriceGrid"
-                                    value={AMAZON_PRICE_GRID.non_uniform}
-                                    label="non-uniform price grid"
-                                    id="amazon-price-grid-non-uniform"
-                                    onChange={this.handleInputChange}
-                                    checked={this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
-                                />
-                                &nbsp;&nbsp;&nbsp;
-                                <CustomInput
-                                    type="radio"
-                                    name="amazonPriceGrid"
-                                    value={AMAZON_PRICE_GRID.uniform}
-                                    label="uniform price grid"
-                                    id="amazon-price-grid-uniform"
-                                    onChange={this.handleInputChange}
-                                    checked={this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
-                                />
-                            </FormGroup>
-                        </Form>
+                    <Col className={"col-sm-4"} hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                        <Label className="mp-label">Line Items Range:</Label>
+                        <div>from [
+                            <CustomInput
+                                invalid={!isEmpty(this.props.formErrors.rangeFrom)}
+                                inline
+                                style={{width: "50px"}}
+                                type="text"
+                                id={"rangeFrom"}
+                                name={"rangeFrom"}
+                                value={this.props.attributes.rangeFrom}
+                                onChange={this.handleInputChange}
+                                className={"mp-form-control"}
+                            />{" "}
+                            to{" "}
+                            <CustomInput
+                                invalid={!isEmpty(this.props.formErrors.rangeTo)}
+                                inline
+                                style={{width: "50px"}}
+                                type="text"
+                                id={"rangeTo"}
+                                name={"rangeTo"}
+                                value={this.props.attributes.rangeTo}
+                                onChange={this.handleInputChange}
+                                className={"mp-form-control"}
+                            />
+                            ] position.</div>
                     </Col>
-                </Row>
-                {this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.uniform ? <Row>
-                    <Col className={"col-sm-16"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                                <Label for="amazonStartPrice" className="mr-sm-2 mp-label">
-                                    Start price:
-                                </Label>
-                                <InputNumber
-                                    min={0.1}
-                                    max={1000}
-                                    step={0.1}
-                                    value={this.props.attributes.amazonStartPrice}
-                                    onChange={event => this.handleInputChange({
-                                        target: {
-                                            name: 'amazonStartPrice',
-                                            value: event
-                                        }
-                                    })}
-                                    style={{width: 65}}
-                                    className={"mp-form-control"}
-                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
-                                />
-                                &nbsp;&nbsp;&nbsp;
-                                <Label for="amazonStep" className="mr-sm-2 mp-label">
-                                    Step:
-                                </Label>
-                                <InputNumber
-                                    min={0.1}
-                                    max={1000}
-                                    step={0.1}
-                                    value={this.props.attributes.amazonStep}
-                                    onChange={event => this.handleInputChange({
-                                        target: {
-                                            name: 'amazonStep',
-                                            value: event
-                                        }
-                                    })}
-                                    style={{width: 65}}
-                                    className={"mp-form-control"}
-                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
-                                />
-                            </FormGroup>
-                        </Form>
+                    <Col className={"col-sm-4"} hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.uniform}>
+                        <Row className={"mb-0"}>
+                            <Col className={"col-sm-6 mb-0"}>
+                        <Label for="amazonStartPrice" className="mp-label">
+                            Start price:
+                        </Label>
+                        <InputNumber
+                            min={0.1}
+                            max={1000}
+                            step={0.1}
+                            value={this.props.attributes.amazonStartPrice}
+                            onChange={event => this.handleInputChange({
+                                target: {
+                                    name: 'amazonStartPrice',
+                                    value: event
+                                }
+                            })}
+                            style={{width: 65, display: "block"}}
+                            className={"mp-form-control"}
+                            parser={(input) => input.replace(/[^\d\.]/g, '')}
+                        />
+                            </Col>
+                            <Col className={"col-sm-6 mb-0"}>
+                        <Label for="amazonStep" className="mp-label">
+                            Step:
+                        </Label>
+                        <InputNumber
+                            min={0.1}
+                            max={1000}
+                            step={0.1}
+                            value={this.props.attributes.amazonStep}
+                            onChange={event => this.handleInputChange({
+                                target: {
+                                    name: 'amazonStep',
+                                    value: event
+                                }
+                            })}
+                            style={{width: 65, display: "block"}}
+                            className={"mp-form-control"}
+                            parser={(input) => input.replace(/[^\d\.]/g, '')}
+                        />
+                            </Col>
+                        </Row>
                     </Col>
-                </Row> : ''}
-                {this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform ? <Row>
-                    <Col className={"col-sm-12"}>
-                        <Form inline>
-                            <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{width: "50%"}}>
-                                <Label className="mr-sm-2 mp-label">
-                                    KV Pairs:
-                                </Label>
-                                <i className="fa fa-question-circle" id={"Tooltip-1"}/>
-                                <Tooltip
-                                    placement="top"
-                                    isOpen={this.state.tooltipKVPairsOpen}
-                                    target={"Tooltip-1"}
-                                    toggle={this.tooltipKVPairsToggle}
-                                >
-                                    Copy the key-value pairs from the spreadsheet sent to you by the account manager.
-                                    One line per line item in the format "key:value" (without quotes), where key denotes
-                                    the line item targeting keyword, and value is the line item price.
-                                </Tooltip>
-                                <textarea
-                                    className="mr-sm-2"
-                                    style={{width: "100%"}}
-                                    onBlur={this.handleCSVChange}
-                                    onKeyDown={event => {
-                                        if (13 == event.keyCode) {
-                                            this.handleCSVChange(event)
-                                        }
-                                    }}
-                                    placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
-                                    onChange={() => {
-                                    }}
-                                >{this.props.attributes.amazonCSVItems}</textarea>
-                            </FormGroup>
-                        </Form>
+                    <Col className={"col-sm-4"} hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.non_uniform}>
+                        <Label className="mp-label">
+                            KV Pairs:
+                        </Label>
+                        <i className="fa fa-question-circle" id={"Tooltip-1"}/>
+                        <Tooltip
+                            placement="top"
+                            isOpen={this.state.tooltipKVPairsOpen}
+                            target={"Tooltip-1"}
+                            toggle={this.tooltipKVPairsToggle}
+                        >
+                            Copy the key-value pairs from the spreadsheet sent to you by the account manager.
+                            One line per line item in the format "key:value" (without quotes), where key denotes
+                            the line item targeting keyword, and value is the line item price.
+                        </Tooltip>
+                        <textarea
+                            className="mr-sm-2"
+                            style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
+                            onBlur={this.handleCSVChange}
+                            onKeyDown={event => {
+                                if (13 == event.keyCode) {
+                                    this.handleCSVChange(event)
+                                }
+                            }}
+                            placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
+                            onChange={() => {
+                            }}
+                        >{this.props.attributes.amazonCSVItems}</textarea>
                     </Col>
-                </Row> : ''}
-                <Row hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>Line Items naming: </span>
+                    <Col className={"col-sm-4"} hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                        <Label className="mp-label">Line Items naming: </Label>
                         <CustomInput
                             invalid={!isEmpty(this.props.formErrors.lineItemsNaming)}
                             inline
-                            style={{width: "200px", display: "inline-block"}}
+                            style={{width: "210px", display: "inline-block"}}
                             type="text"
                             id={"lineItemsNaming"}
                             name={"lineItemsNaming"}
@@ -286,23 +251,18 @@ class AmazonCreateOrder extends CreateOrderForm {
                             {helperText}
                         </Tooltip>
                     </Col>
-                </Row>
-                <Row hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>Keywords template: </span>
+                    <Col className={"col-sm-4"} hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                        <Label className="mp-label">Keywords template: </Label>
                         {this.props.attributes.keywordTemplate}
                     </Col>
-                </Row>
-                <Row>
-                    <Col className={"col-sm-12"}>
-                        <span className={"mp-label"}>Creative format: </span>
+                    <Col className={"col-sm-4"}>
+                        <Label className="mp-label">Creative format: </Label>
                         <Input
                             type="select"
                             name={"creativeFormat"}
                             id="creativeFormat"
                             onChange={this.handleInputChange}
                             value={this.props.attributes.creativeFormat}
-                            style={{display: "inline-block", width: "auto"}}
                             className={"mp-form-control"}
                         >
                             {Object.keys(this.props.creativeFormats).map((option, index) => (
@@ -313,7 +273,6 @@ class AmazonCreateOrder extends CreateOrderForm {
                         </Input>
                     </Col>
                 </Row>
-                <br/>
                 <Row>
                     <Col className={"col-sm-12"}>
                         <AdUnitsSelect
@@ -328,7 +287,7 @@ class AmazonCreateOrder extends CreateOrderForm {
                     </Col>
                 </Row>
                 <Row hidden={isEmpty(this.state.defaultFields)}>
-                    <Col className={"col-sm-12"}>
+                    <Col className={"col-sm-4"}>
                         <h4>Fields with default value:</h4>
                         <ul>
                             {this.state.defaultFields.map(field => (

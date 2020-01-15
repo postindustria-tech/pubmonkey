@@ -1,6 +1,13 @@
 .mp-order-form {
+
+  .main-form {
+    .col {
+      margin-bottom: 30px;
+    }
+  }
+
   .row {
-    margin-bottom: 4px;
+    margin-bottom: 25px;
   }
 
   .mp-form-control {
@@ -14,6 +21,7 @@
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     height: 34px !important;
+    width: 100%;
   }
 
   .rc-input-number {
