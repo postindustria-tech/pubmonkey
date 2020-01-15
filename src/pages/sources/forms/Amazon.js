@@ -2,8 +2,7 @@ import React, {Component} from "react";
 import {
     Col,
     CustomInput,
-    Form,
-    FormGroup, Input,
+    Input,
     Label,
     Row,
     Tooltip
@@ -17,16 +16,12 @@ import {
 import InputNumber from "rc-input-number";
 import {isEmpty} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect} from "../components";
+import {AdUnitsSelect, LineItemsNamingInput, LineItemsRangeInput} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import bind from "bind-decorator";
 import {ModalWindowService} from "../../services";
 import CreateOrderForm from "./CreateOrderForm";
-
-const helperText =
-    "{bid} macro is replaced with a corresponding bid value\n" +
-    "{position} macro is replaced with a position number (natural values starting from 1)";
 
 let defaultAdvertiser = "amazon";
 
@@ -34,10 +29,8 @@ const initialState = {
     advertiser: defaultAdvertiser,
     order: {},
     defaultFields: [],
-
     formValid: true,
-
-    tooltipOpen: false,
+    tooltipKVPairsOpen: false,
     keyword: "",
 };
 
@@ -126,79 +119,64 @@ class AmazonCreateOrder extends CreateOrderForm {
                             checked={this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
                         />
                     </Col>
-                    <Col className={"col-sm-4"} hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
-                        <Label className="mp-label">Line Items Range:</Label>
-                        <div>from [
-                            <CustomInput
-                                invalid={!isEmpty(this.props.formErrors.rangeFrom)}
-                                inline
-                                style={{width: "50px"}}
-                                type="text"
-                                id={"rangeFrom"}
-                                name={"rangeFrom"}
-                                value={this.props.attributes.rangeFrom}
-                                onChange={this.handleInputChange}
-                                className={"mp-form-control"}
-                            />{" "}
-                            to{" "}
-                            <CustomInput
-                                invalid={!isEmpty(this.props.formErrors.rangeTo)}
-                                inline
-                                style={{width: "50px"}}
-                                type="text"
-                                id={"rangeTo"}
-                                name={"rangeTo"}
-                                value={this.props.attributes.rangeTo}
-                                onChange={this.handleInputChange}
-                                className={"mp-form-control"}
-                            />
-                            ] position.</div>
+                    <Col className={"col-sm-4"}
+                         hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                        <LineItemsRangeInput
+                            onChange={this.handleInputChange}
+                            invalidRangeFrom={!isEmpty(this.props.formErrors.rangeFrom)}
+                            invalidRangeTo={!isEmpty(this.props.formErrors.rangeTo)}
+                            rangeFrom={this.props.attributes.rangeFrom}
+                            rangeTo={this.props.attributes.rangeTo}
+                            unit={'position'}
+                        />
                     </Col>
-                    <Col className={"col-sm-4"} hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.uniform}>
+                    <Col className={"col-sm-4"}
+                         hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.uniform}>
                         <Row className={"mb-0"}>
                             <Col className={"col-sm-6 mb-0"}>
-                        <Label for="amazonStartPrice" className="mp-label">
-                            Start price:
-                        </Label>
-                        <InputNumber
-                            min={0.1}
-                            max={1000}
-                            step={0.1}
-                            value={this.props.attributes.amazonStartPrice}
-                            onChange={event => this.handleInputChange({
-                                target: {
-                                    name: 'amazonStartPrice',
-                                    value: event
-                                }
-                            })}
-                            style={{width: 65, display: "block"}}
-                            className={"mp-form-control"}
-                            parser={(input) => input.replace(/[^\d\.]/g, '')}
-                        />
+                                <Label for="amazonStartPrice" className="mp-label">
+                                    Start price:
+                                </Label>
+                                <InputNumber
+                                    min={0.1}
+                                    max={1000}
+                                    step={0.1}
+                                    value={this.props.attributes.amazonStartPrice}
+                                    onChange={event => this.handleInputChange({
+                                        target: {
+                                            name: 'amazonStartPrice',
+                                            value: event
+                                        }
+                                    })}
+                                    style={{width: 65, display: "block"}}
+                                    className={"mp-form-control"}
+                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
+                                />
                             </Col>
                             <Col className={"col-sm-6 mb-0"}>
-                        <Label for="amazonStep" className="mp-label">
-                            Step:
-                        </Label>
-                        <InputNumber
-                            min={0.1}
-                            max={1000}
-                            step={0.1}
-                            value={this.props.attributes.amazonStep}
-                            onChange={event => this.handleInputChange({
-                                target: {
-                                    name: 'amazonStep',
-                                    value: event
-                                }
-                            })}
-                            style={{width: 65, display: "block"}}
-                            className={"mp-form-control"}
-                            parser={(input) => input.replace(/[^\d\.]/g, '')}
-                        />
+                                <Label for="amazonStep" className="mp-label">
+                                    Step:
+                                </Label>
+                                <InputNumber
+                                    min={0.1}
+                                    max={1000}
+                                    step={0.1}
+                                    value={this.props.attributes.amazonStep}
+                                    onChange={event => this.handleInputChange({
+                                        target: {
+                                            name: 'amazonStep',
+                                            value: event
+                                        }
+                                    })}
+                                    style={{width: 65, display: "block"}}
+                                    className={"mp-form-control"}
+                                    parser={(input) => input.replace(/[^\d\.]/g, '')}
+                                />
                             </Col>
                         </Row>
                     </Col>
-                    <Col className={"col-sm-4"} hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.non_uniform}>
+                    <Col className={"col-sm-4"}
+                         hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.non_uniform}>
                         <Label className="mp-label">
                             KV Pairs:
                         </Label>
@@ -227,31 +205,16 @@ class AmazonCreateOrder extends CreateOrderForm {
                             }}
                         >{this.props.attributes.amazonCSVItems}</textarea>
                     </Col>
-                    <Col className={"col-sm-4"} hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
-                        <Label className="mp-label">Line Items naming: </Label>
-                        <CustomInput
-                            invalid={!isEmpty(this.props.formErrors.lineItemsNaming)}
-                            inline
-                            style={{width: "210px", display: "inline-block"}}
-                            type="text"
-                            id={"lineItemsNaming"}
-                            name={"lineItemsNaming"}
+                    <Col className={"col-sm-4"}
+                         hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                        <LineItemsNamingInput
                             onChange={this.handleInputChange}
                             value={this.props.attributes.lineItemsNaming}
-                            placeholder="PN Hybib {bid}"
-                            className={"mp-form-control"}
-                        />{" "}
-                        <i className="fa fa-question-circle" id={"Tooltip-2"}/>
-                        <Tooltip
-                            placement="top"
-                            isOpen={this.state.tooltipOpen}
-                            target={"Tooltip-2"}
-                            toggle={this.tooltipToggle}
-                        >
-                            {helperText}
-                        </Tooltip>
+                            invalid={!isEmpty(this.props.formErrors.lineItemsNaming)}
+                        />
                     </Col>
-                    <Col className={"col-sm-4"} hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                    <Col className={"col-sm-4"}
+                         hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
                         <Label className="mp-label">Keywords template: </Label>
                         {this.props.attributes.keywordTemplate}
                     </Col>

@@ -1,12 +1,9 @@
 import React, {Component} from "react";
 import {
     Col,
-    CustomInput,
-    Form,
-    FormGroup, Input,
+    Input,
     Label,
     Row,
-    Tooltip
 } from "reactstrap";
 import {
     KEYWORD_PLACEHOLDER,
@@ -14,14 +11,10 @@ import {
 } from "../../constants/common";
 import {isEmpty} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect,CreativeSnippet} from "../components";
+import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
-
-const helperText =
-    "{bid} macro is replaced with a corresponding bid value\n" +
-    "{position} macro is replaced with a position number (natural values starting from 1)";
 
 let defaultAdvertiser = "openx";
 
@@ -29,10 +22,7 @@ const initialState = {
     advertiser: defaultAdvertiser,
     order: {},
     defaultFields: [],
-
     formValid: true,
-
-    tooltipOpen: false,
     keyword: "",
 };
 
@@ -47,13 +37,9 @@ class OpenXCreateOrder extends CreateOrderForm {
             lineItemsNaming: "",
             step: "",
             keywordStep: "",
-            rangeFrom: "",
-            rangeTo: ""
         },
         attributes: {
             orderName: '',
-            rangeFrom: 1,
-            rangeTo: 10,
             lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
             keywordTemplate:
                 localStorage.getItem(defaultAdvertiser) ||
@@ -91,28 +77,11 @@ class OpenXCreateOrder extends CreateOrderForm {
                         </Input>
                     </Col>
                     <Col className={"col-sm-4"}>
-                        <Label className={"mp-label"}>Line Items naming: </Label>
-                        <CustomInput
-                            invalid={!isEmpty(this.props.formErrors.lineItemsNaming)}
-                            inline
-                            style={{width: "210px", display: "inline-block"}}
-                            type="text"
-                            id={"lineItemsNaming"}
-                            name={"lineItemsNaming"}
+                        <LineItemsNamingInput
                             onChange={this.handleInputChange}
                             value={this.props.attributes.lineItemsNaming}
-                            placeholder="PN Hybib {bid}"
-                            className={"mp-form-control"}
-                        />{" "}
-                        <i className="fa fa-question-circle" id={"Tooltip-1"}/>
-                        <Tooltip
-                            placement="top"
-                            isOpen={this.state.tooltipOpen}
-                            target={"Tooltip-1"}
-                            toggle={this.tooltipToggle}
-                        >
-                            {helperText}
-                        </Tooltip>
+                            invalid={!isEmpty(this.props.formErrors.lineItemsNaming)}
+                        />
                     </Col>
                     <Col className={"col-sm-4"}>
                         <Label className={"mp-label"}>Keywords template: </Label>
