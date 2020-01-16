@@ -646,6 +646,8 @@ class CreateOrderModal extends Component {
             networkClass: "",
             formValid: true,
             rangeFrom: advertiser === "amazon" ? 1 : 0.1,
+            rangeTo: 10,
+            customEventClassName: '',
             customEventData: customEventData,
             granularity: advertiser === "pubmatic" ? "auto" : "",
             creativeSnippet: advertiser === "openx" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
