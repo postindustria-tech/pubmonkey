@@ -37,7 +37,7 @@ const ProgressModal = new class extends ModalBase {
     @bind
     hideModal() {
         this.progress = [];
-
+        this.interrupt = false;
         super.hideModal();
     }
 
