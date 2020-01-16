@@ -19,7 +19,14 @@ class ModalBase {
 }
 
 const ProgressModal = new class extends ModalBase {
+
+    interrupt = false;
     progress = [];
+
+    @bind
+    needInterrupt() {
+        return this.interrupt;
+    }
 
     @bind
     setProgress(progress) {
@@ -36,6 +43,7 @@ const ProgressModal = new class extends ModalBase {
 
     @bind
     cancel() {
+        this.interrupt = true;
         this.cancelHandler && this.cancelHandler();
 
         onUpdate()

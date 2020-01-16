@@ -484,6 +484,11 @@ class Handler extends AbstractHandler {
             });
 
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
+                if(ModalWindowService.ProgressModal.needInterrupt()){
+                    console.log('INTERRUPT')
+                    return
+                }
+
                 return this.createLineItem(item)
                     .then(lineItem => {
                         this.advertiser.createCreatives(
