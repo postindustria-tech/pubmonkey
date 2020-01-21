@@ -40,7 +40,7 @@ export class LineItemsNamingInput extends Component {
                     value={this.props.value}
                     placeholder="PN Hybib {bid}"
                     className={"mp-form-control"}
-                    autocomplete={"off"}
+                    autoComplete={"off"}
                 />{" "}
                 <i className="fa fa-question-circle" id={"Tooltip-2"}/>
                 <Tooltip

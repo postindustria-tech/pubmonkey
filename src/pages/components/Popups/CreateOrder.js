@@ -11,8 +11,6 @@ import {
     Label,
     Row,
     Col,
-    Form,
-    FormGroup,
 } from "reactstrap";
 import FormErrors from "../FormErrors";
 import {isEmpty, toInteger} from "../../helpers";
@@ -124,13 +122,17 @@ class CreateOrderModal extends Component {
     componentDidMount = () => {
         ModalWindowService.onUpdate = () => this.forceUpdate();
         ModalWindowService.ProgressModal.onCancel(this.onCancel);
+        window.addEventListener('resize', this.updateDimensions);
+        // window.setTimeout(this.updateDimensions, 50);
     };
 
     componentWillUnmount() {
         ModalWindowService.onUpdate = null;
+        window.removeEventListener('resize', this.updateDimensions);
     }
 
     componentDidUpdate(prevProps, prevState) {
+        this.updateDimensions();
         ModalWindowService.ProgressModal.onCancel(this.onCancel);
 
         if (prevState.advertiser !== this.state.advertiser && this.state.advertiser) {
@@ -168,8 +170,7 @@ class CreateOrderModal extends Component {
             ModalWindowService.AlertPopup.message = this.createModalMessage()
             console.log('NEW ORDER IS', this.justCreatedOrder)
         }
-    }
-
+    };
 
     createModalMessage = () => (
         <p style={{margin: 0}}>
@@ -178,10 +179,26 @@ class CreateOrderModal extends Component {
                 View in {this.props.type === AD_SERVER_DFP ? 'DFP' : 'MoPub'}
             </a>}
         </p>
-    )
+    );
 
     ask = () => {
         this.confirmModal.toggle();
+    };
+
+    updateDimensions = () => {
+        const modal = document.getElementById('createOrderModal'),
+            footer = document.getElementById('createOrderModalFooter');
+        if (!modal) return;
+        const height = modal.clientHeight,
+            top = modal.offsetTop;
+        footer.style.width = (modal.clientWidth-2) + 'px';
+        if (window.innerHeight > (height + top)) {
+            footer.style.top = height + 'px';
+            footer.style.bottom = 'auto';
+        } else {
+            footer.style.top = 'auto';
+            footer.style.bottom = '40px';
+        }
     };
 
     render() {
@@ -205,6 +222,8 @@ class CreateOrderModal extends Component {
                     ref={helperModal => (this.helperModal = helperModal)}
                 />
                 <Modal
+                    id={"createOrderModal"}
+                    ref="myImgContainer"
                     isOpen={this.props.createOrderModalOpen}
                     toggle={this.toggle}
                     size="lg"
@@ -404,7 +423,7 @@ class CreateOrderModal extends Component {
                             }
                         })(this.props.advertiser)}
                     </ModalBody>
-                    <ModalFooter>
+                    <ModalFooter id={"createOrderModalFooter"} className={"sticky"}>
                         <Button className={"mr-auto"}
                                 onClick={() => this.preOrder("download")}
                                 color="warning"

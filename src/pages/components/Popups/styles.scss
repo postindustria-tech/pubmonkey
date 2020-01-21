@@ -59,8 +59,8 @@
   .tr {
     display: table-row;
     background-color: white;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
   }
 
   .thead {
@@ -85,8 +85,17 @@
   .tbody {
     display: table-row-group;
   }
+}
 
-
+.modal-footer {
+  &.sticky {
+    background: #ffffff;
+    position: fixed;
+    height: 71px;
+    width: 797px;
+    z-index: 9999;
+    //display: none;
+  }
 }
 
 .progress {
