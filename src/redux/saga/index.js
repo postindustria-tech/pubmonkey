@@ -173,7 +173,7 @@ function* setCreateOrderModalToggle(action) {
         if (orderKey !== undefined && !createOrderModalOpen) {
             params = yield sourceHandler.getOrderWithLineItems(orderKey)
                 .then(order => {
-                    console.log(order);
+                    // console.log(order);
                     let adUnitKeys = [],
                         defaultLineItemInfo = sourceHandler.lineItemInfo,
                         values = {},

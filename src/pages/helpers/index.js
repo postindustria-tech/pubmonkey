@@ -68,14 +68,14 @@ export function parseInputs(inputs) {
 
             if (type === 'radio') {
                 let checked = rawAttrs.indexOf('checked') !== -1,
-                    value = getAttr(rawAttrs, 'value')
+                    value = getAttr(rawAttrs, 'value');
 
                 if (checked) {
                     result[name] = value
                 }
             }
         }
-    })
+    });
 
     return result
 }
@@ -89,7 +89,7 @@ function getAttr(rawAttrs, name) {
         getAttr.rx[name] = new RegExp(name + '="([^"]+)"')
     }
 
-    let rx = getAttr.rx[name]
+    let rx = getAttr.rx[name];
 
     if (rx.test(rawAttrs)) {
         return rawAttrs.match(rx)[1]
@@ -101,9 +101,9 @@ function getAttr(rawAttrs, name) {
 
 export function isEmpty(value) {
    
-    if (value === null || value === undefined) return true
+    if (value === null || value === undefined) return true;
 
-    const type = typeof (value)
+    const type = typeof (value);
     if (Array.isArray(value) || type === 'string') {
         return !value.length
     }
@@ -112,8 +112,7 @@ export function isEmpty(value) {
         return !Object.values(value).length
     }
 
-    if (type === 'number') return false
-    return true
+    return type !== 'number'
 }
 
 export const toInteger = num => Number((Number(num) * 100).toFixed(0));
@@ -121,3 +120,9 @@ export const toDecimal = num => toValidUI(num / 100);
 export const toValidUI = num => Math.round(num * 100) / 100;
 
 export const deepClone = object => JSON.parse(JSON.stringify(object));
+
+Array.prototype.unique = function() {
+    return this.filter(function (value, index, self) {
+        return self.indexOf(value) === index;
+    });
+};

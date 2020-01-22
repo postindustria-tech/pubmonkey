@@ -51,24 +51,64 @@ export const HTTPService = new (class {
         return new Promise((resolve, reject) => {
             let mopubSessionUpdatedAt = localStorage.getItem("mopubSessionUpdatedAt") || 0;
             if ((Number(mopubSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
-                console.log('mopub CSRF token has expired');
+                console.log('Mopub CSRF token has expired');
                 mopubSessionUpdatedAt = Date.now();
                 localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
 
                 let {tabId, frameId} = window.MopubAutomation.request;
 
-                chrome.tabs.reload(tabId, {}, function () {
-                    setTimeout(function () {
-                        resolve();
-                        // chrome.cookies.get(
-                        //     {url: "https://app.mopub.com", name: "csrftoken"},
-                        //     ({value}) => {
-                        //         csrftoken = value;
-                        //         console.log("got a new CSRF token");
-                        //         resolve();
-                        //     }
-                        // );
-                    }, 5000);
+                chrome.tabs.get(tabId, function () {
+                    if (chrome.runtime.lastError) {
+                        console.log(chrome.runtime.lastError.message);
+
+                        chrome.tabs.query({ active:false }, function (tabs) {
+
+                            const mopub = tabs.filter(tab => {
+                                const url = new URL(tab.url);
+                                const domain = url.hostname;
+                                return domain === "app.mopub.com";
+                            });
+
+                            let mopubSessionUpdatedAt = localStorage.getItem("mopubSessionUpdatedAt") || 0;
+
+                            if (mopub.length === 0) {
+                                chrome.tabs.create({ url: "https://app.mopub.com/dashboard", active: false }, function (tab) {
+                                    window.MopubAutomation.request = {
+                                        frameId: 0,
+                                        tabId: tab.id
+                                    };
+                                    tabId = tab.id;
+                                    mopubSessionUpdatedAt = Date.now();
+                                });
+                            } else {
+                                tabId = mopub[0].id;
+                                window.MopubAutomation.request = {
+                                    frameId: 0,
+                                    tabId: tabId
+                                };
+                                chrome.tabs.reload(tabId, {}, function () {
+                                    setTimeout(function () {
+                                        resolve();
+                                    }, 5000);
+                                });
+                            }
+                        });
+                    } else {
+                        // Tab exists
+                        chrome.tabs.reload(tabId, {}, function () {
+                            setTimeout(function () {
+                                resolve();
+                                // chrome.cookies.get(
+                                //     {url: "https://app.mopub.com", name: "csrftoken"},
+                                //     ({value}) => {
+                                //         csrftoken = value;
+                                //         console.log("got a new CSRF token");
+                                //         resolve();
+                                //     }
+                                // );
+                            }, 5000);
+                        });
+                    }
                 });
             } else {
                 resolve();
