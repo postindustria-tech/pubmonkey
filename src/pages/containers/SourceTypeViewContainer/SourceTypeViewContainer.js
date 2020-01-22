@@ -88,7 +88,10 @@ class SourceTypeViewContainer extends PureComponent {
 
     @bind
     mopubLogOut() {
-        this.props.sourceHandler.logout();
+        this.props.sourceHandler.logout()
+            .then(() => {
+                window.location.reload();
+            });
     }
 
     @bind
