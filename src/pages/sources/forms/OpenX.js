@@ -105,23 +105,6 @@ class OpenXCreateOrder extends CreateOrderForm {
                                 </option>
                             ))}
                         </Input>
-                        {/*<div
-                            style={{display: "inline-block", width: "auto"}}
-                        >
-                            {" "}
-                            <span className={"mp-label"}> AdServer Domain: </span>
-                            <CustomInput
-                                invalid={!isEmpty(this.props.formErrors.adServerDomain)}
-                                inline
-                                type="text"
-                                id={"adServerDomain"}
-                                name={"adServerDomain"}
-                                value={this.props.attributes.adServerDomain}
-                                onChange={this.handleInputChange}
-                                className={"mp-form-control"}
-                                style={{width: "200px"}}
-                            />
-                        </div>*/}
                     </Col>
                     <Col className={"col-sm-12"}>
                         <Label className="mr-sm-2 mp-label">

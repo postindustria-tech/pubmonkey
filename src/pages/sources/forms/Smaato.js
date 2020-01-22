@@ -123,7 +123,7 @@ class SmaatoCreateOrder extends CreateOrderForm {
                             networkClasses={this.props.networkClasses}
                         />
                     </Col>
-                    <Col className={"col-sm-4"}>
+                    <Col className={"col-sm-6"}>
                         <Label className={"mp-label"}>Custom Event Data:</Label>
                         <CustomInput
                             invalid={!isEmpty(this.props.formErrors.customEventData)}
@@ -135,7 +135,7 @@ class SmaatoCreateOrder extends CreateOrderForm {
                             className={"mp-form-control"}
                         />
                     </Col>
-                    <Col className={"col-sm-4"}>
+                    <Col className={"col-sm-6"}>
                         <Label className={"mp-label"}>Custom Event Class Name: </Label>
                         <CustomInput
                             type="text"
