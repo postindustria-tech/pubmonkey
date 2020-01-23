@@ -545,6 +545,10 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
             isValid = false;
         }
+        if((isEmpty(this.state.advertiserId) || '--' == this.state.advertiserId) && this.props.type === AD_SERVER_DFP){
+            fieldValidationErrors.advertiserId = "Header Bidding Service DFP is required";
+            isValid = false;
+        }
         if (isEmpty(this.state.granularity) && this.state.selectedAdvertiser === 'openx') {
             fieldValidationErrors.granularity = "Granularity is required!";
             isValid = false;
