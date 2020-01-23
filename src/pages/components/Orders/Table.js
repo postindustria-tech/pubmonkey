@@ -35,6 +35,7 @@ class OrdersTable extends Component {
     };
 
     resetChecked = () => {
+        this.setState({'allSelected': false})
         this.props.setOrders(this.props.orders.map(order => {
             order.checked = false
             return order
