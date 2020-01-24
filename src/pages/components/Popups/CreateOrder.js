@@ -941,6 +941,8 @@ class CreateOrderModal extends Component {
             }
         ]);
 
+        this.justCreatedOrder = null;
+
         progress = this.props.sourceHandler.createOrderDataFromSet(
             order,
             params,
