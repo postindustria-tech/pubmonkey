@@ -42,6 +42,12 @@ const ProgressModal = new class extends ModalBase {
     }
 
     @bind
+    showModal() {
+        this.interrupt = false;
+        super.showModal();
+    }
+
+    @bind
     cancel() {
         this.interrupt = true;
         this.cancelHandler && this.cancelHandler();

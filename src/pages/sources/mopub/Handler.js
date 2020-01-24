@@ -485,7 +485,6 @@ class Handler extends AbstractHandler {
 
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
                 if(ModalWindowService.ProgressModal.needInterrupt()){
-                    console.log('INTERRUPT')
                     return
                 }
 
