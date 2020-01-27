@@ -9,7 +9,7 @@ import {
 } from "reactstrap";
 import {
     AMAZON_KVP_FORMAT,
-    AMAZON_PRICE_GRID,
+    PRICE_GRID,
     KEYWORD_PLACEHOLDER,
     KEYWORD_TEMPLATE_DEFAULT_VALUE
 } from "../../constants/common";
@@ -50,7 +50,7 @@ class AmazonCreateOrder extends CreateOrderForm {
         },
         attributes: {
             orderName: '',
-            amazonPriceGrid: AMAZON_PRICE_GRID.non_uniform,
+            priceGrid: PRICE_GRID.non_uniform,
             amazonStartPrice: 0.1,
             amazonStep: 0.1,
             amazonCSVItems: "",
@@ -102,25 +102,25 @@ class AmazonCreateOrder extends CreateOrderForm {
                     <Col className={"col-sm-4"}>
                         <CustomInput
                             type="radio"
-                            name="amazonPriceGrid"
-                            value={AMAZON_PRICE_GRID.non_uniform}
+                            name="priceGrid"
+                            value={PRICE_GRID.non_uniform}
                             label="non-uniform price grid"
                             id="amazon-price-grid-non-uniform"
                             onChange={this.handleInputChange}
-                            checked={this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform}
+                            checked={this.props.attributes.priceGrid === PRICE_GRID.non_uniform}
                         />
                         <CustomInput
                             type="radio"
-                            name="amazonPriceGrid"
-                            value={AMAZON_PRICE_GRID.uniform}
+                            name="priceGrid"
+                            value={PRICE_GRID.uniform}
                             label="uniform price grid"
                             id="amazon-price-grid-uniform"
                             onChange={this.handleInputChange}
-                            checked={this.props.attributes.amazonPriceGrid === AMAZON_PRICE_GRID.uniform}
+                            checked={this.props.attributes.priceGrid === PRICE_GRID.uniform}
                         />
                     </Col>
                     <Col className={"col-sm-4"}
-                         hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                         hidden={PRICE_GRID.non_uniform === this.props.attributes.priceGrid}>
                         <LineItemsRangeInput
                             onChange={this.handleInputChange}
                             invalidRangeFrom={!isEmpty(this.props.formErrors.rangeFrom)}
@@ -131,7 +131,7 @@ class AmazonCreateOrder extends CreateOrderForm {
                         />
                     </Col>
                     <Col className={"col-sm-4"}
-                         hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.uniform}>
+                         hidden={this.props.attributes.priceGrid !== PRICE_GRID.uniform}>
                         <Row className={"mb-0"}>
                             <Col className={"col-sm-6 mb-0"}>
                                 <Label for="amazonStartPrice" className="mp-label">
@@ -176,7 +176,7 @@ class AmazonCreateOrder extends CreateOrderForm {
                         </Row>
                     </Col>
                     <Col className={"col-sm-4"}
-                         hidden={this.props.attributes.amazonPriceGrid !== AMAZON_PRICE_GRID.non_uniform}>
+                         hidden={this.props.attributes.priceGrid !== PRICE_GRID.non_uniform}>
                         <Label className="mp-label">
                             KV Pairs:
                         </Label>
@@ -206,7 +206,7 @@ class AmazonCreateOrder extends CreateOrderForm {
                         >{this.props.attributes.amazonCSVItems}</textarea>
                     </Col>
                     <Col className={"col-sm-4"}
-                         hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                         hidden={PRICE_GRID.non_uniform === this.props.attributes.priceGrid}>
                         <LineItemsNamingInput
                             onChange={this.handleInputChange}
                             value={this.props.attributes.lineItemsNaming}
@@ -214,7 +214,7 @@ class AmazonCreateOrder extends CreateOrderForm {
                         />
                     </Col>
                     <Col className={"col-sm-4"}
-                         hidden={AMAZON_PRICE_GRID.non_uniform === this.props.attributes.amazonPriceGrid}>
+                         hidden={PRICE_GRID.non_uniform === this.props.attributes.priceGrid}>
                         <Label className="mp-label">Keywords template: </Label>
                         {this.props.attributes.keywordTemplate}
                     </Col>

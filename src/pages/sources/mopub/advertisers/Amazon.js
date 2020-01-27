@@ -1,6 +1,6 @@
 import AbstractAdvertiser from '../../../sources/AbstractAdvertiser'
 import {toDecimal, toInteger, toValidUI} from "../../../helpers";
-import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from "../../../constants/common";
+import {AMAZON_KVP_FORMAT, PRICE_GRID} from "../../../constants/common";
 
 export class Amazon extends AbstractAdvertiser {
 
@@ -24,7 +24,7 @@ export class Amazon extends AbstractAdvertiser {
             lineItemsNaming,
             amazonStartPrice,
             amazonStep,
-            amazonPriceGrid,
+            priceGrid,
             amazonCSVItems,
         } = params;
 
@@ -42,7 +42,7 @@ export class Amazon extends AbstractAdvertiser {
             stepDecimalPartLength--;
         }
 
-        if (AMAZON_PRICE_GRID.non_uniform === amazonPriceGrid) {
+        if (PRICE_GRID.non_uniform === priceGrid) {
             amazonCSVItems.map(line => {
                 const match = line.match(AMAZON_KVP_FORMAT);
                 const bidDecimal = parseFloat(match[2]);

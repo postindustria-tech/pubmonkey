@@ -9,7 +9,7 @@ export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   clearbid: "um_price:{bid}",
   pubmatic: "pwtbst:1 AND pwtplt:inapp AND pwtpb:{bid}",
 };
-export const AMAZON_PRICE_GRID = {
+export const PRICE_GRID = {
   uniform: 'uniform',
   non_uniform: 'non-uniform'
 };

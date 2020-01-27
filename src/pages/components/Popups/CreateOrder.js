@@ -21,7 +21,7 @@ import {
     AMAZON_KVP_FORMAT,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
-    AMAZON_PRICE_GRID
+    PRICE_GRID
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
@@ -45,10 +45,11 @@ const initialState = {
     advertiser: defaultAdvertiser,
     adUnitsSelected: [],
     order: {},
-    orderName: "",
-    amazonPriceGrid: AMAZON_PRICE_GRID.non_uniform,
+    orderName: '',
+    priceGrid: PRICE_GRID.non_uniform,
+    priceBand: '',
     amazonStartPrice: 0.1,
-    amazonCSVItems: "",
+    amazonCSVItems: '',
     amazonStep: 0.1,
     defaultFields: [],
     lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
@@ -304,7 +305,7 @@ class CreateOrderModal extends Component {
                                         handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
                                         attributes={{
                                             orderName: this.state.orderName,
-                                            amazonPriceGrid: this.state.amazonPriceGrid,
+                                            priceGrid: this.state.priceGrid,
                                             amazonStartPrice: this.state.amazonStartPrice,
                                             amazonCSVItems: this.state.amazonCSVItems,
                                             amazonStep: this.state.amazonStep,
@@ -325,6 +326,8 @@ class CreateOrderModal extends Component {
                                         handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
                                         attributes={{
                                             orderName: this.state.orderName,
+                                            priceGrid: this.state.priceGrid,
+                                            priceBand: this.state.priceBand,
                                             rangeFrom: this.state.rangeFrom,
                                             rangeTo: this.state.rangeTo,
                                             lineItemsNaming: this.state.lineItemsNaming,
@@ -484,37 +487,50 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.lineItemsNaming = "Keyword step is required!";
             isValid = false;
         }
-        if (this.state.advertiser !== "amazon") {
+        if (this.state.advertiser === "amazon") {
+            if (PRICE_GRID.uniform === this.state.priceGrid) {
+                if (this.state.amazonStartPrice <= 0) {
+                    fieldValidationErrors.amazonStartPrice = "Amazon start price must be greater than 0";
+                    isValid = false;
+                }
+                if (this.state.amazonStep <= 0) {
+                    fieldValidationErrors.amazonStartPrice = "Amazon price step must be greater than 0";
+                    isValid = false;
+                }
+            }
+            if (PRICE_GRID.non_uniform === this.state.priceGrid) {
+                if (isEmpty(this.state.amazonCSVItems)) {
+                    fieldValidationErrors.amazonCSVItems = "KV pairs is required";
+                    isValid = false;
+                } else {
+                    let broken = [];
+                    this.state.amazonCSVItems.map((item, index) => {
+                        const trimmed = item.trim();
+                        if (!AMAZON_KVP_FORMAT.test(trimmed)) {
+                            broken.push(`#${index + 1} "${trimmed}"`);
+                        }
+                        return trimmed;
+                    });
+                    if (!isEmpty(broken)) {
+                        fieldValidationErrors.amazonCSVItems = `KV pairs: can't parse line(s) ${broken.join(' ')}`;
+                        isValid = false;
+                    }
+                }
+            }
+        } else if (this.state.advertiser === "clearbid" && PRICE_GRID.non_uniform === this.state.priceGrid) {
+            if (isEmpty(this.state.priceBand)) {
+                fieldValidationErrors.priceBand = "Price band is required!";
+                isValid = false;
+            } else {
+                if (!/^[0-9\.\,]+$/.test(this.state.priceBand)) {
+                    fieldValidationErrors.amazonCSVItems = `Allowed characters for Price Band are "0-9,."`;
+                    isValid = false;
+                }
+            }
+        } else {
             if (this.state.keywordStep > this.state.step) {
                 fieldValidationErrors.step = "Line items step can not be less than Keyword step!";
                 isValid = false;
-            }
-        } else if (AMAZON_PRICE_GRID.uniform == this.state.amazonPriceGrid) {
-            if (this.state.amazonStartPrice <= 0) {
-                fieldValidationErrors.amazonStartPrice = "Amazon start price must be greater than 0";
-                isValid = false;
-            }
-            if (this.state.amazonStep <= 0) {
-                fieldValidationErrors.amazonStartPrice = "Amazon price step must be greater than 0";
-                isValid = false;
-            }
-        } else if (AMAZON_PRICE_GRID.non_uniform == this.state.amazonPriceGrid) {
-            if (isEmpty(this.state.amazonCSVItems)) {
-                fieldValidationErrors.amazonCSVItems = "KV pairs is required";
-                isValid = false;
-            } else {
-                let broken = [];
-                this.state.amazonCSVItems.map((item, index) => {
-                    const trimmed = item.trim();
-                    if (!AMAZON_KVP_FORMAT.test(trimmed)) {
-                        broken.push(`#${index + 1} "${trimmed}"`);
-                    }
-                    return trimmed;
-                });
-                if (!isEmpty(broken)) {
-                    fieldValidationErrors.amazonCSVItems = `KV pairs: can't parse line(s) ${broken.join(' ')}`;
-                    isValid = false;
-                }
             }
         }
         if (this.state.Ad_ZONE_ID < 1) {
@@ -716,7 +732,7 @@ class CreateOrderModal extends Component {
             rangeTo,
             advertiser,
             granularity,
-            amazonPriceGrid
+            priceGrid
         } = this.state;
 
         const formValid = this.formValidator();
@@ -809,8 +825,11 @@ class CreateOrderModal extends Component {
                     break;
             }
         } else {
-            if (advertiser === "amazon" && amazonPriceGrid === AMAZON_PRICE_GRID.non_uniform) {
+            if (advertiser === "amazon" && priceGrid === PRICE_GRID.non_uniform) {
                 items = this.state.amazonCSVItems.length;
+                keywords = 1;
+            } else if (advertiser === "clearbid" && priceGrid === PRICE_GRID.non_uniform) {
+                items = this.state.priceBand.split(',').length;
                 keywords = 1;
             } else {
                 for (let bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -897,7 +916,8 @@ class CreateOrderModal extends Component {
             amazonStartPrice,
             amazonCSVItems,
             amazonStep,
-            amazonPriceGrid,
+            priceGrid,
+            priceBand,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -927,7 +947,8 @@ class CreateOrderModal extends Component {
             amazonStartPrice,
             amazonCSVItems,
             amazonStep,
-            amazonPriceGrid,
+            priceGrid,
+            priceBand,
         };
 
         ModalWindowService.ProgressModal.setProgress([
@@ -1047,7 +1068,8 @@ class CreateOrderModal extends Component {
             amazonStartPrice,
             amazonCSVItems,
             amazonStep,
-            amazonPriceGrid,
+            priceGrid,
+            priceBand,
         } = this.state;
 
         let order = this.props.sourceHandler.composeOrderRequest(
@@ -1075,7 +1097,8 @@ class CreateOrderModal extends Component {
             amazonStartPrice,
             amazonCSVItems,
             amazonStep,
-            amazonPriceGrid,
+            priceGrid,
+            priceBand,
         };
 
         ModalWindowService.ProgressModal.setProgress([

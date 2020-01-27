@@ -2,7 +2,7 @@ import Factory from '../../sources/Factory';
 import AbstractHandler from '../../sources/AbstractHandler';
 import {AdvertiserFactory} from "./Factory";
 import {AD_SERVER_DFP, DFP_API_VERSION} from "../../constants/source";
-import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from '../../constants/common';
+import {AMAZON_KVP_FORMAT, PRICE_GRID} from '../../constants/common';
 import {DFP, FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {isEmpty, toDecimal, toInteger, toValidUI, deepClone} from "../../helpers";
@@ -546,7 +546,7 @@ class Handler extends AbstractHandler {
             granularity,
             amazonStartPrice,
             amazonStep,
-            amazonPriceGrid,
+            priceGrid,
             amazonCSVItems,
         } = params;
 
@@ -770,7 +770,7 @@ class Handler extends AbstractHandler {
             this.customTargetingValues = [...this.customTargetingValues, ...newValues];
         }
 
-        if (advertiser === "amazon" && AMAZON_PRICE_GRID.non_uniform == amazonPriceGrid) {
+        if (advertiser === "amazon" && PRICE_GRID.non_uniform == priceGrid) {
 
             await Promise.all(amazonCSVItems.map(async line => {
                 const match = line.match(AMAZON_KVP_FORMAT);

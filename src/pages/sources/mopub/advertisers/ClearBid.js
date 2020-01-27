@@ -1,5 +1,6 @@
 import AbstractAdvertiser from '../../../sources/AbstractAdvertiser'
 import {toDecimal, toInteger, toValidUI} from "../../../helpers";
+import {PRICE_GRID} from "../../../constants/common";
 
 export class ClearBid extends AbstractAdvertiser {
 
@@ -30,46 +31,62 @@ export class ClearBid extends AbstractAdvertiser {
             lineItemsNaming,
             customEventClassName,
             customEventData,
+            priceGrid,
+            priceBand,
         } = params;
 
         let lineItemInfo = {...this.lineItemInfo},
             lineItems = [],
             bid;
 
-        rangeFrom = toInteger(rangeFrom);
-        rangeTo = toInteger(rangeTo);
-        step = toInteger(step);
+        lineItemInfo.type = "network";
+        lineItemInfo["networkType"] = "custom_native";
+        lineItemInfo["enableOverrides"] = true;
+        lineItemInfo["overrideFields"] = {
+            custom_event_class_name: customEventClassName,
+            custom_event_class_data: customEventData
+        };
 
-        const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length;
-        let stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
-        if (step >= 100) {
-            stepDecimalPartLength--;
-        }
-
-        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
-            const bidDecimal = toDecimal(bid),
-                bidValue = bidDecimal.toFixed(stepDecimalPartLength),
-                name = lineItemsNaming.replace("{bid}", bidValue);
-            let keywords = [];
-
-            keywords.push(keywordTemplate.replace("{bid}", bidDecimal.toFixed(keywordStepDecimalPartLength)));
-
-            lineItemInfo.type = "network";
-            lineItemInfo["networkType"] = "custom_native";
-            lineItemInfo["enableOverrides"] = true;
-            lineItemInfo["overrideFields"] = {
-                custom_event_class_name: customEventClassName,
-                custom_event_class_data: customEventData
-            };
-
-            lineItems.push({
-                adUnitKeys: adunits,
-                bid: bidDecimal,
-                name: name,
-                orderKey: orderKey,
-                keywords: keywords,
-                ...lineItemInfo
+        if (PRICE_GRID.non_uniform === priceGrid) {
+            priceBand.split(',').map(price => {
+                const bidDecimal = parseFloat(price);
+                lineItems.push({
+                    adUnitKeys: adunits,
+                    bid: bidDecimal,
+                    name: lineItemsNaming.replace("{bid}", price),
+                    orderKey: orderKey,
+                    keywords: [keywordTemplate.replace("{bid}", price)],
+                    ...lineItemInfo
+                });
             });
+        } else {
+            rangeFrom = toInteger(rangeFrom);
+            rangeTo = toInteger(rangeTo);
+            step = toInteger(step);
+
+            const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length;
+            let stepDecimalPartLength = (step + "").replace(/^[-\d]+\./, "").length;
+            if (step >= 100) {
+                stepDecimalPartLength--;
+            }
+
+            for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                const bidDecimal = toDecimal(bid),
+                    bidValue = bidDecimal.toFixed(stepDecimalPartLength),
+                    name = lineItemsNaming.replace("{bid}", bidValue);
+                let keywords = [];
+
+                keywords.push(keywordTemplate.replace("{bid}", bidDecimal.toFixed(keywordStepDecimalPartLength)));
+
+                lineItems.push({
+                    adUnitKeys: adunits,
+                    bid: bidDecimal,
+                    name: name,
+                    orderKey: orderKey,
+                    keywords: keywords,
+                    ...lineItemInfo
+                });
+            }
         }
 
         return lineItems;
