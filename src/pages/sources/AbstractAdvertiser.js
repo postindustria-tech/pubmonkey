@@ -87,7 +87,7 @@ export default class AbstractAdvertiser {
     }
 
     createCreatives(lineItemKey, params, cb) {
-
+        return {};
     }
 
     getCreativeHtmlData(params) {

@@ -88,7 +88,7 @@ export class Amazon extends AbstractAdvertiser {
     }
 
     createCreatives(lineItemKey, params, cb) {
-        cb({
+        const creative = {
             adType: "html",
             extended: {
                 htmlData: this.getCreativeHtmlData(params),
@@ -98,7 +98,11 @@ export class Amazon extends AbstractAdvertiser {
             imageKeys: [],
             lineItemKey: lineItemKey,
             name: "Creative"
-        });
+        };
+        if (cb) {
+            cb(creative);
+        }
+        return creative;
     }
 
     getCreativeHtmlData(params) {
