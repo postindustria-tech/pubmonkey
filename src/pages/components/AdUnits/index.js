@@ -82,9 +82,17 @@ class AdUnitsList extends Component {
         if (this.sourceHandler) {
             this.sourceHandler.getAdUnit(adUnit.key).then((adUnit) => {
                 let data = adUnit.adSources.map(adSource => {
+
+                    let type = adSource.type
+                    if(type == 'non_gtee'){
+                        type = 'Non-guaranteed'
+                    }else if(type == 'gtee'){
+                        type = 'Guaranteed'
+                    }
+
                     return [
                         adSource.name,
-                        adSource.type,
+                        type,
                         adSource.status,
                         adSource.disabled ? 'disabled' : 'enabled',
                         adSource.priority,

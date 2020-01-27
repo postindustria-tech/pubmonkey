@@ -148,7 +148,7 @@ export class OpenX extends AbstractAdvertiser {
     }
 
     createCreatives(lineItemKey, params, cb) {
-        cb({
+        const creative = {
             adType: "html",
             extended: {
                 htmlData: params.creativeSnippet,//this.getCreativeHtmlData(params),
@@ -158,7 +158,11 @@ export class OpenX extends AbstractAdvertiser {
             imageKeys: [],
             lineItemKey: lineItemKey,
             name: "Creative"
-        });
+        };
+        if (cb) {
+            cb(creative);
+        }
+        return creative;
     }
 
     getCreativeHtmlData(params) {

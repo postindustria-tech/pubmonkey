@@ -538,16 +538,11 @@ class Handler extends AbstractHandler {
 
             if (["amazon", "openx", "pubmatic"].indexOf(params.advertiser) !== -1) {
                 lineItems = lineItems.map(lineItem => {
-                    lineItem.creatives = [{
-                        adType: "html",
-                        extended: {
-                            htmlData: this.advertiser.getCreativeHtmlData(params),
-                            isMraid: params.advertiser === "amazon"
-                        },
-                        format: params.creativeFormat,
-                        imageKeys: [],
-                        name: "Creative"
-                    }];
+                    lineItem.creatives = [this.advertiser.createCreatives(
+                        lineItem.key,
+                        params,
+                        null
+                    )];
                     return lineItem;
                 });
             }
