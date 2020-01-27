@@ -76,6 +76,7 @@ class Handler extends AbstractHandler {
     token = null;
     loggedIn = false;
 
+    customTargetingKeyId = null;
     customTargetingValues = [];
 
     static user = null;
@@ -274,7 +275,7 @@ class Handler extends AbstractHandler {
                     adunits = [];
                 }
                 adunits = adunits.filter(({hasChildren}) => !hasChildren);
-                console.log(adunits);
+                // console.log(adunits);
 
                 resolve(adunits);
             } catch (err) {
@@ -577,9 +578,8 @@ class Handler extends AbstractHandler {
         }
 
 
-        let keyId = null;
         if (!isEmpty(customTargetingKeys)) {
-            keyId = customTargetingKeys[0];
+            this.customTargetingKeyId = customTargetingKeys[0];
         } else {
             let newKeys = await this.createCustomTargetingKeys([{
                 name: this.advertiser.customTargetingKey,
@@ -587,7 +587,7 @@ class Handler extends AbstractHandler {
                 type: "FREEFORM"
             }]);
             // console.log(newKeys);
-            keyId = newKeys[0].id;
+            this.customTargetingKeyId = newKeys[0].id;
         }
 
         const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length,
@@ -760,7 +760,7 @@ class Handler extends AbstractHandler {
         if (!isEmpty(newKeywords)) {
             newKeywords = newKeywords.map(keyword => {
                 return {
-                    customTargetingKeyId: keyId,
+                    customTargetingKeyId: this.customTargetingKeyId,
                     name: keyword,
                     matchType: "EXACT"
                 }
@@ -780,13 +780,13 @@ class Handler extends AbstractHandler {
 
                 const values = await this.findOrCreateKeywords([line.substring(0, line.indexOf(':'))]);
 
-                console.log(values);
+                // console.log(values);
 
                 _lineItemInfo.targeting.customTargeting = CustomCriteriaSet(
-                    [CustomCriteria(keyId, values)]
+                    [CustomCriteria(this.customTargetingKeyId, values)]
                 );
 
-                console.log({..._lineItemInfo});
+                // console.log({..._lineItemInfo});
 
                 _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
 
@@ -860,13 +860,13 @@ class Handler extends AbstractHandler {
 
                 const values = await this.findOrCreateKeywords(keywords);
 
-                console.log(values);
+                // console.log(values);
 
                 _lineItemInfo.targeting.customTargeting = CustomCriteriaSet(
-                    [CustomCriteria(keyId, values)]
+                    [CustomCriteria(this.customTargetingKeyId, values)]
                 );
 
-                console.log({..._lineItemInfo});
+                // console.log({..._lineItemInfo});
 
                 _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
 
@@ -902,7 +902,7 @@ class Handler extends AbstractHandler {
 
             newKeywords = newKeywords.map(keyword => {
                 return {
-                    customTargetingKeyId: keyId,
+                    customTargetingKeyId: this.customTargetingKeyId,
                     name: keyword,
                     matchType: "EXACT"
                 }
