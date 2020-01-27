@@ -20,13 +20,7 @@ class ModalBase {
 
 const ProgressModal = new class extends ModalBase {
 
-    interrupt = false;
     progress = [];
-
-    @bind
-    needInterrupt() {
-        return this.interrupt;
-    }
 
     @bind
     setProgress(progress) {
@@ -37,19 +31,16 @@ const ProgressModal = new class extends ModalBase {
     @bind
     hideModal() {
         this.progress = [];
-        this.interrupt = false;
         super.hideModal();
     }
 
     @bind
     showModal() {
-        this.interrupt = false;
         super.showModal();
     }
 
     @bind
     cancel() {
-        this.interrupt = true;
         this.cancelHandler && this.cancelHandler();
 
         onUpdate()
