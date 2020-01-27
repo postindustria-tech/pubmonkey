@@ -82,6 +82,17 @@ class AuthModal extends Component {
                             </Form>
                         </Col>
                     </Row>
+                    <Row>
+                        <Col className={"col-sm-12"} style={{fontSize: "14px"}}>
+                            Instruction:
+                            <ul>
+                                <li>1. Navigate to <a href="https://admanager.google.com/" target="_blank">https://admanager.google.com/</a></li>
+                                <li>2. Sign-in</li>
+                                <li>3. Copy Network code either from the top left corner of the dashboard or from the URL in the browser:</li>
+                            </ul>
+                            <img src={"../../../images/dfp.png"} alt="" />
+                        </Col>
+                    </Row>
                 </ModalBody>
                 <ModalFooter>
                     <Button onClick={this.submit}>Submit</Button>
