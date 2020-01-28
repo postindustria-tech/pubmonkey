@@ -100,7 +100,7 @@ class AdUnitsList extends Component {
                         adSource.start,
                         adSource.end,
                         adSource.budgetType
-                    ].join('\t')
+                    ].join(',')
                 }).join('\n')
                 FileService.saveFile(data, `${adUnit.name}.csv`);
             })
