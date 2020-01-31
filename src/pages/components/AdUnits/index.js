@@ -13,7 +13,8 @@ import {AD_SERVER_DFP} from "../../constants/source";
 
 class AdUnitsList extends Component {
     state = {
-        adunits: []
+        adunits: [],
+        exportInProgress: []
     };
 
     componentDidMount() {
@@ -59,7 +60,8 @@ class AdUnitsList extends Component {
                                     <td><a target="_blank" href={this.getAdUnitUrl(adunit.key)}>{adunit.name}</a></td>
                                     <td>{ adunit.format }</td>
                                     <td>{ adunit.key }</td>
-                                    {this.props.type !== AD_SERVER_DFP && <td>
+                                    {this.state.exportInProgress.includes(adunit.key) && <td><i className="fa fa-spinner fa-spin" aria-hidden="true"></i></td>}
+                                    {this.props.type !== AD_SERVER_DFP && !this.state.exportInProgress.includes(adunit.key) && <td>
                                         <i className={classnames("fa", "fa-download")} title={"Export AdUnit"} onClick={() => this.export(adunit)}></i>
                                     </td>}
                                 </tr>
@@ -80,6 +82,10 @@ class AdUnitsList extends Component {
 
     export(adUnit) {
         if (this.sourceHandler) {
+            let exportInProgress = this.state.exportInProgress
+            exportInProgress.push(adUnit.key)
+            this.setState({exportInProgress: exportInProgress})
+
             this.sourceHandler.getAdUnit(adUnit.key).then((adUnit) => {
                 let data = adUnit.adSources.map(adSource => {
 
@@ -103,6 +109,7 @@ class AdUnitsList extends Component {
                     ].join(',')
                 }).join('\n')
                 FileService.saveFile(data, `${adUnit.name}.csv`);
+                this.setState({exportInProgress: this.state.exportInProgress.filter(key => key != adUnit.key)})
             })
         }
     }
