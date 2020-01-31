@@ -174,11 +174,6 @@ class OrdersTable extends Component {
                                     title={status === "running" ? "Disable" : "Enable"}
                                     onClick={() => this.togglePause(status, key)}
                                 ></i>
-                                <i
-                                    className={classnames("fa", "fa-copy")}
-                                    title={"Duplicate Order"}
-                                    onClick={() => this.props.createOrderModalToggle(key)}
-                                ></i>
                             </td>
                         </tr>
                     ))
