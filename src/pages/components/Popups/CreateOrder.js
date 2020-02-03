@@ -10,7 +10,7 @@ import {
     Input,
     Label,
     Row,
-    Col,
+    Col, CustomInput, Tooltip,
 } from "reactstrap";
 import FormErrors from "../FormErrors";
 import {isEmpty, toInteger} from "../../helpers";
@@ -72,7 +72,7 @@ const initialState = {
     confirmModalMessage: null,
     creativeFormat: "",
     creativeSnippet: "",
-    tooltipOpen: false,
+    tooltipCompanyOpen: false,
     selectedAdvertiser: defaultAdvertiser,
     Ad_ZONE_ID: 2,
     os: '',
@@ -104,6 +104,7 @@ class CreateOrderModal extends Component {
         networkClasses: {},
         orderKey: null,
         advertiser: defaultAdvertiser,
+        networkCode: ''
     };
 
     state = initialState;
@@ -202,9 +203,18 @@ class CreateOrderModal extends Component {
         }
     };
 
+    @bind
+    tooltipToggle() {
+        this.setState({
+            tooltipCompanyOpen: !this.state.tooltipCompanyOpen
+        });
+    }
+
     render() {
 
-        const classWidth = this.props.type === AD_SERVER_DFP ? 'col-sm-4' : 'col-sm-6';
+        const classWidth = this.props.type === AD_SERVER_DFP ? 'col-sm-4' : 'col-sm-6',
+            networkCode = this.props.networkCode || localStorage.getItem('dfpNetworkCode'),
+            tooltip = `Companies are defined in your Google Ad Manager account under Admin -> Companies. <a href="https://admanager.google.com/${networkCode}#admin/company/list" target="_blank"> Take me there.</a>`;
 
         return (
             <React.Fragment>
@@ -276,7 +286,18 @@ class CreateOrderModal extends Component {
                             </Col>
                             <Col className={classWidth} hidden={this.props.type !== AD_SERVER_DFP}>
                                 <Label for="advertiserId" className="mp-label">
-                                    Header Bidding Service DFP:
+                                    Company:
+                                    {" "}
+                                    <i className="fa fa-question-circle" id={"Tooltip-company"}/>
+                                    <Tooltip
+                                        placement="top"
+                                        isOpen={this.state.tooltipCompanyOpen}
+                                        target={"Tooltip-company"}
+                                        toggle={this.tooltipToggle}
+                                        autohide={false}
+                                    >
+                                        <span dangerouslySetInnerHTML={{__html: tooltip}}></span>
+                                    </Tooltip>
                                 </Label>
                                 <Input
                                     type="select"
@@ -1169,6 +1190,7 @@ const mapStateToProps = state => ({
     adunits: adServerSelectors.adunits(state),
     sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
     advertiser: adServerSelectors.getAdvertiser(state),
+    networkCode: adServerSelectors.networkCode(state),
 
     ...adServerSelectors.dfpInventory(state),
     ...adServerSelectors.duplicateOrder(state),

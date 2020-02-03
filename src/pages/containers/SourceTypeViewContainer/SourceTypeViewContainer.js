@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react';
 import {connect} from "react-redux";
-import {Button, Col, Row} from "reactstrap";
 import adServerSelectors from '../../../redux/selectors/adServer';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
 import bind from "bind-decorator";
