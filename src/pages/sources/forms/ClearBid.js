@@ -185,6 +185,17 @@ class ClearBidCreateOrder extends CreateOrderForm {
                         />
                     </Col>
                     <Col className={"col-sm-6"}>
+                        <Label className={"mp-label"}>Custom Event Class Name: </Label>
+                        <CustomInput
+                            type="text"
+                            id={"customEventClassName"}
+                            name={"customEventClassName"}
+                            onChange={this.handleInputChange}
+                            value={this.props.attributes.customEventClassName}
+                            className={"mp-form-control"}
+                        />
+                    </Col>
+                    <Col className={"col-sm-6"}>
                         <Label className={"mp-label"}>Custom Event Data: </Label>
                         <CustomInput
                             invalid={!isEmpty(this.props.formErrors.customEventData)}
@@ -193,17 +204,6 @@ class ClearBidCreateOrder extends CreateOrderForm {
                             name={"customEventData"}
                             value={this.props.attributes.customEventData}
                             onChange={this.handleInputChange}
-                            className={"mp-form-control"}
-                        />
-                    </Col>
-                    <Col className={"col-sm-6"}>
-                        <Label className={"mp-label"}>Custom Event Class Name: </Label>
-                        <CustomInput
-                            type="text"
-                            id={"customEventClassName"}
-                            name={"customEventClassName"}
-                            onChange={this.handleInputChange}
-                            value={this.props.attributes.customEventClassName}
                             className={"mp-form-control"}
                         />
                     </Col>
