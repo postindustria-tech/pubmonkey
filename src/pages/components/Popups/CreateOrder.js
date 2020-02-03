@@ -80,7 +80,7 @@ const initialState = {
     customEventClassName: '',
     adServerDomain: '',
     keyword: '',
-    granularity: '',
+    granularity: 'auto',
 
     advertiserId: null,
     customEventData: '',
@@ -357,6 +357,7 @@ class CreateOrderModal extends Component {
                                             adServerDomain: this.state.adServerDomain,
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
+                                            granularity: this.state.granularity,
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
@@ -688,7 +689,7 @@ class CreateOrderModal extends Component {
             rangeTo: 10,
             customEventClassName: '',
             customEventData: customEventData,
-            granularity: advertiser === "pubmatic" ? "auto" : "",
+            granularity: "auto",
             creativeSnippet: advertiser === "openx" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
         });
     }
