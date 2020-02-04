@@ -108,6 +108,18 @@ class AdUnitsList extends Component {
                         adSource.budgetType
                     ].join(',')
                 }).join('\n')
+                data.unshift([
+                    'Name',
+                    'Type',
+                    'Status',
+                    'Disabled/Enabled',
+                    'Priority',
+                    'Bid',
+                    'Start',
+                    'End',
+                    'Budget Type'
+                ])
+
                 FileService.saveFile(data, `${adUnit.name}.csv`);
                 this.setState({exportInProgress: this.state.exportInProgress.filter(key => key != adUnit.key)})
             })
