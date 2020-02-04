@@ -6,6 +6,8 @@ import bind from "bind-decorator";
 import adServerActions from "../../../redux/actions/adServer";
 import AuthModal from "../../sources/dfp/AuthModal";
 import Promise from "bluebird";
+import LoginLink from "../../Components/Common/LoginLink"
+import LogoutLink from "../../Components/Common/LogoutLink"
 
 class SourceTypeViewContainer extends PureComponent {
 
@@ -50,12 +52,16 @@ class SourceTypeViewContainer extends PureComponent {
                             <div className="dfp-login-link" style={{display: "inline-block"}}>
                                 <a href="https://admanager.google.com/" target="_blank">Logged in.</a>
                                 &nbsp;
-                                <a style={{textDecoration: "underline"}} href="#" onClick={this.dfpLogOut}>Logout</a>
+                                <LogoutLink style={{textDecoration: "underline"}}>
+                                    Logout
+                                </LogoutLink>
                             </div>
                         ) :
                         (
                             <div className="dfp-login-link" style={{display: "inline-block"}}>Not logged in.&nbsp;
-                                <a style={{textDecoration: "underline"}} href="#" onClick={this.dfpLogIn}>Login</a>
+                                <LoginLink style={{textDecoration: "underline"}}>
+                                    Login
+                                </LoginLink>
                             </div>
                         )}
                         <a
@@ -72,12 +78,16 @@ class SourceTypeViewContainer extends PureComponent {
                             <div>
                                 <a href="https://app.mopub.com/dashboard/" target="_blank">Logged in.</a>
                                 &nbsp;
-                                <a style={{textDecoration: "underline"}} href="#" onClick={this.mopubLogOut}>Logout</a>
+                                <LogoutLink style={{textDecoration: "underline"}}>
+                                    Logout
+                                </LogoutLink>
                             </div>
                         )
                         : (
                             <div className="login-link">Not logged in.&nbsp;
-                                <a href="#" onClick={window.MopubAutomation.openLoginPage}>Log in.</a>
+                                <LoginLink style={{textDecoration: "underline"}}>
+                                    Log in.
+                                </LoginLink>
                             </div>
                         )
                     : null}

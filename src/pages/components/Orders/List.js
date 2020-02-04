@@ -18,6 +18,7 @@ import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 import ConfirmModal from "../Popups/ConfirmModal";
 import OrdersStats from './Stats'
+import LoginLink from "../Common/LoginLink"
 
 window.canceledExport = false;
 
@@ -142,27 +143,7 @@ class OrdersList extends Component {
                     onUpdate={this.onOrdersListUpdate}
                 />
 
-                {((this.props.type == AD_SERVER_MOPUB && loggedIn != null && loggedIn) || (this.props.type == AD_SERVER_DFP && this.props.dfpLoggedIn != null && this.props.dfpLoggedIn))
-                        ? (
-                            this.props.ordersLoaded
-                            ? (
-                                !this.props.orders.filter(filterFn).length && (
-                                    <div className={"no-orders"}>
-                                        <p>No orders</p>
-                                    </div>
-                                )
-                            )
-                            : (
-                                <div className={"loading-in-progress"}>
-                                    <p>Loading...</p>
-                                    <svg width="100px"  height="100px"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" className="lds-rolling" style={{"background": "none"}}><circle cx="50" cy="50" fill="none"  stroke="#b3121e" strokeWidth="10" r="35" strokeDasharray="164.93361431346415 56.97787143782138" transform="rotate(68.8726 50 50)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="2.1s" begin="0s" repeatCount="indefinite"></animateTransform></circle></svg>
-                                </div>
-                                )
-                        )
-                        : (<div className={"please-log-in"}>
-                            <p>Please login to load orders</p>
-                        </div>)
-                }
+                {this.statusInOrdersTable()}
 
                 <ConfirmModal
                     message={this.state.confirmModalMessage}
@@ -171,6 +152,75 @@ class OrdersList extends Component {
                 />
             </BaseLayout>
         );
+    }
+
+    getNetworkCode(){
+        return this.props.networkCode || localStorage.getItem('dfpNetworkCode')
+    }
+
+    @bind
+    changeNetworkCode() {
+        this.props.dfpAuthModalToggle();
+    }
+
+    statusInOrdersTable(){
+        const isLoggedIn = (this.props.type == AD_SERVER_MOPUB && this.state.loggedIn != null && this.state.loggedIn)
+                            || (this.props.type == AD_SERVER_DFP && this.props.dfpLoggedIn != null && this.props.dfpLoggedIn)
+
+        if(!isLoggedIn && !this.getNetworkCode() && this.props.type == AD_SERVER_DFP){
+            return (
+                <div className={"please-log-in"}>
+                    <p>
+                        Please&nbsp;<LoginLink>login</LoginLink>&nbsp;and provide&nbsp;
+                        <a href="#"
+                            onClick={this.changeNetworkCode}>
+                            Network Code
+                        </a>&nbsp;
+                        to load orders
+                    </p>
+                </div>
+            )
+        }
+
+        if(isLoggedIn && !this.getNetworkCode() && this.props.type == AD_SERVER_DFP){
+            return (
+                <div className={"please-log-in"}>
+                    <p>
+                        Please provide&nbsp;
+                        <a href="#"
+                            onClick={this.changeNetworkCode}>
+                            Network Code
+                        </a>&nbsp;
+                        to load orders
+                     </p>
+                </div>
+            )
+        }
+
+        if(!isLoggedIn && (this.getNetworkCode() || this.props.type == AD_SERVER_MOPUB)){
+            return (
+                <div className={"please-log-in"}>
+                    <p>Please&nbsp;<LoginLink>login</LoginLink>&nbsp;to load orders</p>
+                </div>
+            )
+        }
+
+        if(this.props.ordersLoaded){
+            return (
+                !this.props.orders.filter(this.state.filterFn).length && (
+                    <div className={"no-orders"}>
+                        <p>No orders</p>
+                    </div>
+                )
+            )
+        }
+
+        return (
+            <div className={"loading-in-progress"}>
+                <p>Loading...</p>
+                <svg width="100px"  height="100px"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" className="lds-rolling" style={{"background": "none"}}><circle cx="50" cy="50" fill="none"  stroke="#b3121e" strokeWidth="10" r="35" strokeDasharray="164.93361431346415 56.97787143782138" transform="rotate(68.8726 50 50)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 50;360 50 50" keyTimes="0;1" dur="2.1s" begin="0s" repeatCount="indefinite"></animateTransform></circle></svg>
+            </div>
+        )
     }
 
     @bind
@@ -532,12 +582,14 @@ const mapDispatchToProps = {
     setSwitcher: adServerActions.setSwitcher,
     refreshOrders: adServerActions.refreshOrders,
     filterOrderStatus: adServerActions.filterOrderStatus,
+    dfpAuthModalToggle: adServerActions.dfpAuthModalToggle
 };
 
 const mapStateToProps = state => ({
     orders: adServerSelectors.orders(state),
     ordersLoaded: adServerSelectors.ordersLoaded(state),
     dfpLoggedIn: adServerSelectors.dfpLoggedIn(state),
+    networkCode: adServerSelectors.networkCode(state),
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
     sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
