@@ -772,6 +772,7 @@ class CreateOrderModal extends Component {
 
         if (advertiser === "openx" || advertiser === "pubmatic") {
             if (advertiser === "pubmatic") {
+                granularity = 'auto';
                 items++
             }
             switch (granularity) {
