@@ -68,7 +68,6 @@ class OpenXCreateOrder extends CreateOrderForm {
                             value={this.props.attributes.granularity}
                             className={"mp-form-control"}
                         >
-                            <option value={""}>{""}</option>
                             <option value={"low"}>{"low"}</option>
                             <option value={"med"}>{"med"}</option>
                             <option value={"high"}>{"high"}</option>
