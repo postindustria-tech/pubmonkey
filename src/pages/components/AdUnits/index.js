@@ -107,7 +107,7 @@ class AdUnitsList extends Component {
                         adSource.end,
                         adSource.budgetType
                     ].join(',')
-                }).join('\n')
+                })
                 data.unshift([
                     'Name',
                     'Type',
@@ -120,7 +120,7 @@ class AdUnitsList extends Component {
                     'Budget Type'
                 ])
 
-                FileService.saveFile(data, `${adUnit.name}.csv`);
+                FileService.saveFile(data.join('\n'), `${adUnit.name}.csv`);
                 this.setState({exportInProgress: this.state.exportInProgress.filter(key => key != adUnit.key)})
             })
         }
