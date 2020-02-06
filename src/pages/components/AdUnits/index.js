@@ -109,15 +109,15 @@ class AdUnitsList extends Component {
                     ].join(',')
                 })
                 data.unshift([
-                    'Name',
+                    'Ad source',
                     'Type',
                     'Status',
-                    'Disabled/Enabled',
+                    'Enabled',
                     'Priority',
-                    'Bid',
+                    'Rate',
                     'Start',
-                    'End',
-                    'Budget Type'
+                    'Stop',
+                    'Goal/Progress'
                 ])
 
                 FileService.saveFile(data.join('\n'), `${adUnit.name}.csv`);
