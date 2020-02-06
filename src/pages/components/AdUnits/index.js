@@ -62,7 +62,7 @@ class AdUnitsList extends Component {
                                     <td>{ adunit.key }</td>
                                     {this.state.exportInProgress.includes(adunit.key) && <td><i className="fa fa-spinner fa-spin" aria-hidden="true"></i></td>}
                                     {this.props.type !== AD_SERVER_DFP && !this.state.exportInProgress.includes(adunit.key) && <td>
-                                        <i className={classnames("fa", "fa-download")} title={"Export AdUnit"} onClick={() => this.export(adunit)}></i>
+                                        <i className={classnames("fa", "fa-download")} title={"Export ad sources"} onClick={() => this.export(adunit)}></i>
                                     </td>}
                                 </tr>
                             ))
