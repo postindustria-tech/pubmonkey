@@ -10,6 +10,9 @@ class AdUnitsStats extends Component {
         }
         const apps = [...new Set(this.props.adunits.map(u => u.appKey))].length
         const length = this.props.adunits.length
+        if(!apps){
+            return (<React.Fragment></React.Fragment>)
+        }
         return (
             <React.Fragment>
                 {apps} apps, {length} ad units
