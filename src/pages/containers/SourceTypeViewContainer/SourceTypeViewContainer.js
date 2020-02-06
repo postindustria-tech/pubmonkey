@@ -51,7 +51,6 @@ class SourceTypeViewContainer extends PureComponent {
                         (
                             <div className="dfp-login-link" style={{display: "inline-block"}}>
                                 <a href="https://admanager.google.com/" target="_blank">Logged in.</a>
-                                &nbsp;
                                 <LogoutLink style={{textDecoration: "underline"}}>
                                     Logout
                                 </LogoutLink>

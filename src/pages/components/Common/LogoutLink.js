@@ -25,7 +25,7 @@ class LogoutLink extends Component {
             (this.props.type === AD_SERVER_DFP && !this.props.dfpLoggedIn)
             || (this.props.type === AD_SERVER_MOPUB && (loggedIn == null || !loggedIn))
         ){
-            return (<React.Fragment>CCCCCCC</React.Fragment>)
+            return (<React.Fragment></React.Fragment>)
         }
 
         if(this.props.type === AD_SERVER_DFP){
@@ -36,7 +36,7 @@ class LogoutLink extends Component {
             return (<a style={this.props.style} href="#" onClick={this.mopubLogOut}>{this.props.children}</a>)
         }
 
-        return (<React.Fragment>BBBBB</React.Fragment>)
+        return (<React.Fragment></React.Fragment>)
     }
 
     @bind
