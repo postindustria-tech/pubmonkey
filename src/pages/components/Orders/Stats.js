@@ -28,6 +28,9 @@ class OrdersStats extends Component {
             lineItems = isNaN(lineItems) ? 0 : lineItems
         }
 
+        if(!orders.length){
+            return (<React.Fragment></React.Fragment>)
+        }
 
         return (
             <React.Fragment>
