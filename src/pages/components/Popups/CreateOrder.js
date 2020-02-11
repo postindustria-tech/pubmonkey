@@ -104,7 +104,8 @@ class CreateOrderModal extends Component {
         networkClasses: {},
         orderKey: null,
         advertiser: defaultAdvertiser,
-        networkCode: ''
+        networkCode: '',
+        orders: []
     };
 
     state = initialState;
@@ -164,10 +165,10 @@ class CreateOrderModal extends Component {
     }
 
     componentWillReceiveProps = (props, state) => {
-        if(
+        if (
             this.props.orders.length != props.orders.length
             && props.orders.length - this.props.orders.length == 1
-        ){
+        ) {
             this.justCreatedOrder = props.orders.map(o => o.key).filter(key => !this.props.orders.map(o => o.key).includes(key))[0]
             ModalWindowService.AlertPopup.message = this.createModalMessage()
             console.log('NEW ORDER IS', this.justCreatedOrder)
@@ -176,7 +177,7 @@ class CreateOrderModal extends Component {
 
     createModalMessage = () => (
         <p style={{margin: 0}}>
-            Order has been created successfully.<br />
+            Order has been created successfully.<br/>
             {this.justCreatedOrder && <a href={this.getOrderUrl(this.justCreatedOrder)} target="_blank">
                 View in {this.props.type === AD_SERVER_DFP ? 'DFP' : 'MoPub'}
             </a>}
@@ -193,7 +194,7 @@ class CreateOrderModal extends Component {
         if (!modal) return;
         const height = modal.clientHeight,
             top = modal.offsetTop;
-        footer.style.width = (modal.clientWidth-2) + 'px';
+        footer.style.width = (modal.clientWidth - 2) + 'px';
         if (window.innerHeight > (height + top)) {
             footer.style.top = height + 'px';
             footer.style.bottom = 'auto';
@@ -318,7 +319,7 @@ class CreateOrderModal extends Component {
                         </Row>
 
                         {((advertiser) => {
-                            switch(advertiser) {
+                            switch (advertiser) {
                                 case 'amazon':
                                     return <AmazonCreateOrder
                                         formErrors={this.state.formErrors}
@@ -579,7 +580,7 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.adunits = "Your line item will not run without targeting an ad unit";
             isValid = false;
         }
-        if((isEmpty(this.state.advertiserId) || '--' == this.state.advertiserId) && this.props.type === AD_SERVER_DFP){
+        if ((isEmpty(this.state.advertiserId) || '--' == this.state.advertiserId) && this.props.type === AD_SERVER_DFP) {
             fieldValidationErrors.advertiserId = "Header Bidding Service DFP is required";
             isValid = false;
         }

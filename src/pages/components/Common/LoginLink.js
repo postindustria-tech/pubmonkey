@@ -5,7 +5,6 @@ import adServerActions from "../../../redux/actions/adServer";
 import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
 import bind from "bind-decorator";
 
-
 class LoginLink extends Component {
 
     state = {

@@ -7,10 +7,9 @@ import {connect} from "react-redux";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {AD_SERVER_DFP} from "../../constants/source";
 import {StatusSelect} from "../Select";
-import {
-    Col,
-    Row
-} from "reactstrap";
+import {Col, Row} from "reactstrap";
+import {isEmpty} from "../../helpers";
+
 const workerOptions = ['Pause', 'Resume', 'Archive'];
 
 class OrdersTable extends Component {
@@ -44,8 +43,11 @@ class OrdersTable extends Component {
     }
 
     actionsForSelectedItems = () => {
+        if (isEmpty(this.props.orders)) {
+            return (<React.Fragment></React.Fragment>)
+        }
         const checked = this.props.orders.filter(this.props.filter).filter(order => order.checked)
-        if(!checked.length){
+        if (!checked.length) {
             return (<React.Fragment></React.Fragment>)
         }
 
@@ -60,42 +62,42 @@ class OrdersTable extends Component {
                     <span className={"mp-label"}>
                         {checked.length} selected
                         {hasUnarchived && (
-                        <i
-                            className={classnames("fa", "fa-archive", {archived: false})}
-                            title="Archive"
-                            onClick={() => {
-                                checked.map(order => this.updateStatus("archived", order.key))
-                                this.resetChecked()
-                            }}
-                        ></i>)}
+                            <i
+                                className={classnames("fa", "fa-archive", {archived: false})}
+                                title="Archive"
+                                onClick={() => {
+                                    checked.map(order => this.updateStatus("archived", order.key))
+                                    this.resetChecked()
+                                }}
+                            ></i>)}
                         {hasArchived && (
-                        <i
-                            className={classnames("fa", "fa-archive", {archived: true})}
-                            title="Unarchive"
-                            onClick={() => {
-                                checked.map(order => this.updateStatus(this.props.type === AD_SERVER_DFP ? "unarchived" : "running", order.key))
-                                this.resetChecked()
-                            }}
-                        ></i>)}
+                            <i
+                                className={classnames("fa", "fa-archive", {archived: true})}
+                                title="Unarchive"
+                                onClick={() => {
+                                    checked.map(order => this.updateStatus(this.props.type === AD_SERVER_DFP ? "unarchived" : "running", order.key))
+                                    this.resetChecked()
+                                }}
+                            ></i>)}
                         {this.props.type !== AD_SERVER_DFP && (
-                        <React.Fragment>
-                            {hasRunning && <i
-                                className={classnames("fa", "fa-pause")}
-                                title="Disable"
-                                onClick={() => {
-                                    checked.map(order => this.updateStatus("paused", order.key))
-                                    this.resetChecked()
-                                }}
-                            ></i>}
-                            {hasPaused && <i
-                                className={classnames("fa", "fa-play")}
-                                title="Enable"
-                                onClick={() => {
-                                    checked.map(order => this.updateStatus("running", order.key))
-                                    this.resetChecked()
-                                }}
-                            ></i>}
-                        </React.Fragment>
+                            <React.Fragment>
+                                {hasRunning && <i
+                                    className={classnames("fa", "fa-pause")}
+                                    title="Disable"
+                                    onClick={() => {
+                                        checked.map(order => this.updateStatus("paused", order.key))
+                                        this.resetChecked()
+                                    }}
+                                ></i>}
+                                {hasPaused && <i
+                                    className={classnames("fa", "fa-play")}
+                                    title="Enable"
+                                    onClick={() => {
+                                        checked.map(order => this.updateStatus("running", order.key))
+                                        this.resetChecked()
+                                    }}
+                                ></i>}
+                            </React.Fragment>
                         )}
                     </span>
                 </Col>
@@ -108,79 +110,79 @@ class OrdersTable extends Component {
             {allSelected} = this.state;
 
         return (
-        <React.Fragment>
-            {this.actionsForSelectedItems()}
-            <Table className="orders-table">
-                <thead>
-                <tr>
-                    <th className="select select-all">
-                        <input
-                            type="checkbox"
-                            onChange={e => this.toggleAll(e.target.checked)}
-                            checked={allSelected}
-                        />
-                    </th>
-                    <th>Name</th>
-                    <th>Advertiser</th>
-                    <th>Line items</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {orders
-                    .filter(filter)
-                    .map(({name, status, advertiser, lineItemCount, key, checked = false}, index) => (
-                        <tr key={key} className="order">
-                            <td className="select">
-                                <input
-                                    type="checkbox"
-                                    checked={checked}
-                                    onChange={() => this.toggleSelected(key)}
-                                />
-                            </td>
-                            <td>
-                                <a target="_blank" href={this.getOrderUrl(key)}>
-                                    {name}
-                                </a>
-                            </td>
-                            <td>{advertiser}</td>
-                            <td>{Array.isArray(lineItemCount) ?
-                                lineItemCount.map((item, i) => {
-                                    return <p key={i}>{item}</p>;
-                                }) :
-                                lineItemCount}
-                            </td>
-                            <td>{status}{/*{this.props.type === AD_SERVER_DFP ?
+            <React.Fragment>
+                {this.actionsForSelectedItems()}
+                <Table className="orders-table">
+                    <thead>
+                    <tr>
+                        <th className="select select-all">
+                            <input
+                                type="checkbox"
+                                onChange={e => this.toggleAll(e.target.checked)}
+                                checked={allSelected}
+                            />
+                        </th>
+                        <th>Name</th>
+                        <th>Advertiser</th>
+                        <th>Line items</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {orders
+                        .filter(filter)
+                        .map(({name, status, advertiser, lineItemCount, key, checked = false}, index) => (
+                            <tr key={key} className="order">
+                                <td className="select">
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={() => this.toggleSelected(key)}
+                                    />
+                                </td>
+                                <td>
+                                    <a target="_blank" href={this.getOrderUrl(key)}>
+                                        {name}
+                                    </a>
+                                </td>
+                                <td>{advertiser}</td>
+                                <td>{Array.isArray(lineItemCount) ?
+                                    lineItemCount.map((item, i) => {
+                                        return <p key={i}>{item}</p>;
+                                    }) :
+                                    lineItemCount}
+                                </td>
+                                <td>{status}{/*{this.props.type === AD_SERVER_DFP ?
                                 <StatusSelect
                                     options={workerOptions}
                                     status={status}
                                     onSelect={status => this.changeOrderStatus(key, status)}
                                 /> : status}*/}
-                            </td>
-                            <td className="actions">
-                                <i
-                                    className={classnames("fa", "fa-archive", {
-                                        archived: status.toLowerCase() === "archived"
-                                    })}
-                                    title={status.toLowerCase() === "archived" ? "Unarchive" : "Archive"}
-                                    onClick={() => this.toggleArchive(status, key)}
-                                ></i>
-                                <i
-                                    className={classnames("fa", {
-                                        "fa-pause": status === "running",
-                                        "fa-play": status === "paused"
-                                    })}
-                                    title={status === "running" ? "Disable" : "Enable"}
-                                    onClick={() => this.togglePause(status, key)}
-                                ></i>
-                            </td>
-                        </tr>
-                    ))
-                }
-                </tbody>
-            </Table>
-        </React.Fragment>
+                                </td>
+                                <td className="actions">
+                                    <i
+                                        className={classnames("fa", "fa-archive", {
+                                            archived: status.toLowerCase() === "archived"
+                                        })}
+                                        title={status.toLowerCase() === "archived" ? "Unarchive" : "Archive"}
+                                        onClick={() => this.toggleArchive(status, key)}
+                                    ></i>
+                                    <i
+                                        className={classnames("fa", {
+                                            "fa-pause": status === "running",
+                                            "fa-play": status === "paused"
+                                        })}
+                                        title={status === "running" ? "Disable" : "Enable"}
+                                        onClick={() => this.togglePause(status, key)}
+                                    ></i>
+                                </td>
+                            </tr>
+                        ))
+                    }
+                    </tbody>
+                </Table>
+            </React.Fragment>
         );
     }
 
