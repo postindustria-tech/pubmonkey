@@ -61,11 +61,13 @@ class LogoutLink extends Component {
 
 const mapDispatchToProps = {
     dfpLogOut: adServerActions.dfpLogOut,
+    setDFPLoggedIn: adServerActions.dfpLoggedIn,
 };
 
 const mapStateToProps = state => ({
     type: adServerSelectors.switcherType(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
+    dfpLoggedIn: adServerSelectors.dfpLoggedIn(state)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LogoutLink)

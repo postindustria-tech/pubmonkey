@@ -19,18 +19,18 @@ class LoginLink extends Component {
     render() {
         const {loggedIn} = this.state;
 
-        if(
+        if (
             (this.props.type === AD_SERVER_DFP && this.props.dfpLoggedIn)
             || (this.props.type === AD_SERVER_MOPUB && loggedIn != null && loggedIn)
-        ){
+        ) {
             return (<React.Fragment></React.Fragment>)
         }
 
-        if(this.props.type === AD_SERVER_DFP){
+        if (this.props.type === AD_SERVER_DFP) {
             return (<a style={this.props.style} href="#" onClick={this.dfpLogIn}>{this.props.children}</a>)
         }
 
-        if(this.props.type === AD_SERVER_MOPUB){
+        if (this.props.type === AD_SERVER_MOPUB) {
             return (<a href="#" onClick={window.MopubAutomation.openLoginPage}>{this.props.children}</a>)
         }
 
