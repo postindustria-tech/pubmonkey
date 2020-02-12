@@ -16,7 +16,7 @@ export class Amazon extends AbstractAdvertiser {
     };
 
     getCreativeHtmlData(params) {
-        const [width, height] = params.creativeFormat.split("x")
+        const [width, height] = params.creativeFormat.split("x");
         let creativeHtmlData =
             '<div style="display:inline-block">\n' +
             '    <div id="__dtbAd__" style="width:{width}px; height:{height}px; overflow:hidden;">\n' +

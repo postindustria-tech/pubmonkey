@@ -563,20 +563,7 @@ class Handler extends AbstractHandler {
         let lineItemInfo = this.lineItemInfo;
         lineItemInfo = this.advertiser.setupDefaultValues(lineItemInfo, params);
 
-        let mask = "{bid}";
-        switch (advertiser) {
-            // case 'pubnative':
-            // keywordAdvertiser = 'pn_bid';
-            // break;
-            // case 'openx':
-            //
-            //     break;
-            case "amazon":
-                // keywordAdvertiser = 'amznslots:m320x50p';
-                mask = "{position}";
-                break;
-        }
-
+        const mask = String(advertiser) === 'amazon' ? '{position}' : "{bid}";
 
         if (!isEmpty(customTargetingKeys)) {
             this.customTargetingKeyId = customTargetingKeys[0];
@@ -586,7 +573,6 @@ class Handler extends AbstractHandler {
                 displayName: this.advertiser.customTargetingKey,
                 type: "FREEFORM"
             }]);
-            // console.log(newKeys);
             this.customTargetingKeyId = newKeys[0].id;
         }
 
@@ -953,7 +939,7 @@ class Handler extends AbstractHandler {
                         order.advertiserId,
                         "Creative for " + order.name,
                         size,
-                        this.advertiser.getCreativeHtmlData(params)
+                        advertiser === 'openx' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                     )
                 ]);
                 if (creatives.length === 1) {
@@ -965,16 +951,17 @@ class Handler extends AbstractHandler {
 
             return this.createLineItems(lineItems)
                 .then(lineItems => {
-                    let associations = [];
-                    lineItems.map(({id}) => {
-                        associations.push(LineItemCreativeAssociation(
-                            id,
-                            creative.id,
-                            [Size(width, height, false)]
-                        ));
-                    });
-                    this.createLineItemCreativeAssociations(associations);
-
+                    if (creative) {
+                        let associations = [];
+                        lineItems.map(({id}) => {
+                            associations.push(LineItemCreativeAssociation(
+                                id,
+                                creative.id,
+                                [Size(width, height, false)]
+                            ));
+                        });
+                        this.createLineItemCreativeAssociations(associations);
+                    }
                     return lineItems;
                 })
                 .then(lineItems => {
