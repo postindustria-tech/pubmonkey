@@ -233,12 +233,14 @@ class OrdersTable extends Component {
             allSelected: checked
         });
 
-        onUpdate(
-            orders.map(order => {
-                order.checked = checked;
-                return order;
-            })
-        );
+        if (orders && onUpdate) {
+            onUpdate(
+                orders.map(order => {
+                    order.checked = checked;
+                    return order;
+                })
+            );
+        }
     }
 
     toggleSelected(_key) {
