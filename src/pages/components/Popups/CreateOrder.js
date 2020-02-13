@@ -572,6 +572,10 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.step = "Range too short!";
             isValid = false;
         }
+        if (this.props.type === AD_SERVER_DFP && ["amazon", "openx"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.creativeFormat)) {
+            fieldValidationErrors.adType = "Creative Format is required!";
+            isValid = false;
+        }
         if (["clearbid", "pubmatic", "pubnative", "smaato"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.customEventClassName)) {
             fieldValidationErrors.adType = "Custom Event Class Name is required!";
             isValid = false;
