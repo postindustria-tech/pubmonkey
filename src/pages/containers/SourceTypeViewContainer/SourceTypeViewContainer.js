@@ -6,8 +6,8 @@ import bind from "bind-decorator";
 import adServerActions from "../../../redux/actions/adServer";
 import AuthModal from "../../sources/dfp/AuthModal";
 import Promise from "bluebird";
-import LoginLink from "../../Components/Common/LoginLink"
-import LogoutLink from "../../Components/Common/LogoutLink"
+import LoginLink from "../../components/Common/LoginLink"
+import LogoutLink from "../../components/Common/LogoutLink"
 
 class SourceTypeViewContainer extends PureComponent {
 
