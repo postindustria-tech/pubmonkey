@@ -7,12 +7,13 @@ let headers = {
     'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;?.*/g, '$1')
 };
 
-// if(isLoadedByFrame) {
+
+if(isLoadedByFrame) {
     chrome.runtime.onMessage.addListener(({ action, payload }, { id }, sendResponse) => {
         try {
             if (action === 'init') {
                 sendResponse({
-                    name: document.querySelectorAll('#account-menu a.user-nav-top')[0].innerText.trim()
+                    name: document.querySelectorAll('nav div span.Icon')[0].parentNode.innerText.trim()
                 })
             }
 
@@ -56,4 +57,4 @@ let headers = {
             sendResponse({ ok: false, error: err })
         }
     });
-// }
+}
