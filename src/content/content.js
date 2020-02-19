@@ -1,60 +1,61 @@
 import axios from 'axios'
 
-const isLoadedByFrame = window.self !== window.top
-
-let headers = {
-    'x-requested-with': 'XMLHttpRequest',
-    'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;?.*/g, '$1')
-};
-
-
-if(isLoadedByFrame) {
-    chrome.runtime.onMessage.addListener(({ action, payload }, { id }, sendResponse) => {
-        try {
-            if (action === 'init') {
-                sendResponse({
-                    name: document.querySelectorAll('nav div span.Icon')[0].parentNode.innerText.trim()
-                })
+window.onload = () => {
+    if(window.self !== window.top) {
+        const headers = {
+                'x-requested-with': 'XMLHttpRequest',
+                'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;?.*/g, '$1')
             }
 
-            if (action === 'request') {
-                if (payload.isFormData) {
-                    let formData = new FormData,
-                        { data } = payload
+        let accountContainer = document.querySelectorAll('nav div span.Icon')[0]
+            name = accountContainer? accountContainer.parentNode.innerText.trim() : ''
 
-                    Object.keys(data).forEach(key => {
-                        if (
-                            ['form-0-weekdays', 'adunits', 'targeted_countries'].includes(key)
-                            && Array.isArray(data[key])
-                        ) {
-                            data[key].forEach(value => formData.append(key, value))
-                        } else {
-                            formData.append(key, data[key])
-                        }
-                    });
+        // initialization
+        chrome.runtime.sendMessage({
+            name
+        })
 
-                    delete payload.isFormData
-                    payload.data = formData
+        chrome.runtime.onMessage.addListener(({ action, payload }, { id }, sendResponse) => {
+            try {
+                if (action === 'reload') {
+                    // console.log('iframe reloaded!')
+                    location.reload();
+                    return true
                 }
 
-                let response = (...args) => {
-                    // console.log(args)
-                    sendResponse(...args)
-                };
+                if (action === 'request') {
+                    if (payload.isFormData) {
+                        let formData = new FormData,
+                            { data } = payload
 
-                payload.headers = headers;
+                        Object.keys(data).forEach(key => {
+                            if (
+                                ['form-0-weekdays', 'adunits', 'targeted_countries'].includes(key)
+                                && Array.isArray(data[key])
+                            ) {
+                                data[key].forEach(value => formData.append(key, value))
+                            } else {
+                                formData.append(key, data[key])
+                            }
+                        });
 
-                axios(payload)
-                    .then(({ data }) => data)
-                    .then(data => response({ ok: true, data }))
-                    .catch(error => {
-                        response({ ok: false, error: error.response.data })
-                    });
+                        delete payload.isFormData
+                        payload.data = formData
+                    }
 
+                    payload.headers = headers;
+
+                    axios(payload)
+                        .then(({ data }) => sendResponse({ ok: true, data }))
+                        .catch(err => sendResponse({ ok: false, error: err.response.data }));
+
+                    return true
+                }
+            } catch(err) {
+                sendResponse({ ok: false, error: err })
                 return true
             }
-        } catch(err) {
-            sendResponse({ ok: false, error: err })
-        }
-    });
+
+        });
+    }
 }

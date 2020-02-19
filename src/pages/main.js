@@ -2,9 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {AppRouter} from './router'
 
-import './sources'
 import './auth'
-
+import './sources'
 
 ReactDOM.render(
     <AppRouter/>,
