@@ -13,9 +13,7 @@ chrome.tabs.query({ url: EXTENSION_URL}, tabs =>
 );
 
 chrome.runtime.onMessage.addListener(({ name }, { frameId }) => {
-    chrome.tabs.getCurrent(tab => {
-        const tabId = tab.id
-
+    chrome.tabs.getCurrent(({ id: tabId }) => {
         CJ.request = {
             tabId,
             frameId
@@ -24,20 +22,21 @@ chrome.runtime.onMessage.addListener(({ name }, { frameId }) => {
         // console.log('iframe initialization', CJ.request)
 
         resolveName(name)
-
-        // Refresh mopub's iframe every 5 minutes for a valid csrf token
-        setTimeout(() => {
-            chrome.tabs.sendMessage(tabId, { action:'reload' }, { frameId })
-        }, 5 * 60 * 1000)
     })
 })
 
+// Refresh mopub's iframe every 5 minutes for a valid csrf token
+setInterval(
+    () => chrome.tabs.sendMessage(CJ.request.tabId, { action:'reload' }, { frameId: CJ.request.frameId }),
+    5 * 60 * 1000
+)
 
 chrome.webRequest.onHeadersReceived.addListener(
     ({ responseHeaders }) =>
         ({
             responseHeaders: responseHeaders.filter(
-                ({ name }) => name !== "x-frame-options")
+                ({ name }) => name !== "x-frame-options"
+            )
         })
     ,
     {

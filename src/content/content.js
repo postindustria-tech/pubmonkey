@@ -7,8 +7,8 @@ window.onload = () => {
                 'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;?.*/g, '$1')
             }
 
-        let accountContainer = document.querySelectorAll('nav div span.Icon')[0]
-            name = accountContainer? accountContainer.parentNode.innerText.trim() : ''
+        let accountContainer = document.querySelectorAll('nav div span.Icon')[0],
+            name = accountContainer ? accountContainer.parentNode.innerText.trim() : ''
 
         // initialization
         chrome.runtime.sendMessage({
