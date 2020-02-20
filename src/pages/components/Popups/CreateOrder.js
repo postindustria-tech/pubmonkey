@@ -273,7 +273,7 @@ class CreateOrderModal extends Component {
                                     name={"advertiser"}
                                     id="advertiser"
                                     onChange={this.handleInputChange}
-                                    value={this.state.advertiser}
+                                    value={this.state.advertiser || ''}
                                     className={"mp-form-control"}
                                 >
                                     {Object.keys(this.props.ADVERTISER_DEFAULT_NAME).map(
@@ -304,7 +304,7 @@ class CreateOrderModal extends Component {
                                     type="select"
                                     name={"advertiserId"}
                                     onChange={this.handleInputChange}
-                                    value={this.state.advertiserId}
+                                    value={this.state.advertiserId || ''}
                                     id="advertiserId"
                                     className={"mp-form-control"}
                                 >
