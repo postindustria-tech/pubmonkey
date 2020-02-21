@@ -427,51 +427,7 @@ class Handler extends AbstractHandler {
         });
     }
 
-    // async prepareMoPubTabForRequests() {
-    //     let mopubSessionUpdatedAt = Date.now();
-    //     localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
-    //     let {tabId, frameId} = window.MopubAutomation.request;
-    //
-    //     tabId = await this.promiseQuery({index: tabId})
-    //         .then(tabs => {
-    //             if (!tabs.length) {
-    //                 return this.promiseQuery({active: false})
-    //                     .then(tabs => {
-    //                         const mopub = tabs.filter(tab => {
-    //                             const url = new URL(tab.url);
-    //                             const domain = url.hostname;
-    //                             return domain === "app.mopub.com";
-    //                         });
-    //                         if (mopub.length === 0) {
-    //                             // open new tab
-    //                             return this.promiseCreate({url: "https://app.mopub.com/dashboard", active: false})
-    //                                 .then(tab => {
-    //                                     return tab.id;
-    //                                 });
-    //                         } else {
-    //                             return mopub[0].id;
-    //                         }
-    //                     });
-    //             } else {
-    //                 return tabId;
-    //             }
-    //         });
-    //
-    //     window.MopubAutomation.request = {
-    //         frameId: 0,
-    //         tabId: tabId
-    //     };
-    //
-    //     chrome.tabs.reload(tabId, {}, function () {
-    //         console.log('reloading mopub page');
-    //     });
-    //     await delay(5000);
-    // }
-
     async createOrderDataFromSet(order, params, stepCallback) {
-
-        // await this.prepareMoPubTabForRequests();
-
         return this.createOrder(order).then(order => {
             const lineItems = this.advertiser.composerLineItems(order.key, params);
 
