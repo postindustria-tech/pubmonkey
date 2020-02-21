@@ -21,10 +21,10 @@ class SourceTypeViewContainer extends PureComponent {
         this.setNetworkCode();
 
         window.MopubAutomation.username
-            .then(username => this.setState({username}));
+            .then(username => this.setState({ username }));
 
         window.MopubAutomation.loggedIn
-            .then(loggedIn => this.setState({loggedIn}));
+            .then(loggedIn => this.setState({ loggedIn }));
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -40,7 +40,7 @@ class SourceTypeViewContainer extends PureComponent {
 
     render() {
 
-        const {username, loggedIn} = this.state;
+        const { username, loggedIn } = this.state;
 
         return (
             <div className={"username"}>
@@ -75,7 +75,7 @@ class SourceTypeViewContainer extends PureComponent {
                     loggedIn != null && loggedIn
                         ? (
                             <div>
-                                <a href="https://app.mopub.com/dashboard/" target="_blank">Logged in.</a>
+                                <a href="https://app.mopub.com/dashboard/" target="_blank">{ username }</a>
                                 &nbsp;
                                 <LogoutLink style={{textDecoration: "underline"}}>
                                     Logout

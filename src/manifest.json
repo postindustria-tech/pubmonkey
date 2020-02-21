@@ -17,7 +17,6 @@
   },
   "permissions": [
     "tabs",
-    "cookies",
     "webRequest",
     "webRequestBlocking",
     "https://app.mopub.com/*",
