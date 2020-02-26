@@ -669,7 +669,7 @@ class Handler extends AbstractHandler {
                         keywords.push(bidDecimal.toFixed(2));
                     }
                     // 3.05 ... 8 (0.05)
-                    step = toInteger(0.1);
+                    step = toInteger(0.05);
                     rangeFrom = toInteger(3.05);
                     rangeTo = toInteger(8);
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
