@@ -85,7 +85,14 @@ class OpenXCreateOrder extends CreateOrderForm {
                     <Col className={"col-sm-4"}>
                         <Label className={"mp-label"}>Keywords template: </Label>
                         <div>
-                        {this.props.attributes.keywordTemplate}
+                        <Input 
+                            className="mr-sm-2"
+                            name="keywordTemplate"
+                            style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
+                            placeholder={this.props.attributes.keywordTemplate}
+                            onChange={this.handleInputChange}
+                            value={this.props.attributes.keywordTemplate}
+                        />
                         </div>
                     </Col>
                     <Col className={"col-sm-4"}>
