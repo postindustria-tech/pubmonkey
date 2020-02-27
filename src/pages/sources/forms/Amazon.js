@@ -191,8 +191,9 @@ class AmazonCreateOrder extends CreateOrderForm {
                             One line per line item in the format "key:value" (without quotes), where key denotes
                             the line item targeting keyword, and value is the line item price.
                         </Tooltip>
-                        <textarea
+                        <Input type="textarea"
                             className="mr-sm-2"
+                            name="amazonCSVItems"
                             style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
                             onBlur={this.handleCSVChange}
                             onKeyDown={event => {
@@ -201,8 +202,7 @@ class AmazonCreateOrder extends CreateOrderForm {
                                 }
                             }}
                             placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
-                            onChange={() => {
-                            }}
+                            onChange={this.handleInputChange}
                             value={this.props.attributes.amazonCSVItems}
                         />
                     </Col>
