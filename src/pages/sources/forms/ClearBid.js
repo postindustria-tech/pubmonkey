@@ -109,18 +109,18 @@ class ClearBidCreateOrder extends CreateOrderForm {
                         <Label className="mp-label">
                             Price band:
                         </Label>
-                        <textarea
+                        <Input type="textarea"
                             className="mr-sm-2"
                             style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
                             onBlur={this.handlePriceBandChange}
+                            name="priceBand"
                             onKeyDown={event => {
                                 if (13 == event.keyCode) {
                                     this.handlePriceBandChange(event)
                                 }
                             }}
                             placeholder="0.01,0.2,0.4,0.6,0.8,1,1.25,1.5,1.65,1.75,1.85,1.95,2,2.05,2.15,2.25,2.35,2.5,2.75,3,3.5,4,4.5,5,5.5,6,6.5,7,8,9,10,15,20"
-                            onChange={() => {
-                            }}
+                            onChange={this.handleInputChange}
                             value={this.props.attributes.priceBand}
                         />
                     </Col>
