@@ -93,7 +93,6 @@ class OpenXCreateOrder extends CreateOrderForm {
                             placeholder={this.props.attributes.keywordTemplate}
                             onChange={this.handleInputChange}
                             value={this.props.attributes.keywordTemplate}
-                            {...(this.props.type === AD_SERVER_DFP ? {readOnly: true} : {})}
                         />
                         </div>
                     </Col>
