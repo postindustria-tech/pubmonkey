@@ -20,6 +20,6 @@ export function pagesCSS() {
     return gulp.src('./src/pages/**/*.scss')
         .pipe(sass().on('error', sass.logError))
         .pipe(concat('styles.css'))
-        .pipe(postcss(postcssPlugins))
+        // .pipe(postcss(postcssPlugins))
         .pipe(gulp.dest('./build/pages/css'))
 }
