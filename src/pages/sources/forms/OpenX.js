@@ -9,6 +9,7 @@ import {
     KEYWORD_PLACEHOLDER,
     KEYWORD_TEMPLATE_DEFAULT_VALUE
 } from "../../constants/common";
+import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import {isEmpty} from "../../helpers";
 import _ from "underscore";
 import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../components";
@@ -92,6 +93,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                             placeholder={this.props.attributes.keywordTemplate}
                             onChange={this.handleInputChange}
                             value={this.props.attributes.keywordTemplate}
+                            {...(this.props.type === AD_SERVER_DFP ? {readOnly: true} : {})}
                         />
                         </div>
                     </Col>
@@ -155,6 +157,7 @@ class OpenXCreateOrder extends CreateOrderForm {
 const mapStateToProps = state => ({
     adunits: adServerSelectors.adunits(state),
     sourceHandler: adServerSelectors.sourceHandler(state),
+    type: adServerSelectors.switcherType(state),
 
     ...adServerSelectors.dfpInventory(state),
     ...adServerSelectors.duplicateOrder(state),
