@@ -1,4 +1,6 @@
 .base-layout {
+    min-height: calc(100vh - 24px);
+
     .header {
         background: #14171a;
         color: #fff;
