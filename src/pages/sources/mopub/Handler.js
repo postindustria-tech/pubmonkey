@@ -456,13 +456,13 @@ class Handler extends AbstractHandler {
                         if (idx > 0 && idx % 50 === 0) {
                             // wait for last request
                             await delay(1000);
-                            let mopubSessionUpdatedAt = Date.now();
-                            localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
-                            let {tabId, frameId} = window.MopubAutomation.request;
-                            chrome.tabs.reload(tabId, {}, function () {
-                                console.log('reloading mopub page');
-                            });
-                            await delay(10000);
+                            // let mopubSessionUpdatedAt = Date.now();
+                            // localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+                            // let {tabId, frameId} = window.MopubAutomation.request;
+                            // chrome.tabs.reload(tabId, {}, function () {
+                            //     console.log('reloading mopub page');
+                            // });
+                            // await delay(10000);
                         } else {
                             await delay(50);
                         }
