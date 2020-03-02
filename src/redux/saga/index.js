@@ -18,7 +18,6 @@ function* getOrders(action) {
             console.log("sourceHandler isn't ready");
         }
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -28,7 +27,6 @@ function* getOrdersAfter(sourceHandler) {
         const orders = yield sourceHandler.getOrdersAfter(ordersOriginal) || ordersOriginal;
         yield put(adServerActions.setOrdersAfter(orders));
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -41,7 +39,6 @@ function* getAdUnits(action) {
             yield put(adServerActions.setAdUnits(adunits));
         }
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -57,7 +54,6 @@ function* setSourceHandler(action) {
         // }
         // yield setSourceHandlerAfter();
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -93,7 +89,6 @@ function* setSourceHandlerAfter() {
             }
         }
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -105,7 +100,6 @@ function* setNetworkCode() {
             yield put(adServerActions.setSourceHandler(sourceHandler));
         }
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -156,7 +150,6 @@ function* loadAdvertiser(action) {
             }));
         }
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -271,7 +264,6 @@ function* setCreateOrderModalToggle(action) {
         }));
 
     } catch (error) {
-        console.log(error);
     }
 }
 

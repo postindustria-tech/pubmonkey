@@ -111,7 +111,6 @@ class CreateOrderModal extends Component {
     state = initialState;
 
     reset() {
-        console.log('reset state');
         this.setState(initialState);
     }
 
@@ -171,7 +170,6 @@ class CreateOrderModal extends Component {
         ) {
             this.justCreatedOrder = props.orders.map(o => o.key).filter(key => !this.props.orders.map(o => o.key).includes(key))[0]
             ModalWindowService.AlertPopup.message = this.createModalMessage()
-            console.log('NEW ORDER IS', this.justCreatedOrder)
         }
     };
 

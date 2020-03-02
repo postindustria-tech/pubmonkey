@@ -19,8 +19,6 @@ chrome.runtime.onMessage.addListener(({ name }, { frameId }) => {
             frameId
         }
 
-        // console.log('iframe initialization', CJ.request)
-
         resolveName(name)
     })
 })

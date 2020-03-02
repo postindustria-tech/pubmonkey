@@ -20,7 +20,6 @@ export default class AbstractHandler {
 
     setAdvertiser(advertiser) {
         this.advertiser = this.advertiserFactory.getHandler(advertiser);
-        // console.log(`set advertiser ${advertiser}`);
     }
 
     getAdvertiser() {

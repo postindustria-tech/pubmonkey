@@ -6,7 +6,6 @@ export default class SourceFactory {
     }
 
     static getHandler (adServer) {
-        // console.log('new instance of ' + adServer);
         return new pull[adServer]
     }
 }

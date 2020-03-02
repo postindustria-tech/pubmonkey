@@ -439,7 +439,6 @@ class OrdersList extends Component {
 
     @bind
     loadOrders() {
-        console.log('loadOrders: ' + this.props.type);
         this.props.refreshOrders();
     }
 

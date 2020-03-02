@@ -25,11 +25,6 @@ export class CreatableSingle extends Component {
     };
 
     handleChange = (newValue, actionMeta) => {
-        // console.group('Value Changed');
-        // console.log(newValue);
-        // console.log(`action: ${actionMeta.action}`);
-        // console.groupEnd();
-
         this.setState({value: newValue});
 
         if (this.props.onSelect) {
@@ -38,10 +33,7 @@ export class CreatableSingle extends Component {
     };
 
     handleInputChange = (inputValue, actionMeta) => {
-        // console.group('Input Changed');
-        // console.log(inputValue);
-        // console.log(`action: ${actionMeta.action}`);
-        // console.groupEnd();
+
     };
 
     render() {

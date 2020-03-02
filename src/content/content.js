@@ -18,7 +18,6 @@ window.onload = () => {
         chrome.runtime.onMessage.addListener(({ action, payload }, { id }, sendResponse) => {
             try {
                 if (action === 'reload') {
-                    // console.log('iframe reloaded!')
                     location.reload();
                     return true
                 }

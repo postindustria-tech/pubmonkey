@@ -178,15 +178,9 @@ class Handler extends AbstractHandler {
         if (!this.token) {
             this.token = await this.getToken();
         }
-        // console.log(this.token);
         if (!this.dfp) {
             this.dfp = new DFP({networkCode: this.networkCode, apiVersion: DFP_API_VERSION, token: this.token});
         }
-        // const Service = await this.dfp.getService('UserService');
-        // Service.setToken(this.token);
-        //
-        // Handler.user = await Service.getCurrentUser({});
-        // console.log(user);
 
         return this.dfp;
     }
@@ -275,11 +269,9 @@ class Handler extends AbstractHandler {
                     adunits = [];
                 }
                 adunits = adunits.filter(({hasChildren}) => !hasChildren);
-                // console.log(adunits);
 
                 resolve(adunits);
             } catch (err) {
-                // console.log(err);
             }
         }).then(adunits => {
             adunits = adunits.map(adunit => ({
@@ -300,14 +292,12 @@ class Handler extends AbstractHandler {
 
                 if (orders.totalResultSetSize > 0) {
                     orders = orders.results;
-                    // console.log(orders);
                 } else {
                     orders = [];
                 }
 
                 resolve(orders);
             } catch (err) {
-                // console.log(err);
             }
         }).then(orders => {
             return orders.map(order => {
@@ -358,8 +348,6 @@ class Handler extends AbstractHandler {
                 query: 'WHERE OrderId IN (' + ids.join(',') + ')'
             });
 
-            // console.log(lineItems);
-
             if (lineItems.totalResultSetSize > 0) {
                 lineItems = lineItems.results;
             } else {
@@ -376,12 +364,10 @@ class Handler extends AbstractHandler {
             try {
                 let companies = await this._getByStatement('CompanyService', {});
 
-                // console.log(companies.results);
                 companies = companies.results;
 
                 resolve(companies);
             } catch (err) {
-                // console.log(err);
             }
         }).then(companies => {
             companies = companies.map(company => ({
@@ -393,20 +379,6 @@ class Handler extends AbstractHandler {
             return companies;
         });
     }
-
-    /*async getAdvertiser(advertiserId) {
-        return new Promise(async (resolve, reject) => {
-
-            let companies = await this._getByStatement('CompanyService', {
-                query: "WHERE id = " + advertiserId
-            });
-
-            // console.log(companies.results);
-            companies = companies.results;
-
-            resolve(companies[0]);
-        });
-    }*/
 
     async getCurrentUser() {
         return new Promise(async (resolve, reject) => {
@@ -442,11 +414,9 @@ class Handler extends AbstractHandler {
                     keys = [];
                 }
                 keys = keys.filter(({status}) => status === 'ACTIVE');
-                // console.log(keys);
 
                 resolve(keys);
             } catch (err) {
-                // console.log(err);
             }
         });
     }
@@ -468,11 +438,9 @@ class Handler extends AbstractHandler {
                 } else {
                     values = [];
                 }
-                // console.log(values);
 
                 resolve(values);
             } catch (err) {
-                // console.log(err);
             }
         });
     }
@@ -526,8 +494,6 @@ class Handler extends AbstractHandler {
             if (result.hasOwnProperty('numChanges') && result.numChanges === 1) {
                 return resolve({status: resultStatus.toUpperCase()});
             }
-
-            // console.log(result);
 
             reject(result);
         });
@@ -741,8 +707,6 @@ class Handler extends AbstractHandler {
             return self.indexOf(value) === index;
         });
 
-        // console.log(this.customTargetingValues, keywords, newKeywords);
-
         if (!isEmpty(newKeywords)) {
             newKeywords = newKeywords.map(keyword => {
                 return {
@@ -766,13 +730,9 @@ class Handler extends AbstractHandler {
 
                 const values = await this.findOrCreateKeywords([line.substring(0, line.indexOf(':'))]);
 
-                // console.log(values);
-
                 _lineItemInfo.targeting.customTargeting = CustomCriteriaSet(
                     [CustomCriteria(this.customTargetingKeyId, values)]
                 );
-
-                // console.log({..._lineItemInfo});
 
                 _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
 
@@ -846,13 +806,9 @@ class Handler extends AbstractHandler {
 
                 const values = await this.findOrCreateKeywords(keywords);
 
-                // console.log(values);
-
                 _lineItemInfo.targeting.customTargeting = CustomCriteriaSet(
                     [CustomCriteria(this.customTargetingKeyId, values)]
                 );
-
-                // console.log({..._lineItemInfo});
 
                 _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
 
@@ -864,8 +820,6 @@ class Handler extends AbstractHandler {
                 }];
             }));
         }
-
-        console.log(lineItems);
 
         return lineItems;
     }
@@ -1019,8 +973,6 @@ class Handler extends AbstractHandler {
                     ]
                 });
             } catch (e) {
-                console.log(e);
-
                 let message = e;
 
                 const parser = new DOMParser();
@@ -1044,8 +996,6 @@ class Handler extends AbstractHandler {
                 return reject(message);
             }
 
-            console.log(orders[0]);
-
             resolve(orders[0]);
         });
     }
@@ -1059,8 +1009,6 @@ class Handler extends AbstractHandler {
             let lineItems = await Service.createLineItems({
                 lineItems: data
             });
-
-            console.log(lineItems);
 
             resolve(lineItems);
         });
@@ -1076,8 +1024,6 @@ class Handler extends AbstractHandler {
                 creatives: data
             });
 
-            console.log(creatives);
-
             resolve(creatives);
         });
     }
@@ -1091,8 +1037,6 @@ class Handler extends AbstractHandler {
             let associations = await Service.createLineItemCreativeAssociations({
                 lineItemCreativeAssociations: data
             });
-
-            console.log(associations);
 
             resolve(associations);
         });
@@ -1109,14 +1053,11 @@ class Handler extends AbstractHandler {
                 keys: data
             });
 
-            console.log(keys);
-
             resolve(keys);
         }).then(keys => {
             const ids = keys.map(({id}) => {
                 return id;
             });
-            console.log(ids);
             Service.performCustomTargetingKeyAction({
                 customTargetingKeyAction: {
                     attributes: {'xsi:type': 'ActivateCustomTargetingKeys'}
@@ -1138,8 +1079,6 @@ class Handler extends AbstractHandler {
             let values = await Service.createCustomTargetingValues({
                 values: data
             });
-
-            console.log(values);
 
             resolve(values);
         });

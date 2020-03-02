@@ -222,7 +222,6 @@ class OrdersTable extends Component {
 
     @bind
     loadOrders() {
-        console.log("loadOrders: " + this.props.adServer);
         this.props.setSwitcher(this.props.adServer);
     }
 
