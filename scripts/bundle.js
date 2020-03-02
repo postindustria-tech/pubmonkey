@@ -77,11 +77,6 @@ function getBundler(dest) {
         })
     )
 
-    // if (isDev) {
-    //     browserifyInc(bundler[dest], {
-    //         cacheFile: `./scripts/temp/${fileName}.json`
-    //     })
-    // }
     if (isDev) {
         browserifyInc(bundler[dest], {
             cacheFile: `./scripts/temp/${fileName}.json`

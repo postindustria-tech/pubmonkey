@@ -14,9 +14,15 @@ const mainInitialState = {
     adServer: adServerInitialState
 };
 
-console.log(process)
+let middlewares
 
-const store = createStore(mainReducer, mainInitialState, applyMiddleware(process.env.NODE_ENV !== 'production' && logger, sagaMiddleware));
+if (process.env.NODE_ENV === 'development') {
+    middlewares = applyMiddleware(logger, sagaMiddleware);
+} else {
+    middlewares = applyMiddleware(sagaMiddleware);
+}
+
+const store = createStore(mainReducer, mainInitialState, middlewares);
 
 sagaMiddleware.run(rootSaga);
 

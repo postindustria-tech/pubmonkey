@@ -15,7 +15,7 @@ function* getOrders(action) {
             yield put(adServerActions.setOrders(orders));
             yield getOrdersAfter(sourceHandler);
         } else {
-            console.log("sourceHandler isn't ready");
+            // console.log("sourceHandler isn't ready");
         }
     } catch (error) {
     }
