@@ -54,7 +54,7 @@ class AuthModal extends Component {
     render() {
         return (
             <Modal isOpen={this.props.dfpAuthModalOpen} toggle={this.toggle}>
-                <ModalHeader>Google Ad Manager (DFP)</ModalHeader>
+                <ModalHeader>Google Ad Manager (former DFP)</ModalHeader>
                 <ModalBody>
                     <div className="panel panel-default">
                         <FormErrors

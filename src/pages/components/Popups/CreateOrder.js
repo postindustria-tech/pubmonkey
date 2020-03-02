@@ -585,7 +585,7 @@ class CreateOrderModal extends Component {
             isValid = false;
         }
         if ((isEmpty(this.state.advertiserId) || '--' == this.state.advertiserId) && this.props.type === AD_SERVER_DFP) {
-            fieldValidationErrors.advertiserId = "Header Bidding Service DFP is required";
+            fieldValidationErrors.advertiserId = "Header Bidding Service GAM is required";
             isValid = false;
         }
         if (isEmpty(this.state.granularity) && this.state.selectedAdvertiser === 'openx') {
