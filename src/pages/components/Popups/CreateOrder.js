@@ -638,30 +638,34 @@ class CreateOrderModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
+
         if (['rangeFrom', 'rangeTo', 'amazonStartPrice', 'amazonStep'].includes(name)) {
             if (value !== "" && !ONLY_NUMBERS.test(value)) {
                 return;
             }
         }
+
         if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
             let lineItemsNaming = KEYWORD_PLACEHOLDER["amazon"];
+
             if (value.indexOf("x") !== -1) {
                 const [width, height] = value.split("x");
                 lineItemsNaming = lineItemsNaming.replace("{width}", width).replace("{height}", height);
             }
+
             this.setState({
                 keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value),
                 lineItemsNaming: lineItemsNaming
-            });
+            }, () => this.setState({[name]: value}));
         }
+
         if (name === "os") {
             this.setState({
                 adUnitsSelected: [],
                 networkClass: this.props.networkClasses[value][0],
                 customEventClassName: this.props.networkClasses[value][0].hasOwnProperty('value') ? this.props.networkClasses[value][0].value : ''
-            });
+            }, () => this.setState({[name]: value}));
         }
-        this.setState({[name]: value});
     }
 
     @bind
