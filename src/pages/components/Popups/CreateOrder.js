@@ -645,27 +645,29 @@ class CreateOrderModal extends Component {
             }
         }
 
-        if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
-            let lineItemsNaming = KEYWORD_PLACEHOLDER["amazon"];
+        this.setState({[name]: value}, () => {
+            if (name === "creativeFormat" && this.state.selectedAdvertiser === "amazon") {
+                let lineItemsNaming = KEYWORD_PLACEHOLDER["amazon"];
 
-            if (value.indexOf("x") !== -1) {
-                const [width, height] = value.split("x");
-                lineItemsNaming = lineItemsNaming.replace("{width}", width).replace("{height}", height);
+                if (value.indexOf("x") !== -1) {
+                    const [width, height] = value.split("x");
+                    lineItemsNaming = lineItemsNaming.replace("{width}", width).replace("{height}", height);
+                }
+
+                this.setState({
+                    keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value),
+                    lineItemsNaming: lineItemsNaming
+                });
             }
 
-            this.setState({
-                keywordTemplate: CreateOrderModal.getKeywordTemplate("amazon", value),
-                lineItemsNaming: lineItemsNaming
-            }, () => this.setState({[name]: value}));
-        }
-
-        if (name === "os") {
-            this.setState({
-                adUnitsSelected: [],
-                networkClass: this.props.networkClasses[value][0],
-                customEventClassName: this.props.networkClasses[value][0].hasOwnProperty('value') ? this.props.networkClasses[value][0].value : ''
-            }, () => this.setState({[name]: value}));
-        }
+            if (name === "os") {
+                this.setState({
+                    adUnitsSelected: [],
+                    networkClass: this.props.networkClasses[value][0],
+                    customEventClassName: this.props.networkClasses[value][0].hasOwnProperty('value') ? this.props.networkClasses[value][0].value : ''
+                });
+            }
+        })
     }
 
     @bind
