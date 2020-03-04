@@ -23,11 +23,11 @@ export class ProgressModal extends Component {
                     ))}
                 </ModalBody>
                 <ModalFooter>
-                    {adServer === AD_SERVER_MOPUB ? (
+                    {/* {adServer === AD_SERVER_MOPUB ? (
                         <div style={{width: "100%", textAlign: "left", color: "red"}}>
                             Please don't close or refresh MoPub tab
                         </div>
-                    ) : null}
+                    ) : null} */}
                     <Button color="secondary" disabled={ !onCancel } onClick={ this.onCancel }>Cancel</Button>
                 </ModalFooter>
             </Modal>

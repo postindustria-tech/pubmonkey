@@ -413,17 +413,17 @@ class Handler extends AbstractHandler {
         });
     }
 
-    promiseQuery(options) {
-        return new Promise(function (resolve, reject) {
-            chrome.tabs.query(options, resolve);
-        });
-    }
-
-    promiseCreate(options) {
-        return new Promise(function (resolve, reject) {
-            chrome.tabs.create(options, resolve);
-        });
-    }
+    // promiseQuery(options) {
+    //     return new Promise(function (resolve, reject) {
+    //         chrome.tabs.query(options, resolve);
+    //     });
+    // }
+    //
+    // promiseCreate(options) {
+    //     return new Promise(function (resolve, reject) {
+    //         chrome.tabs.create(options, resolve);
+    //     });
+    // }
 
     async createOrderDataFromSet(order, params, stepCallback) {
         return this.createOrder(order).then(order => {
@@ -435,6 +435,8 @@ class Handler extends AbstractHandler {
                 lineItemsDone: 1,
                 lineItemCount: lineItems.length
             });
+
+            clearInterval(MopubAutomation.interval);
 
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
                 if(window.canceledExport){
@@ -452,8 +454,7 @@ class Handler extends AbstractHandler {
                     })
                     .then(async result => {
                         if (idx > 0 && idx % 50 === 0) {
-                            // wait for last request
-                            await delay(1000);
+                            await MopubAutomation.refreshIframe();
                         } else {
                             await delay(50);
                         }
@@ -469,7 +470,8 @@ class Handler extends AbstractHandler {
 
                         return result;
                     });
-            }).then(lineItems => ({...order, lineItems}));
+            }).then(lineItems => ({...order, lineItems}))
+            .finally(() => MopubAutomation.refreshIframeByInterval());
         });
     }
 

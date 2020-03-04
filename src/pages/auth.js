@@ -20,14 +20,33 @@ chrome.runtime.onMessage.addListener(({ name }, { frameId }) => {
         }
 
         resolveName(name)
+
+        CJ.initResolver && CJ.initResolver()
     })
 })
 
+CJ.refreshIframe = () => {
+    let promise = new Promise(resolve => {
+        CJ.initResolver = resolve
+    });
+
+    chrome.tabs.sendMessage(CJ.request.tabId, { action:'reload' }, { frameId: CJ.request.frameId });
+
+    return promise;
+}
+
+CJ.refreshIframeByInterval = () => {
+    clearInterval(CJ.interval);
+
+    CJ.interval = setInterval(
+        CJ.refreshIframe,
+        5 * 60 * 1000
+    )
+}
+
 // Refresh mopub's iframe every 5 minutes for a valid csrf token
-setInterval(
-    () => chrome.tabs.sendMessage(CJ.request.tabId, { action:'reload' }, { frameId: CJ.request.frameId }),
-    5 * 60 * 1000
-)
+CJ.refreshIframeByInterval()
+
 
 chrome.webRequest.onHeadersReceived.addListener(
     ({ responseHeaders }) =>

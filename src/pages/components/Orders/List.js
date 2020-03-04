@@ -236,6 +236,8 @@ class OrdersList extends Component {
     @bind
     importSelected() {
         FileService.openFile().then((result) => {
+            clearInterval(MopubAutomation.interval);
+
             if (result) {
                 let orders;
                 try {
@@ -267,6 +269,8 @@ class OrdersList extends Component {
             }
         }).catch(err => {
             ModalWindowService.ErrorPopup.showMessage(err)
+        }).finally(() => {
+            MopubAutomation.refreshIframeByInterval();
         });
     }
 
@@ -288,6 +292,8 @@ class OrdersList extends Component {
                 progress: {value: 0}
             }
         ]);
+
+        clearInterval(MopubAutomation.interval);
 
         let promise = this.props.sourceHandler.restoreOrdersWithLineItems(
             orders,
@@ -342,6 +348,7 @@ class OrdersList extends Component {
             })
             .finally(() => {
                 this.loadOrders();
+                MopubAutomation.refreshIframeByInterval();
                 ModalWindowService.ProgressModal.hideModal();
             });
 
@@ -372,6 +379,8 @@ class OrdersList extends Component {
                 progress: {value: 0}
             }
         ]);
+
+        clearInterval(MopubAutomation.interval);
 
         let promise = this.props.sourceHandler.collectOrderDataFromSet(
             selected,
@@ -421,6 +430,7 @@ class OrdersList extends Component {
                 FileService.saveFile(data, `${name}.json`);
             })
             .finally(() => {
+                MopubAutomation.refreshIframeByInterval()
                 ModalWindowService.ProgressModal.hideModal();
             });
 
@@ -456,6 +466,8 @@ class OrdersList extends Component {
             }
         ]);
 
+        clearInterval(MopubAutomation.interval);
+
         let promise = this.props.sourceHandler.updateOrderStatusInSet(
             selected,
             status,
@@ -474,7 +486,10 @@ class OrdersList extends Component {
         );
 
         promise.finally(() => {
+            MopubAutomation.refreshIframeByInterval();
+
             ModalWindowService.ProgressModal.hideModal();
+
             this.loadOrders();
         });
     }
@@ -499,6 +514,8 @@ class OrdersList extends Component {
                 progress: {value: 0}
             }
         ]);
+
+        clearInterval(MopubAutomation.interval);
 
         let promise = this.props.sourceHandler.collectOrderDataFromSet(
             selected,
@@ -540,7 +557,10 @@ class OrdersList extends Component {
                 MainController.keepInDraft(JSON.stringify(result));
                 this.props.history.push("/backup/preview");
             })
-            .finally(ModalWindowService.ProgressModal.hideModal);
+            .finally(() => {
+                MopubAutomation.refreshIframeByInterval();
+                ModalWindowService.ProgressModal.hideModal();
+            });
 
         ModalWindowService.ProgressModal.onCancel(() =>
             promise.cancel("canceled by user")
