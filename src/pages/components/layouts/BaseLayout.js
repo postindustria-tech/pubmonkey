@@ -33,10 +33,8 @@ class BaseLayout extends Component {
         };
 
         return (
-
             <div className={ classnames('base-layout d-flex', className) } id="wrapper">
-
-                <div className={"bg-light sticky-top"} id="sidebar-wrapper" style={{height: "100%"}}>
+                <div className={"bg-light sticky-top"} id="sidebar-wrapper">
                     <div className={"sidebar-heading"}>
                         <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
                     </div>
