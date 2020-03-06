@@ -558,7 +558,10 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
+                        // keywords.push(bidDecimal.toFixed(2));
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );
                     }
                     break;
                 case 'med':
@@ -789,7 +792,7 @@ class Handler extends AbstractHandler {
                         case 'med':
                         case 'auto':
                         case 'dense':
-                            keywords.push(bidValue);
+                            keywords.push(keywordTemplate.replace(mask, bidValue));
                             break;
                     }
                 } else {
