@@ -471,7 +471,8 @@ class Handler extends AbstractHandler {
                         return result;
                     });
             }).then(lineItems => ({...order, lineItems}))
-            .finally(() => MopubAutomation.refreshIframeByInterval());
+            .finally(() => {
+            });
         });
     }
 

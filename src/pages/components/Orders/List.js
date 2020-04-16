@@ -270,7 +270,6 @@ class OrdersList extends Component {
         }).catch(err => {
             ModalWindowService.ErrorPopup.showMessage(err)
         }).finally(() => {
-            MopubAutomation.refreshIframeByInterval();
         });
     }
 
@@ -348,7 +347,6 @@ class OrdersList extends Component {
             })
             .finally(() => {
                 this.loadOrders();
-                MopubAutomation.refreshIframeByInterval();
                 ModalWindowService.ProgressModal.hideModal();
             });
 
@@ -430,7 +428,6 @@ class OrdersList extends Component {
                 FileService.saveFile(data, `${name}.json`);
             })
             .finally(() => {
-                MopubAutomation.refreshIframeByInterval()
                 ModalWindowService.ProgressModal.hideModal();
             });
 
@@ -486,8 +483,6 @@ class OrdersList extends Component {
         );
 
         promise.finally(() => {
-            MopubAutomation.refreshIframeByInterval();
-
             ModalWindowService.ProgressModal.hideModal();
 
             this.loadOrders();
@@ -558,7 +553,6 @@ class OrdersList extends Component {
                 this.props.history.push("/backup/preview");
             })
             .finally(() => {
-                MopubAutomation.refreshIframeByInterval();
                 ModalWindowService.ProgressModal.hideModal();
             });
 

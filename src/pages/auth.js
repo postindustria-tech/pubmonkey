@@ -1,89 +1,98 @@
+
 const CJ = (window.MopubAutomation = {}),
     EXTENSION_URL = chrome.extension.getURL("index.html");
 
-var resolveName, resolveAdUnits, resolveLoggedIn;
+var resolveName, resolveAdUnits;
 
 CJ.username = new Promise(resolve => (resolveName = resolve));
 CJ.adunits = new Promise(resolve => (resolveAdUnits = resolve));
-CJ.loggedIn = new Promise(resolve => (resolveLoggedIn = resolve));
-
 
 chrome.tabs.query({ url: EXTENSION_URL}, tabs =>
-    tabs.forEach(({ active, id }) => !active && chrome.tabs.remove(id))
+    tabs.forEach(({active, id}) => !active && chrome.tabs.remove(id))
 );
 
-chrome.runtime.onMessage.addListener(({ name }, { frameId }) => {
-    chrome.tabs.getCurrent(({ id: tabId }) => {
-        CJ.request = {
-            tabId,
-            frameId
-        }
+chrome.tabs.query({ active:false }, function (tabs) {
 
-        resolveName(name)
-
-        CJ.initResolver && CJ.initResolver()
-    })
-})
-
-CJ.refreshIframe = () => {
-    let promise = new Promise(resolve => {
-        CJ.initResolver = resolve
+    const mopub = tabs.filter(tab => {
+        const url = new URL(tab.url);
+        const domain = url.hostname;
+        return domain === "app.mopub.com";
     });
 
-    chrome.tabs.sendMessage(CJ.request.tabId, { action:'reload' }, { frameId: CJ.request.frameId });
+    let mopubSessionUpdatedAt = localStorage.getItem("mopubSessionUpdatedAt") || 0;
 
-    return promise;
-}
+    if (mopub.length === 0) {
+        chrome.tabs.create({ url: "https://app.mopub.com/dashboard", active: false }, function (tab) {
+            CJ.request = {
+                frameId: 0,
+                tabId: tab.id
+            };
+            mopubSessionUpdatedAt = Date.now();
+        });
+    } else {
+        let tabId = mopub[0].id;
+        let frameId = 0;
 
-CJ.refreshIframeByInterval = () => {
-    clearInterval(CJ.interval);
+        // On enable need to add permission "webNavigation"
+        // chrome.webNavigation.getAllFrames({ tabId: tabId }, function (details) {
+        //     console.log(details);
+        // });
 
-    CJ.interval = setInterval(
-        CJ.refreshIframe,
-        5 * 60 * 1000
-    )
-}
+        CJ.request = {
+            frameId: 0,
+            tabId: tabId
+        };
 
-// Refresh mopub's iframe every 5 minutes for a valid csrf token
-CJ.refreshIframeByInterval()
+        chrome.tabs.sendMessage(tabId, {action: "init"}, {frameId}, data => {
+            if (!data) {
+                return;
+            }
 
+            let {name} = data;
+
+            resolveName(name);
+        });
+    }
+
+    // Refresh mopub's tab every 5 minutes for a valid csrf token
+    if ((Number(mopubSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
+        mopubSessionUpdatedAt = Date.now();
+        localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+        chrome.tabs.reload(CJ.request.tabId);
+    }
+
+});
 
 chrome.webRequest.onHeadersReceived.addListener(
-    ({ responseHeaders }) =>
-        ({
-            responseHeaders: responseHeaders.filter(
-                ({ name }) => name !== "x-frame-options"
-            )
-        })
-    ,
-    {
-        urls: [
-            '<all_urls>'
-    ],
-        types: ["sub_frame"]
+    ({frameId, tabId}) => {
+        // console.log({frameId, tabId});
+        if (frameId) {
+            CJ.request = {frameId, tabId};
+
+            chrome.tabs.sendMessage(tabId, {action: "init"}, {frameId}, data => {
+                if (!data) {
+                    return;
+                }
+
+                let {name} = data;
+
+                resolveName(name);
+            });
+        }
     },
-    ["blocking", "responseHeaders"]
+    {urls: ["https://app.mopub.com/*"]}
 );
 
-const iframe = document.createElement('iframe')
-
-document.body.append(iframe)
-
-iframe.src = 'http://app.mopub.com/account'
-iframe.height = 0
-iframe.width = 0
-iframe.style = 'border: none'
-
+var resolveLoggedIn;
+CJ.loggedIn = new Promise(resolve => (resolveLoggedIn = resolve));
 
 chrome.webRequest.onHeadersReceived.addListener(
-    function handler({ statusCode }) {
+    ({statusCode}) => {
         if (statusCode === 200) {
             resolveLoggedIn(true);
         } else {
             resolveLoggedIn(false);
         }
-
-        chrome.webRequest.onHeadersReceived.removeListener(handler)
     },
     {
         urls: [
@@ -93,19 +102,53 @@ chrome.webRequest.onHeadersReceived.addListener(
     }
 );
 
+chrome.webRequest.onHeadersReceived.addListener(
+    ({responseHeaders}) => ({
+        responseHeaders: responseHeaders.filter(
+            ({name}) => name !== "x-frame-options"
+        )
+    }),
+    {
+        urls: ["https://app.mopub.com/*"],
+        types: ["sub_frame"]
+    },
+    ["blocking", "responseHeaders"]
+);
 
 CJ.openLoginPage = function () {
-    chrome.tabs.create({ url: "https://app.mopub.com/dashboard", active: true }, function (tab) {
-        chrome.tabs.onUpdated.addListener(function handler(tabId, { status, url }) {
-            if (
-                tabId === tab.id
-                && status === 'loading'
-                && (url.includes('//app.mopub.com/dashboard') || url.includes('//app.mopub.com/new-app'))
+
+    chrome.tabs.query({active: false}, function (tabs) {
+        const mopub = tabs.filter(tab => {
+            const url = new URL(tab.url);
+            const domain = url.hostname;
+            return domain === "app.mopub.com";
+        });
+
+        let tabId = mopub[0].id;
+
+        chrome.tabs.update(tabId, {selected: true}, function () {
+            chrome.tabs.onUpdated.addListener(function handler(
+                _tabId,
+                {status, url}
             ) {
-                chrome.tabs.onUpdated.removeListener(handler);
-                chrome.tabs.remove(tab.id);
-                location.reload();
-            }
-        })
-    })
+                if (
+                    tabId === _tabId &&
+                    status === "loading" &&
+                    (url === "https://app.mopub.com/dashboard" ||
+                        url === "https://app.mopub.com/dashboard/" ||
+                        url === "https://app.mopub.com/new-app")
+                ) {
+                    // chrome.tabs.remove(tabId);
+                    chrome.tabs.onUpdated.removeListener(handler);
+
+                    let url = EXTENSION_URL;
+
+                    chrome.tabs.query({url}, tabs =>
+                        chrome.tabs.update(tabs[0].id, {url, active: true})
+                    );
+                }
+            });
+        });
+
+    });
 };
