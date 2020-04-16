@@ -453,11 +453,6 @@ class Handler extends AbstractHandler {
                         return lineItem;
                     })
                     .then(async result => {
-                        if (idx > 0 && idx % 50 === 0) {
-                            await MopubAutomation.refreshIframe();
-                        } else {
-                            await delay(50);
-                        }
 
                         if (stepCallback) {
                             stepCallback({
