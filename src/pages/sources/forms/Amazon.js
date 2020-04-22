@@ -77,7 +77,7 @@ class AmazonCreateOrder extends CreateOrderForm {
     handleCSVChange(event) {
         let {value, name} = event.target;
         if (!isEmpty(value)) {
-            value = value.split("\n");
+            value = [].concat.apply([], value.split("\n").map(v => v.split(",")));
             let broken = [];
             value = value.map((item, index) => {
                 const trimmed = item.trim();
