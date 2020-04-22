@@ -7,6 +7,16 @@ var resolveName, resolveAdUnits;
 CJ.username = new Promise(resolve => (resolveName = resolve));
 CJ.adunits = new Promise(resolve => (resolveAdUnits = resolve));
 
+CJ.refreshMopub = () => {
+    // Refresh mopub's tab every 5 minutes for a valid csrf token
+    let mopubSessionUpdatedAt = localStorage.getItem("mopubSessionUpdatedAt") || 0;
+
+    if ((Number(mopubSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
+        localStorage.setItem("mopubSessionUpdatedAt", (Date.now()).toString());
+        chrome.tabs.reload(CJ.request.tabId);
+    }
+}
+
 chrome.tabs.query({ url: EXTENSION_URL}, tabs =>
     tabs.forEach(({active, id}) => !active && chrome.tabs.remove(id))
 );
@@ -28,6 +38,8 @@ chrome.tabs.query({ active:false }, function (tabs) {
                 tabId: tab.id
             };
             mopubSessionUpdatedAt = Date.now();
+
+            CJ.refreshMopub();
         });
     } else {
         let tabId = mopub[0].id;
@@ -51,16 +63,10 @@ chrome.tabs.query({ active:false }, function (tabs) {
             let {name} = data;
 
             resolveName(name);
+
+            CJ.refreshMopub();
         });
     }
-
-    // Refresh mopub's tab every 5 minutes for a valid csrf token
-    if ((Number(mopubSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
-        mopubSessionUpdatedAt = Date.now();
-        localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
-        chrome.tabs.reload(CJ.request.tabId);
-    }
-
 });
 
 chrome.webRequest.onHeadersReceived.addListener(

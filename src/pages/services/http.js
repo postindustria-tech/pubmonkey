@@ -117,7 +117,6 @@ export const HTTPService = new (class {
         .then(() => {
 
             return new Promise((resolve, reject) => {
-
                 let {tabId, frameId} = window.MopubAutomation.request,
                     payload = {
                         isFormData,
