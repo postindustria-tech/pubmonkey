@@ -4,8 +4,9 @@ import {AdvertiserFactory} from "./Factory";
 import {FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {wrapSeries, delay} from "../helpers";
-import {isEmpty} from "../../helpers";
+import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
 import {AD_SERVER_MOPUB} from "../../constants/source";
+import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from '../../constants/common';
 import axios from "ex-axios";
 
 const WEB_URL = "https://app.mopub.com";
@@ -50,6 +51,7 @@ class Handler extends AbstractHandler {
     }
 
     async isReady() {
+        // console.log('isReady');
         if (this.sessionChecked) {
             return window.MopubAutomation.loggedIn
                 .then(loggedIn => {
@@ -375,6 +377,7 @@ class Handler extends AbstractHandler {
 
             return this.restoreOrder(order)
                 .then(result => {
+                    console.log(result);
                     timestamp = Date.now() - timestamp;
 
                     step({
@@ -414,16 +417,16 @@ class Handler extends AbstractHandler {
     }
 
     promiseQuery(options) {
-         return new Promise(function (resolve, reject) {
-             chrome.tabs.query(options, resolve);
-         });
+        return new Promise(function (resolve, reject) {
+            chrome.tabs.query(options, resolve);
+        });
     }
-    //
-    // promiseCreate(options) {
-    //     return new Promise(function (resolve, reject) {
-    //         chrome.tabs.create(options, resolve);
-    //     });
-    // }
+
+    promiseCreate(options) {
+        return new Promise(function (resolve, reject) {
+            chrome.tabs.create(options, resolve);
+        });
+    }
 
     async prepareMoPubTabForRequests() {
         let mopubSessionUpdatedAt = Date.now();
@@ -467,6 +470,7 @@ class Handler extends AbstractHandler {
     }
 
     async createOrderDataFromSet(order, params, stepCallback) {
+
         await this.prepareMoPubTabForRequests();
 
         return this.createOrder(order).then(order => {
@@ -478,8 +482,6 @@ class Handler extends AbstractHandler {
                 lineItemsDone: 1,
                 lineItemCount: lineItems.length
             });
-
-            clearInterval(MopubAutomation.interval);
 
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
                 if(window.canceledExport){
@@ -496,6 +498,19 @@ class Handler extends AbstractHandler {
                         return lineItem;
                     })
                     .then(async result => {
+                        if (idx > 0 && idx % 50 === 0) {
+                            // wait for last request
+                            await delay(1000);
+                            let mopubSessionUpdatedAt = Date.now();
+                            localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+                            let {tabId, frameId} = window.MopubAutomation.request;
+                            chrome.tabs.reload(tabId, {}, function () {
+                                console.log('reloading mopub page');
+                            });
+                            await delay(10000);
+                        } else {
+                            await delay(50);
+                        }
 
                         if (stepCallback) {
                             stepCallback({
@@ -508,9 +523,7 @@ class Handler extends AbstractHandler {
 
                         return result;
                     });
-            }).then(lineItems => ({...order, lineItems}))
-            .finally(() => {
-            });
+            }).then(lineItems => ({...order, lineItems}));
         });
     }
 
