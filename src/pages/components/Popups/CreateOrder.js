@@ -570,7 +570,7 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.step = "Range too short!";
             isValid = false;
         }
-        if (["amazon", "openx"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.creativeFormat)) {
+        if (["amazon"].indexOf(this.state.advertiser) !== -1 && isEmpty(this.state.creativeFormat)) {
             fieldValidationErrors.adType = "Creative Format is required!";
             isValid = false;
         }
