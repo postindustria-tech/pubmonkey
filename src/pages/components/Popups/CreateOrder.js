@@ -445,7 +445,7 @@ class CreateOrderModal extends Component {
                                 default:
                                     return null;
                             }
-                        })(this.props.advertiser)}
+                        })(this.state.advertiser)}
                     </ModalBody>
                     <ModalFooter id={"createOrderModalFooter"} className={"sticky"}>
                         <Button className={"mr-auto"}
