@@ -96,7 +96,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                         />
                         </div>
                     </Col>
-                    <Col className={"col-sm-4"}>
+                    <Col className={"col-sm-4"} style={{display: 'none'}}>
                         <Label className={"mp-label"}>Creative format: </Label>
                         <Input
                             type="select"
