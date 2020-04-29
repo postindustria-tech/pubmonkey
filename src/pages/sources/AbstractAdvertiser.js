@@ -45,11 +45,7 @@ export default class AbstractAdvertiser {
         userAppsTargetingList: []
     };
 
-    setupDefaultValues(lineItemInfo, params) {
-        const targetedAdUnits = params.adunits.map(id => ({
-            adUnitId: id,
-            includeDescendants: true
-        }));
+    getDefaultSize(params){
         let size = null;
         if (params.advertiser === "pubnative") {
             if (typeof NETWORK_CLASS_TO_DIMENSION[params.customEventClassName] !== "undefined" &&
@@ -60,7 +56,16 @@ export default class AbstractAdvertiser {
             size = params.creativeFormat;
         }
 
-        const [width, height] = size ? size.split("x") : [0, 0];
+        return size ? size.split("x") : [0, 0];
+    }
+
+    setupDefaultValues(lineItemInfo, params) {
+        const targetedAdUnits = params.adunits.map(id => ({
+            adUnitId: id,
+            includeDescendants: true
+        }));
+
+        const [width, height] = this.getDefaultSize(params);
 
         lineItemInfo.targeting = Targeting(
             {

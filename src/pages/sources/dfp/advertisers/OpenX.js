@@ -19,6 +19,10 @@ export class OpenX extends AbstractAdvertiser {
         "970x90": "970 x 90",
     };
 
+    getDefaultSize(params){
+        return [1, 1];
+    }
+
     getCreativeHtmlData(params) {
         return '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
             "<script>\n" +

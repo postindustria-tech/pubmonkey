@@ -876,18 +876,14 @@ class Handler extends AbstractHandler {
                 lineItemCount: lineItems.length
             });
 
-            const {creativeFormat, advertiser} = params,
-                [width, height] = creativeFormat.split("x");
+            const {creativeFormat, advertiser} = params
+            let [width, height] = creativeFormat.split("x")
 
-            let size = null;
-            switch (advertiser) {
-                case "openx":
-                    size = Size(1, 1, false);
-                    break;
-                case "amazon":
-                    size = Size(width, height, false);
-                    break;
+            if(advertiser == "openx"){
+                width = 1
+                height = 1
             }
+            const size = Size(width, height, false);
 
             let creative = null;
             if (advertiser === "openx" || advertiser === "amazon") {
@@ -909,12 +905,13 @@ class Handler extends AbstractHandler {
             return this.createLineItems(lineItems)
                 .then(lineItems => {
                     if (creative) {
+                        console.log('!!!!!', size, creative)
                         let associations = [];
                         lineItems.map(({id}) => {
                             associations.push(LineItemCreativeAssociation(
                                 id,
                                 creative.id,
-                                [Size(width, height, false)]
+                                [size]
                             ));
                         });
                         this.createLineItemCreativeAssociations(associations);
