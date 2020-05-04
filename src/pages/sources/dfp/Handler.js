@@ -905,7 +905,6 @@ class Handler extends AbstractHandler {
             return this.createLineItems(lineItems)
                 .then(lineItems => {
                     if (creative) {
-                        console.log('!!!!!', size, creative)
                         let associations = [];
                         lineItems.map(({id}) => {
                             associations.push(LineItemCreativeAssociation(
