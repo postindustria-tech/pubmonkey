@@ -254,10 +254,6 @@ class OrdersList extends Component {
                             return current.status !== "archived" ? sum + current.lineItemCount : sum;
                         }, 0);
 
-                    if (lineItemsCount >= 1000) {
-                        return Promise.reject("Number of line items exceeded");
-                    }
-
                     if (total + lineItemsCount > 1000) {
                         this.setState({confirmModalMessage: `You will exceed the number of line items available in MoPub, this import will create only some part of line items out of requested ${total}, would you like to continue?`});
                         this.confirmModal.toggle();
