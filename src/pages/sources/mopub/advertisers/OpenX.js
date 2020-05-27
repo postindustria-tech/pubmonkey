@@ -160,7 +160,11 @@ export class OpenX extends AbstractAdvertiser {
             name: "Creative"
         };
         if (cb) {
-            cb(creative);
+            const result = cb(creative)
+            .then(result => {})
+            .catch(error => {
+                console.log('Create creative error', creative, error)
+            });
         }
         return creative;
     }

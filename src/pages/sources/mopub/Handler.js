@@ -490,11 +490,23 @@ class Handler extends AbstractHandler {
 
                 return this.createLineItem(item)
                     .then(lineItem => {
-                        this.advertiser.createCreatives(
-                            lineItem.key,
-                            params,
-                            this.createCreatives
-                        );
+                        params.adunits.forEach(currentAdUnit => {
+                            const creativeParams = Object.assign({}, params)
+
+                            creativeParams.creativeFormat = creativeParams.creativeFormat && creativeParams.creativeFormat.length
+                                ? creativeParams.creativeFormat
+                                : (params.adUnitsParams.find(adunit => adunit.key == currentAdUnit) || {}).format
+
+                            if('custom' == creativeParams.creativeFormat){
+                                creativeParams.creativeFormat = '320x50'
+                            }
+
+                            this.advertiser.createCreatives(
+                                lineItem.key,
+                                creativeParams,
+                                this.createCreatives
+                            );
+                        })
                         return lineItem;
                     })
                     .then(async result => {
