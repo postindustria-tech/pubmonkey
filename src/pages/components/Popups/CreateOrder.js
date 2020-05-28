@@ -177,7 +177,7 @@ class CreateOrderModal extends Component {
         <p style={{margin: 0}}>
             Order has been created successfully.<br/>
             {this.justCreatedOrder && <a href={this.getOrderUrl(this.justCreatedOrder)} target="_blank">
-                View in {this.props.type === AD_SERVER_DFP ? 'DFP' : 'MoPub'}
+                View in {this.props.type === AD_SERVER_DFP ? 'Google Ad Manager' : 'MoPub'}
             </a>}
         </p>
     );
