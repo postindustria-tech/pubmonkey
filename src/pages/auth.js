@@ -11,8 +11,8 @@ chrome.tabs.query({ url: EXTENSION_URL}, tabs =>
     tabs.forEach(({active, id}) => !active && chrome.tabs.remove(id))
 );
 
-chrome.tabs.query({ active:false }, function (tabs) {
-
+CJ.checkMopubTab = function(){
+    chrome.tabs.query({ active:false }, function (tabs) {
     const mopub = tabs.filter(tab => {
         const url = new URL(tab.url);
         const domain = url.hostname;
@@ -58,10 +58,15 @@ chrome.tabs.query({ active:false }, function (tabs) {
     if ((Number(mopubSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
         mopubSessionUpdatedAt = Date.now();
         localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
-        chrome.tabs.reload(CJ.request.tabId);
+        if(CJ.request){
+            chrome.tabs.reload(CJ.request.tabId);
+        }
     }
 
 });
+}
+
+CJ.checkMopubTab()
 
 chrome.webRequest.onHeadersReceived.addListener(
     ({frameId, tabId}) => {
@@ -124,31 +129,37 @@ CJ.openLoginPage = function () {
             return domain === "app.mopub.com";
         });
 
-        let tabId = mopub[0].id;
-
-        chrome.tabs.update(tabId, {selected: true}, function () {
-            chrome.tabs.onUpdated.addListener(function handler(
-                _tabId,
-                {status, url}
-            ) {
-                if (
-                    tabId === _tabId &&
-                    status === "loading" &&
-                    (url === "https://app.mopub.com/dashboard" ||
-                        url === "https://app.mopub.com/dashboard/" ||
-                        url === "https://app.mopub.com/new-app")
-                ) {
-                    // chrome.tabs.remove(tabId);
-                    chrome.tabs.onUpdated.removeListener(handler);
-
-                    let url = EXTENSION_URL;
-
-                    chrome.tabs.query({url}, tabs =>
-                        chrome.tabs.update(tabs[0].id, {url, active: true})
-                    );
-                }
-            });
-        });
-
+        if (mopub.length === 0) {
+            CJ.checkMopubTab()
+            setTimeout(() => CJ.openLoginPage(), 1000)
+        } else {
+            CJ.openLoginPageInTab(mopub[0].id)
+        }
     });
 };
+
+CJ.openLoginPageInTab = function(tabId) {
+    chrome.tabs.update(tabId, {selected: true}, function () {
+        chrome.tabs.onUpdated.addListener(function handler(
+            _tabId,
+            {status, url}
+        ) {
+            if (
+                tabId === _tabId &&
+                status === "loading" &&
+                (url === "https://app.mopub.com/dashboard" ||
+                    url === "https://app.mopub.com/dashboard/" ||
+                    url === "https://app.mopub.com/new-app")
+            ) {
+                // chrome.tabs.remove(tabId);
+                chrome.tabs.onUpdated.removeListener(handler);
+
+                let url = EXTENSION_URL;
+
+                chrome.tabs.query({url}, tabs =>
+                    chrome.tabs.update(tabs[0].id, {url, active: true})
+                );
+            }
+        });
+    });
+}
