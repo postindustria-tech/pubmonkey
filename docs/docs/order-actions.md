@@ -1,5 +1,7 @@
 # Order Actions
 
+The below actions are available for the MoPub account.  GAM only supports order creation on the fly for now. 
+
 ## Export
 
 1. Check the orders which you would like to export. Note: several orders can be exported in a single JSON file. 
