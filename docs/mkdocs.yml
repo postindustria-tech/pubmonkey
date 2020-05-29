@@ -1,4 +1,4 @@
 site_name: PubMonkey
 theme:
-  name: mkdocs
+  name: gitbook
 
