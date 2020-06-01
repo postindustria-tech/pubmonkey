@@ -203,7 +203,7 @@ class AmazonCreateOrder extends CreateOrderForm {
                             }}
                             placeholder="m320x50p1:0.53&#10;m320x50p2:0.68&#10;m320x50p3:0.83"
                             onChange={this.handleInputChange}
-                            value={this.props.attributes.amazonCSVItems}
+                            value={Array.isArray(this.props.attributes.amazonCSVItems) ? this.props.attributes.amazonCSVItems.join("\n") : this.props.attributes.amazonCSVItems}
                         />
                     </Col>
                     <Col className={"col-sm-4"}
