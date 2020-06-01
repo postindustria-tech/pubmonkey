@@ -3,8 +3,7 @@ site_name: PubMonkey
 #   name: gitbook
 theme:
     name: mkdocs
-    nav_style: dark
-    navigation_depth: 0
+    navigation_depth: 2
 nav:
   - Home: index.md
   - Release Notes: changelog.md
