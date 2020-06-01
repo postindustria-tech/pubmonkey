@@ -62,10 +62,10 @@ class BaseLayout extends Component {
                         </NavLink>
                         <a
                             className={"list-group-item list-group-item-action bg-light"}
-                            href="https://postindustria.com/wp-content/uploads/2019/07/PubMonkey-manual.pdf"
+                            href="https://doc.pubmonkey.postindustria.com/"
                             target="_blank">
                             <i className="fas fa-question-circle"/>
-                            &nbsp; Download manual
+                            &nbsp; User Guide
                         </a>
                     </div>
                     {/*<div className={"list-group list-group-flush"}>
