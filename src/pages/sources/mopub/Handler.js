@@ -491,20 +491,11 @@ class Handler extends AbstractHandler {
                 return this.createLineItem(item)
                     .then(lineItem => {
                         params.adunits.forEach(currentAdUnit => {
-                            const creativeParams = Object.assign({}, params)
-
-                            creativeParams.creativeFormat = creativeParams.creativeFormat && creativeParams.creativeFormat.length
-                                ? creativeParams.creativeFormat
-                                : (params.adUnitsParams.find(adunit => adunit.key == currentAdUnit) || {}).format
-
-                            if('custom' == creativeParams.creativeFormat){
-                                creativeParams.creativeFormat = '320x50'
-                            }
-
                             this.advertiser.createCreatives(
                                 lineItem.key,
-                                creativeParams,
-                                this.createCreatives
+                                params,
+                                this.createCreatives,
+                                currentAdUnit
                             );
                         })
                         return lineItem;
@@ -551,11 +542,12 @@ class Handler extends AbstractHandler {
 
             if (["amazon", "openx", "pubmatic"].indexOf(params.advertiser) !== -1) {
                 lineItems = lineItems.map(lineItem => {
-                    lineItem.creatives = [this.advertiser.createCreatives(
+                    lineItem.creatives = params.adunits.map(currentAdUnit => this.advertiser.createCreatives(
                         lineItem.key,
                         params,
-                        null
-                    )];
+                        null,
+                        currentAdUnit
+                    ))
                     return lineItem;
                 });
             }

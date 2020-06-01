@@ -147,14 +147,26 @@ export class OpenX extends AbstractAdvertiser {
         return lineItems;
     }
 
-    createCreatives(lineItemKey, params, cb) {
+    createCreatives(lineItemKey, params, cb, currentAdUnit = null) {
+        const creativeParams = Object.assign({}, params)
+
+        if(currentAdUnit){
+            creativeParams.creativeFormat = creativeParams.creativeFormat && creativeParams.creativeFormat.length
+                ? creativeParams.creativeFormat
+                : (params.adUnitsParams.find(adunit => adunit.key == currentAdUnit) || {}).format
+        }
+
+        if('custom' == creativeParams.creativeFormat){
+            creativeParams.creativeFormat = '320x50'
+        }
+
         const creative = {
             adType: "html",
             extended: {
-                htmlData: params.creativeSnippet,//this.getCreativeHtmlData(params),
+                htmlData: creativeParams.creativeSnippet,//this.getCreativeHtmlData(params),
                 isMraid: false
             },
-            format: params.creativeFormat,
+            format: creativeParams.creativeFormat,
             imageKeys: [],
             lineItemKey: lineItemKey,
             name: "Creative"

@@ -1103,6 +1103,7 @@ class CreateOrderModal extends Component {
             priceGrid,
             priceBand,
         } = this.state;
+        let adUnitsParams = this.props.adunits
 
         let order = this.props.sourceHandler.composeOrderRequest(
             this.props.type === AD_SERVER_DFP ? advertiserId : this.props.ADVERTISER_DEFAULT_NAME[advertiser],
@@ -1111,6 +1112,7 @@ class CreateOrderModal extends Component {
 
         let params = {
             adunits,
+            adUnitsParams,
             step,
             keywordStep,
             keywordTemplate,
