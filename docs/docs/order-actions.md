@@ -1,4 +1,4 @@
-# Order Actions
+# Manage Orders
 
 The below actions are available for the MoPub account.  GAM only supports order creation on the fly for now. 
 
@@ -36,3 +36,36 @@ Click the Pause button to pause the running order.  Supported only for MoPub.
 Click the Run button to run the paused order.  Supported only for MoPub.
 
 ![other actions](img/order-actions.png)
+
+# Generate Orders
+
+## Generate a Prebid Order
+
+Prebid Order generation is supported for both MoPub and GAM (Google Ad Manager). 
+
+1. On the **Order** tab in PubMonkey click **CREATE** button.
+2. As a **Header Bidding Service** choose "Prebid.org".
+3. Name your Order.
+4. Choose the appropriate **Granularity** - default is **auto**.
+5. There are also common defaults specified for line items naming and keywords.  You may wish to change them according to your use case.
+6. Creative Snippet is also editable and reflects a standard Universal Creative described [here](http://prebid.org/overview/prebid-universal-creative.html).
+7. Choose the needed ad units below the creative. 
+8. You are all set.  For MoPub you can download a JSON representation to import an order later, or you can hit "Create in MoPub" right away.  For GAM - just hit "Create in GAM".
+9. For GAM you would also need to specify the Company - tap the **?** near that field to be taken to the Ad Manager page where you can create a Company.  
+
+![Prebid order](img/order-prebid01.png)
+
+![Prebid order](img/order-prebid02.png)
+
+## Generate an Amazon TAM Order
+
+TAM Order generation is supported for both MoPub and GAM (Google Ad Manager). 
+
+1. On the **Order** tab in PubMonkey click **CREATE** button.
+2. As a **Header Bidding Service** choose "Amazon Publisher Services (TAM)".
+3. Name your Order.
+4. For Amazon we have a uniform and non-uniform price granularity implemented, most likely - you have received a price grid from your account manager - so use non-uniform price granularity.
+5. Copy and paste your price grid in the format shown in the **KV Pairs** placeholder field.  F.e. highlighting and copying from a CSV opened in Excel or Google Spreadsheet - usually results in a correct format of KV Pairs.  
+6. Amazon Creative restricts the ad format, thus you have to choose the **Creative format**.
+7. Choose the ad units filtered according to the chosen ad format. 
+8. For GAM you would also need to specify the Company - tap the **?** near that field to be taken to the Ad Manager page where you can create a Company.  

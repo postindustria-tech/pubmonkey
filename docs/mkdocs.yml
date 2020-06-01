@@ -1,4 +1,13 @@
 site_name: PubMonkey
+# theme:
+#   name: gitbook
 theme:
-  name: gitbook
-
+    name: mkdocs
+    nav_style: dark
+    navigation_depth: 0
+nav:
+  - Home: index.md
+  - Release Notes: changelog.md
+  - Order Management: order-actions.md
+  - Connect GAM: connecting-to-google-ad-manager.md
+plugins: []

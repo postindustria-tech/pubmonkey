@@ -15,24 +15,8 @@ Please read detailed [release notes](changelog.md)
 * [Export and import orders](order-actions.md#export) [__MoPub__, __GAM__]
 * [Archive orders](order-actions.md#archive) [__MoPub__, __GAM__]
 * [Run / pause orders](order-actions.md#pause) [__MoPub__]
-* Generate orders for several header bidding services (Prebid.org [__MoPub__, __GAM__], Amazon TAM [__MoPub__, __GAM__], Smaato [__MoPub__], PubMatic [__MoPub__], PubNative HyBid[__MoPub__])
+* [Generate](order-actions.md#generate-orders) orders for several header bidding services ([Prebid.org](order-actions.md#generate-a-prebid-order) [__MoPub__, __GAM__], [Amazon TAM](order-actions.md#generate-an-amazon-tam-order) [__MoPub__, __GAM__], Smaato [__MoPub__], PubMatic [__MoPub__], PubNative HyBid[__MoPub__])
 * Ad Units [__MoPub__]
 * Export ad unit ad sources state [__MoPub__]
+* To connect to your GAM (Google Ad Manager account) follow [this short instruction](connecting-to-google-ad-manager.md)
 
-## Use Cases
-
-To connect to your GAM (Google Ad Manager account) follow [this short instruction](connecting-to-google-ad-manager.md)
-
-### How to generate
-
-To generate an Order click **CREATE** button.  In general the fields on the Order generation form are self explanatory, but we've added an instruction for the most popular solutions:
-
-* [a Prebid.org order](generate-prebid.md)
-* [an Amazon TAM order](generate-amazon.md)
-* a Smaato order
-* a PubMatic OpenWrap order
-* a PubNative HyBid order
-
-### Other
-
-* export MoPub ad unit ad sources
