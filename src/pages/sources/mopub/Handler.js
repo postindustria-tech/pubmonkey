@@ -501,9 +501,9 @@ class Handler extends AbstractHandler {
                         return lineItem;
                     })
                     .then(async result => {
+                        // wait for last request
+                        await delay(Math.floor(idx/50)*1000);
                         if (idx > 0 && idx % 50 === 0) {
-                            // wait for last request
-                            await delay(1000);
                             let mopubSessionUpdatedAt = Date.now();
                             localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
                             let {tabId, frameId} = window.MopubAutomation.request;
@@ -511,8 +511,6 @@ class Handler extends AbstractHandler {
                                 console.log('reloading mopub page');
                             });
                             await delay(10000);
-                        } else {
-                            await delay(50);
                         }
 
                         if (stepCallback) {
