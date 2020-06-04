@@ -469,6 +469,13 @@ class Handler extends AbstractHandler {
         await delay(5000);
     }
 
+    filterAdUnitParams(params){
+        const custom = (params.adUnitsParams.find(adunit => adunit.format == 'custom') || {}).key
+        const banner = (params.adUnitsParams.find(adunit => adunit.format == '320x50') || {}).key
+
+        return [...new Set(params.adunits.map(adunit => adunit == custom ? banner : adunit))]
+    }
+
     async createOrderDataFromSet(order, params, stepCallback) {
 
         await this.prepareMoPubTabForRequests();
@@ -490,7 +497,7 @@ class Handler extends AbstractHandler {
 
                 return this.createLineItem(item)
                     .then(lineItem => {
-                        params.adunits.forEach(currentAdUnit => {
+                        this.filterAdUnitParams(params).forEach(currentAdUnit => {
                             this.advertiser.createCreatives(
                                 lineItem.key,
                                 params,
@@ -540,7 +547,7 @@ class Handler extends AbstractHandler {
 
             if (["amazon", "openx", "pubmatic"].indexOf(params.advertiser) !== -1) {
                 lineItems = lineItems.map(lineItem => {
-                    lineItem.creatives = params.adunits.map(currentAdUnit => this.advertiser.createCreatives(
+                    lineItem.creatives = this.filterAdUnitParams(params).map(currentAdUnit => this.advertiser.createCreatives(
                         lineItem.key,
                         params,
                         null,

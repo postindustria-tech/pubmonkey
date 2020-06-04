@@ -156,10 +156,6 @@ export class OpenX extends AbstractAdvertiser {
                 : (params.adUnitsParams.find(adunit => adunit.key == currentAdUnit) || {}).format
         }
 
-        if('custom' == creativeParams.creativeFormat){
-            creativeParams.creativeFormat = '320x50'
-        }
-
         const creative = {
             adType: "html",
             extended: {
