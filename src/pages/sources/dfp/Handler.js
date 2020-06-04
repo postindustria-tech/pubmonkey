@@ -876,44 +876,42 @@ class Handler extends AbstractHandler {
                 lineItemCount: lineItems.length
             });
 
-            const {creativeFormat, advertiser} = params
-            let [width, height] = creativeFormat.split("x")
+            const creatives = (await Promise.all(params.adunits.map(async adunit => {
+                const {advertiser} = params
+                const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
+                let [width, height] = creative.format.split("x")
 
-            if(advertiser == "openx"){
-                width = 1
-                height = 1
-            }
-            const size = Size(width, height, false);
+                if(advertiser == "openx"){
+                    width = 1
+                    height = 1
+                }
 
-            let creative = null;
-            if (advertiser === "openx" || advertiser === "amazon") {
-                let creatives = await this.createCreatives([
+                return await this.createCreatives([
                     ThirdPartyCreative(
                         order.advertiserId,
-                        "Creative for " + order.name,
-                        size,
+                        creative.name + ". For " + order.name,
+                        Size(width, height, false),
                         advertiser === 'openx' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                     )
                 ]);
-                if (creatives.length === 1) {
-                    creative = creatives[0];
-                }
-            }
+            }))).flat()
 
             await this.performOrderAction('running', 'ApproveOrders', order.id);
 
             return this.createLineItems(lineItems)
-                .then(lineItems => {
-                    if (creative) {
+                .then(async lineItems => {
+                    for (let index = 0; index < creatives.length; index++) {
+                        const creative = creatives[index]
+
                         let associations = [];
                         lineItems.map(({id}) => {
                             associations.push(LineItemCreativeAssociation(
                                 id,
                                 creative.id,
-                                [size]
+                                [creative.size]
                             ));
                         });
-                        this.createLineItemCreativeAssociations(associations);
+                        await this.createLineItemCreativeAssociations(associations);
                     }
                     return lineItems;
                 })

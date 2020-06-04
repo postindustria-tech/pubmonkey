@@ -165,7 +165,7 @@ export class OpenX extends AbstractAdvertiser {
             format: creativeParams.creativeFormat,
             imageKeys: [],
             lineItemKey: lineItemKey,
-            name: "Creative"
+            name: "Creative ".concat(creativeParams.creativeFormat)
         };
         if (cb) {
             const result = cb(creative)
