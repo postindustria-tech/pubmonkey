@@ -884,6 +884,8 @@ class Handler extends AbstractHandler {
                 if(advertiser == "openx"){
                     width = 1
                     height = 1
+                }else if(!creative.format){
+                    [width, height] = params.creativeFormat.split("x")
                 }
 
                 return await this.createCreatives([
@@ -898,13 +900,27 @@ class Handler extends AbstractHandler {
 
             await this.performOrderAction('running', 'ApproveOrders', order.id);
 
-            return this.createLineItems(lineItems)
-                .then(async lineItems => {
+            const pagination = []
+            let start = 0
+            const length = 50
+            while(start < lineItems.length){
+                pagination.push(lineItems.slice(start, start + length))
+                start += length
+            }
+
+            return Promise.mapSeries(pagination, async (part, idx, lineItemCount) => {
+                if(window.canceledExport){
+                    return
+                }
+
+                await delay(Math.floor(idx/length)*1000);
+                return this.createLineItems(part)
+                .then(async part => {
                     for (let index = 0; index < creatives.length; index++) {
                         const creative = creatives[index]
 
                         let associations = [];
-                        lineItems.map(({id}) => {
+                        part.map(({id}) => {
                             associations.push(LineItemCreativeAssociation(
                                 id,
                                 creative.id,
@@ -913,20 +929,23 @@ class Handler extends AbstractHandler {
                         });
                         await this.createLineItemCreativeAssociations(associations);
                     }
-                    return lineItems;
+                    return part;
                 })
-                .then(lineItems => {
+                .then(part => {
                     if (stepCallback) {
                         stepCallback({
                             ordersDone: 1,
-                            orderCount: 1,
-                            lineItemCount: lineItems.length,//lineItemCount,
-                            lineItemsDone: lineItems.length//idx + 1
+                                orderCount: 1,
+                                lineItemCount: lineItems.length,
+                                lineItemsDone: (idx + 1)*length
                         });
                     }
 
                     return lineItems;
                 });
+            })
+
+
         });
     }
 
@@ -953,6 +972,30 @@ class Handler extends AbstractHandler {
         });
     }
 
+    parseSOAPError(e){
+        let message = e;
+
+        const parser = new DOMParser();
+        let docError = parser.parseFromString(e.body);
+        const ApiExceptions = docError.getElementsByTagName("ApiExceptionFault");
+        if (ApiExceptions.length > 0) {
+            const errors = ApiExceptions[0].getElementsByTagName('errors');
+            if (errors.length > 0) {
+                const errorString = errors[0].getElementsByTagName('errorString');
+                if (errorString.length > 0) {
+                    const nodeValue = errorString[0].childNodes[0].nodeValue
+                    if (nodeValue === "UniqueError.NOT_UNIQUE") {
+                        message = new OrderError("Order with specified name already exists", false, false);
+                    } else {
+                        message = new Error(nodeValue);
+                    }
+                }
+            }
+        }
+
+        return message
+    }
+
     async createOrder(data) {
         return new Promise(async (resolve, reject) => {
 
@@ -969,31 +1012,10 @@ class Handler extends AbstractHandler {
                         data
                     ]
                 });
+                resolve(orders[0]);
             } catch (e) {
-                let message = e;
-
-                const parser = new DOMParser();
-                let docError = parser.parseFromString(e.body);
-                const ApiExceptions = docError.getElementsByTagName("ApiExceptionFault");
-                if (ApiExceptions.length > 0) {
-                    const errors = ApiExceptions[0].getElementsByTagName('errors');
-                    if (errors.length > 0) {
-                        const errorString = errors[0].getElementsByTagName('errorString');
-                        if (errorString.length > 0) {
-                            const nodeValue = errorString[0].childNodes[0].nodeValue
-                            if (nodeValue === "UniqueError.NOT_UNIQUE") {
-                                message = new OrderError("Order with specified name already exists", false, false);
-                            } else {
-                                message = new Error(nodeValue);
-                            }
-                        }
-                    }
-                }
-
-                return reject(message);
+                reject(this.parseSOAPError(e));
             }
-
-            resolve(orders[0]);
         });
     }
 
@@ -1003,11 +1025,16 @@ class Handler extends AbstractHandler {
             const Service = await this.getDfp().then(dfp => dfp.getService("LineItemService"));
             Service.setToken(this.token);
 
-            let lineItems = await Service.createLineItems({
-                lineItems: data
-            });
-
-            resolve(lineItems);
+            try{
+                let lineItems = await Service.createLineItems({
+                    lineItems: data
+                });
+                resolve(lineItems);
+            } catch (e) {
+                reject(this.parseSOAPError(e));
+            }
+        }).catch((error) => {
+            console.error(error);
         });
     }
 
@@ -1017,11 +1044,16 @@ class Handler extends AbstractHandler {
             const Service = await this.getDfp().then(dfp => dfp.getService("CreativeService"));
             Service.setToken(this.token);
 
-            let creatives = await Service.createCreatives({
-                creatives: data
-            });
-
-            resolve(creatives);
+            try{
+                let creatives = await Service.createCreatives({
+                    creatives: data
+                });
+                resolve(creatives);
+            } catch (e) {
+                reject(this.parseSOAPError(e));
+            }
+        }).catch((error) => {
+            console.error(error);
         });
     }
 
@@ -1031,11 +1063,16 @@ class Handler extends AbstractHandler {
             const Service = await this.getDfp().then(dfp => dfp.getService("LineItemCreativeAssociationService"));
             Service.setToken(this.token);
 
-            let associations = await Service.createLineItemCreativeAssociations({
-                lineItemCreativeAssociations: data
-            });
-
-            resolve(associations);
+            try{
+                let associations = await Service.createLineItemCreativeAssociations({
+                    lineItemCreativeAssociations: data
+                });
+                resolve(associations);
+            } catch (e) {
+                reject(this.parseSOAPError(e));
+            }
+        }).catch((error) => {
+            console.error(error);
         });
     }
 
@@ -1046,11 +1083,15 @@ class Handler extends AbstractHandler {
 
         return new Promise(async (resolve, reject) => {
 
-            let keys = await Service.createCustomTargetingKeys({
-                keys: data
-            });
+            try{
+                let keys = await Service.createCustomTargetingKeys({
+                    keys: data
+                });
 
-            resolve(keys);
+                resolve(keys);
+            } catch (e) {
+                reject(this.parseSOAPError(e));
+            }
         }).then(keys => {
             const ids = keys.map(({id}) => {
                 return id;
@@ -1064,6 +1105,8 @@ class Handler extends AbstractHandler {
                 }
             });
             return keys;
+        }).catch((error) => {
+            console.error(error);
         });
     }
 
@@ -1073,11 +1116,17 @@ class Handler extends AbstractHandler {
             const Service = await this.getDfp().then(dfp => dfp.getService("CustomTargetingService"));
             Service.setToken(this.token);
 
-            let values = await Service.createCustomTargetingValues({
-                values: data
-            });
+            try{
+                let values = await Service.createCustomTargetingValues({
+                    values: data
+                });
 
-            resolve(values);
+                resolve(values);
+            } catch (e) {
+                reject(this.parseSOAPError(e));
+            }
+        }).catch((error) => {
+            console.error(error);
         });
     }
 
@@ -1092,6 +1141,8 @@ class Handler extends AbstractHandler {
                     }),
                 canceled
             );
+        }).catch((error) => {
+            console.error(error);
         });
     }
 

@@ -470,10 +470,11 @@ class Handler extends AbstractHandler {
     }
 
     filterAdUnitParams(params){
-        const custom = (params.adUnitsParams.find(adunit => adunit.format == 'custom') || {}).key
-        const banner = (params.adUnitsParams.find(adunit => adunit.format == '320x50') || {}).key
-
-        return [...new Set(params.adunits.map(adunit => adunit == custom ? banner : adunit))]
+        return [... new Set(params.adunits.map(key => {
+            const adunit = params.adUnitsParams.find(adunit => adunit.key == key)
+            return adunit.format =='custom' ? '320x50' : adunit.format
+        }))]
+        .map(format => params.adUnitsParams.find(adunit => adunit.format == format).key)
     }
 
     async createOrderDataFromSet(order, params, stepCallback) {
