@@ -2,7 +2,8 @@
 import {
     OpenX,
     Amazon,
-    PubNative
+    PubNative,
+    ApolloSDK
 } from './advertisers';
 
 export class AdvertiserFactory {
@@ -15,6 +16,8 @@ export class AdvertiserFactory {
                 return new Amazon();
             case PubNative.ADVERTISER:
                 return new PubNative();
+            case ApolloSDK.ADVERTISER:
+                return new ApolloSDK();
             default:
                 throw `Wrong advertiser ${advertiser}`;
         }
