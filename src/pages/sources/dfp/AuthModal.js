@@ -55,7 +55,7 @@ class AuthModal extends Component {
         return (
             <Modal isOpen={this.props.dfpAuthModalOpen} toggle={this.toggle}>
                 <ModalHeader>Google Ad Manager</ModalHeader>
-                <ModalBody>
+                <ModalBody style={{maxHeight: '50vw'}}>
                     <div className="panel panel-default">
                         <FormErrors
                             formErrors={this.state.formErrors}
@@ -90,7 +90,7 @@ class AuthModal extends Component {
                                 <li>2. Sign-in</li>
                                 <li>3. Copy Network code either from the top left corner of the dashboard or from the URL in the browser:</li>
                             </ul>
-                            <img src={"../../../images/dfp.png"} alt="" />
+                            <img style={{height: '22vw'}} src={"../../../images/dfp.png"} alt="" />
                         </Col>
                     </Row>
                 </ModalBody>
