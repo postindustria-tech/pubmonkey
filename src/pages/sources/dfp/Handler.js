@@ -44,7 +44,9 @@ class Handler extends AbstractHandler {
 
     ADVERTISER_DEFAULT_NAME = {
         amazon: "Amazon Publisher Services (TAM)",
-        openx: "Prebid.org"
+        openx: "Prebid.org",
+        apollo: "OpenX Apollo SDK"
+
     };
 
     FILTER_FN = [
@@ -548,8 +550,7 @@ class Handler extends AbstractHandler {
         let bids = [],
             keywords = [],
             skip = false;
-
-        if (advertiser === "openx") {
+        if (advertiser === "openx" || advertiser === "apollo") {
 
             switch (granularity) {
                 case 'low':
@@ -678,7 +679,7 @@ class Handler extends AbstractHandler {
                 const bidDecimal = toDecimal(bid),
                     s = toDecimal(step);
 
-                if (advertiser === "openx") {
+                if (advertiser === "openx" || advertiser === "apollo") {
                     const to = +toValidUI(bidDecimal + s).toFixed(2);
                     for (let i = bidDecimal; i < to; i += keywordStep) {
                         i = toValidUI(i);
@@ -770,7 +771,7 @@ class Handler extends AbstractHandler {
                     }
                     name = name.replace("{position}", line);
                     line++;
-                } else if (advertiser === "openx") {
+                } else if (advertiser === "openx" || advertiser === "apollo") {
                     // const to = +toValidUI(bidDecimal + s).toFixed(2);
                     // for (let i = bidDecimal; i < to; i += keywordStep) {
                     //     i = toValidUI(i);
@@ -880,8 +881,8 @@ class Handler extends AbstractHandler {
                 const {advertiser} = params
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
                 let [width, height] = creative.format.split("x")
-
-                if(advertiser == "openx"){
+                console.log('size '+ width+" * "+ height)
+                if(advertiser == "openx" || advertiser == "apollo"){
                     width = 1
                     height = 1
                 }else if(!creative.format){
@@ -893,7 +894,7 @@ class Handler extends AbstractHandler {
                         order.advertiserId,
                         creative.name + ". For " + order.name,
                         Size(width, height, false),
-                        advertiser === 'openx' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                        advertiser === 'openx' || advertiser === 'apollo' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                     )
                 ]);
             }))).flat()

@@ -30,6 +30,7 @@ import {connect} from "react-redux";
 import AmazonCreateOrder from "../../sources/forms/Amazon";
 import ClearBidCreateOrder from "../../sources/forms/ClearBid";
 import OpenXCreateOrder from "../../sources/forms/OpenX";
+import OpenXApolloSDK from "../../sources/forms/OpenXApolloSDK";
 import PubMaticCreateOrder from "../../sources/forms/PubMatic";
 import PubNativeCreateOrder from "../../sources/forms/PubNative";
 import SmaatoCreateOrder from "../../sources/forms/Smaato";
@@ -442,6 +443,26 @@ class CreateOrderModal extends Component {
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
+                                case 'apollo':
+                                    return <OpenXApolloSDK
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            creativeFormat: this.state.creativeFormat,
+                                            creativeSnippet: this.state.creativeSnippet,
+                                            adServerDomain: this.state.adServerDomain,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                            granularity: this.state.granularity,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
                                 default:
                                     return null;
                             }
@@ -716,7 +737,7 @@ class CreateOrderModal extends Component {
             customEventClassName: '',
             customEventData: customEventData,
             granularity: "auto",
-            creativeSnippet: advertiser === "openx" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
+            creativeSnippet: advertiser === "openx" || advertiser === "apollo" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
         });
     }
 
@@ -775,7 +796,7 @@ class CreateOrderModal extends Component {
             keywords = 0,
             bid;
 
-        if (advertiser === "openx" || advertiser === "pubmatic") {
+        if (advertiser === "openx" || advertiser === "pubmatic" || advertiser === "apollo") {
             if (advertiser === "pubmatic") {
                 granularity = 'auto';
                 items++
