@@ -974,8 +974,7 @@ class CreateOrderModal extends Component {
             this.props.type === AD_SERVER_DFP ? advertiserId : this.props.ADVERTISER_DEFAULT_NAME[advertiser],
             orderName
         );
-        console.log(order)
-        console.log("advertiserId: "+order.advertiserId)
+
         let params = {
             adunits,
             adUnitsParams,
