@@ -31,6 +31,7 @@ import AmazonCreateOrder from "../../sources/forms/Amazon";
 import ClearBidCreateOrder from "../../sources/forms/ClearBid";
 import OpenXCreateOrder from "../../sources/forms/OpenX";
 import OpenXApolloSDK from "../../sources/forms/OpenXApolloSDK";
+import OpenXApollo from "../../sources/forms/OpenXApollo";
 import PubMaticCreateOrder from "../../sources/forms/PubMatic";
 import PubNativeCreateOrder from "../../sources/forms/PubNative";
 import SmaatoCreateOrder from "../../sources/forms/Smaato";
@@ -444,6 +445,26 @@ class CreateOrderModal extends Component {
                                         stateSetter={this.stateSetter}
                                     />;
                                 case 'apollo':
+                                    return <OpenXApollo
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            creativeFormat: this.state.creativeFormat,
+                                            creativeSnippet: this.state.creativeSnippet,
+                                            adServerDomain: this.state.adServerDomain,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                            granularity: this.state.granularity,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
+                                case 'apolloSDK':
                                     return <OpenXApolloSDK
                                         formErrors={this.state.formErrors}
                                         handleInputChange={this.handleInputChange}
@@ -737,7 +758,7 @@ class CreateOrderModal extends Component {
             customEventClassName: '',
             customEventData: customEventData,
             granularity: "auto",
-            creativeSnippet: advertiser === "openx" || advertiser === "apollo" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
+            creativeSnippet: advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
         });
     }
 
@@ -796,7 +817,7 @@ class CreateOrderModal extends Component {
             keywords = 0,
             bid;
 
-        if (advertiser === "openx" || advertiser === "pubmatic" || advertiser === "apollo") {
+        if (advertiser === "openx" || advertiser === "pubmatic" || advertiser === "apollo" || advertiser === "apolloSDK") {
             if (advertiser === "pubmatic") {
                 granularity = 'auto';
                 items++

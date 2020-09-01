@@ -17,7 +17,7 @@ import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
 
-let defaultAdvertiser = "apolloSDK";
+let defaultAdvertiser = "apollo";
 
 const initialState = {
     advertiser: defaultAdvertiser,
@@ -27,7 +27,7 @@ const initialState = {
     keyword: "",
 };
 
-class ApolloSDKCreateOrder extends CreateOrderForm {
+class ApolloCreateOrder extends CreateOrderForm {
 
     static defaultProps = {
         stateSetter: () => {},
@@ -161,4 +161,4 @@ const mapStateToProps = state => ({
     ...adServerSelectors.duplicateOrder(state),
 });
 
-export default connect(mapStateToProps, null)(ApolloSDKCreateOrder)
+export default connect(mapStateToProps, null)(ApolloCreateOrder)
