@@ -84,7 +84,7 @@ const initialState = {
     adServerDomain: '',
     keyword: '',
     granularity: 'auto',
-
+    childContentEligibility: "DISALLOWED",
     advertiserId: null,
     customEventData: '',
 };
@@ -1017,6 +1017,7 @@ class CreateOrderModal extends Component {
             amazonStep,
             priceGrid,
             priceBand,
+            childContentEligibility
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1050,8 +1051,9 @@ class CreateOrderModal extends Component {
             amazonStep,
             priceGrid,
             priceBand,
+            childContentEligibility,
         };
-
+        console.log(params)
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",

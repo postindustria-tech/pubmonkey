@@ -102,7 +102,7 @@ class Handler extends AbstractHandler {
         status: "PAUSED",
         isArchived: "false",
         primaryGoal: Goal('NONE', 'IMPRESSIONS', 100),
-        //childContentEligibility: "ALLOWED",
+        childContentEligibility: "DISALLOWED",
         targeting: {
             geoTargeting: {
                 targetedLocations: []
@@ -520,6 +520,7 @@ class Handler extends AbstractHandler {
             amazonStep,
             priceGrid,
             amazonCSVItems,
+            childContentEligibility,
         } = params;
 
         this.customTargetingValues = customTargetingValues;
