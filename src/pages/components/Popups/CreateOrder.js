@@ -35,6 +35,7 @@ import OpenXApollo from "../../sources/forms/OpenXApollo";
 import PubMaticCreateOrder from "../../sources/forms/PubMatic";
 import PubNativeCreateOrder from "../../sources/forms/PubNative";
 import SmaatoCreateOrder from "../../sources/forms/Smaato";
+import BidMachineCreateOrder from "../../sources/forms/BidMachine";
 
 let progress = null,
     defaultAdvertiser = "amazon";
@@ -484,6 +485,25 @@ class CreateOrderModal extends Component {
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
+                                case 'bidmachine':
+                                    return <BidMachineCreateOrder
+                                        formErrors={this.state.formErrors}
+                                        handleInputChange={this.handleInputChange}
+                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
+                                        attributes={{
+                                            orderName: this.state.orderName,
+                                            rangeFrom: this.state.rangeFrom,
+                                            rangeTo: this.state.rangeTo,
+                                            lineItemsNaming: this.state.lineItemsNaming,
+                                            keywordTemplate: this.state.keywordTemplate,
+                                            creativeFormat: this.state.creativeFormat,
+                                            creativeSnippet: this.state.creativeSnippet,
+                                            adServerDomain: this.state.adServerDomain,
+                                            adUnitsSelected: this.state.adUnitsSelected,
+                                            keyword: this.state.keyword,
+                                        }}
+                                        stateSetter={this.stateSetter}
+                                    />;
                                 default:
                                     return null;
                             }
@@ -758,7 +778,8 @@ class CreateOrderModal extends Component {
             customEventClassName: '',
             customEventData: customEventData,
             granularity: "auto",
-            creativeSnippet: advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
+            creativeSnippet: advertiser === "openx" || advertiser === "apollo"
+            || advertiser === "apolloSDK" || advertiser === "bidmachine" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
         });
     }
 
@@ -894,7 +915,15 @@ class CreateOrderModal extends Component {
                     keywords = 1;
                     break;
             }
-        } else {
+        } else if (advertiser === "bidmachine") {
+            let itemsPrices = []
+            granularity.split(/\r?\n/).forEach(element => {
+                let number = parseFloat(element.match(/[\d\.]+/))
+                if (number) itemsPrices.push(number)
+            })
+            items = itemsPrices.length
+            keywords = 1
+        }else {
             if (advertiser === "amazon" && priceGrid === PRICE_GRID.non_uniform) {
                 items = this.state.amazonCSVItems.length;
                 keywords = 1;

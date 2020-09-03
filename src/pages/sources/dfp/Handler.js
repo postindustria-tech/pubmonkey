@@ -46,7 +46,8 @@ class Handler extends AbstractHandler {
         amazon: "Amazon Publisher Services (TAM)",
         openx: "Prebid.org",
         apolloSDK: "OpenX Apollo SDK",
-        apollo: "OpenX Apollo"
+        apollo: "OpenX Apollo",
+        bidmachine: "BidMachine"
 
     };
 
@@ -101,6 +102,7 @@ class Handler extends AbstractHandler {
         status: "PAUSED",
         isArchived: "false",
         primaryGoal: Goal('NONE', 'IMPRESSIONS', 100),
+        //childContentEligibility: "ALLOWED",
         targeting: {
             geoTargeting: {
                 targetedLocations: []
@@ -672,6 +674,18 @@ class Handler extends AbstractHandler {
                 }
                 startPriceIndex++
             }
+        } else if (advertiser === "bidmachine") {
+            granularity.split(/\r?\n/).forEach(element => {
+                var number = parseFloat(element.match(/[\d\.]+/))
+                if (number) {
+                    number *= 1000
+                    bids.push(number)
+                    const bidDecimal = toDecimal(number);
+                    keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(2)))
+                    console.log("create keywords: " + number)
+                }
+
+            })
         } else {
             let startPriceIndex = 0
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -772,7 +786,11 @@ class Handler extends AbstractHandler {
                     }
                     name = name.replace("{position}", line);
                     line++;
-                } else if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
+                } else if (advertiser === "bidmachine") {
+
+                    keywords.push(keywordTemplate.replace(mask, bidValue));
+
+                }else if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
                     // const to = +toValidUI(bidDecimal + s).toFixed(2);
                     // for (let i = bidDecimal; i < to; i += keywordStep) {
                     //     i = toValidUI(i);
@@ -883,7 +901,8 @@ class Handler extends AbstractHandler {
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
                 let [width, height] = creative.format.split("x")
                 console.log('size '+ width+" * "+ height)
-                if(advertiser == "openx" || advertiser == "apollo" ||advertiser == "apolloSDK"){
+                if(advertiser == "openx" || advertiser == "apollo" ||
+                    advertiser == "apolloSDK" || advertiser == "bidmachine"){
                     width = 1
                     height = 1
                 }else if(!creative.format){
@@ -1028,9 +1047,13 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
+                //console.log("line item request")
+                console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });
+                console.log(lineItems)
+                //console.log("line item response")
                 resolve(lineItems);
             } catch (e) {
                 reject(this.parseSOAPError(e));

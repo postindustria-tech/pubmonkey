@@ -4,7 +4,8 @@ import {
     Amazon,
     PubNative,
     ApolloSDK,
-    Apollo
+    Apollo,
+    BidMachine
 } from './advertisers';
 
 export class AdvertiserFactory {
@@ -21,6 +22,8 @@ export class AdvertiserFactory {
                 return new ApolloSDK();
             case Apollo.ADVERTISER:
                 return new Apollo();
+            case BidMachine.ADVERTISER:
+                return new BidMachine();
             default:
                 throw `Wrong advertiser ${advertiser}`;
         }
