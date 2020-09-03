@@ -1053,7 +1053,7 @@ class CreateOrderModal extends Component {
             priceBand,
             childContentEligibility,
         };
-        console.log(params)
+
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",

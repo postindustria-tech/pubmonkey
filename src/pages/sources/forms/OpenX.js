@@ -3,7 +3,7 @@ import {
     Col,
     Input,
     Label,
-    Row,
+    Row, Tooltip,
 } from "reactstrap";
 import {
     KEYWORD_PLACEHOLDER,
@@ -16,6 +16,7 @@ import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../component
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
+import bind from "bind-decorator";
 
 let defaultAdvertiser = "openx";
 
@@ -48,12 +49,23 @@ class OpenXCreateOrder extends CreateOrderForm {
             creativeFormat: "",
             creativeSnippet: "",
             adServerDomain: "",
+            childContentEligibility: "DISALLOWED",
+            tooltipChildAllow: false,
         },
     };
 
     state = initialState;
 
+    @bind
+    tooltipToggle() {
+        this.setState({
+            tooltipChildAllow: !this.state.tooltipChildAllow
+        });
+    }
+
     render() {
+        const tooltip = `Select whether to allow this line item to serve child-directed ads. For YouTube Partner Sellers, please note that <a href="https://support.google.com/adspolicy/answer/9683742" target="_blank">YouTube's content policies for kids</a> are applicable. Learn more about <a href="https://support.google.com/platformspolicy/answer/3204170" target="_blank">COPPA.</a>`;
+
         return (
             <React.Fragment>
                 <Row className={"main-form"}>
@@ -111,6 +123,30 @@ class OpenXCreateOrder extends CreateOrderForm {
                                     {this.props.creativeFormats[option]}
                                 </option>
                             ))}
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-8"}>
+                        <Label className={"mp-label"}>Child-directed ads:</Label>
+                        <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
+                        <Tooltip
+                            placement="top"
+                            isOpen={this.state.tooltipChildAllow}
+                            target={"Tooltip-child-allow"}
+                            toggle={this.tooltipToggle}
+                            autohide={false}
+                        >
+                            <span dangerouslySetInnerHTML={{__html: tooltip}}></span>
+                        </Tooltip>
+                        <Input
+                            type="select"
+                            name={"childContentEligibility"}
+                            onChange={this.handleInputChange}
+                            id="childContentEligibility"
+                            value={this.props.attributes.childContentEligibility}
+                            className={"mp-form-control"}
+                        >
+                            <option value={"DISALLOWED"}>{"Do not serve on child-directed requests"}</option>
+                            <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                         </Input>
                     </Col>
                     <Col className={"col-sm-12"}>

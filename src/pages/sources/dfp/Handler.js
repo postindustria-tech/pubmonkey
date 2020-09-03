@@ -901,7 +901,7 @@ class Handler extends AbstractHandler {
                 const {advertiser} = params
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
                 let [width, height] = creative.format.split("x")
-                console.log('size '+ width+" * "+ height)
+
                 if(advertiser == "openx" || advertiser == "apollo" ||
                     advertiser == "apolloSDK" || advertiser == "bidmachine"){
                     width = 1
@@ -1048,13 +1048,9 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                //console.log("line item request")
-                console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });
-                console.log(lineItems)
-                //console.log("line item response")
                 resolve(lineItems);
             } catch (e) {
                 reject(this.parseSOAPError(e));
