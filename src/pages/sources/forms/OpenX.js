@@ -125,7 +125,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                             ))}
                         </Input>
                     </Col>
-                    <Col className={"col-sm-8"}>
+                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip
@@ -149,7 +149,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                             <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                         </Input>
                     </Col>
-                    <Col className={"col-sm-12"}>
+                    <Col className={"col-sm-12"} >
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>
