@@ -24,6 +24,17 @@ export class BidMachine extends AbstractAdvertiser {
     }
 
     getCreativeHtmlData(params) {
+        console.log("get creative html")
+        console.log("params")
+        console.log(params)
+        if(params && params.snippetType === "inerstitial") {
+            console.log("params")
+            console.log(params)
+            return '<script type=\"text/javascript\" src="//media.admob.com/api/v1/google_mobile_app_ads.js"></script>\n' +
+                '<script type=\"text/javascript\">document.addEventListener("DOMContentLoaded", function() {\n' +
+                '      admob.events.dispatchAppEvent("bidmachine-interstitial", "");\n' +
+                '    });</script>'
+        }
         return '<script type=\"text/javascript\" src="//media.admob.com/api/v1/google_mobile_app_ads.js"></script>\n' +
             '<script type=\"text/javascript\">document.addEventListener("DOMContentLoaded", function() {\n' +
             '      admob.events.dispatchAppEvent("bidmachine-banner", "");\n' +

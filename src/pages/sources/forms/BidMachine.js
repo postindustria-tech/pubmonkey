@@ -51,6 +51,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
             granularity: "",
             childContentEligibility: "DISALLOWED",
             tooltipChildAllow: false,
+            snippetType: "banner"
         },
     };
 
@@ -103,7 +104,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
-                    <Col className={"col-sm-4"} >
+                    <Col className={"col-sm-3"} >
                         <Label className={"mp-label"}>Creative format: </Label>
                         <Input
                             type="select"
@@ -120,7 +121,21 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             ))}
                         </Input>
                     </Col>
-                    <Col className={"col-sm-8"}>
+                    <Col className={"col-sm-3"}>
+                        <Label className={"mp-label"}>Snippet type:</Label>
+                        <Input
+                            type="select"
+                            name={"snippetType"}
+                            onChange={this.handleInputChange}
+                            id="snippetType"
+                            value={this.props.attributes.snippetType}
+                            className={"mp-form-control"}
+                        >
+                            <option value={"banner"}>{"Banner"}</option>
+                            <option value={"inerstitial"}>{"Inerstitial"}</option>
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-6"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip

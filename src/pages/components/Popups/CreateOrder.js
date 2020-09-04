@@ -87,6 +87,7 @@ const initialState = {
     childContentEligibility: "DISALLOWED",
     advertiserId: null,
     customEventData: '',
+    snippetType: "banner"
 };
 
 class CreateOrderModal extends Component {
@@ -700,7 +701,7 @@ class CreateOrderModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
-
+        console.log("value: " + value+ ", name: "+ name)
         if (['rangeFrom', 'rangeTo', 'amazonStartPrice', 'amazonStep'].includes(name)) {
             if (value !== "" && !ONLY_NUMBERS.test(value)) {
                 return;
@@ -728,6 +729,16 @@ class CreateOrderModal extends Component {
                     networkClass: this.props.networkClasses[value][0],
                     customEventClassName: this.props.networkClasses[value][0].hasOwnProperty('value') ? this.props.networkClasses[value][0].value : ''
                 });
+            }
+
+            if (name === "snippetType") {
+                this.setState(
+                    {
+                        creativeSnippet: this.props.sourceHandler.getAdvertiser().getCreativeHtmlData({snippetType: value})
+                    }
+                )
+                //this.creativeSnippet = this.props.sourceHandler.getAdvertiser().getCreativeHtmlData({snippetType: value})
+                //console.log(this.creativeSnippet)
             }
         })
     }
@@ -1017,7 +1028,8 @@ class CreateOrderModal extends Component {
             amazonStep,
             priceGrid,
             priceBand,
-            childContentEligibility
+            childContentEligibility,
+            snippetType
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1052,8 +1064,9 @@ class CreateOrderModal extends Component {
             priceGrid,
             priceBand,
             childContentEligibility,
+            snippetType
         };
-
+        console.log(params)
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",
