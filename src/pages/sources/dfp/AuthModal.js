@@ -90,7 +90,7 @@ class AuthModal extends Component {
                                 <li>2. Sign-in</li>
                                 <li>3. Copy Network code either from the top left corner of the dashboard or from the URL in the browser:</li>
                             </ul>
-                            <img style={{height: '22vw'}} src={"../../../images/dfp.png"} alt="" />
+                            <img style={{height: '18vw'}} src={"../../../images/dfp.png"} alt="" />
                         </Col>
                     </Row>
                 </ModalBody>

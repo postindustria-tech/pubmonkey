@@ -45,7 +45,9 @@ class Handler extends AbstractHandler {
     ADVERTISER_DEFAULT_NAME = {
         amazon: "Amazon Publisher Services (TAM)",
         openx: "Prebid.org",
-        apollo: "OpenX Apollo SDK"
+        apolloSDK: "OpenX Apollo SDK",
+        apollo: "OpenX Apollo",
+        bidmachine: "BidMachine"
 
     };
 
@@ -100,6 +102,7 @@ class Handler extends AbstractHandler {
         status: "PAUSED",
         isArchived: "false",
         primaryGoal: Goal('NONE', 'IMPRESSIONS', 100),
+        childContentEligibility: "DISALLOWED",
         targeting: {
             geoTargeting: {
                 targetedLocations: []
@@ -517,6 +520,7 @@ class Handler extends AbstractHandler {
             amazonStep,
             priceGrid,
             amazonCSVItems,
+            childContentEligibility,
         } = params;
 
         this.customTargetingValues = customTargetingValues;
@@ -550,7 +554,7 @@ class Handler extends AbstractHandler {
         let bids = [],
             keywords = [],
             skip = false;
-        if (advertiser === "openx" || advertiser === "apollo") {
+        if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
 
             switch (granularity) {
                 case 'low':
@@ -671,6 +675,18 @@ class Handler extends AbstractHandler {
                 }
                 startPriceIndex++
             }
+        } else if (advertiser === "bidmachine") {
+            granularity.split(/\r?\n/).forEach(element => {
+                var number = parseFloat(element.match(/[\d\.]+/))
+                if (number) {
+                    number *= 1000
+                    bids.push(number)
+                    const bidDecimal = toDecimal(number);
+                    keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(2)))
+                    console.log("create keywords: " + number)
+                }
+
+            })
         } else {
             let startPriceIndex = 0
             for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -679,7 +695,7 @@ class Handler extends AbstractHandler {
                 const bidDecimal = toDecimal(bid),
                     s = toDecimal(step);
 
-                if (advertiser === "openx" || advertiser === "apollo") {
+                if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
                     const to = +toValidUI(bidDecimal + s).toFixed(2);
                     for (let i = bidDecimal; i < to; i += keywordStep) {
                         i = toValidUI(i);
@@ -771,7 +787,11 @@ class Handler extends AbstractHandler {
                     }
                     name = name.replace("{position}", line);
                     line++;
-                } else if (advertiser === "openx" || advertiser === "apollo") {
+                } else if (advertiser === "bidmachine") {
+
+                    keywords.push(keywordTemplate.replace(mask, bidValue));
+
+                }else if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
                     // const to = +toValidUI(bidDecimal + s).toFixed(2);
                     // for (let i = bidDecimal; i < to; i += keywordStep) {
                     //     i = toValidUI(i);
@@ -881,8 +901,9 @@ class Handler extends AbstractHandler {
                 const {advertiser} = params
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
                 let [width, height] = creative.format.split("x")
-                console.log('size '+ width+" * "+ height)
-                if(advertiser == "openx" || advertiser == "apollo"){
+
+                if(advertiser == "openx" || advertiser == "apollo" ||
+                    advertiser == "apolloSDK" || advertiser == "bidmachine"){
                     width = 1
                     height = 1
                 }else if(!creative.format){
@@ -894,7 +915,7 @@ class Handler extends AbstractHandler {
                         order.advertiserId,
                         creative.name + ". For " + order.name,
                         Size(width, height, false),
-                        advertiser === 'openx' || advertiser === 'apollo' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                        advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                     )
                 ]);
             }))).flat()

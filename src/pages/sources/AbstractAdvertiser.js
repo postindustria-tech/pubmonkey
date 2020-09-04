@@ -42,7 +42,8 @@ export default class AbstractAdvertiser {
         targetIpod: false,
         type: "non_gtee",
         userAppsTargeting: "include",
-        userAppsTargetingList: []
+        userAppsTargetingList: [],
+        childContentEligibility: "DISALLOWED"
     };
 
     getDefaultSize(params){
@@ -76,7 +77,7 @@ export default class AbstractAdvertiser {
             },
             {}
         );
-
+        lineItemInfo.childContentEligibility = params.childContentEligibility
         lineItemInfo.lineItemType = "PRICE_PRIORITY";
         lineItemInfo.costType = "CPM";
         lineItemInfo.creativeRotationType = "EVEN";

@@ -2,7 +2,7 @@ import AbstractAdvertiser from '../../../sources/AbstractAdvertiser'
 
 export class ApolloSDK extends AbstractAdvertiser {
 
-    static advertiser = "apollo";
+    static advertiser = "apolloSDK";
 
     customTargetingKey = "hb_pb";
 

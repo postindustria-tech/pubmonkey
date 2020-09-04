@@ -18,7 +18,7 @@ import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
 import bind from "bind-decorator";
 
-let defaultAdvertiser = "openx";
+let defaultAdvertiser = "bidmachine";
 
 const initialState = {
     advertiser: defaultAdvertiser,
@@ -28,7 +28,7 @@ const initialState = {
     keyword: "",
 };
 
-class OpenXCreateOrder extends CreateOrderForm {
+class BidMachineCreateOrder extends CreateOrderForm {
 
     static defaultProps = {
         stateSetter: () => {},
@@ -45,12 +45,13 @@ class OpenXCreateOrder extends CreateOrderForm {
             lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
             keywordTemplate:
                 localStorage.getItem(defaultAdvertiser) ||
-                KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
-            creativeFormat: "",
+                KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],creativeFormat: "",
             creativeSnippet: "",
             adServerDomain: "",
+            granularity: "",
             childContentEligibility: "DISALLOWED",
             tooltipChildAllow: false,
+            snippetType: "banner"
         },
     };
 
@@ -71,21 +72,16 @@ class OpenXCreateOrder extends CreateOrderForm {
                 <Row className={"main-form"}>
                     <Col className={"col-sm-4"}>
                         <Label className={"mp-label"}>
-                          Granularity:{" "}
+                            Granularity:{" "}
                         </Label>
                         <Input
-                            type="select"
+                            type="textarea"
                             name={"granularity"}
                             onChange={this.handleInputChange}
                             id="granularity"
                             value={this.props.attributes.granularity}
                             className={"mp-form-control"}
                         >
-                            <option value={"low"}>{"low"}</option>
-                            <option value={"med"}>{"med"}</option>
-                            <option value={"high"}>{"high"}</option>
-                            <option value={"auto"}>{"auto"}</option>
-                            <option value={"dense"}>{"dense"}</option>
                         </Input>
                     </Col>
                     <Col className={"col-sm-4"}>
@@ -98,17 +94,17 @@ class OpenXCreateOrder extends CreateOrderForm {
                     <Col className={"col-sm-4"}>
                         <Label className={"mp-label"}>Keywords template: </Label>
                         <div>
-                        <Input 
-                            className="mr-sm-2"
-                            name="keywordTemplate"
-                            style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
-                            placeholder={this.props.attributes.keywordTemplate}
-                            onChange={this.handleInputChange}
-                            value={this.props.attributes.keywordTemplate}
-                        />
+                            <Input
+                                className="mr-sm-2"
+                                name="keywordTemplate"
+                                style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
+                                placeholder={this.props.attributes.keywordTemplate}
+                                onChange={this.handleInputChange}
+                                value={this.props.attributes.keywordTemplate}
+                            />
                         </div>
                     </Col>
-                    <Col className={"col-sm-4"} style={{display: 'none'}}>
+                    <Col className={"col-sm-3"} >
                         <Label className={"mp-label"}>Creative format: </Label>
                         <Input
                             type="select"
@@ -125,7 +121,21 @@ class OpenXCreateOrder extends CreateOrderForm {
                             ))}
                         </Input>
                     </Col>
-                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
+                    <Col className={"col-sm-3"}>
+                        <Label className={"mp-label"}>Snippet type:</Label>
+                        <Input
+                            type="select"
+                            name={"snippetType"}
+                            onChange={this.handleInputChange}
+                            id="snippetType"
+                            value={this.props.attributes.snippetType}
+                            className={"mp-form-control"}
+                        >
+                            <option value={"banner"}>{"Banner"}</option>
+                            <option value={"inerstitial"}>{"Inerstitial"}</option>
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-6"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip
@@ -138,18 +148,18 @@ class OpenXCreateOrder extends CreateOrderForm {
                             <span dangerouslySetInnerHTML={{__html: tooltip}}></span>
                         </Tooltip>
                         <Input
-                            type="select"
-                            name={"childContentEligibility"}
-                            onChange={this.handleInputChange}
-                            id="childContentEligibility"
-                            value={this.props.attributes.childContentEligibility}
-                            className={"mp-form-control"}
+                        type="select"
+                        name={"childContentEligibility"}
+                        onChange={this.handleInputChange}
+                        id="childContentEligibility"
+                        value={this.props.attributes.childContentEligibility}
+                        className={"mp-form-control"}
                         >
-                            <option value={"DISALLOWED"}>{"Do not serve on child-directed requests"}</option>
-                            <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
-                        </Input>
+                        <option value={"DISALLOWED"}>{"Do not serve on child-directed requests"}</option>
+                        <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
+                    </Input>
                     </Col>
-                    <Col className={"col-sm-12"} >
+                    <Col className={"col-sm-12"}>
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>
@@ -198,4 +208,4 @@ const mapStateToProps = state => ({
     ...adServerSelectors.duplicateOrder(state),
 });
 
-export default connect(mapStateToProps, null)(OpenXCreateOrder)
+export default connect(mapStateToProps, null)(BidMachineCreateOrder)

@@ -18,7 +18,7 @@ import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
 import bind from "bind-decorator";
 
-let defaultAdvertiser = "openx";
+let defaultAdvertiser = "apollo";
 
 const initialState = {
     advertiser: defaultAdvertiser,
@@ -28,7 +28,7 @@ const initialState = {
     keyword: "",
 };
 
-class OpenXCreateOrder extends CreateOrderForm {
+class ApolloCreateOrder extends CreateOrderForm {
 
     static defaultProps = {
         stateSetter: () => {},
@@ -45,8 +45,7 @@ class OpenXCreateOrder extends CreateOrderForm {
             lineItemsNaming: KEYWORD_PLACEHOLDER[defaultAdvertiser],
             keywordTemplate:
                 localStorage.getItem(defaultAdvertiser) ||
-                KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],
-            creativeFormat: "",
+                KEYWORD_TEMPLATE_DEFAULT_VALUE[defaultAdvertiser],creativeFormat: "",
             creativeSnippet: "",
             adServerDomain: "",
             childContentEligibility: "DISALLOWED",
@@ -71,7 +70,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                 <Row className={"main-form"}>
                     <Col className={"col-sm-4"}>
                         <Label className={"mp-label"}>
-                          Granularity:{" "}
+                            Granularity:{" "}
                         </Label>
                         <Input
                             type="select"
@@ -98,17 +97,17 @@ class OpenXCreateOrder extends CreateOrderForm {
                     <Col className={"col-sm-4"}>
                         <Label className={"mp-label"}>Keywords template: </Label>
                         <div>
-                        <Input 
-                            className="mr-sm-2"
-                            name="keywordTemplate"
-                            style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
-                            placeholder={this.props.attributes.keywordTemplate}
-                            onChange={this.handleInputChange}
-                            value={this.props.attributes.keywordTemplate}
-                        />
+                            <Input
+                                className="mr-sm-2"
+                                name="keywordTemplate"
+                                style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
+                                placeholder={this.props.attributes.keywordTemplate}
+                                onChange={this.handleInputChange}
+                                value={this.props.attributes.keywordTemplate}
+                            />
                         </div>
                     </Col>
-                    <Col className={"col-sm-4"} style={{display: 'none'}}>
+                    <Col className={"col-sm-4"} >
                         <Label className={"mp-label"}>Creative format: </Label>
                         <Input
                             type="select"
@@ -125,7 +124,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                             ))}
                         </Input>
                     </Col>
-                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
+                    <Col className={"col-sm-8"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip
@@ -149,7 +148,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                             <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                         </Input>
                     </Col>
-                    <Col className={"col-sm-12"} >
+                    <Col className={"col-sm-12"}>
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>
@@ -198,4 +197,4 @@ const mapStateToProps = state => ({
     ...adServerSelectors.duplicateOrder(state),
 });
 
-export default connect(mapStateToProps, null)(OpenXCreateOrder)
+export default connect(mapStateToProps, null)(ApolloCreateOrder)

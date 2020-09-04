@@ -5,10 +5,12 @@ export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   pubnative: "pn_bid:{bid}",
   openx: "hb_pb:{bid}",
   apollo: "hb_pb:{bid}",
+  apolloSDK: "hb_pb:{bid}",
   amazon: "amznslots:m{format}p{position}",
   smaato: "smaato_cpm:{bid}",
   clearbid: "um_price:{bid}",
   pubmatic: "pwtbst:1 AND pwtplt:inapp AND pwtpb:{bid}",
+  bidmachine: "hb_pb:{bid}"
 };
 export const PRICE_GRID = {
   uniform: 'uniform',
@@ -18,10 +20,12 @@ export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
   apollo: "hb_pb {bid}",
+  apolloSDK: "hb_pb {bid}",
   amazon: "m{width}x{height}p{position}",
   smaato: "Smaato UB {bid}",
   clearbid: "um_price {bid}",
   pubmatic: "pwtpb {bid}",
+  bidmachine: "hb_pb {bid}"
 };
 export const NETWORK_CLASS_TO_DIMENSION = {
   "HyBidMoPubLeaderboardCustomEvent": "728x90",
