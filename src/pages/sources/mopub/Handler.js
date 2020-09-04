@@ -495,7 +495,7 @@ class Handler extends AbstractHandler {
                 if(window.canceledExport){
                     return
                 }
-
+                delete item.childContentEligibility
                 return this.createLineItem(item)
                     .then(lineItem => {
                         this.filterAdUnitParams(params).forEach(currentAdUnit => {

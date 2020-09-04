@@ -701,7 +701,6 @@ class CreateOrderModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
-        console.log("value: " + value+ ", name: "+ name)
         if (['rangeFrom', 'rangeTo', 'amazonStartPrice', 'amazonStep'].includes(name)) {
             if (value !== "" && !ONLY_NUMBERS.test(value)) {
                 return;
@@ -737,8 +736,6 @@ class CreateOrderModal extends Component {
                         creativeSnippet: this.props.sourceHandler.getAdvertiser().getCreativeHtmlData({snippetType: value})
                     }
                 )
-                //this.creativeSnippet = this.props.sourceHandler.getAdvertiser().getCreativeHtmlData({snippetType: value})
-                //console.log(this.creativeSnippet)
             }
         })
     }
