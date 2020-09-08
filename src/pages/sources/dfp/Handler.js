@@ -521,6 +521,7 @@ class Handler extends AbstractHandler {
             priceGrid,
             amazonCSVItems,
             childContentEligibility,
+            BidMachinePriceGrid
         } = params;
 
         this.customTargetingValues = customTargetingValues;
@@ -676,10 +677,10 @@ class Handler extends AbstractHandler {
                 startPriceIndex++
             }
         } else if (advertiser === "bidmachine") {
-            granularity.split(/\r?\n/).forEach(element => {
+            BidMachinePriceGrid.split(/\r?\n/).forEach(element => {
                 var number = parseFloat(element.match(/[\d\.]+/))
                 if (number) {
-                    number *= 1000
+                    number *= 100
                     bids.push(number)
                     const bidDecimal = toDecimal(number);
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(2)))

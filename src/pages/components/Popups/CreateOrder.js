@@ -87,7 +87,8 @@ const initialState = {
     childContentEligibility: "DISALLOWED",
     advertiserId: null,
     customEventData: '',
-    snippetType: "banner"
+    snippetType: "banner",
+    BidMachinePriceGrid: ''
 };
 
 class CreateOrderModal extends Component {
@@ -502,6 +503,7 @@ class CreateOrderModal extends Component {
                                             adServerDomain: this.state.adServerDomain,
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
+                                            BidMachinePriceGrid: this.state.BidMachinePriceGrid
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
@@ -731,11 +733,93 @@ class CreateOrderModal extends Component {
             }
 
             if (name === "snippetType") {
+                console.log(this.state.BidMachinePriceGrid)
                 this.setState(
                     {
                         creativeSnippet: this.props.sourceHandler.getAdvertiser().getCreativeHtmlData({snippetType: value})
                     }
                 )
+            }
+            if (name === "granularity" && this.state.advertiser === 'bidmachine') {
+
+                let rangeFrom = toInteger(0);
+                let rangeTo = toInteger(0);
+                let step = toInteger(0);
+
+                let bid;
+                let granularity = value
+                let priceGrid = ''
+
+                switch (granularity) {
+                    case 'low':
+                        step = rangeFrom = toInteger(0.5);
+                        rangeTo = toInteger(5);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        break;
+                    case 'med':
+                        step = rangeFrom = toInteger(0.1);
+                        rangeTo = toInteger(20);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        break;
+                    case 'high':
+                        step = rangeFrom = toInteger(0.1);
+                        rangeTo = toInteger(20);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        break;
+                    case 'auto':
+                        // 0.05 ... 5 (0.05)
+                        step = rangeFrom = toInteger(0.05);
+                        rangeTo = toInteger(5);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        // 5.1 ... 10 (0.1)
+                        step = toInteger(0.1);
+                        rangeFrom = toInteger(5.1);
+                        rangeTo = toInteger(10);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        // 10.5 ... 20 (0.5)
+                        step = toInteger(0.5);
+                        rangeFrom = toInteger(10.5);
+                        rangeTo = toInteger(20);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        break;
+                    case 'dense':
+                        // 0.01 ... 3 (0.01)
+                        step = rangeFrom = toInteger(0.01);
+                        rangeTo = toInteger(3);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        // 3.05 ... 8 (0.05)
+                        step = toInteger(0.05);
+                        rangeFrom = toInteger(3.05);
+                        rangeTo = toInteger(8);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        // 8.5 ... 20 (0.5)
+                        step = toInteger(0.5);
+                        rangeFrom = toInteger(8.5);
+                        rangeTo = toInteger(20);
+                        for (bid = rangeFrom; bid <= rangeTo; bid += step) {
+                            priceGrid += (bid/100).toString(10) + '\n'
+                        }
+                        break;
+                }
+                this.setState({
+                    BidMachinePriceGrid: priceGrid
+                })
             }
         })
     }
@@ -830,7 +914,8 @@ class CreateOrderModal extends Component {
             rangeTo,
             advertiser,
             granularity,
-            priceGrid
+            priceGrid,
+            BidMachinePriceGrid
         } = this.state;
 
         const formValid = this.formValidator();
@@ -925,7 +1010,7 @@ class CreateOrderModal extends Component {
             }
         } else if (advertiser === "bidmachine") {
             let itemsPrices = []
-            granularity.split(/\r?\n/).forEach(element => {
+            BidMachinePriceGrid.split(/\r?\n/).forEach(element => {
                 let number = parseFloat(element.match(/[\d\.]+/))
                 if (number) itemsPrices.push(number)
             })
@@ -1026,7 +1111,8 @@ class CreateOrderModal extends Component {
             priceGrid,
             priceBand,
             childContentEligibility,
-            snippetType
+            snippetType,
+            BidMachinePriceGrid
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1061,7 +1147,8 @@ class CreateOrderModal extends Component {
             priceGrid,
             priceBand,
             childContentEligibility,
-            snippetType
+            snippetType,
+            BidMachinePriceGrid
         };
         console.log(params)
         ModalWindowService.ProgressModal.setProgress([

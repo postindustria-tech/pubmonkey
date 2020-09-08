@@ -3,14 +3,14 @@ import {
     Col,
     Input,
     Label,
-    Row, Tooltip,
+    Row, Tooltip
 } from "reactstrap";
 import {
     KEYWORD_PLACEHOLDER,
-    KEYWORD_TEMPLATE_DEFAULT_VALUE
+    KEYWORD_TEMPLATE_DEFAULT_VALUE, PRICE_GRID
 } from "../../constants/common";
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
-import {isEmpty} from "../../helpers";
+import {isEmpty, toInteger} from "../../helpers";
 import _ from "underscore";
 import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
@@ -51,7 +51,8 @@ class BidMachineCreateOrder extends CreateOrderForm {
             granularity: "",
             childContentEligibility: "DISALLOWED",
             tooltipChildAllow: false,
-            snippetType: "banner"
+            snippetType: "banner",
+            BidMachinePriceGrid: ""
         },
     };
 
@@ -70,19 +71,40 @@ class BidMachineCreateOrder extends CreateOrderForm {
         return (
             <React.Fragment>
                 <Row className={"main-form"}>
-                    <Col className={"col-sm-4"}>
+                    <Col className={"col-sm-2"}>
                         <Label className={"mp-label"}>
                             Granularity:{" "}
                         </Label>
                         <Input
-                            type="textarea"
+                            type="select"
                             name={"granularity"}
                             onChange={this.handleInputChange}
                             id="granularity"
                             value={this.props.attributes.granularity}
                             className={"mp-form-control"}
                         >
+                            <option value={"custom"}>{"custom"}</option>
+                            <option value={"low"}>{"low"}</option>
+                            <option value={"med"}>{"med"}</option>
+                            <option value={"high"}>{"high"}</option>
+                            <option value={"auto"}>{"auto"}</option>
+                            <option value={"dense"}>{"dense"}</option>
                         </Input>
+                    </Col>
+                    <Col className={"col-sm-2"}>
+                        <Label className="mp-label">
+                            Price Grid:
+                        </Label>
+                        <Input type="textarea"
+                               className="mr-sm-2"
+                               rows={4}
+                               name={"BidMachinePriceGrid"}
+                               id="BidMachinePriceGrid"
+                               style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
+                               placeholder="0.1&#10;0.2&#10;0.3&#10;0.4"
+                               onChange={this.handleInputChange}
+                               value={this.props.attributes.BidMachinePriceGrid}
+                        />
                     </Col>
                     <Col className={"col-sm-4"}>
                         <LineItemsNamingInput
