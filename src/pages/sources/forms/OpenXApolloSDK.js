@@ -107,23 +107,6 @@ class ApolloSDKCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
-                    <Col className={"col-sm-4"} >
-                        <Label className={"mp-label"}>Creative format: </Label>
-                        <Input
-                            type="select"
-                            name={"creativeFormat"}
-                            id="creativeFormat"
-                            onChange={this.handleInputChange}
-                            value={this.props.attributes.creativeFormat}
-                            className={"mp-form-control"}
-                        >
-                            {Object.keys(this.props.creativeFormats).map((option, index) => (
-                                <option key={index} value={option}>
-                                    {this.props.creativeFormats[option]}
-                                </option>
-                            ))}
-                        </Input>
-                    </Col>
                     <Col className={"col-sm-8"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
