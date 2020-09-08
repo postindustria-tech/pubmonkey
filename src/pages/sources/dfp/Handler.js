@@ -684,7 +684,6 @@ class Handler extends AbstractHandler {
                     bids.push(number)
                     const bidDecimal = toDecimal(number);
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(2)))
-                    console.log("create keywords: " + number)
                 }
 
             })
@@ -1049,6 +1048,7 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
+                //console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });
