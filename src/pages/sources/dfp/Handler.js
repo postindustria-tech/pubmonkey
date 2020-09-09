@@ -557,7 +557,7 @@ class Handler extends AbstractHandler {
             keywords = [],
             skip = false;
         if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
-
+            keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
             switch (granularity) {
                 case 'low':
                     step = rangeFrom = toInteger(0.5);
@@ -678,13 +678,13 @@ class Handler extends AbstractHandler {
                 startPriceIndex++
             }
         } else if (advertiser === "bidmachine") {
+            keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
             BidMachinePriceGrid.split(/\r?\n/).forEach(element => {
                 var number = parseFloat(element.match(/[\d\.]+/))
                 if (number) {
                     number *= 100
                     bids.push(number)
                     const bidDecimal = toDecimal(number);
-                    keywordTemplate = keywordTemplate.replace('bm_pf:', '')
                     keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(2)))
                 }
 
@@ -718,8 +718,6 @@ class Handler extends AbstractHandler {
                 }
             }
         }
-        console.log("keywords: ")
-        console.log(keywords)
         let newKeywords = keywords.filter(
             function (e) {
                 return !this.find(keyword => keyword.name === e);
