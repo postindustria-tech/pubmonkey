@@ -10,7 +10,7 @@ export const KEYWORD_TEMPLATE_DEFAULT_VALUE = {
   smaato: "smaato_cpm:{bid}",
   clearbid: "um_price:{bid}",
   pubmatic: "pwtbst:1 AND pwtplt:inapp AND pwtpb:{bid}",
-  bidmachine: "hb_pb:{bid}"
+  bidmachine: "bm_pf:{bid}",
 };
 export const PRICE_GRID = {
   uniform: 'uniform',
@@ -25,7 +25,7 @@ export const KEYWORD_PLACEHOLDER = {
   smaato: "Smaato UB {bid}",
   clearbid: "um_price {bid}",
   pubmatic: "pwtpb {bid}",
-  bidmachine: "hb_pb {bid}"
+  bidmachine: "bidmachine_{ad_type}_{bid}"
 };
 export const NETWORK_CLASS_TO_DIMENSION = {
   "HyBidMoPubLeaderboardCustomEvent": "728x90",

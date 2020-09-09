@@ -521,7 +521,8 @@ class Handler extends AbstractHandler {
             priceGrid,
             amazonCSVItems,
             childContentEligibility,
-            BidMachinePriceGrid
+            BidMachinePriceGrid,
+            snippetType
         } = params;
 
         this.customTargetingValues = customTargetingValues;
@@ -556,7 +557,7 @@ class Handler extends AbstractHandler {
             keywords = [],
             skip = false;
         if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
-
+            keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
             switch (granularity) {
                 case 'low':
                     step = rangeFrom = toInteger(0.5);
@@ -677,6 +678,7 @@ class Handler extends AbstractHandler {
                 startPriceIndex++
             }
         } else if (advertiser === "bidmachine") {
+            keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
             BidMachinePriceGrid.split(/\r?\n/).forEach(element => {
                 var number = parseFloat(element.match(/[\d\.]+/))
                 if (number) {
@@ -716,7 +718,6 @@ class Handler extends AbstractHandler {
                 }
             }
         }
-
         let newKeywords = keywords.filter(
             function (e) {
                 return !this.find(keyword => keyword.name === e);
@@ -788,7 +789,7 @@ class Handler extends AbstractHandler {
                     name = name.replace("{position}", line);
                     line++;
                 } else if (advertiser === "bidmachine") {
-
+                    name = name.replace("{ad_type}", snippetType)
                     keywords.push(keywordTemplate.replace(mask, bidValue));
 
                 }else if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {

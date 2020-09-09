@@ -651,7 +651,10 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.advertiserId = "Header Bidding Service GAM is required";
             isValid = false;
         }
-        if (isEmpty(this.state.granularity) && this.state.selectedAdvertiser === 'openx') {
+        if (isEmpty(this.state.granularity) && (this.state.selectedAdvertiser === 'openx' ||
+            this.state.selectedAdvertiser === 'apollo' || this.state.selectedAdvertiser === 'apolloSDK' ||
+            this.state.selectedAdvertiser === 'bidmachine') ) {
+
             fieldValidationErrors.granularity = "Granularity is required!";
             isValid = false;
         }
@@ -673,6 +676,12 @@ class CreateOrderModal extends Component {
                     isValid = false;
                 }
             }
+        }
+        if (this.state.advertiser === "bidmachine" && this.state.granularity === "custom" &&
+                                                      !this.state.BidMachinePriceGrid) {
+
+            fieldValidationErrors.customEventData = "This field is required, please fill price grid";
+            isValid = false;
         }
 
         this.setState({
@@ -869,7 +878,7 @@ class CreateOrderModal extends Component {
             rangeTo: 10,
             customEventClassName: '',
             customEventData: customEventData,
-            granularity: "auto",
+            granularity: advertiser !== "bidmachine" ? 'auto': 'custom',
             creativeSnippet: advertiser === "openx" || advertiser === "apollo"
             || advertiser === "apolloSDK" || advertiser === "bidmachine" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
         });
