@@ -4,7 +4,7 @@ export class BidMachine extends AbstractAdvertiser {
 
     static advertiser = "bidmachine";
 
-    customTargetingKey = "hb_pb";
+    customTargetingKey = "bm_pf";
 
     CREATIVE_FORMATS = {
         "": "All",
