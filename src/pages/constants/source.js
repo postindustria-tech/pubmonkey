@@ -7,4 +7,4 @@ export const AD_SERVERS = {
     [AD_SERVER_DFP]: "Google Ad Manager"
 };
 
-export const DFP_API_VERSION = "v201908";
+export const DFP_API_VERSION = "v201911";
