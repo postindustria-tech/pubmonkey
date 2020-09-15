@@ -902,23 +902,53 @@ class Handler extends AbstractHandler {
                 const {advertiser} = params
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
                 let [width, height] = creative.format.split("x")
-
+                let adUnitSizes = []
                 if(advertiser == "openx" || advertiser == "apollo" ||
-                    advertiser == "apolloSDK" || advertiser == "bidmachine"){
+                    advertiser == "apolloSDK") {
                     width = 1
                     height = 1
+                } else if (advertiser == "bidmachine"){
+                    if(params.snippetType == "interstitial") {
+                        width = 1
+                        height = 1
+                    } else {
+                        if(creative.format.indexOf(',') > -1) {
+                            let formats = creative.format.split(', ')
+                            formats.forEach(format => {
+                                let [width, height] = format.split("x")
+                                adUnitSizes.push({width: width, height: height})
+                            })
+                        } else {
+                            [width, height] = params.creativeFormat.split("x")
+                        }
+
+                    }
                 }else if(!creative.format){
                     [width, height] = params.creativeFormat.split("x")
                 }
-
-                return await this.createCreatives([
-                    ThirdPartyCreative(
-                        order.advertiserId,
-                        creative.name + ". For " + order.name,
-                        Size(width, height, false),
-                        advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                let data = []
+                if(adUnitSizes.length > 0) {
+                    adUnitSizes.forEach(element => {
+                        data.push(
+                            ThirdPartyCreative(
+                                order.advertiserId,
+                                creative.name + ". For " + order.name,
+                                Size(element.width, element.height, false),
+                                advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                            )
+                        )
+                    })
+                } else {
+                    data.push(
+                        ThirdPartyCreative(
+                            order.advertiserId,
+                            creative.name + ". For " + order.name,
+                            Size(width, height, false),
+                            advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                        )
                     )
-                ]);
+                }
+                return await this.createCreatives(data);
             }))).flat()
 
             await this.performOrderAction('running', 'ApproveOrders', order.id);
@@ -1049,7 +1079,6 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                //console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });

@@ -1159,6 +1159,7 @@ class CreateOrderModal extends Component {
             snippetType,
             BidMachinePriceGrid
         };
+        console.log("Params:")
         console.log(params)
         ModalWindowService.ProgressModal.setProgress([
             {

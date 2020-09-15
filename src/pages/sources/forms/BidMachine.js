@@ -137,7 +137,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             className={"mp-form-control"}
                         >
                             <option value={"banner"}>{"Banner"}</option>
-                            <option value={"inerstitial"}>{"Inerstitial"}</option>
+                            <option value={"interstitial"}>{"Interstitial"}</option>
                         </Input>
                     </Col>
                     <Col className={"col-sm-8"}>

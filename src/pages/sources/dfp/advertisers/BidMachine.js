@@ -24,7 +24,7 @@ export class BidMachine extends AbstractAdvertiser {
     }
 
     getCreativeHtmlData(params) {
-        if(params && params.snippetType === "inerstitial") {
+        if(params && params.snippetType === "interstitial") {
             return '<script type=\"text/javascript\" src="//media.admob.com/api/v1/google_mobile_app_ads.js"></script>\n' +
                 '<script type=\"text/javascript\">document.addEventListener("DOMContentLoaded", function() {\n' +
                 '      admob.events.dispatchAppEvent("bidmachine-interstitial", "");\n' +
