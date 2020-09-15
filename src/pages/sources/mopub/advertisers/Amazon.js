@@ -90,6 +90,7 @@ export class Amazon extends AbstractAdvertiser {
     createCreatives(lineItemKey, params, cb) {
         const creative = {
             adType: "html",
+            dimensions: params.creativeFormat,
             extended: {
                 htmlData: this.getCreativeHtmlData(params),
                 isMraid: true
