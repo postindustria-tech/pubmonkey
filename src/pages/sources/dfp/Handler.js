@@ -919,7 +919,7 @@ class Handler extends AbstractHandler {
                                 adUnitSizes.push({width: width, height: height})
                             })
                         } else {
-                            [width, height] = params.creativeFormat.split("x")
+                            let [width, height] = creative.format.split("x")
                         }
 
                     }
