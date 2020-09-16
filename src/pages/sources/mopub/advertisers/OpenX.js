@@ -158,6 +158,7 @@ export class OpenX extends AbstractAdvertiser {
 
         const creative = {
             adType: "html",
+            dimensions: creativeParams.creativeFormat,
             extended: {
                 htmlData: creativeParams.creativeSnippet,//this.getCreativeHtmlData(params),
                 isMraid: false
