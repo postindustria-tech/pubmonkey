@@ -81,6 +81,34 @@ export default class AbstractAdvertiser {
         lineItemInfo.lineItemType = "PRICE_PRIORITY";
         lineItemInfo.costType = "CPM";
         lineItemInfo.creativeRotationType = "EVEN";
+
+        if (params.advertiser === "bidmachine" && params.snippetType !== "interstitial") {
+            let expectedCreativesSize = []
+            params.adunits.map(adunit => {
+                const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
+                if(creative.format.indexOf(',') > -1) {
+                    let formats = creative.format.split(', ')
+                    formats.forEach(format => {
+                        let [width, height] = format.split("x")
+                        expectedCreativesSize.push({width: width, height: height})
+                    })
+                } else {
+                    let [width, height] = creative.format.split("x")
+                    expectedCreativesSize.push({width: width, height: height})
+                }
+            })
+            let creativePlaceholders = []
+            for (let i = 0; i < expectedCreativesSize.length; i++) {
+                creativePlaceholders.push(
+                    CreativePlaceholder(
+                        Size(expectedCreativesSize[i].width, expectedCreativesSize[i].height, false),
+                        1,
+                        'PIXEL'
+                    )
+                )
+            }
+            lineItemInfo.creativePlaceholders = creativePlaceholders
+        } else {
         lineItemInfo.creativePlaceholders = [
             CreativePlaceholder(
                 Size(width, height, false),
@@ -88,6 +116,7 @@ export default class AbstractAdvertiser {
                 'PIXEL'
             )
         ];
+        }
 
         return lineItemInfo;
     }

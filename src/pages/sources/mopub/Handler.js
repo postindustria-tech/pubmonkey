@@ -480,7 +480,8 @@ class Handler extends AbstractHandler {
     async createOrderDataFromSet(order, params, stepCallback) {
 
         await this.prepareMoPubTabForRequests();
-
+        console.log("order params")
+        console.log(order)
         return this.createOrder(order).then(order => {
             const lineItems = this.advertiser.composerLineItems(order.key, params);
 
@@ -490,7 +491,8 @@ class Handler extends AbstractHandler {
                 lineItemsDone: 1,
                 lineItemCount: lineItems.length
             });
-
+            console.log("line items")
+            console.log(lineItems)
             return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
                 if(window.canceledExport){
                     return
