@@ -12,7 +12,7 @@ import {
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import {isEmpty, toInteger} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../components";
+import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput, VastTagUrl} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
@@ -52,7 +52,8 @@ class BidMachineCreateOrder extends CreateOrderForm {
             childContentEligibility: "DISALLOWED",
             tooltipChildAllow: false,
             snippetType: "banner",
-            BidMachinePriceGrid: ""
+            BidMachinePriceGrid: "",
+            vastTagUrl: ""
         },
     };
 
@@ -127,7 +128,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                         </div>
                     </Col>
                     <Col className={"col-sm-4"}>
-                        <Label className={"mp-label"}>Snippet type:</Label>
+                        <Label className={"mp-label"}>Creative type:</Label>
                         <Input
                             type="select"
                             name={"snippetType"}
@@ -138,6 +139,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                         >
                             <option value={"banner"}>{"Banner"}</option>
                             <option value={"interstitial"}>{"Interstitial"}</option>
+                            <option value={"VAST"}>{"VAST"}</option>
                         </Input>
                     </Col>
                     <Col className={"col-sm-8"}>
@@ -164,13 +166,22 @@ class BidMachineCreateOrder extends CreateOrderForm {
                         <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                     </Input>
                     </Col>
-                    <Col className={"col-sm-12"}>
+                    <Col className={"col-sm-12"} hidden={this.props.attributes.snippetType === "VAST"}>
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>
                         <CreativeSnippet
                             snippet={this.props.attributes.creativeSnippet}
                             onChange={(snippet) => {this.stateSetter({creativeSnippet: snippet})}}
+                        />
+                    </Col>
+                    <Col className={"col-sm-12"} hidden={this.props.attributes.snippetType !== "VAST"}>
+                        <Label className="mr-sm-2 mp-label">
+                            Vast tag URL:
+                        </Label>
+                        <VastTagUrl
+                            vastTagUrl={this.props.attributes.vastTagUrl}
+                            onChange={(vastTagUrl) => {this.stateSetter({vastTagUrl: vastTagUrl})}}
                         />
                     </Col>
                 </Row>

@@ -88,7 +88,8 @@ const initialState = {
     advertiserId: null,
     customEventData: '',
     snippetType: "banner",
-    BidMachinePriceGrid: ''
+    BidMachinePriceGrid: '',
+    vastTagUrl: ''
 };
 
 class CreateOrderModal extends Component {
@@ -503,7 +504,9 @@ class CreateOrderModal extends Component {
                                             adServerDomain: this.state.adServerDomain,
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
-                                            BidMachinePriceGrid: this.state.BidMachinePriceGrid
+                                            BidMachinePriceGrid: this.state.BidMachinePriceGrid,
+                                            vastTagUrl: this.state.vastTagUrl,
+                                            snippetType: this.state.snippetType
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
@@ -742,9 +745,10 @@ class CreateOrderModal extends Component {
             }
 
             if (name === "snippetType") {
-                console.log(this.state.BidMachinePriceGrid)
                 this.setState(
                     {
+                        vastTagUrl: this.props.sourceHandler.getAdvertiser().getVastTagUrl(),
+                        snippetType: value,
                         creativeSnippet: this.props.sourceHandler.getAdvertiser().getCreativeHtmlData({snippetType: value})
                     }
                 )
@@ -879,6 +883,7 @@ class CreateOrderModal extends Component {
             customEventClassName: '',
             customEventData: customEventData,
             granularity: advertiser !== "bidmachine" ? 'auto': 'custom',
+            vastTagUrl: advertiser === "bidmachine" ? this.props.sourceHandler.getAdvertiser().getVastTagUrl() : "",
             creativeSnippet: advertiser === "openx" || advertiser === "apollo"
             || advertiser === "apolloSDK" || advertiser === "bidmachine" ? this.props.sourceHandler.getAdvertiser().getCreativeHtmlData([]) : "",
         });
@@ -1121,7 +1126,8 @@ class CreateOrderModal extends Component {
             priceBand,
             childContentEligibility,
             snippetType,
-            BidMachinePriceGrid
+            BidMachinePriceGrid,
+            vastTagUrl
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1157,7 +1163,8 @@ class CreateOrderModal extends Component {
             priceBand,
             childContentEligibility,
             snippetType,
-            BidMachinePriceGrid
+            BidMachinePriceGrid,
+            vastTagUrl
         };
         console.log("Params:")
         console.log(params)

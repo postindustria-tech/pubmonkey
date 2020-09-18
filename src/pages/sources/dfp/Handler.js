@@ -11,6 +11,7 @@ import {
     Size,
     Money,
     ThirdPartyCreative,
+    VastPartyCreative,
     CustomCriteriaSet,
     CustomCriteria,
     LineItemCreativeAssociation
@@ -98,6 +99,7 @@ class Handler extends AbstractHandler {
         discountType: "PERCENTAGE",
         discount: "0.0",
         creativePlaceholders: [],
+        environmentType: "BROWSER",
         budget: Money(0, 'USD'),
         status: "PAUSED",
         isArchived: "false",
@@ -928,25 +930,49 @@ class Handler extends AbstractHandler {
                 }
                 let data = []
                 if(adUnitSizes.length > 0) {
-                    adUnitSizes.forEach(element => {
+                    if(params.snippetType === "VAST") {
+                        adUnitSizes.forEach(element => {
+                            data.push(
+                                VastPartyCreative(
+                                    order.advertiserId,
+                                    creative.name + ". For " + order.name,
+                                    Size(element.width, element.height, false),
+                                    params.vastTagUrl
+                                )
+                            )
+                        })
+                    } else {
+                        adUnitSizes.forEach(element => {
+                            data.push(
+                                ThirdPartyCreative(
+                                    order.advertiserId,
+                                    creative.name + ". For " + order.name,
+                                    Size(element.width, element.height, false),
+                                    advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                                )
+                            )
+                        })
+                    }
+                } else {
+                    if(params.snippetType === "VAST") {
+                        data.push(
+                            VastPartyCreative(
+                                order.advertiserId,
+                                creative.name + ". For " + order.name,
+                                Size(width, height, false),
+                                params.vastTagUrl
+                            )
+                        )
+                    } else {
                         data.push(
                             ThirdPartyCreative(
                                 order.advertiserId,
                                 creative.name + ". For " + order.name,
-                                Size(element.width, element.height, false),
+                                Size(width, height, false),
                                 advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                             )
                         )
-                    })
-                } else {
-                    data.push(
-                        ThirdPartyCreative(
-                            order.advertiserId,
-                            creative.name + ". For " + order.name,
-                            Size(width, height, false),
-                            advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
-                        )
-                    )
+                    }
                 }
                 return await this.createCreatives(data);
             }))).flat()
@@ -1079,9 +1105,13 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
+                console.log("lineitem data")
+                console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });
+                console.log("lineitem response")
+                console.log(lineItems)
                 resolve(lineItems);
             } catch (e) {
                 reject(this.parseSOAPError(e));
@@ -1098,9 +1128,13 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
+                console.log("creative data")
+                console.log(data)
                 let creatives = await Service.createCreatives({
                     creatives: data
                 });
+                console.log("creative response")
+                console.log(creatives)
                 resolve(creatives);
             } catch (e) {
                 reject(this.parseSOAPError(e));

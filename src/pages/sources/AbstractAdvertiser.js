@@ -83,6 +83,10 @@ export default class AbstractAdvertiser {
         lineItemInfo.creativeRotationType = "EVEN";
 
         if (params.advertiser === "bidmachine" && params.snippetType !== "interstitial") {
+            if(params.snippetType === "VAST") {
+                lineItemInfo.environmentType = "VIDEO_PLAYER"
+                lineItemInfo.targeting.requestPlatformTargeting = {targetedRequestPlatforms: ["VIDEO_PLAYER"]}
+            }
             let expectedCreativesSize = []
             params.adunits.map(adunit => {
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
