@@ -82,7 +82,7 @@ export default class AbstractAdvertiser {
         lineItemInfo.costType = "CPM";
         lineItemInfo.creativeRotationType = "EVEN";
 
-        if (params.advertiser === "bidmachine" && params.snippetType !== "interstitial") {
+        if (params.advertiser === "bidmachine") {
             if(params.snippetType === "VAST") {
                 lineItemInfo.environmentType = "VIDEO_PLAYER"
                 lineItemInfo.targeting.requestPlatformTargeting = {targetedRequestPlatforms: ["VIDEO_PLAYER"]}
@@ -91,13 +91,13 @@ export default class AbstractAdvertiser {
             params.adunits.map(adunit => {
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
                 if(creative.format.indexOf(',') > -1) {
-                    let formats = creative.format.split(', ')
+                    let formats = creative.format.replace('v', '').split(', ')
                     formats.forEach(format => {
                         let [width, height] = format.split("x")
                         expectedCreativesSize.push({width: width, height: height})
                     })
                 } else {
-                    let [width, height] = creative.format.split("x")
+                    let [width, height] = creative.format.replace('v', '').split("x")
                     expectedCreativesSize.push({width: width, height: height})
                 }
             })

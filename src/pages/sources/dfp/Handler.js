@@ -910,20 +910,16 @@ class Handler extends AbstractHandler {
                     width = 1
                     height = 1
                 } else if (advertiser == "bidmachine"){
-                    if(params.snippetType == "interstitial") {
-                        width = 1
-                        height = 1
+                    if(creative.format.indexOf(',') > -1) {
+                        let formats = creative.format.split(', ')
+                        formats.forEach(format => {
+                            let [width, height] = format.replace('v', '').split("x")
+                            adUnitSizes.push({width: width, height: height})
+                        })
                     } else {
-                        if(creative.format.indexOf(',') > -1) {
-                            let formats = creative.format.split(', ')
-                            formats.forEach(format => {
-                                let [width, height] = format.split("x")
-                                adUnitSizes.push({width: width, height: height})
-                            })
-                        } else {
-                            let [width, height] = creative.format.split("x")
-                        }
-
+                        let format = creative.format.replace('v', '').split("x")
+                        width = format[0]
+                        height = format[1]
                     }
                 }else if(!creative.format){
                     [width, height] = params.creativeFormat.split("x")
