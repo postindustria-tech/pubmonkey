@@ -482,6 +482,9 @@ class CreateOrderModal extends Component {
                                             creativeFormat: this.state.creativeFormat,
                                             creativeSnippet: this.state.creativeSnippet,
                                             adServerDomain: this.state.adServerDomain,
+                                            os: this.state.os,
+                                            customEventClassName: this.state.customEventClassName,
+                                            customEventData: this.state.customEventData,
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
                                             granularity: this.state.granularity,
@@ -855,6 +858,8 @@ class CreateOrderModal extends Component {
                 case "clearbid":
                     return "{\"w\":\"\", \"h\":\"\", \"ad_unit_id\":\"\"}";
                 case "pubmatic":
+                    return "{}";
+                case "apolloSDK":
                     return "{}";
                 default:
                     return "";

@@ -29,6 +29,7 @@ class Handler extends AbstractHandler {
         pubmatic: "PubMatic OpenBid",
         pubnative: "PubNative HyBid",
         smaato: "Smaato Unified Bidding",
+        apolloSDK: "OpenX Apollo SDK",
     };
 
     FILTER_FN = [
