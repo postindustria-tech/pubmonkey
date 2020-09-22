@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {
-    Col,
+    Col, CustomInput,
     Input,
     Label,
     Row, Tooltip,
@@ -12,7 +12,7 @@ import {
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import {isEmpty} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../components";
+import {AdTypeSelect, AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
@@ -50,7 +50,11 @@ class ApolloSDKCreateOrder extends CreateOrderForm {
             adServerDomain: "",
             childContentEligibility: "DISALLOWED",
             tooltipChildAllow: false,
+            os: '',
+            customEventClassName: '',
+            customEventData: "{}",
         },
+        networkClasses: {},
     };
 
     state = initialState;
@@ -107,7 +111,53 @@ class ApolloSDKCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
-                    <Col className={"col-sm-8"}>
+                    <Col className={"col-sm-4"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>OS:</Label>
+                        <Input
+                            type="select"
+                            name={"os"}
+                            id="creativeFormat"
+                            onChange={this.handleInputChange}
+                            value={this.props.attributes.os}
+                            className={"mp-form-control"}
+                        >
+                            <option value={""}>Select OS</option>
+                            <option value={"iphone"}>iOS</option>
+                            <option value={"android"}>Android</option>
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-4"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>Ad Type:</Label>
+                        <AdTypeSelect
+                            onChange={this.onChangeAdType}
+                            os={this.props.attributes.os}
+                            networkClasses={this.props.networkClasses}
+                        />
+                    </Col>
+                    <Col className={"col-sm-7"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>Custom Event Class Name: </Label>
+                        <CustomInput
+                            type="text"
+                            id={"customEventClassName"}
+                            name={"customEventClassName"}
+                            onChange={this.handleInputChange}
+                            value={this.props.attributes.customEventClassName}
+                            className={"mp-form-control"}
+                        />
+                    </Col>
+                    <Col className={"col-sm-5"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>Custom Event Data:</Label>
+                        <CustomInput
+                            invalid={!isEmpty(this.props.formErrors.customEventData)}
+                            type="text"
+                            id={"customEventData"}
+                            name={"customEventData"}
+                            value={this.props.attributes.customEventData}
+                            onChange={this.handleInputChange}
+                            className={"mp-form-control"}
+                        />
+                    </Col>
+                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip

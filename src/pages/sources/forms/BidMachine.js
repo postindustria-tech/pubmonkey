@@ -12,7 +12,7 @@ import {
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import {isEmpty, toInteger} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput} from "../components";
+import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput, VastTagUrl} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
@@ -51,8 +51,10 @@ class BidMachineCreateOrder extends CreateOrderForm {
             granularity: "",
             childContentEligibility: "DISALLOWED",
             tooltipChildAllow: false,
+            tooltipVastTag: false,
             snippetType: "banner",
-            BidMachinePriceGrid: ""
+            BidMachinePriceGrid: "",
+            vastTagUrl: ""
         },
     };
 
@@ -65,8 +67,16 @@ class BidMachineCreateOrder extends CreateOrderForm {
         });
     }
 
+    @bind
+    tooltipToggleVast() {
+        this.setState({
+            tooltipVastTag: !this.state.tooltipVastTag
+        });
+    }
+
     render() {
         const tooltip = `Select whether to allow this line item to serve child-directed ads. For YouTube Partner Sellers, please note that <a href="https://support.google.com/adspolicy/answer/9683742" target="_blank">YouTube's content policies for kids</a> are applicable. Learn more about <a href="https://support.google.com/platformspolicy/answer/3204170" target="_blank">COPPA.</a>`;
+        const tooltipVast = `The VAST URL from a third-party ad server. <a href="https://support.google.com/admanager/answer/1171783#redirect" target="_blank">Learn more</a>`;
 
         return (
             <React.Fragment>
@@ -127,7 +137,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                         </div>
                     </Col>
                     <Col className={"col-sm-4"}>
-                        <Label className={"mp-label"}>Snippet type:</Label>
+                        <Label className={"mp-label"}>Creative type:</Label>
                         <Input
                             type="select"
                             name={"snippetType"}
@@ -138,6 +148,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                         >
                             <option value={"banner"}>{"Banner"}</option>
                             <option value={"interstitial"}>{"Interstitial"}</option>
+                            <option value={"VAST"}>{"VAST"}</option>
                         </Input>
                     </Col>
                     <Col className={"col-sm-8"}>
@@ -164,13 +175,32 @@ class BidMachineCreateOrder extends CreateOrderForm {
                         <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                     </Input>
                     </Col>
-                    <Col className={"col-sm-12"}>
+                    <Col className={"col-sm-12"} hidden={this.props.attributes.snippetType === "VAST"}>
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>
                         <CreativeSnippet
                             snippet={this.props.attributes.creativeSnippet}
                             onChange={(snippet) => {this.stateSetter({creativeSnippet: snippet})}}
+                        />
+                    </Col>
+                    <Col className={"col-sm-12"} hidden={this.props.attributes.snippetType !== "VAST"}>
+                        <Label className="mr-sm-2 mp-label">
+                            Vast tag URL:
+                        </Label>
+                        <i className="fa fa-question-circle" id={"Tooltip-vast-tag"}/>
+                        <Tooltip
+                            placement="top"
+                            isOpen={this.state.tooltipVastTag}
+                            target={"Tooltip-vast-tag"}
+                            toggle={this.tooltipToggleVast}
+                            autohide={false}
+                        >
+                            <span dangerouslySetInnerHTML={{__html: tooltipVast}}></span>
+                        </Tooltip>
+                        <VastTagUrl
+                            vastTagUrl={this.props.attributes.vastTagUrl}
+                            onChange={(vastTagUrl) => {this.stateSetter({vastTagUrl: vastTagUrl})}}
                         />
                     </Col>
                 </Row>

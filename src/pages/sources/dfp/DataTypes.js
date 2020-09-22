@@ -38,7 +38,7 @@ export function Targeting(geoTargeting, inventoryTargeting, customTargeting) {
     return {
         geoTargeting: geoTargeting,
         inventoryTargeting: inventoryTargeting,
-        customTargeting: customTargeting
+        customTargeting: customTargeting,
         // customTargeting: {
         //     logicalOperator: "OR",
         //     children: [{
@@ -56,6 +56,9 @@ export function Targeting(geoTargeting, inventoryTargeting, customTargeting) {
         //         ]
         //     }]
         // }
+        //requestPlatformTargeting: {
+            //targetedRequestPlatforms: ["VIDEO_PLAYER"]
+        //}
     };
 }
 
@@ -83,6 +86,18 @@ export function ThirdPartyCreative(advertiserId, name, size, snippet) {
         name: name,
         size: size,
         snippet: snippet,
+    }
+}
+
+export function VastPartyCreative(advertiserId, name, size, vastTagUrl) {
+    return {
+        attributes: {"xsi:type": "VastRedirectCreative"},
+        advertiserId: advertiserId,
+        name: name,
+        size: size,
+        vastXmlUrl: vastTagUrl,
+        vastRedirectType: "LINEAR_AND_NON_LINEAR",
+        duration: 1
     }
 }
 

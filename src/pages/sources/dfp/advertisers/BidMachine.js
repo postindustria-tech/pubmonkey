@@ -35,4 +35,8 @@ export class BidMachine extends AbstractAdvertiser {
             '      admob.events.dispatchAppEvent("bidmachine-banner", "");\n' +
             '    });</script>'
     }
+
+    getVastTagUrl() {
+        return "https://js.bidmachine.io/gam_lightweight.xml"
+    }
 }
