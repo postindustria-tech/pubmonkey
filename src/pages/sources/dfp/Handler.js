@@ -1101,13 +1101,11 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                console.log("lineitem data")
-                console.log(data)
+                //console.log("lineitem data")
+                //console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });
-                console.log("lineitem response")
-                console.log(lineItems)
                 resolve(lineItems);
             } catch (e) {
                 reject(this.parseSOAPError(e));
@@ -1124,8 +1122,8 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                console.log("creative data")
-                console.log(data)
+                //console.log("creative data")
+                //console.log(data)
                 let creatives = await Service.createCreatives({
                     creatives: data
                 });
