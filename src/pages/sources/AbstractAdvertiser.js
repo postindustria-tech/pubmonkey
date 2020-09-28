@@ -85,7 +85,7 @@ export default class AbstractAdvertiser {
         if (PREBID_GROUP_ADVERTISERS.includes(params.advertiser)) {
             if(params.snippetType === "VAST") {
                 lineItemInfo.environmentType = "VIDEO_PLAYER"
-                lineItemInfo.targeting.requestPlatformTargeting = {targetedRequestPlatforms: ["VIDEO_PLAYER"]}
+                lineItemInfo.targeting.requestPlatformTargeting = {targetedRequestPlatforms: ["ANY"]}
             }
             let expectedCreativesSize = []
             params.adunits.map(adunit => {
