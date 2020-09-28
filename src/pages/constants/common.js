@@ -36,3 +36,10 @@ export const NETWORK_CLASS_TO_DIMENSION = {
   "net.pubnative.lite.adapters.mopub.PNLiteMoPubMRectCustomEvent": "300x250",
   "net.pubnative.lite.adapters.mopub.PNLiteMoPubInterstitialCustomEvent": ""
 };
+
+export const PREBID_GROUP_ADVERTISERS = [
+  "openx",
+  "apollo",
+  "apolloSDK",
+  "bidmachine",
+];

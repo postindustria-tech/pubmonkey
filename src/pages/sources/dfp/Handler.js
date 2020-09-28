@@ -2,7 +2,7 @@ import Factory from '../../sources/Factory';
 import AbstractHandler from '../../sources/AbstractHandler';
 import {AdvertiserFactory} from "./Factory";
 import {AD_SERVER_DFP, DFP_API_VERSION} from "../../constants/source";
-import {AMAZON_KVP_FORMAT, PRICE_GRID} from '../../constants/common';
+import {AMAZON_KVP_FORMAT, PRICE_GRID, PREBID_GROUP_ADVERTISERS} from '../../constants/common';
 import {DFP, FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {isEmpty, toDecimal, toInteger, toValidUI, deepClone} from "../../helpers";
@@ -905,11 +905,7 @@ class Handler extends AbstractHandler {
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
                 let [width, height] = creative.format.split("x")
                 let adUnitSizes = []
-                if(advertiser == "openx" || advertiser == "apollo" ||
-                    advertiser == "apolloSDK") {
-                    width = 1
-                    height = 1
-                } else if (advertiser == "bidmachine"){
+                if (PREBID_GROUP_ADVERTISERS.includes(advertiser)){
                     if(creative.format.indexOf(',') > -1) {
                         let formats = creative.format.split(', ')
                         formats.forEach(format => {
@@ -1101,11 +1097,13 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                //console.log("lineitem data")
-                //console.log(data)
+                console.log("lineitem data")
+                console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });
+                console.log("lineitem response")
+                console.log(lineItems)
                 resolve(lineItems);
             } catch (e) {
                 reject(this.parseSOAPError(e));
@@ -1122,8 +1120,8 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                //console.log("creative data")
-                //console.log(data)
+                console.log("creative data")
+                console.log(data)
                 let creatives = await Service.createCreatives({
                     creatives: data
                 });
@@ -1145,9 +1143,13 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
+                console.log("creative associations data")
+                console.log(data)
                 let associations = await Service.createLineItemCreativeAssociations({
                     lineItemCreativeAssociations: data
                 });
+                console.log("creative associations response")
+                console.log(associations)
                 resolve(associations);
             } catch (e) {
                 reject(this.parseSOAPError(e));
