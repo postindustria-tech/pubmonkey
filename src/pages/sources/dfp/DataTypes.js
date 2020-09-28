@@ -85,6 +85,7 @@ export function ThirdPartyCreative(advertiserId, name, size, snippet) {
         advertiserId: advertiserId,
         name: name,
         size: size,
+        thirdPartyDataDeclaration: {declarationType: "DECLARED", thirdPartyCompanyIds: ['2213', ]},
         snippet: snippet,
     }
 }

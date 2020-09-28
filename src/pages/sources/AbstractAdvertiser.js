@@ -1,5 +1,5 @@
 import {CreativePlaceholder, Size, Targeting} from "./dfp/DataTypes";
-import {NETWORK_CLASS_TO_DIMENSION} from "../constants/common";
+import {NETWORK_CLASS_TO_DIMENSION, PREBID_GROUP_ADVERTISERS} from "../constants/common";
 import {isEmpty} from "../helpers";
 
 export default class AbstractAdvertiser {
@@ -82,7 +82,7 @@ export default class AbstractAdvertiser {
         lineItemInfo.costType = "CPM";
         lineItemInfo.creativeRotationType = "EVEN";
 
-        if (params.advertiser === "bidmachine") {
+        if (PREBID_GROUP_ADVERTISERS.includes(params.advertiser)) {
             if(params.snippetType === "VAST") {
                 lineItemInfo.environmentType = "VIDEO_PLAYER"
                 lineItemInfo.targeting.requestPlatformTargeting = {targetedRequestPlatforms: ["VIDEO_PLAYER"]}
