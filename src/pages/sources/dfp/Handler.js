@@ -927,7 +927,7 @@ class Handler extends AbstractHandler {
                             data.push(
                                 VastPartyCreative(
                                     order.advertiserId,
-                                    creative.name + ". For " + order.name,
+                                    order.name + ". " + creative.name,
                                     Size(element.width, element.height, false),
                                     params.vastTagUrl
                                 )
@@ -938,7 +938,8 @@ class Handler extends AbstractHandler {
                             data.push(
                                 ThirdPartyCreative(
                                     order.advertiserId,
-                                    creative.name + ". For " + order.name,
+                                    //creative.name + ". For " + order.name,
+                                    order.name + ". " + creative.name,
                                     Size(element.width, element.height, false),
                                     advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                                 )
@@ -950,7 +951,7 @@ class Handler extends AbstractHandler {
                         data.push(
                             VastPartyCreative(
                                 order.advertiserId,
-                                creative.name + ". For " + order.name,
+                                order.name + ". " + creative.name,
                                 Size(width, height, false),
                                 params.vastTagUrl
                             )
@@ -959,7 +960,7 @@ class Handler extends AbstractHandler {
                         data.push(
                             ThirdPartyCreative(
                                 order.advertiserId,
-                                creative.name + ". For " + order.name,
+                                order.name + ". " + creative.name,
                                 Size(width, height, false),
                                 advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                             )
