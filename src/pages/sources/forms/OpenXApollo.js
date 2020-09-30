@@ -107,7 +107,7 @@ class ApolloCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
-                    <Col className={"col-sm-8"}>
+                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip

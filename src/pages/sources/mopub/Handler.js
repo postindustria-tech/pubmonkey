@@ -30,6 +30,8 @@ class Handler extends AbstractHandler {
         pubnative: "PubNative HyBid",
         smaato: "Smaato Unified Bidding",
         apolloSDK: "OpenX Apollo SDK",
+        apollo: "OpenX Apollo",
+        //bidmachine: "BidMachine"
     };
 
     FILTER_FN = [
@@ -142,6 +144,8 @@ class Handler extends AbstractHandler {
     }
 
     createOrder(data) {
+        //console.log("order data")
+        //console.log(data)
         return HTTPService.POST(`${WEB_URL}/web-client/api/orders/create`, data);
     }
 
@@ -150,6 +154,8 @@ class Handler extends AbstractHandler {
     }
 
     createLineItem(data) {
+        //console.log("create lineitems")
+        //console.log(data)
         return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/create`, data);
     }
 
@@ -483,7 +489,8 @@ class Handler extends AbstractHandler {
         await this.prepareMoPubTabForRequests();
         return this.createOrder(order).then(order => {
             const lineItems = this.advertiser.composerLineItems(order.key, params);
-
+            //console.log("odrer request")
+            //console.log(order)
             stepCallback({
                 ordersDone: 1,
                 orderCount: 1,

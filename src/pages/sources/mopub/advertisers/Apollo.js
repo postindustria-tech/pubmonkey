@@ -1,26 +1,9 @@
 import AbstractAdvertiser from '../../../sources/AbstractAdvertiser'
 import {toDecimal, toInteger, toValidUI} from "../../../helpers";
 
-export class ApolloSDK extends AbstractAdvertiser {
+export class Apollo extends AbstractAdvertiser {
 
-    static advertiser = "apolloSDK";
-
-    NETWORK_CLASS = {
-        "": [
-            {value: '', label: 'Please select OS'},
-        ],
-        iphone: [
-            {value: 'OXAMoPubBannerAdapter', label: 'Banner'},
-            {value: 'OXAMoPubInterstitialAdapter', label: 'Interstitial'},
-            {value: 'OXAMoPubRewardedVideoAdapter', label: 'Rewarded Video'},
-            {value: 'OXAMoPubVideoInterstitialAdapter', label: 'video intersitial'}
-        ],
-        android: [
-            {value: 'com.mopub.mobileads.OpenXApolloBannerAdapter', label: 'Banner'},
-            {value: 'com.mopub.mobileads.OpenXApolloInterstitialAdapter', label: 'Interstitial'},
-            {value: 'com.mopub.mobileads.OpenXApolloRewardedVideoAdapter', label: 'Rewarded Video'},
-        ]
-    };
+    static advertiser = "apollo";
 
     CREATIVE_FORMATS = {
         "": "All",
@@ -46,14 +29,6 @@ export class ApolloSDK extends AbstractAdvertiser {
         let lineItemInfo = {...this.lineItemInfo},
             lineItems = [],
             bid;
-
-        lineItemInfo.type = "network";
-        lineItemInfo["networkType"] = "custom_native";
-        lineItemInfo["enableOverrides"] = true;
-        lineItemInfo["overrideFields"] = {
-            custom_event_class_name: customEventClassName,
-            custom_event_class_data: customEventData
-        };
 
         rangeFrom = toInteger(rangeFrom);
         rangeTo = toInteger(rangeTo);
@@ -174,17 +149,52 @@ export class ApolloSDK extends AbstractAdvertiser {
         return lineItems;
     }
 
+    createCreatives(lineItemKey, params, cb, currentAdUnit = null) {
+        const creativeParams = Object.assign({}, params)
+
+        if(currentAdUnit){
+            creativeParams.creativeFormat = creativeParams.creativeFormat && creativeParams.creativeFormat.length
+                ? creativeParams.creativeFormat
+                : (params.adUnitsParams.find(adunit => adunit.key == currentAdUnit) || {}).format
+        }
+
+        const creative = {
+            adType: "html",
+            dimensions: creativeParams.creativeFormat,
+            extended: {
+                htmlData: creativeParams.creativeSnippet,//this.getCreativeHtmlData(params),
+                isMraid: false
+            },
+            format: creativeParams.creativeFormat,
+            imageKeys: [],
+            lineItemKey: lineItemKey,
+            name: "Creative ".concat(creativeParams.creativeFormat)
+        };
+        if (cb) {
+            const result = cb(creative)
+                .then(result => {})
+                .catch(error => {
+                    console.log('Create creative error', creative, error)
+                });
+        }
+        return creative;
+    }
 
     getCreativeHtmlData(params) {
         return '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
             "<script>\n" +
             "   var ucTagData = {};\n" +
-            '   ucTagData.adServerDomain = "";\n' +//' + params.adServerDomain + '
-            '   ucTagData.cacheHost = "";\n' +
-            '   ucTagData.cachePath = "";\n' +
-            '   ucTagData.pubUrl = "%%KEYWORD:url%%";\n' +
-            '   ucTagData.targetingKeywords = "%%KEYWORDS%%";\n' +
-            '   ucTagData.hbPb = "%%KEYWORD:hb_pb%%";\n' +
+            '   ucTagData.adServerDomain = "mobile-d.openx.net";\n' +
+            '   ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
+            '   ucTagData.targetingMap = "%%PATTERN:TARGETINGMAP%%";\n' +
+            '   ucTagData.adId = "%%PATTERN:hb_adid%%";\n' +
+            '   ucTagData.cacheHost = "%%PATTERN:hb_cache_host%%";\n' +
+            '   ucTagData.cachePath = "%%PATTERN:hb_cache_path%%";\n' +
+            '   ucTagData.uuid = "%%PATTERN:hb_cache_id%%";\n' +
+            '   ucTagData.mediaType = "%%PATTERN:hb_format%%";\n' +
+            '   ucTagData.env = "%%PATTERN:hb_env%%";\n' +
+            '   ucTagData.size = "%%PATTERN:hb_size%%";\n' +
+            '   ucTagData.hbPb = "%%PATTERN:hb_pb%%";\n' +
             "   try {\n" +
             "       ucTag.renderAd(document, ucTagData);\n" +
             "   } catch (e) {\n" +
