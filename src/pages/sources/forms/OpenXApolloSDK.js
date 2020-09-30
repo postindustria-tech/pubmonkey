@@ -181,7 +181,7 @@ class ApolloSDKCreateOrder extends CreateOrderForm {
                             <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                         </Input>
                     </Col>
-                    <Col className={"col-sm-12"}>
+                    <Col className={"col-sm-12"} hidden={this.props.type === "mopub"}>
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>

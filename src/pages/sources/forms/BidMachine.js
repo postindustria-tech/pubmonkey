@@ -136,7 +136,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
-                    <Col className={"col-sm-4"}>
+                    <Col className={"col-sm-4"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Creative type:</Label>
                         <Input
                             type="select"
@@ -151,7 +151,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             <option value={"VAST"}>{"VAST"}</option>
                         </Input>
                     </Col>
-                    <Col className={"col-sm-8"}>
+                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip
