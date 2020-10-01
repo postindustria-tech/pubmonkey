@@ -19,8 +19,8 @@ export const PRICE_GRID = {
 export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
-  apollo: "hb_pb {bid}",
-  apolloSDK: "openx-apollo-prebid_{bid}",
+  apollo: "openx-apollo-prebid_ {bid}",
+  apolloSDK: "hb_pb{bid}",
   amazon: "m{width}x{height}p{position}",
   smaato: "Smaato UB {bid}",
   clearbid: "um_price {bid}",
