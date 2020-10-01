@@ -13,7 +13,7 @@ export class ApolloSDK extends AbstractAdvertiser {
             {value: 'OXAMoPubBannerAdapter', label: 'Banner'},
             {value: 'OXAMoPubInterstitialAdapter', label: 'Interstitial'},
             {value: 'OXAMoPubRewardedVideoAdapter', label: 'Rewarded Video'},
-            {value: 'OXAMoPubVideoInterstitialAdapter', label: 'video intersitial'}
+            {value: 'OXAMoPubVideoInterstitialAdapter', label: 'Video Intersitial'}
         ],
         android: [
             {value: 'com.mopub.mobileads.OpenXApolloBannerAdapter', label: 'Banner'},
