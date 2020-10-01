@@ -505,6 +505,9 @@ class CreateOrderModal extends Component {
                                             creativeFormat: this.state.creativeFormat,
                                             creativeSnippet: this.state.creativeSnippet,
                                             adServerDomain: this.state.adServerDomain,
+                                            os: this.state.os,
+                                            customEventClassName: this.state.customEventClassName,
+                                            customEventData: this.state.customEventData,
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
                                             BidMachinePriceGrid: this.state.BidMachinePriceGrid,
@@ -860,6 +863,8 @@ class CreateOrderModal extends Component {
                 case "pubmatic":
                     return "{}";
                 case "apolloSDK":
+                    return "{}";
+                case "bidmachine":
                     return "{}";
                 default:
                     return "";

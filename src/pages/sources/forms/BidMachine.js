@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {
-    Col,
+    Col, CustomInput,
     Input,
     Label,
     Row, Tooltip
@@ -12,7 +12,7 @@ import {
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import {isEmpty, toInteger} from "../../helpers";
 import _ from "underscore";
-import {AdUnitsSelect, CreativeSnippet, LineItemsNamingInput, VastTagUrl} from "../components";
+import {AdTypeSelect, AdUnitsSelect, CreativeSnippet, LineItemsNamingInput, VastTagUrl} from "../components";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
 import CreateOrderForm from "./CreateOrderForm";
@@ -54,7 +54,10 @@ class BidMachineCreateOrder extends CreateOrderForm {
             tooltipVastTag: false,
             snippetType: "banner",
             BidMachinePriceGrid: "",
-            vastTagUrl: ""
+            vastTagUrl: "",
+            os: '',
+            customEventClassName: '',
+            customEventData: "{}",
         },
     };
 
@@ -136,6 +139,52 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
+                    <Col className={"col-sm-4"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>OS:</Label>
+                        <Input
+                            type="select"
+                            name={"os"}
+                            id="creativeFormat"
+                            onChange={this.handleInputChange}
+                            value={this.props.attributes.os}
+                            className={"mp-form-control"}
+                        >
+                            <option value={""}>Select OS</option>
+                            <option value={"iphone"}>iOS</option>
+                            <option value={"android"}>Android</option>
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-4"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>Ad Type:</Label>
+                        <AdTypeSelect
+                            onChange={this.onChangeAdType}
+                            os={this.props.attributes.os}
+                            networkClasses={this.props.networkClasses}
+                        />
+                    </Col>
+                    <Col className={"col-sm-7"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>Custom Event Class Name: </Label>
+                        <CustomInput
+                            type="text"
+                            id={"customEventClassName"}
+                            name={"customEventClassName"}
+                            onChange={this.handleInputChange}
+                            value={this.props.attributes.customEventClassName}
+                            className={"mp-form-control"}
+                        />
+                    </Col>
+                    <Col className={"col-sm-5"} hidden={this.props.type !== "mopub"}>
+                        <Label className={"mp-label"}>Custom Event Data:</Label>
+                        <CustomInput
+                            invalid={!isEmpty(this.props.formErrors.customEventData)}
+                            type="text"
+                            id={"customEventData"}
+                            name={"customEventData"}
+                            value={this.props.attributes.customEventData}
+                            onChange={this.handleInputChange}
+                            className={"mp-form-control"}
+                        />
+                    </Col>
                     <Col className={"col-sm-4"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Creative type:</Label>
                         <Input
@@ -175,7 +224,8 @@ class BidMachineCreateOrder extends CreateOrderForm {
                         <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                     </Input>
                     </Col>
-                    <Col className={"col-sm-12"} hidden={this.props.attributes.snippetType === "VAST"}>
+                    <Col className={"col-sm-12"} hidden={this.props.attributes.snippetType === "VAST" ||
+                                                         this.props.type === "mopub"}>
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>

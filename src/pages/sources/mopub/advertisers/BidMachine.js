@@ -10,15 +10,16 @@ export class BidMachine extends AbstractAdvertiser {
             {value: '', label: 'Please select OS'},
         ],
         iphone: [
-            {value: 'OXAMoPubBannerAdapter', label: 'Banner'},
-            {value: 'OXAMoPubInterstitialAdapter', label: 'Interstitial'},
-            {value: 'OXAMoPubRewardedVideoAdapter', label: 'Rewarded Video'},
-            {value: 'OXAMoPubVideoInterstitialAdapter', label: 'video intersitial'}
+            {value: 'BidMachineBannerCustomEvent', label: 'Banner'},
+            {value: 'BidMachineInterstitialCustomEvent', label: 'Interstitial'},
+            {value: 'BidMachineRewardedVideoCustomEvent', label: 'Rewarded Video'},
+            {value: 'BidMachineNativeAdCustomEvent', label: 'Native'}
         ],
         android: [
-            {value: 'com.mopub.mobileads.OpenXApolloBannerAdapter', label: 'Banner'},
-            {value: 'com.mopub.mobileads.OpenXApolloInterstitialAdapter', label: 'Interstitial'},
-            {value: 'com.mopub.mobileads.OpenXApolloRewardedVideoAdapter', label: 'Rewarded Video'},
+            {value: 'com.mopub.mobileads.BidMachineBanner', label: 'Banner'},
+            {value: 'com.mopub.mobileads.BidMachineInterstitial', label: 'Interstitial'},
+            {value: 'com.mopub.mobileads.BidMachineRewardedVideo', label: 'Rewarded Video'},
+            {value: 'com.mopub.mobileads.BidMachineNative', label: 'Native'}
         ]
     };
 
@@ -41,7 +42,8 @@ export class BidMachine extends AbstractAdvertiser {
             granularity,
             customEventClassName,
             customEventData,
-            BidMachinePriceGrid
+            BidMachinePriceGrid,
+            networkClass,
         } = params;
 
         let lineItemInfo = {...this.lineItemInfo},
@@ -63,7 +65,7 @@ export class BidMachine extends AbstractAdvertiser {
         BidMachinePriceGrid.split(/\r?\n/).forEach(element => {
             var number = parseFloat(element.match(/[\d\.]+/))
             if (number) {
-                number *= 100
+                //number *= 100
                 bids.push(number)
                 const bidDecimal = toDecimal(number);
                 //keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(2)))
@@ -71,11 +73,23 @@ export class BidMachine extends AbstractAdvertiser {
 
         })
 
+        let adType = ''
+
+        try {
+            adType = this.NETWORK_CLASS.android.find(object => object.value === customEventClassName).label
+        } catch (e) {
+            try {
+                adType = this.NETWORK_CLASS.iphone.find(object => object.value === customEventClassName).label
+            } catch (er) {
+                adType = ''
+            }
+        }
+
         lineItems = bids.map(bid => {
             return {
                 adUnitKeys: adunits,
                 bid: bid,
-                name: lineItemsNaming.replace("{bid}", bid),
+                name: lineItemsNaming.replace("{bid}", bid).replace('{ad_type}',adType),
                 orderKey: orderKey,
                 keywords: [keywordTemplate.replace(mask, toDecimal(bid).toFixed(2))],
                 ...lineItemInfo
