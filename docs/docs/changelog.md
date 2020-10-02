@@ -1,5 +1,10 @@
 # Release Notes
 
+## 2.8
+* Generate orders for OpenX Apollo and Apollo SDK (GAM + MoPub)
+* Generate orders for BidMachine (GAM only, MoPub coming soon in 2.9)
+* Various improvements
+
 ## 2.7
 * ClearBid non-uniform grid
 * Google Ad Manager usability improvements

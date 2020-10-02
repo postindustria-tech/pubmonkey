@@ -69,3 +69,14 @@ TAM Order generation is supported for both MoPub and GAM (Google Ad Manager).
 6. Amazon Creative restricts the ad format, thus you have to choose the **Creative format**.
 7. Choose the ad units filtered according to the chosen ad format. 
 8. For GAM you would also need to specify the Company - tap the **?** near that field to be taken to the Ad Manager page where you can create a Company.  
+
+
+## Other Orders
+
+OpenX Apollo order generation is analogous to Prebid order generation. 
+
+OpenX Apollo SDK for GAM is also analogous to Prebid except the creative uses app events. 
+
+OpenX Apollo SDK for MoPub uses custom event classes.  
+
+BidMachine order generation also uses app events for GAM and custom event classes for MoPub - please see BidMachine's integration instructions [here](https://doc.bidmachine.io/eng/ssp-publisher-integration-documentation/bidmachine-sdk-admanager-appevent-integration)
