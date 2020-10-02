@@ -27,7 +27,7 @@ export class Apollo extends AbstractAdvertiser {
         return '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
             "<script>\n" +
             "   var ucTagData = {};\n" +
-            '   ucTagData.adServerDomain = "mobile-d.openx.net";\n' +
+            '   ucTagData.adServerDomain = "";\n' +
             '   ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
             '   ucTagData.targetingMap = "%%PATTERN:TARGETINGMAP%%";\n' +
             '   ucTagData.adId = "%%PATTERN:hb_adid%%";\n' +

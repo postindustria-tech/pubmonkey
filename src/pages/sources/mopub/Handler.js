@@ -31,7 +31,7 @@ class Handler extends AbstractHandler {
         smaato: "Smaato Unified Bidding",
         apolloSDK: "OpenX Apollo SDK",
         apollo: "OpenX Apollo",
-        //bidmachine: "BidMachine"
+        bidmachine: "BidMachine"
     };
 
     FILTER_FN = [
