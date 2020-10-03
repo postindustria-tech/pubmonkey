@@ -12,6 +12,7 @@ import {
     Row,
     Col, CustomInput, Tooltip,
 } from "reactstrap";
+import {ModalExtended} from "../Common/ModalExtended";
 import FormErrors from "../FormErrors";
 import {isEmpty, toInteger} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
@@ -237,7 +238,7 @@ class CreateOrderModal extends Component {
                     header={"Something went wrong!"}
                     ref={helperModal => (this.helperModal = helperModal)}
                 />
-                <Modal
+                <ModalExtended
                     id={"createOrderModal"}
                     ref="myImgContainer"
                     isOpen={this.props.createOrderModalOpen}
@@ -535,7 +536,7 @@ class CreateOrderModal extends Component {
                             Create in {AD_SERVERS[this.props.type]}
                         </Button>
                     </ModalFooter>
-                </Modal>
+                </ModalExtended>
                 <ConfirmModal
                     message={this.state.confirmModalMessage}
                     ref={modal => (this.confirmModal = modal)}
