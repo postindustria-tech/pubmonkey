@@ -197,15 +197,17 @@ class CreateOrderModal extends Component {
         const modal = document.getElementById('createOrderModal'),
             footer = document.getElementById('createOrderModalFooter');
         if (!modal) return;
-        const height = modal.clientHeight,
+        const
+            offset = 40,
+            height = modal.clientHeight,
             top = modal.offsetTop;
         footer.style.width = (modal.clientWidth - 2) + 'px';
-        if (window.innerHeight > (height + top)) {
+        if (window.innerHeight > (height + top + offset)) {
             footer.style.top = height + 'px';
             footer.style.bottom = 'auto';
         } else {
             footer.style.top = 'auto';
-            footer.style.bottom = '40px';
+            footer.style.bottom = offset + 'px';
         }
     };
 
