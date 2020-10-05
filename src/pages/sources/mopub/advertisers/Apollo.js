@@ -184,17 +184,10 @@ export class Apollo extends AbstractAdvertiser {
         return '<script src = "https://cdn.jsdelivr.net/npm/prebid-universal-creative@latest/dist/creative.js"></script>\n' +
             "<script>\n" +
             "   var ucTagData = {};\n" +
-            '   ucTagData.adServerDomain = "mobile-d.openx.net";\n' +
-            '   ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
-            '   ucTagData.targetingMap = "%%PATTERN:TARGETINGMAP%%";\n' +
-            '   ucTagData.adId = "%%PATTERN:hb_adid%%";\n' +
-            '   ucTagData.cacheHost = "%%PATTERN:hb_cache_host%%";\n' +
-            '   ucTagData.cachePath = "%%PATTERN:hb_cache_path%%";\n' +
-            '   ucTagData.uuid = "%%PATTERN:hb_cache_id%%";\n' +
-            '   ucTagData.mediaType = "%%PATTERN:hb_format%%";\n' +
-            '   ucTagData.env = "%%PATTERN:hb_env%%";\n' +
-            '   ucTagData.size = "%%PATTERN:hb_size%%";\n' +
-            '   ucTagData.hbPb = "%%PATTERN:hb_pb%%";\n' +
+            '   ucTagData.adServerDomain = "";\n' +
+            '   ucTagData.pubUrl = "%%KEYWORD:url%%";\n' +
+            '   ucTagData.targetingKeywords = "%%KEYWORDS%%";\n' +
+            '   ucTagData.hbPb = "%%KEYWORD:hb_pb%%";\n' +
             "   try {\n" +
             "       ucTag.renderAd(document, ucTagData);\n" +
             "   } catch (e) {\n" +
