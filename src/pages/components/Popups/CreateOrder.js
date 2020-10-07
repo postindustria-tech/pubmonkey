@@ -1302,6 +1302,7 @@ class CreateOrderModal extends Component {
             amazonStep,
             priceGrid,
             priceBand,
+            BidMachinePriceGrid
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1335,6 +1336,7 @@ class CreateOrderModal extends Component {
             amazonStep,
             priceGrid,
             priceBand,
+            BidMachinePriceGrid
         };
 
         ModalWindowService.ProgressModal.setProgress([
@@ -1347,7 +1349,8 @@ class CreateOrderModal extends Component {
                 progress: {value: 0}
             }
         ]);
-
+        console.log("download params")
+        console.log(params)
         progress = this.props.sourceHandler.downloadOrderDataFromSet(
             order,
             params,
