@@ -91,7 +91,7 @@ export class BidMachine extends AbstractAdvertiser {
                 bid: bid,
                 name: lineItemsNaming.replace("{bid}", bid).replace('{ad_type}',adType),
                 orderKey: orderKey,
-                keywords: [keywordTemplate.replace(mask, toDecimal(bid).toFixed(2))],
+                keywords: [keywordTemplate.replace(mask, bid)],
                 ...lineItemInfo
             }
         });
