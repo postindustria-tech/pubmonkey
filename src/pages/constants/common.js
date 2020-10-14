@@ -20,7 +20,7 @@ export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
   apollo: "openx-apollo-prebid_{bid}",
-  apolloSDK: "hb_pb{bid}",
+  apolloSDK: "openx-apollo-prebid_{bid}",
   amazon: "m{width}x{height}p{position}",
   smaato: "Smaato UB {bid}",
   clearbid: "um_price {bid}",
