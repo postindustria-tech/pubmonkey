@@ -12,6 +12,7 @@ import {
     Row,
     Col, CustomInput, Tooltip,
 } from "reactstrap";
+import {ModalExtended} from "../Common/ModalExtended";
 import FormErrors from "../FormErrors";
 import {isEmpty, toInteger} from "../../helpers";
 import ConfirmModal from "./ConfirmModal";
@@ -196,15 +197,17 @@ class CreateOrderModal extends Component {
         const modal = document.getElementById('createOrderModal'),
             footer = document.getElementById('createOrderModalFooter');
         if (!modal) return;
-        const height = modal.clientHeight,
+        const
+            offset = 40,
+            height = modal.clientHeight,
             top = modal.offsetTop;
         footer.style.width = (modal.clientWidth - 2) + 'px';
-        if (window.innerHeight > (height + top)) {
+        if (window.innerHeight > (height + top + offset)) {
             footer.style.top = height + 'px';
             footer.style.bottom = 'auto';
         } else {
             footer.style.top = 'auto';
-            footer.style.bottom = '40px';
+            footer.style.bottom = offset + 'px';
         }
     };
 
@@ -237,7 +240,7 @@ class CreateOrderModal extends Component {
                     header={"Something went wrong!"}
                     ref={helperModal => (this.helperModal = helperModal)}
                 />
-                <Modal
+                <ModalExtended
                     id={"createOrderModal"}
                     ref="myImgContainer"
                     isOpen={this.props.createOrderModalOpen}
@@ -535,7 +538,7 @@ class CreateOrderModal extends Component {
                             Create in {AD_SERVERS[this.props.type]}
                         </Button>
                     </ModalFooter>
-                </Modal>
+                </ModalExtended>
                 <ConfirmModal
                     message={this.state.confirmModalMessage}
                     ref={modal => (this.confirmModal = modal)}
@@ -1299,6 +1302,7 @@ class CreateOrderModal extends Component {
             amazonStep,
             priceGrid,
             priceBand,
+            BidMachinePriceGrid
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1332,6 +1336,7 @@ class CreateOrderModal extends Component {
             amazonStep,
             priceGrid,
             priceBand,
+            BidMachinePriceGrid
         };
 
         ModalWindowService.ProgressModal.setProgress([
@@ -1344,7 +1349,8 @@ class CreateOrderModal extends Component {
                 progress: {value: 0}
             }
         ]);
-
+        console.log("download params")
+        console.log(params)
         progress = this.props.sourceHandler.downloadOrderDataFromSet(
             order,
             params,
