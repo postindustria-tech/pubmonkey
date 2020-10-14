@@ -29,7 +29,7 @@ export class Apollo extends AbstractAdvertiser {
             "   var ucTagData = {};\n" +
             '   ucTagData.adServerDomain = "";\n' +
             '   ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
-            '   ucTagData.targetingMap = "%%PATTERN:TARGETINGMAP%%";\n' +
+            '   ucTagData.targetingMap = %%PATTERN:TARGETINGMAP%%;\n' +
             '   ucTagData.adId = "%%PATTERN:hb_adid%%";\n' +
             '   ucTagData.cacheHost = "%%PATTERN:hb_cache_host%%";\n' +
             '   ucTagData.cachePath = "%%PATTERN:hb_cache_path%%";\n' +

@@ -1,5 +1,6 @@
 import AbstractAdvertiser from '../../../sources/AbstractAdvertiser'
 import {toDecimal, toInteger, toValidUI} from "../../../helpers";
+import {MOPUB_CREATIVE_FORMAT} from "../../../constants/common";
 
 export class Apollo extends AbstractAdvertiser {
 
@@ -152,32 +153,64 @@ export class Apollo extends AbstractAdvertiser {
     createCreatives(lineItemKey, params, cb, currentAdUnit = null) {
         const creativeParams = Object.assign({}, params)
 
-        if(currentAdUnit){
+        if (currentAdUnit) {
             creativeParams.creativeFormat = creativeParams.creativeFormat && creativeParams.creativeFormat.length
                 ? creativeParams.creativeFormat
                 : (params.adUnitsParams.find(adunit => adunit.key == currentAdUnit) || {}).format
         }
 
-        const creative = {
-            adType: "html",
-            dimensions: creativeParams.creativeFormat,
-            extended: {
-                htmlData: creativeParams.creativeSnippet,//this.getCreativeHtmlData(params),
-                isMraid: false
-            },
-            format: creativeParams.creativeFormat,
-            imageKeys: [],
-            lineItemKey: lineItemKey,
-            name: "Creative ".concat(creativeParams.creativeFormat)
-        };
-        if (cb) {
-            const result = cb(creative)
-                .then(result => {})
-                .catch(error => {
-                    console.log('Create creative error', creative, error)
-                });
+        let creativeList = []
+
+        if (Object.keys(MOPUB_CREATIVE_FORMAT).indexOf(creativeParams.creativeFormat) !== -1) {
+            if (["full", "banner", "medium_rectangle"].indexOf(creativeParams.creativeFormat) !== -1) {
+                MOPUB_CREATIVE_FORMAT[creativeParams.creativeFormat].dimensions.forEach(dimension => {
+                    let format = dimension
+                    if (creativeParams.creativeFormat === "full") {
+                        format = MOPUB_CREATIVE_FORMAT[creativeParams.creativeFormat].type
+                    }
+                    creativeList.push({
+                        adType: "html",
+                        dimensions: dimension,
+                        //orientation: "portrait",
+                        extended: {
+                            htmlData: creativeParams.creativeSnippet,//this.getCreativeHtmlData(params),
+                            isMraid: false
+                        },
+                        format: format,
+                        imageKeys: [],
+                        lineItemKey: lineItemKey,
+                        name: "Creative ".concat(creativeParams.creativeFormat).concat("("+dimension+")")
+                    })
+                })
+            }
+        } else {
+            creativeList.push({
+                adType: "html",
+                dimensions: creativeParams.creativeFormat,
+                extended: {
+                    htmlData: creativeParams.creativeSnippet,//this.getCreativeHtmlData(params),
+                    isMraid: false
+                },
+                format: creativeParams.creativeFormat,
+                imageKeys: [],
+                lineItemKey: lineItemKey,
+                name: "Creative ".concat(creativeParams.creativeFormat)
+            })
         }
-        return creative;
+
+        if (cb) {
+            creativeList.forEach(element => {
+                cb(element)
+                    .then(result => {
+                        console.log("result creative")
+                        console.log(result)
+                    })
+                    .catch(error => {
+                        console.log('Create creative error', element, error)
+                    });
+            })
+        }
+        return creativeList;
     }
 
     getCreativeHtmlData(params) {
@@ -185,16 +218,9 @@ export class Apollo extends AbstractAdvertiser {
             "<script>\n" +
             "   var ucTagData = {};\n" +
             '   ucTagData.adServerDomain = "";\n' +
-            '   ucTagData.pubUrl = "%%PATTERN:url%%";\n' +
-            '   ucTagData.targetingMap = "%%PATTERN:TARGETINGMAP%%";\n' +
-            '   ucTagData.adId = "%%PATTERN:hb_adid%%";\n' +
-            '   ucTagData.cacheHost = "%%PATTERN:hb_cache_host%%";\n' +
-            '   ucTagData.cachePath = "%%PATTERN:hb_cache_path%%";\n' +
-            '   ucTagData.uuid = "%%PATTERN:hb_cache_id%%";\n' +
-            '   ucTagData.mediaType = "%%PATTERN:hb_format%%";\n' +
-            '   ucTagData.env = "%%PATTERN:hb_env%%";\n' +
-            '   ucTagData.size = "%%PATTERN:hb_size%%";\n' +
-            '   ucTagData.hbPb = "%%PATTERN:hb_pb%%";\n' +
+            '   ucTagData.pubUrl = "%%KEYWORD:url%%";\n' +
+            '   ucTagData.targetingKeywords = "%%KEYWORDS%%";\n' +
+            '   ucTagData.hbPb = "%%KEYWORD:hb_pb%%";\n' +
             "   try {\n" +
             "       ucTag.renderAd(document, ucTagData);\n" +
             "   } catch (e) {\n" +

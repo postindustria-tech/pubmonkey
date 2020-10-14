@@ -5,8 +5,8 @@ import {FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {wrapSeries, delay} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
-import {AD_SERVER_MOPUB} from "../../constants/source";
-import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from '../../constants/common';
+import {AD_SERVER_MOPUB, } from "../../constants/source";
+import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID, MOPUB_CREATIVE_FORMAT} from '../../constants/common';
 import axios from "ex-axios";
 
 const WEB_URL = "https://app.mopub.com";
