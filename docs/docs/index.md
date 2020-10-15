@@ -19,7 +19,7 @@ Please read detailed [release notes](changelog.md)
  	* [Prebid.org](order-actions.md#generate-a-prebid-order) [__MoPub__, __GAM__]
  	* OpenX Apollo [__MoPub__, __GAM__]
  	* OpenX Apollo SDK [__MoPub__, __GAM__]
- 	* BidMachine [__GAM__]
+ 	* BidMachine [__GAM__] (checkout [BidMachine documentation on GAM integration](https://doc.bidmachine.io/eng/ssp-publisher-integration-documentation/bidmachine-sdk-admanager-appevent-integration))
  	* [Amazon TAM](order-actions.md#generate-an-amazon-tam-order) [__MoPub__, __GAM__]
  	* Smaato [__MoPub__]
  	* PubMatic [__MoPub__] 
