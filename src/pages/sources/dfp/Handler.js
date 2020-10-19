@@ -567,7 +567,6 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        // keywords.push(bidDecimal.toFixed(2));
                         keywords.push(
                             keywordTemplate.replace(mask, bidDecimal.toFixed(2))
                         );
@@ -795,13 +794,7 @@ class Handler extends AbstractHandler {
                     keywords.push(keywordTemplate.replace(mask, bidValue));
 
                 }else if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
-                    // const to = +toValidUI(bidDecimal + s).toFixed(2);
-                    // for (let i = bidDecimal; i < to; i += keywordStep) {
-                    //     i = toValidUI(i);
-                    //     if (i < to) {
-                    //         keywords.push(i.toFixed(2));
-                    //     }
-                    // }
+
                     switch (granularity) {
                         case 'high':
                             const to = +toValidUI(toDecimal(bid) + toDecimal(step)).toFixed(2);
@@ -938,7 +931,6 @@ class Handler extends AbstractHandler {
                             data.push(
                                 ThirdPartyCreative(
                                     order.advertiserId,
-                                    //creative.name + ". For " + order.name,
                                     order.name + ". " + creative.name,
                                     Size(element.width, element.height, false),
                                     advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
@@ -1098,13 +1090,9 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                console.log("lineitem data")
-                console.log(data)
                 let lineItems = await Service.createLineItems({
                     lineItems: data
                 });
-                console.log("lineitem response")
-                console.log(lineItems)
                 resolve(lineItems);
             } catch (e) {
                 reject(this.parseSOAPError(e));
@@ -1121,13 +1109,9 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                console.log("creative data")
-                console.log(data)
                 let creatives = await Service.createCreatives({
                     creatives: data
                 });
-                console.log("creative response")
-                console.log(creatives)
                 resolve(creatives);
             } catch (e) {
                 reject(this.parseSOAPError(e));
@@ -1144,13 +1128,9 @@ class Handler extends AbstractHandler {
             Service.setToken(this.token);
 
             try{
-                console.log("creative associations data")
-                console.log(data)
                 let associations = await Service.createLineItemCreativeAssociations({
                     lineItemCreativeAssociations: data
                 });
-                console.log("creative associations response")
-                console.log(associations)
                 resolve(associations);
             } catch (e) {
                 reject(this.parseSOAPError(e));

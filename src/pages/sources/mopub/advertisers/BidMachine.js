@@ -19,7 +19,7 @@ export class BidMachine extends AbstractAdvertiser {
             {value: 'com.mopub.mobileads.BidMachineBanner', label: 'Banner'},
             {value: 'com.mopub.mobileads.BidMachineInterstitial', label: 'Interstitial'},
             {value: 'com.mopub.mobileads.BidMachineRewardedVideo', label: 'Rewarded Video'},
-            {value: 'com.mopub.mobileads.BidMachineNative', label: 'Native'}
+            {value: 'com.mopub.nativeads.BidMachineNative', label: 'Native'}
         ]
     };
 
@@ -61,14 +61,11 @@ export class BidMachine extends AbstractAdvertiser {
 
         let bids = []
 
-        //keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
         BidMachinePriceGrid.split(/\r?\n/).forEach(element => {
             var number = parseFloat(element.match(/[\d\.]+/))
             if (number) {
-                //number *= 100
                 bids.push(number)
                 const bidDecimal = toDecimal(number);
-                //keywords.push(keywordTemplate.replace(mask, bidDecimal.toFixed(2)))
             }
 
         })
@@ -89,9 +86,9 @@ export class BidMachine extends AbstractAdvertiser {
             return {
                 adUnitKeys: adunits,
                 bid: bid,
-                name: lineItemsNaming.replace("{bid}", bid).replace('{ad_type}',adType),
+                name: lineItemsNaming.replace("{bid}", bid.toFixed(2)).replace('{ad_type}',adType),
                 orderKey: orderKey,
-                keywords: [keywordTemplate.replace(mask, bid)],
+                keywords: [keywordTemplate.replace(mask, bid.toFixed(2))],
                 ...lineItemInfo
             }
         });

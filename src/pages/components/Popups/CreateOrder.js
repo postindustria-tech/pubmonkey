@@ -1176,8 +1176,7 @@ class CreateOrderModal extends Component {
             BidMachinePriceGrid,
             vastTagUrl
         };
-        console.log("Params:")
-        console.log(params)
+
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",
