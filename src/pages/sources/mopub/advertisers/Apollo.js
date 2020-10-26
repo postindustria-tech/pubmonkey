@@ -22,8 +22,6 @@ export class Apollo extends AbstractAdvertiser {
             rangeTo,
             lineItemsNaming,
             granularity,
-            customEventClassName,
-            customEventData,
         } = params;
 
         let lineItemInfo = {...this.lineItemInfo},
