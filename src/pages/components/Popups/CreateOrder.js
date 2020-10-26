@@ -545,6 +545,16 @@ class CreateOrderModal extends Component {
         );
     }
 
+    isOrderNameExist(orderName) {
+        let last = this.props.orders.length
+        for (let i=0; i<last; i++) {
+            if(this.props.orders[i].name === orderName) {
+                return true
+            }
+        }
+        return false
+    }
+
     @bind
     formValidator() {
         let fieldValidationErrors = {
@@ -568,6 +578,10 @@ class CreateOrderModal extends Component {
         //@TODO: Need to refactor
         if (isEmpty(this.state.orderName)) {
             fieldValidationErrors.orderName = "Order name is required!";
+            isValid = false;
+        }
+        if(this.isOrderNameExist(this.state.orderName)) {
+            fieldValidationErrors.orderName = "Order with this name is already exist!";
             isValid = false;
         }
         if (isEmpty(this.state.lineItemsNaming)) {
@@ -1176,7 +1190,7 @@ class CreateOrderModal extends Component {
             BidMachinePriceGrid,
             vastTagUrl
         };
-
+        /*
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",
@@ -1262,7 +1276,7 @@ class CreateOrderModal extends Component {
                 this.setState({canceled: false});
                 window.canceledExport = false
             }, 1000)
-        });
+        });*/
     }
 
     getOrderUrl(key) {
