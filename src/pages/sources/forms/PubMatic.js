@@ -67,9 +67,18 @@ class PubMaticCreateOrder extends CreateOrderForm {
                         />
                     </Col>
                     <Col className={"col-sm-4"}>
-                        <span className={"mp-label"}>Keywords template: </span>
                         <div>
-                        {this.props.attributes.keywordTemplate}
+                            <Label className={"mp-label"}>Keywords template: </Label>
+                            <Input
+                                type="textarea"
+                                className="mr-sm-2"
+                                rows={2}
+                                name="keywordTemplate"
+                                style={{width: "100%", border: "1px solid #ced4da", borderRadius: "0.25rem"}}
+                                placeholder={this.props.attributes.keywordTemplate}
+                                onChange={this.handleInputChange}
+                                value={this.props.attributes.keywordTemplate}
+                            />
                         </div>
                     </Col>
                     <Col className={"col-sm-4"}>
