@@ -5,6 +5,7 @@ export default class AbstractHandler {
 
     advertiserFactory = null;
     advertiser = null;
+    defaultAdvertiser = null;
 
     ADVERTISER_DEFAULT_NAME = {};
     FILTER_FN = [];

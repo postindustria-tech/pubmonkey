@@ -20,13 +20,15 @@
     "webRequest",
     "webRequestBlocking",
     "https://app.mopub.com/*",
+    "https://apps.admob.com/*",
     "identity",
     "https://ads.google.com/apis/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://app.mopub.com/*"
+        "https://app.mopub.com/*",
+        "https://apps.admob.com/*"
       ],
       "js": [
         "content/content.js"
@@ -38,7 +40,8 @@
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "externally_connectable": {
     "matches": [
-      "https://app.mopub.com/*"
+      "https://app.mopub.com/*",
+      "https://apps.admob.com/*"
     ]
   },
   "browser_action": {

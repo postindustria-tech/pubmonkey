@@ -9,7 +9,7 @@ import SourceFactory from "../../sources/Factory";
 import AdUnitsStats from './Stats'
 import {FileService} from "../../services";
 import classnames from "classnames";
-import {AD_SERVER_DFP} from "../../constants/source";
+import {AD_SERVER_MOPUB} from "../../constants/source";
 
 class AdUnitsList extends Component {
     state = {
@@ -49,7 +49,7 @@ class AdUnitsList extends Component {
                             <th>Ad Unit Name</th>
                             <th>Format</th>
                             <th>Ad Unit ID</th>
-                            {this.props.type !== AD_SERVER_DFP && <th>Actions</th>}
+                            {this.props.type === AD_SERVER_MOPUB && <th>Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -61,7 +61,7 @@ class AdUnitsList extends Component {
                                     <td>{ adunit.format }</td>
                                     <td>{ adunit.key }</td>
                                     {this.state.exportInProgress.includes(adunit.key) && <td><i className="fa fa-spinner fa-spin" aria-hidden="true"></i></td>}
-                                    {this.props.type !== AD_SERVER_DFP && !this.state.exportInProgress.includes(adunit.key) && <td>
+                                    {this.props.type === AD_SERVER_MOPUB && !this.state.exportInProgress.includes(adunit.key) && <td>
                                         <i className={classnames("fa", "fa-download")} title={"Export ad sources"} onClick={() => this.export(adunit)}></i>
                                     </td>}
                                 </tr>

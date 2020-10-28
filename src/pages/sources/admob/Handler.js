@@ -5,11 +5,10 @@ import {FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {wrapSeries, delay} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
-import {AD_SERVER_MOPUB} from "../../constants/source";
-import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from '../../constants/common';
-import axios from "ex-axios";
+import {AD_SERVER_ADMOB} from "../../constants/source";
+import axios from "axios";
 
-const WEB_URL = "https://app.mopub.com";
+const WEB_URL = "https://apps.admob.com/v2";
 
 Promise.config({
     // Enable cancellation
@@ -18,23 +17,15 @@ Promise.config({
 
 class Handler extends AbstractHandler {
 
-    static source = AD_SERVER_MOPUB;
+    static source = AD_SERVER_ADMOB;
 
     sessionChecked = false;
 
     ADVERTISER_DEFAULT_NAME = {
-        amazon: "Amazon Publisher Services (TAM)",
-        clearbid: "ClearBid",
-        openx: "Prebid.org",
-        pubmatic: "PubMatic OpenWrap",
-        pubnative: "PubNative HyBid",
-        smaato: "Smaato Unified Bidding",
-        apolloSDK: "OpenX Apollo SDK",
-        apollo: "OpenX Apollo",
         bidmachine: "BidMachine"
     };
 
-    defaultAdvertiser = 'amazon'
+    defaultAdvertiser = 'bidmachine'
 
     FILTER_FN = [
         ({status}) => status !== "archived",
@@ -56,26 +47,40 @@ class Handler extends AbstractHandler {
     }
 
     async isReady() {
-        // console.log('isReady');
-        if (this.sessionChecked) {
-            return window.MopubAutomation.loggedIn
-                .then(loggedIn => {
-                    return loggedIn;
-                });
-        } else {
-            this.sessionChecked = true;
-            return axios.get(`${WEB_URL}/account/`, {responseType: 'text'})
-                .then(result => {
-                    return window.MopubAutomation.loggedIn
-                        .then(loggedIn => {
-                            return loggedIn;
-                        });
-                });
-        }
+        console.log('admob isReady');
+
+        return axios.get(`${WEB_URL}/home`)
+            .then(resp => {
+
+                this.sessionChecked = true;
+
+                // Mediation Groups
+                let amrpd = resp.data.match(/var amrpd = '(.*)onAmrpdAvailableCallbacks/m);
+                // console.log(amrpd);
+                //@TODO: Add validations
+                amrpd = amrpd[0].match(/'(.*)';/m);
+                amrpd = amrpd[1];
+
+                return amrpd.hexDecode()
+            })
+            .then(json => {
+
+                const obj = JSON.parse(json);
+                if (typeof obj[32] !== "undefined") {
+                    console.log(obj[32]);
+                    return true;
+                }
+
+                return false;
+
+            }).catch(error => {
+                console.error(error);
+                return false;
+            });
     }
 
     logout() {
-        return HTTPService.POST(`${WEB_URL}/account/logout/`);
+        // return HTTPService.POST(`${WEB_URL}/account/logout/`);
     }
 
     getAdvertiserByName(advertiserName) {
@@ -93,20 +98,127 @@ class Handler extends AbstractHandler {
     }
 
     getAdUnits() {
-        // return window.MopubAutomation.adunits;
-        return HTTPService.GET(`${WEB_URL}/web-client/api/ad-units/query`);
+        return axios.get(`${WEB_URL}/apps/list`)
+            .then(resp => {
+
+                // Apps
+                let apd = resp.data.match(/var apd = '(.*)onApdAvailableCallbacks/m);
+                //@TODO: Add validations
+                apd = apd[0].match(/'(.*)';/m);
+                apd = apd[1];
+                const apps = JSON.parse(apd.hexDecode());
+
+                // Adunits
+                let aupd = resp.data.match(/var aupd = '(.*)onAupdAvailableCallbacks/m);
+                //@TODO: Add validations
+                aupd = aupd[0].match(/'(.*)';/m);
+                aupd = aupd[1];
+                const adunits = JSON.parse(aupd.hexDecode());
+
+                return {apps, adunits}
+            })
+            .then(({apps, adunits}) => {
+                console.log(apps, adunits);
+
+                return adunits[1].reduce((acc, adunit) => {
+                    if (adunit[9] === true) {
+                        return acc;
+                    }
+                    const app = apps[1].find(object => object[1] === adunit[2]);
+                    console.log(app);
+                    let platform = '';
+                    let os = '';
+                    switch (app[3]) {
+                        case 1:
+                            platform = 'iOS';
+                            os = 'iphone';
+                            break;
+                        case 2:
+                            os = platform = 'Android';
+                            break;
+                    }
+                    let format = '';
+                    switch (adunit[14]) {
+                        case 0:
+                            format = 'Banner';
+                            break;
+                        case 1:
+                            format = 'Interstitial';
+                            break;
+                    }
+                    acc.push({
+                        key: adunit[1],
+                        name: adunit[3],
+                        appKey: adunit[2],
+                        appName: `${app[2]} (${platform})`,
+                        appType: os.toLowerCase(),
+                        format: format,
+                    });
+                    return acc;
+                }, []);
+
+            }).catch(error => {
+                console.error(error);
+            });
     }
 
     getAdUnit(key) {
-        return HTTPService.GET(`${WEB_URL}/web-client/api/ad-units/get?key=${key}&includeAdSources=true`);
     }
 
     getAllOrders() {
-        return HTTPService.GET(`${WEB_URL}/web-client/api/orders/query`);
+
+        return axios.get(`${WEB_URL}/mediation/groups/list`)
+            .then(resp => {
+
+                // Mediation Groups
+                let mglpd = resp.data.match(/var mglpd = '(.*)onMglpdAvailableCallbacks/m);
+                //@TODO: Add validations
+                mglpd = mglpd[0].match(/'(.*)';/m);
+                mglpd = mglpd[1];
+
+                return JSON.parse(mglpd.hexDecode());
+            })
+            .then(groups => {
+                console.log(groups);
+                return groups['1']['1'].reduce((acc, group) => {
+                    if (Number(group['1']) === 0) {
+                        return acc;
+                    }
+                    let platform = '';
+                    switch (group['4'][1]) {
+                        case 1:
+                            platform = 'iOS';
+                            break;
+                        case 2:
+                            platform = 'Android';
+                            break;
+                    }
+                    let format = '';
+                    switch (group['4'][2]) {
+                        case 0:
+                            format = 'Banner';
+                            break;
+                        case 1:
+                            format = 'Interstitial';
+                            break;
+                    }
+                    acc.push({
+                        key: group['1'],
+                        name: group['2'],
+                        status: Number(group['3']) === 1 ? 'Enabled' : 'Paused',
+                        platform: platform,
+                        format: format,
+                        adSource: group['5']['0']['9'],
+                        lineItemCount: 0
+                    });
+                    return acc;
+                }, []);
+            }).catch(error => {
+                console.error(error);
+            });
     }
 
     getOrder(id) {
-        return HTTPService.GET(`${WEB_URL}/web-client/api/orders/get?key=${id}`);
     }
 
     getOrderWithLineItems(id) {
@@ -145,10 +257,121 @@ class Handler extends AbstractHandler {
         return HTTPService.GET(`${WEB_URL}/web-client/api/line-items/get?key=${id}`);
     }
 
-    createOrder(data) {
-        //console.log("order data")
-        //console.log(data)
-        return HTTPService.POST(`${WEB_URL}/web-client/api/orders/create`, data);
+    createOrder(data, params) {
+
+        let adType = ''
+        try {
+            adType = this.advertiser.NETWORK_CLASS.android.find(object => object.value === params.customEventClassName).label
+        } catch (e) {
+            try {
+                adType = this.advertiser.NETWORK_CLASS.iphone.find(object => object.value === params.customEventClassName).label
+            } catch (er) {
+                adType = ''
+            }
+        }
+        params.adType = adType;
+
+        console.log(data, params);
+
+        const lineItems = this.advertiser.composerLineItems(params);
+        console.log(lineItems);
+
+        const os = ((os) => {
+            switch (os) {
+                case "iphone":
+                    return 1;
+                case "android":
+                    return 2;
+                default:
+                    return 0;
+            }
+        })(params.os);
+
+        const format = ((format) => {
+            switch (format) {
+                case "Banner":
+                    return 0;
+                case "Interstitial":
+                    return 1;
+                case "Rewarded Video":
+                    return 5;
+                case "Native":
+                    return 3;
+            }
+        })(params.adType);
+
+        const body = {
+            "1": data.name,
+            "2": 1,
+            "3": {
+                "1": os,
+                "2": format,//0 banner 1 inter 2? 3 native 5-rewarded?
+                "3": params.adunits
+            },
+            "4": lineItems
+        };
+        console.log(body);
+
+        return axios.get(`https://apps.admob.com/v2/home`)
+            .then(resp => {
+                let xsrfToken = resp.data.match(/xsrfToken: '(.*)'/m);
+                console.log(xsrfToken[1]);
+                return xsrfToken[1];
+            })
+            .then(token => {
+                console.log(token);
+
+                return new Promise((resolve, reject) => {
+
+                    //@TODO: Do we need fetch f.sid?
+                    let isAdMob = true,
+                        url = 'https://apps.admob.com/mediationGroup/_/rpc/MediationGroupService/Create?rpcTrackingId=MediationGroupService.Create%3A1&f.sid=8901338717484996000',
+                        data = {
+                            '__ar': JSON.stringify(body)
+                        };
+
+                    // return new Promise((resolve, reject) => {
+                    let {tabId, frameId} = window.AdMobAutomation.admobRequest,
+                        payload = {
+                            isAdMob,
+                            url,
+                            data,
+                            method: "post",
+                            headers: {
+                                'x-framework-xsrf-token': token,
+                                'x-same-domain': 1,
+                                'content-type': 'application/x-www-form-urlencoded'
+                            }
+                        };
+                    console.log(payload);
+
+                    chrome.tabs.sendMessage(tabId, {action: "request", payload}, {frameId}, (result = {}) => {
+                        console.log('payload: ', payload);
+                        console.log('result: ', result);
+                        let {ok, data, error} = result;
+                        if (ok) {
+                            resolve(data);
+                        } else {
+                            error = error || {errors: ["Fatal error"]};
+                            error.errors = error.errors.map(error => {
+                                return typeof error === 'object' && error.hasOwnProperty('message') ?
+                                    error.message :
+                                    error
+                            });
+                            // console.log(error);
+                            let err = new Error(error.errors);
+                            err.data = error;
+                            reject(err);
+                        }
+                    })
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+
+        // return HTTPService.POST(`${WEB_URL}/web-client/api/orders/create`, data);
     }
 
     createLineItems(data, callback) {
@@ -184,23 +407,6 @@ class Handler extends AbstractHandler {
         return HTTPService.POST(
             `${WEB_URL}/web-client/api/line-items/update?key=${id}`,
             data
-        );
-    }
-
-    updateLineItemStatus(status, id) {
-        let formData = new FormData();
-
-        formData.append("ad_sources[]", id);
-        formData.append("status", status);
-
-        return HTTPService.POST(`${WEB_URL}/advertise/ad_source/status/`, formData);
-    }
-
-    updateLineItemStatusInSet(lineItems, status, step) {
-        return wrapSeries(
-            lineItems,
-            ({key}) => this.updateLineItemStatus(status, key),
-            step
         );
     }
 
@@ -425,123 +631,22 @@ class Handler extends AbstractHandler {
         });
     }
 
-    promiseQuery(options) {
-        return new Promise(function (resolve, reject) {
-            chrome.tabs.query(options, resolve);
-        });
-    }
-
-    promiseCreate(options) {
-        return new Promise(function (resolve, reject) {
-            chrome.tabs.create(options, resolve);
-        });
-    }
-
-    async prepareMoPubTabForRequests() {
-        let mopubSessionUpdatedAt = Date.now();
-        localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
-        let {tabId, frameId} = window.MopubAutomation.request;
-
-        tabId = await this.promiseQuery({index: tabId})
-            .then(tabs => {
-                if (!tabs.length) {
-                    return this.promiseQuery({active: false})
-                        .then(tabs => {
-                            const mopub = tabs.filter(tab => {
-                                const url = new URL(tab.url);
-                                const domain = url.hostname;
-                                return domain === "app.mopub.com";
-                            });
-                            if (mopub.length === 0) {
-                                // open new tab
-                                return this.promiseCreate({url: "https://app.mopub.com/dashboard", active: false})
-                                    .then(tab => {
-                                        return tab.id;
-                                    });
-                            } else {
-                                return mopub[0].id;
-                            }
-                        });
-                } else {
-                    return tabId;
-                }
-            });
-
-        window.MopubAutomation.request = {
-            frameId: 0,
-            tabId: tabId
-        };
-
-        chrome.tabs.reload(tabId, {}, function () {
-            console.log('reloading mopub page');
-        });
-        await delay(5000);
-    }
-
-    filterAdUnitParams(params){
-        return [... new Set(params.adunits.map(key => {
-            const adunit = params.adUnitsParams.find(adunit => adunit.key == key)
-            return adunit.format =='custom' ? '320x50' : adunit.format
-        }))]
-        .map(format => params.adUnitsParams.find(adunit => adunit.format == format).key)
-    }
-
     async createOrderDataFromSet(order, params, stepCallback) {
 
-        await this.prepareMoPubTabForRequests();
-        return this.createOrder(order).then(order => {
-            const lineItems = this.advertiser.composerLineItems(order.key, params);
-            //console.log("odrer request")
-            //console.log(order)
+        return this.createOrder(order, params).then(result => {
+            // return result;
+
+            console.log(result);
+
             stepCallback({
                 ordersDone: 1,
                 orderCount: 1,
                 lineItemsDone: 1,
-                lineItemCount: lineItems.length
+                lineItemCount: 1
             });
-            return Promise.mapSeries(lineItems, (item, idx, lineItemCount) => {
-                if(window.canceledExport){
-                    return
-                }
-                delete item.childContentEligibility
-                return this.createLineItem(item)
-                    .then(lineItem => {
-                        this.filterAdUnitParams(params).forEach(currentAdUnit => {
-                            this.advertiser.createCreatives(
-                                lineItem.key,
-                                params,
-                                this.createCreatives,
-                                currentAdUnit
-                            );
-                        })
-                        return lineItem;
-                    })
-                    .then(async result => {
-                        // wait for last request
-                        await delay(Math.floor(idx/50)*1000);
-                        if (idx > 0 && idx % 50 === 0) {
-                            let mopubSessionUpdatedAt = Date.now();
-                            localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
-                            let {tabId, frameId} = window.MopubAutomation.request;
-                            chrome.tabs.reload(tabId, {}, function () {
-                                console.log('reloading mopub page');
-                            });
-                            await delay(10000);
-                        }
 
-                        if (stepCallback) {
-                            stepCallback({
-                                ordersDone: 1,
-                                orderCount: 1,
-                                lineItemCount,
-                                lineItemsDone: idx + 1
-                            });
-                        }
-
-                        return result;
-                    });
-            }).then(lineItems => ({...order, lineItems}));
         });
+
     }
 
     downloadOrderDataFromSet(order, params, stepCallback) {
@@ -553,18 +658,6 @@ class Handler extends AbstractHandler {
             };
 
             let lineItems = this.advertiser.composerLineItems(null, params);
-
-            if (["amazon", "openx", "pubmatic"].indexOf(params.advertiser) !== -1) {
-                lineItems = lineItems.map(lineItem => {
-                    lineItem.creatives = this.filterAdUnitParams(params).map(currentAdUnit => this.advertiser.createCreatives(
-                        lineItem.key,
-                        params,
-                        null,
-                        currentAdUnit
-                    ))
-                    return lineItem;
-                });
-            }
 
             data.lineItemCount = lineItems.length;
             order.lineItems = lineItems;
@@ -604,7 +697,7 @@ class Handler extends AbstractHandler {
     }
 
     getOrderUrl(key) {
-        return `https://app.mopub.com/order?key=${key}`;
+        return `${WEB_URL}/mediation/groups/${key}/edit`;
     }
 
     getAdUnitUrl(key) {
