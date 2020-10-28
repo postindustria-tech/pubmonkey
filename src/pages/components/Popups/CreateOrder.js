@@ -1184,8 +1184,7 @@ class CreateOrderModal extends Component {
             vastTagUrl,
             os
         };
-        console.log("Params:")
-        console.log(params)
+
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",

@@ -20,7 +20,7 @@ export const KEYWORD_PLACEHOLDER = {
   pubnative: "PN HyBid {bid}",
   openx: "hb_pb {bid}",
   apollo: "openx-apollo-prebid_{bid}",
-  apolloSDK: "hb_pb{bid}",
+  apolloSDK: "openx-apollo-prebid_{bid}",
   amazon: "m{width}x{height}p{position}",
   smaato: "Smaato UB {bid}",
   clearbid: "um_price {bid}",
@@ -43,3 +43,11 @@ export const PREBID_GROUP_ADVERTISERS = [
   "apolloSDK",
   "bidmachine",
 ];
+
+export const MOPUB_CREATIVE_FORMAT = {
+  "native" : {type: "Native", dimensions: []},
+  "full": {type: "full", dimensions: ["320x480","320x568","300x600","360x640","768x1024","300x1050"]},
+  "rewarded_video": {type: "Rewarded Video", dimensions: []},
+  "medium_rectangle": {type: "Medium Rectangle", dimensions: ["336x280", "300x250"]},
+  "banner": {type: "Banner", dimensions: [ "300x50","320x50", "468x60","728x90","970x90","970x250"]},
+}

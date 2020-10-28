@@ -5,8 +5,8 @@ import {FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {wrapSeries, delay} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
-import {AD_SERVER_MOPUB} from "../../constants/source";
-import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID} from '../../constants/common';
+import {AD_SERVER_MOPUB, } from "../../constants/source";
+import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID, MOPUB_CREATIVE_FORMAT} from '../../constants/common';
 import axios from "ex-axios";
 
 const WEB_URL = "https://app.mopub.com";
@@ -56,7 +56,6 @@ class Handler extends AbstractHandler {
     }
 
     async isReady() {
-        // console.log('isReady');
         if (this.sessionChecked) {
             return window.MopubAutomation.loggedIn
                 .then(loggedIn => {
@@ -146,8 +145,6 @@ class Handler extends AbstractHandler {
     }
 
     createOrder(data) {
-        //console.log("order data")
-        //console.log(data)
         return HTTPService.POST(`${WEB_URL}/web-client/api/orders/create`, data);
     }
 
@@ -156,8 +153,6 @@ class Handler extends AbstractHandler {
     }
 
     createLineItem(data) {
-        //console.log("create lineitems")
-        //console.log(data)
         return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/create`, data);
     }
 
@@ -491,8 +486,6 @@ class Handler extends AbstractHandler {
         await this.prepareMoPubTabForRequests();
         return this.createOrder(order).then(order => {
             const lineItems = this.advertiser.composerLineItems(order.key, params);
-            //console.log("odrer request")
-            //console.log(order)
             stepCallback({
                 ordersDone: 1,
                 orderCount: 1,
