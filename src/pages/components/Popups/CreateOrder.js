@@ -21,7 +21,8 @@ import {
     AMAZON_KVP_FORMAT,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
-    PRICE_GRID
+    PRICE_GRID,
+    CREATIVE_GENERATION_POLICY
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
@@ -89,7 +90,8 @@ const initialState = {
     customEventData: '',
     snippetType: "banner",
     BidMachinePriceGrid: '',
-    vastTagUrl: ''
+    vastTagUrl: '',
+    creativeGenerationPolicy: CREATIVE_GENERATION_POLICY[1]
 };
 
 class CreateOrderModal extends Component {
@@ -384,6 +386,7 @@ class CreateOrderModal extends Component {
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
                                             granularity: this.state.granularity,
+                                            creativeGenerationPolicy: this.state.creativeGenerationPolicy
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
@@ -465,6 +468,7 @@ class CreateOrderModal extends Component {
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
                                             granularity: this.state.granularity,
+                                            creativeGenerationPolicy: this.state.creativeGenerationPolicy
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
@@ -1151,7 +1155,8 @@ class CreateOrderModal extends Component {
             childContentEligibility,
             snippetType,
             BidMachinePriceGrid,
-            vastTagUrl
+            vastTagUrl,
+            creativeGenerationPolicy
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1188,9 +1193,10 @@ class CreateOrderModal extends Component {
             childContentEligibility,
             snippetType,
             BidMachinePriceGrid,
-            vastTagUrl
+            vastTagUrl,
+            creativeGenerationPolicy
         };
-        /*
+
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",
@@ -1276,7 +1282,7 @@ class CreateOrderModal extends Component {
                 this.setState({canceled: false});
                 window.canceledExport = false
             }, 1000)
-        });*/
+        });
     }
 
     getOrderUrl(key) {
@@ -1359,8 +1365,6 @@ class CreateOrderModal extends Component {
                 progress: {value: 0}
             }
         ]);
-        console.log("download params")
-        console.log(params)
         progress = this.props.sourceHandler.downloadOrderDataFromSet(
             order,
             params,

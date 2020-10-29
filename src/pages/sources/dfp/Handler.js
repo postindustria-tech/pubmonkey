@@ -2,7 +2,7 @@ import Factory from '../../sources/Factory';
 import AbstractHandler from '../../sources/AbstractHandler';
 import {AdvertiserFactory} from "./Factory";
 import {AD_SERVER_DFP, DFP_API_VERSION} from "../../constants/source";
-import {AMAZON_KVP_FORMAT, PRICE_GRID, PREBID_GROUP_ADVERTISERS} from '../../constants/common';
+import {AMAZON_KVP_FORMAT, PRICE_GRID, PREBID_GROUP_ADVERTISERS, CREATIVE_GENERATION_POLICY} from '../../constants/common';
 import {DFP, FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {isEmpty, toDecimal, toInteger, toValidUI, deepClone} from "../../helpers";
@@ -899,7 +899,10 @@ class Handler extends AbstractHandler {
                 let [width, height] = creative.format.split("x")
                 let adUnitSizes = []
                 if (PREBID_GROUP_ADVERTISERS.includes(advertiser)){
-                    if(creative.format.indexOf(',') > -1) {
+                    if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[0]) {
+                        width = 1
+                        height = 1
+                    } else if(creative.format.indexOf(',') > -1) {
                         let formats = creative.format.split(', ')
                         formats.forEach(format => {
                             let [width, height] = format.replace('v', '').split("x")

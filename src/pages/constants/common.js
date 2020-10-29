@@ -43,3 +43,8 @@ export const PREBID_GROUP_ADVERTISERS = [
   "apolloSDK",
   "bidmachine",
 ];
+
+export const CREATIVE_GENERATION_POLICY = [
+    "generate a single creative 1x1",
+    "generate a single creative of ad unit size per targeted ad unit"
+]
