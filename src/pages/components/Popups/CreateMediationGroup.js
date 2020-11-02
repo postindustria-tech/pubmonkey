@@ -22,28 +22,30 @@ import {
     AMAZON_KVP_FORMAT,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
-    PRICE_GRID,
-    CREATIVE_GENERATION_POLICY
+    PRICE_GRID
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
+import BidMachineCreateOrder from "../../sources/forms/BidMachine";
+import {AdUnitsSelect, LineItemsRangeInput} from "../../sources/components";
+import _ from "underscore";
+import InputNumber from "rc-input-number";
 import AmazonCreateOrder from "../../sources/forms/Amazon";
 import ClearBidCreateOrder from "../../sources/forms/ClearBid";
 import OpenXCreateOrder from "../../sources/forms/OpenX";
-import OpenXApolloSDK from "../../sources/forms/OpenXApolloSDK";
-import OpenXApollo from "../../sources/forms/OpenXApollo";
 import PubMaticCreateOrder from "../../sources/forms/PubMatic";
 import PubNativeCreateOrder from "../../sources/forms/PubNative";
 import SmaatoCreateOrder from "../../sources/forms/Smaato";
-import BidMachineCreateOrder from "../../sources/forms/BidMachine";
+import OpenXApollo from "../../sources/forms/OpenXApollo";
+import OpenXApolloSDK from "../../sources/forms/OpenXApolloSDK";
 
 let progress = null,
-    defaultAdvertiser = "amazon";
+    defaultAdvertiser = "bidmachine";
 
 const initialState = {
-    title: "Create New Order",
+    title: "Create Mediation Group",
     executor: "create",
     backdrop: true,
     showCreativeFormat: false,
@@ -91,11 +93,10 @@ const initialState = {
     customEventData: '',
     snippetType: "banner",
     BidMachinePriceGrid: '',
-    vastTagUrl: '',
-    creativeGenerationPolicy: CREATIVE_GENERATION_POLICY[1]
+    vastTagUrl: ''
 };
 
-class CreateOrderModal extends Component {
+class CreateMediationGroupModal extends Component {
 
     progress = null;
 
@@ -120,8 +121,6 @@ class CreateOrderModal extends Component {
     state = initialState;
 
     reset() {
-        initialState.advertiser = this.props.sourceHandler.defaultAdvertiser;
-        initialState.selectedAdvertiser = this.props.sourceHandler.defaultAdvertiser;
         this.setState(initialState);
     }
 
@@ -198,8 +197,8 @@ class CreateOrderModal extends Component {
     };
 
     updateDimensions = () => {
-        const modal = document.getElementById('createOrderModal'),
-            footer = document.getElementById('createOrderModalFooter');
+        const modal = document.getElementById('createMediationGroupModal'),
+            footer = document.getElementById('createMediationGroupModalFooter');
         if (!modal) return;
         const
             offset = 40,
@@ -224,10 +223,6 @@ class CreateOrderModal extends Component {
 
     render() {
 
-        const classWidth = this.props.type === AD_SERVER_DFP ? 'col-sm-4' : 'col-sm-6',
-            networkCode = this.props.networkCode || localStorage.getItem('dfpNetworkCode'),
-            tooltip = `Companies are defined in your Google Ad Manager account under Admin -> Companies. <a href="https://admanager.google.com/${networkCode}#admin/company/list" target="_blank"> Take me there.</a>`;
-
         return (
             <React.Fragment>
                 {this.props.withButton ? (
@@ -245,7 +240,7 @@ class CreateOrderModal extends Component {
                     ref={helperModal => (this.helperModal = helperModal)}
                 />
                 <ModalExtended
-                    id={"createOrderModal"}
+                    id={"createMediationGroupModal"}
                     ref="myImgContainer"
                     isOpen={this.props.createOrderModalOpen}
                     toggle={this.toggle}
@@ -261,9 +256,9 @@ class CreateOrderModal extends Component {
                             />
                         </div>
                         <Row>
-                            <Col className={classWidth}>
+                            <Col className={"col-sm-4"}>
                                 <Label for="orderName" className="mp-label">
-                                    Order Name:
+                                    Name:
                                 </Label>
                                 <Input
                                     invalid={!isEmpty(this.state.formErrors.orderName)}
@@ -275,231 +270,10 @@ class CreateOrderModal extends Component {
                                     className={"mp-form-control"}
                                 />
                             </Col>
-                            <Col className={classWidth}>
-                                <Label for="Advertiser" className="mp-label">
-                                    Header Bidding Service:
-                                </Label>
-                                <Input
-                                    type="select"
-                                    name={"advertiser"}
-                                    id="advertiser"
-                                    onChange={this.handleInputChange}
-                                    value={this.state.advertiser || ''}
-                                    className={"mp-form-control"}
-                                >
-                                    {Object.keys(this.props.ADVERTISER_DEFAULT_NAME).map(
-                                        (option, index) => (
-                                            <option key={index} value={option}>
-                                                {this.props.ADVERTISER_DEFAULT_NAME[option]}
-                                            </option>
-                                        )
-                                    )}
-                                </Input>
-                            </Col>
-                            <Col className={classWidth} hidden={this.props.type !== AD_SERVER_DFP}>
-                                <Label for="advertiserId" className="mp-label">
-                                    Company:
-                                    {" "}
-                                    <i className="fa fa-question-circle" id={"Tooltip-company"}/>
-                                    <Tooltip
-                                        placement="top"
-                                        isOpen={this.state.tooltipCompanyOpen}
-                                        target={"Tooltip-company"}
-                                        toggle={this.tooltipToggle}
-                                        autohide={false}
-                                    >
-                                        <span dangerouslySetInnerHTML={{__html: tooltip}}></span>
-                                    </Tooltip>
-                                </Label>
-                                <Input
-                                    type="select"
-                                    name={"advertiserId"}
-                                    onChange={this.handleInputChange}
-                                    value={this.state.advertiserId || ''}
-                                    id="advertiserId"
-                                    className={"mp-form-control"}
-                                >
-                                    <option>--</option>
-                                    {this.props.sourceAdvertisers.map(
-                                        ({id, name}) => (
-                                            <option key={id} value={id}>{name}</option>
-                                        )
-                                    )}
-                                </Input>
-                            </Col>
-                        </Row>
 
+                        </Row>
                         {((advertiser) => {
                             switch (advertiser) {
-                                case 'amazon':
-                                    return <AmazonCreateOrder
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            priceGrid: this.state.priceGrid,
-                                            amazonStartPrice: this.state.amazonStartPrice,
-                                            amazonCSVItems: this.state.amazonCSVItems,
-                                            amazonStep: this.state.amazonStep,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            creativeFormat: this.state.creativeFormat,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
-                                case 'clearbid':
-                                    return <ClearBidCreateOrder
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            priceGrid: this.state.priceGrid,
-                                            priceBand: this.state.priceBand,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            step: this.state.step,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            os: this.state.os,
-                                            customEventClassName: this.state.customEventClassName,
-                                            customEventData: this.state.customEventData,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
-                                case 'openx':
-                                    return <OpenXCreateOrder
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            creativeFormat: this.state.creativeFormat,
-                                            creativeSnippet: this.state.creativeSnippet,
-                                            adServerDomain: this.state.adServerDomain,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                            granularity: this.state.granularity,
-                                            creativeGenerationPolicy: this.state.creativeGenerationPolicy
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
-                                case 'pubmatic':
-                                    return <PubMaticCreateOrder
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            step: this.state.step,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            os: this.state.os,
-                                            customEventClassName: this.state.customEventClassName,
-                                            customEventData: this.state.customEventData,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
-                                case 'pubnative':
-                                    return <PubNativeCreateOrder
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            step: this.state.step,
-                                            keywordStep: this.state.keywordStep,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            os: this.state.os,
-                                            customEventClassName: this.state.customEventClassName,
-                                            Ad_ZONE_ID: this.state.Ad_ZONE_ID,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
-                                case 'smaato':
-                                    return <SmaatoCreateOrder
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            step: this.state.step,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            os: this.state.os,
-                                            customEventClassName: this.state.customEventClassName,
-                                            customEventData: this.state.customEventData,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
-                                case 'apollo':
-                                    return <OpenXApollo
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            creativeFormat: this.state.creativeFormat,
-                                            creativeSnippet: this.state.creativeSnippet,
-                                            adServerDomain: this.state.adServerDomain,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                            granularity: this.state.granularity,
-                                            creativeGenerationPolicy: this.state.creativeGenerationPolicy
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
-                                case 'apolloSDK':
-                                    return <OpenXApolloSDK
-                                        formErrors={this.state.formErrors}
-                                        handleInputChange={this.handleInputChange}
-                                        handleAdUnitsCheckboxChange={this.handleAdUnitsCheckboxChange}
-                                        attributes={{
-                                            orderName: this.state.orderName,
-                                            rangeFrom: this.state.rangeFrom,
-                                            rangeTo: this.state.rangeTo,
-                                            lineItemsNaming: this.state.lineItemsNaming,
-                                            keywordTemplate: this.state.keywordTemplate,
-                                            creativeFormat: this.state.creativeFormat,
-                                            creativeSnippet: this.state.creativeSnippet,
-                                            adServerDomain: this.state.adServerDomain,
-                                            os: this.state.os,
-                                            customEventClassName: this.state.customEventClassName,
-                                            customEventData: this.state.customEventData,
-                                            adUnitsSelected: this.state.adUnitsSelected,
-                                            keyword: this.state.keyword,
-                                            granularity: this.state.granularity,
-                                        }}
-                                        stateSetter={this.stateSetter}
-                                    />;
                                 case 'bidmachine':
                                     return <BidMachineCreateOrder
                                         formErrors={this.state.formErrors}
@@ -530,7 +304,7 @@ class CreateOrderModal extends Component {
                             }
                         })(this.state.advertiser)}
                     </ModalBody>
-                    <ModalFooter id={"createOrderModalFooter"} className={"sticky"}>
+                    <ModalFooter id={"createMediationGroupModalFooter"} className={"sticky"}>
                         <Button className={"mr-auto"}
                                 onClick={() => this.preOrder("download")}
                                 color="warning"
@@ -552,16 +326,6 @@ class CreateOrderModal extends Component {
                 />
             </React.Fragment>
         );
-    }
-
-    isOrderNameExist(orderName) {
-        let last = this.props.orders.length
-        for (let i=0; i<last; i++) {
-            if(this.props.orders[i].name === orderName) {
-                return true
-            }
-        }
-        return false
     }
 
     @bind
@@ -587,10 +351,6 @@ class CreateOrderModal extends Component {
         //@TODO: Need to refactor
         if (isEmpty(this.state.orderName)) {
             fieldValidationErrors.orderName = "Order name is required!";
-            isValid = false;
-        }
-        if(this.isOrderNameExist(this.state.orderName)) {
-            fieldValidationErrors.orderName = "Order with this name is already exist!";
             isValid = false;
         }
         if (isEmpty(this.state.lineItemsNaming)) {
@@ -726,7 +486,7 @@ class CreateOrderModal extends Component {
 
     @bind
     open() {
-        this.changeAdvertiser(this.props.sourceHandler.defaultAdvertiser);
+        this.changeAdvertiser(defaultAdvertiser);
         this.props.createOrderModalToggle();
     }
 
@@ -737,7 +497,7 @@ class CreateOrderModal extends Component {
 
     @bind
     toggle() {
-        this.reset();
+        this.setState(initialState);
         this.props.createOrderModalToggle();
     }
 
@@ -768,7 +528,7 @@ class CreateOrderModal extends Component {
             if (name === "os") {
                 this.setState({
                     adUnitsSelected: [],
-                    networkClass: this.props.networkClasses[value][0],
+                    // networkClass: this.props.networkClasses[value][0],
                     customEventClassName: this.props.networkClasses[value][0].hasOwnProperty('value') ? this.props.networkClasses[value][0].value : ''
                 });
             }
@@ -872,7 +632,6 @@ class CreateOrderModal extends Component {
     }
 
     changeAdvertiser(advertiser) {
-        console.log(`changeAdvertiser: ${this.state.advertiser}`);
         const lineItemsNaming = KEYWORD_PLACEHOLDER[advertiser],
             step = advertiser === "amazon" ? 1 : 0.1,
             keywordStep = advertiser === "amazon" ? 1 : 0.01,
@@ -899,7 +658,7 @@ class CreateOrderModal extends Component {
         this.props.setAdvertiser(advertiser);
 
         this.setState({
-            keywordTemplate: CreateOrderModal.getKeywordTemplate(
+            keywordTemplate: CreateMediationGroupModal.getKeywordTemplate(
                 advertiser,
                 this.state.creativeFormat
             ),
@@ -1162,7 +921,7 @@ class CreateOrderModal extends Component {
             snippetType,
             BidMachinePriceGrid,
             vastTagUrl,
-            creativeGenerationPolicy
+            os
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1200,9 +959,10 @@ class CreateOrderModal extends Component {
             snippetType,
             BidMachinePriceGrid,
             vastTagUrl,
-            creativeGenerationPolicy
+            os
         };
-
+        console.log("Params:")
+        console.log(params)
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",
@@ -1371,6 +1131,8 @@ class CreateOrderModal extends Component {
                 progress: {value: 0}
             }
         ]);
+        console.log("download params")
+        console.log(params)
         progress = this.props.sourceHandler.downloadOrderDataFromSet(
             order,
             params,
@@ -1423,10 +1185,9 @@ const mapStateToProps = state => ({
     adunits: adServerSelectors.adunits(state),
     sourceHandlerReady: adServerSelectors.sourceHandlerStatus(state),
     advertiser: adServerSelectors.getAdvertiser(state),
-    networkCode: adServerSelectors.networkCode(state),
 
     ...adServerSelectors.dfpInventory(state),
     ...adServerSelectors.duplicateOrder(state),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateOrderModal)
+export default connect(mapStateToProps, mapDispatchToProps)(CreateMediationGroupModal)

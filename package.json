@@ -61,6 +61,7 @@
     "jquery": "^3.3.1",
     "moment": "^2.22.1",
     "prismjs": "^1.17.1",
+    "qs": "^6.9.4",
     "rc-input-number": "^4.4.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",

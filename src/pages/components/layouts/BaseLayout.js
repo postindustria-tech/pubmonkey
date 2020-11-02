@@ -11,6 +11,8 @@ import {connect} from "react-redux";
 import AdServerSwitcherContainer from "../../containers/adServerSwitcherContainer/adServerSwitcherContainer";
 import OrdersStats from '../Orders/Stats'
 import AdUnitsStats from '../AdUnits/Stats'
+import MediationGroupsStats from "../Mediation/Stats";
+import {AD_SERVER_ADMOB} from "../../constants/source";
 
 class BaseLayout extends Component {
 
@@ -39,17 +41,33 @@ class BaseLayout extends Component {
                         <NavbarBrand>PubMonkey <small>v. { version }</small></NavbarBrand>
                     </div>
                     <div className={"list-group list-group-flush"}>
-                        <NavLink
-                            tag={ RRNavLink }
-                            className={"list-group-item list-group-item-action bg-light"}
-                            activeClassName="active"
-                            to="/orders"
-                            isActive={isActive}
-                        >
-                            <i className="fas fa-truck"/>
-                            &nbsp; Orders<br />
-                            <OrdersStats />
-                        </NavLink>
+                        {
+                            type === AD_SERVER_ADMOB
+                                ?
+                                <NavLink
+                                    tag={ RRNavLink }
+                                    className={"list-group-item list-group-item-action bg-light"}
+                                    activeClassName="active"
+                                    to="/mediation"
+                                >
+                                    <i className="fas fa-random"/>
+                                    &nbsp; Mediation<br />
+                                    <MediationGroupsStats />
+                                </NavLink>
+                                :
+                                <NavLink
+                                    tag={ RRNavLink }
+                                    className={"list-group-item list-group-item-action bg-light"}
+                                    activeClassName="active"
+                                    to="/orders"
+                                    isActive={isActive}
+                                >
+                                    <i className="fas fa-truck"/>
+                                    &nbsp; Orders<br />
+                                    <OrdersStats />
+                                </NavLink>
+                        }
+
                         <NavLink
                             tag={ RRNavLink }
                             className={"list-group-item list-group-item-action bg-light"}

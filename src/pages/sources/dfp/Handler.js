@@ -49,8 +49,9 @@ class Handler extends AbstractHandler {
         apolloSDK: "OpenX Apollo SDK",
         apollo: "OpenX Apollo",
         bidmachine: "BidMachine"
-
     };
+
+    defaultAdvertiser = 'amazon'
 
     FILTER_FN = [
         ({status}) => status !== "ARCHIVED",

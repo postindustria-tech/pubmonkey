@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {connect} from "react-redux";
 import adServerSelectors from '../../../redux/selectors/adServer';
-import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
+import {AD_SERVER_ADMOB, AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
 import bind from "bind-decorator";
 import adServerActions from "../../../redux/actions/adServer";
 import AuthModal from "../../sources/dfp/AuthModal";
@@ -24,6 +24,12 @@ class SourceTypeViewContainer extends PureComponent {
             .then(username => this.setState({ username }));
 
         window.MopubAutomation.loggedIn
+            .then(loggedIn => this.setState({ loggedIn }));
+
+        window.AdMobAutomation.username
+            .then(username => this.setState({ username }));
+
+        window.AdMobAutomation.loggedIn
             .then(loggedIn => this.setState({ loggedIn }));
     }
 
@@ -76,6 +82,25 @@ class SourceTypeViewContainer extends PureComponent {
                         ? (
                             <div>
                                 <a href="https://app.mopub.com/dashboard/" target="_blank">{ username }</a>
+                                &nbsp;
+                                <LogoutLink style={{textDecoration: "underline"}}>
+                                    Logout
+                                </LogoutLink>
+                            </div>
+                        )
+                        : (
+                            <div className="login-link">Not logged in.&nbsp;
+                                <LoginLink style={{textDecoration: "underline"}}>
+                                    Log in.
+                                </LoginLink>
+                            </div>
+                        )
+                    : null}
+                {this.props.type === AD_SERVER_ADMOB ?
+                    loggedIn != null && loggedIn
+                        ? (
+                            <div>
+                                <a href="https://apps.admob.com/v2/home" target="_blank">{ username }</a>
                                 &nbsp;
                                 <LogoutLink style={{textDecoration: "underline"}}>
                                     Logout

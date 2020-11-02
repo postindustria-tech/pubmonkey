@@ -13,7 +13,7 @@ import BaseLayout from "../layouts/BaseLayout";
 import {FileService, ModalWindowService} from "../../services";
 import {MainController} from "../../controllers";
 import CreateOrderModal from "../Popups/CreateOrder";
-import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../constants/source";
+import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVER_ADMOB} from "../../constants/source";
 import adServerSelectors from '../../../redux/selectors/adServer'
 import adServerActions from '../../../redux/actions/adServer'
 import ConfirmModal from "../Popups/ConfirmModal";

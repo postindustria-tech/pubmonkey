@@ -29,14 +29,6 @@ class adServerSwitcherContainer extends PureComponent {
                         </button>
                     ))}
                     </div>
-
-                {/*{Object.keys(AD_SERVERS).map((option, index) => (*/}
-                {/*    <div*/}
-                {/*        key={index}*/}
-                {/*        onClick={() => this.handleAdServerChange(option)}*/}
-                {/*        className={`adserver-button ${this.props.type === option ? 'active' : ''}`}>{AD_SERVERS[option]}*/}
-                {/*    </div>*/}
-                {/*))}*/}
                 </Col>
             </Row>
         )

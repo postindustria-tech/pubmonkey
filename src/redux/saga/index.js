@@ -2,7 +2,7 @@ import adServerActions from "../actions/adServer";
 import {put, takeEvery, takeLatest, all, select} from "redux-saga/effects";
 import SourceFactory from "../../pages/sources/Factory";
 import adServerSelectors from "../selectors/adServer";
-import {AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../pages/constants/source";
+import {AD_SERVER_ADMOB, AD_SERVER_DFP, AD_SERVER_MOPUB} from "../../pages/constants/source";
 import {isEmpty} from "../../pages/helpers";
 
 function* getOrders(action) {
@@ -45,6 +45,7 @@ function* getAdUnits(action) {
 function* setSourceHandler(action) {
     try {
         const {type} = action.payload;
+        console.log(type);
 
         localStorage.setItem("type", type);
         const sourceHandler = SourceFactory.getHandler(type);
@@ -80,6 +81,15 @@ function* setSourceHandlerAfter() {
             }
         }
         if (type === AD_SERVER_MOPUB) {
+            const ready = yield sourceHandler.isReady();
+            if (ready) {
+                yield put(adServerActions.loadInventory({
+                    ...params
+                }));
+                yield put(adServerActions.setSourceHandlerStatus(true));
+            }
+        }
+        if (type === AD_SERVER_ADMOB) {
             const ready = yield sourceHandler.isReady();
             if (ready) {
                 yield put(adServerActions.loadInventory({

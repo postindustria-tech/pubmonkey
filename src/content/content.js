@@ -1,10 +1,11 @@
 import axios from 'axios'
+import qs from 'qs'
 
 const isLoadedByFrame = window.self !== window.top
 
 let headers = {
     'x-requested-with': 'XMLHttpRequest',
-    'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;?.*/g, '$1')
+    'x-csrftoken': document.cookie.replace(/.*csrftoken=([^;]+)\;?.*/g, '$1'),
 };
 
 // if(isLoadedByFrame) {
@@ -34,6 +35,11 @@ let headers = {
 
                     delete payload.isFormData
                     payload.data = formData
+                }
+                if (payload.isAdMob) {
+                    headers = payload.headers;
+                    delete payload.isAdMob
+                    payload.data = qs.stringify(payload.data)
                 }
 
                 let response = (...args) => {

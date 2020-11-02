@@ -9,7 +9,7 @@ import {
     KEYWORD_PLACEHOLDER,
     KEYWORD_TEMPLATE_DEFAULT_VALUE, PRICE_GRID
 } from "../../constants/common";
-import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
+import {AD_SERVER_ADMOB, AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import {isEmpty, toInteger} from "../../helpers";
 import _ from "underscore";
 import {AdTypeSelect, AdUnitsSelect, CreativeSnippet, LineItemsNamingInput, VastTagUrl} from "../components";
@@ -84,7 +84,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
         return (
             <React.Fragment>
                 <Row className={"main-form"}>
-                    <Col className={"col-sm-2"}>
+                    <Col className={"col-sm-2"} hidden={this.props.type === AD_SERVER_ADMOB}>
                         <Label className={"mp-label"}>
                             Granularity:{" "}
                         </Label>
@@ -139,7 +139,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
-                    <Col className={"col-sm-4"} hidden={this.props.type !== "mopub"}>
+                    <Col className={"col-sm-4"} hidden={this.props.type === AD_SERVER_DFP}>
                         <Label className={"mp-label"}>OS:</Label>
                         <Input
                             type="select"
@@ -154,7 +154,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             <option value={"android"}>Android</option>
                         </Input>
                     </Col>
-                    <Col className={"col-sm-4"} hidden={this.props.type !== "mopub"}>
+                    <Col className={"col-sm-4"} hidden={this.props.type === AD_SERVER_DFP}>
                         <Label className={"mp-label"}>Ad Type:</Label>
                         <AdTypeSelect
                             onChange={this.onChangeAdType}
@@ -162,7 +162,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             networkClasses={this.props.networkClasses}
                         />
                     </Col>
-                    <Col className={"col-sm-7"} hidden={this.props.type !== "mopub"}>
+                    <Col className={"col-sm-7"} hidden={this.props.type === AD_SERVER_DFP}>
                         <Label className={"mp-label"}>Custom Event Class Name: </Label>
                         <CustomInput
                             type="text"
@@ -173,7 +173,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             className={"mp-form-control"}
                         />
                     </Col>
-                    <Col className={"col-sm-5"} hidden={this.props.type !== "mopub"}>
+                    <Col className={"col-sm-5"} hidden={this.props.type !== AD_SERVER_MOPUB}>
                         <Label className={"mp-label"}>Custom Event Data:</Label>
                         <CustomInput
                             invalid={!isEmpty(this.props.formErrors.customEventData)}
@@ -185,7 +185,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             className={"mp-form-control"}
                         />
                     </Col>
-                    <Col className={"col-sm-4"} hidden={this.props.type === "mopub"}>
+                    <Col className={"col-sm-4"} hidden={this.props.type !== AD_SERVER_DFP}>
                         <Label className={"mp-label"}>Creative type:</Label>
                         <Input
                             type="select"
@@ -200,7 +200,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             <option value={"VAST"}>{"VAST"}</option>
                         </Input>
                     </Col>
-                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
+                    <Col className={"col-sm-8"} hidden={this.props.type !== AD_SERVER_DFP}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip
@@ -213,19 +213,19 @@ class BidMachineCreateOrder extends CreateOrderForm {
                             <span dangerouslySetInnerHTML={{__html: tooltip}}></span>
                         </Tooltip>
                         <Input
-                        type="select"
-                        name={"childContentEligibility"}
-                        onChange={this.handleInputChange}
-                        id="childContentEligibility"
-                        value={this.props.attributes.childContentEligibility}
-                        className={"mp-form-control"}
+                            type="select"
+                            name={"childContentEligibility"}
+                            onChange={this.handleInputChange}
+                            id="childContentEligibility"
+                            value={this.props.attributes.childContentEligibility}
+                            className={"mp-form-control"}
                         >
                         <option value={"DISALLOWED"}>{"Do not serve on child-directed requests"}</option>
                         <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
                     </Input>
                     </Col>
                     <Col className={"col-sm-12"} hidden={this.props.attributes.snippetType === "VAST" ||
-                                                         this.props.type === "mopub"}>
+                                                         this.props.type === AD_SERVER_MOPUB || this.props.type === AD_SERVER_ADMOB}>
                         <Label className="mr-sm-2 mp-label">
                             Creative Snippet:
                         </Label>
