@@ -90,7 +90,8 @@ export default class AbstractAdvertiser {
             let expectedCreativesSize = []
             params.adunits.map(adunit => {
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
-                if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[0]) {
+                if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[0] ||
+                    params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[2]) {
                     expectedCreativesSize.push({width: 1, height: 1})
                 } else if(creative.format.indexOf(',') > -1) {
                     let formats = creative.format.replace('v', '').split(', ')

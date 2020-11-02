@@ -45,6 +45,7 @@ export const PREBID_GROUP_ADVERTISERS = [
 ];
 
 export const CREATIVE_GENERATION_POLICY = [
-    "generate a single creative 1x1",
-    "generate a single creative of ad unit size per targeted ad unit"
+    "1x1 creative per ad unit (suitable for web setup)",
+    "generate a single creative of ad unit size per targeted ad unit",
+    "single creative 1x1"
 ]
