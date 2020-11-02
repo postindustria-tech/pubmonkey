@@ -6,6 +6,7 @@ import {
     Row, Tooltip,
 } from "reactstrap";
 import {
+    CREATIVE_GENERATION_POLICY,
     KEYWORD_PLACEHOLDER,
     KEYWORD_TEMPLATE_DEFAULT_VALUE
 } from "../../constants/common";
@@ -107,7 +108,7 @@ class ApolloCreateOrder extends CreateOrderForm {
                             />
                         </div>
                     </Col>
-                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
+                    <Col className={"col-sm-6"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip
@@ -129,6 +130,25 @@ class ApolloCreateOrder extends CreateOrderForm {
                         >
                             <option value={"DISALLOWED"}>{"Do not serve on child-directed requests"}</option>
                             <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-6"} hidden={this.props.type === "mopub"}>
+                        <Label className={"mp-label"}>
+                            Creative generation policy
+                        </Label>
+                        <Input
+                            type="select"
+                            name={"creativeGenerationPolicy"}
+                            onChange={this.handleInputChange}
+                            id="creativeGenerationPolicy"
+                            value={this.props.attributes.creativeGenerationPolicy}
+                            className={"mp-form-control"}
+                        >
+                            {Object.keys(CREATIVE_GENERATION_POLICY).map((option, index) => (
+                                <option key={index} value={CREATIVE_GENERATION_POLICY[option]}>
+                                    {CREATIVE_GENERATION_POLICY[option]}
+                                </option>
+                            ))}
                         </Input>
                     </Col>
                     <Col className={"col-sm-12"}>

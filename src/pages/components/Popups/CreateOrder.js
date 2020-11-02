@@ -22,7 +22,8 @@ import {
     AMAZON_KVP_FORMAT,
     KEYWORD_TEMPLATE_DEFAULT_VALUE,
     KEYWORD_PLACEHOLDER,
-    PRICE_GRID
+    PRICE_GRID,
+    CREATIVE_GENERATION_POLICY
 } from '../../constants/common';
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
@@ -90,7 +91,8 @@ const initialState = {
     customEventData: '',
     snippetType: "banner",
     BidMachinePriceGrid: '',
-    vastTagUrl: ''
+    vastTagUrl: '',
+    creativeGenerationPolicy: CREATIVE_GENERATION_POLICY[1]
 };
 
 class CreateOrderModal extends Component {
@@ -389,6 +391,7 @@ class CreateOrderModal extends Component {
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
                                             granularity: this.state.granularity,
+                                            creativeGenerationPolicy: this.state.creativeGenerationPolicy
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
@@ -470,6 +473,7 @@ class CreateOrderModal extends Component {
                                             adUnitsSelected: this.state.adUnitsSelected,
                                             keyword: this.state.keyword,
                                             granularity: this.state.granularity,
+                                            creativeGenerationPolicy: this.state.creativeGenerationPolicy
                                         }}
                                         stateSetter={this.stateSetter}
                                     />;
@@ -550,6 +554,16 @@ class CreateOrderModal extends Component {
         );
     }
 
+    isOrderNameExist(orderName) {
+        let last = this.props.orders.length
+        for (let i=0; i<last; i++) {
+            if(this.props.orders[i].name === orderName) {
+                return true
+            }
+        }
+        return false
+    }
+
     @bind
     formValidator() {
         let fieldValidationErrors = {
@@ -573,6 +587,10 @@ class CreateOrderModal extends Component {
         //@TODO: Need to refactor
         if (isEmpty(this.state.orderName)) {
             fieldValidationErrors.orderName = "Order name is required!";
+            isValid = false;
+        }
+        if(this.isOrderNameExist(this.state.orderName)) {
+            fieldValidationErrors.orderName = "Order with this name is already exist!";
             isValid = false;
         }
         if (isEmpty(this.state.lineItemsNaming)) {
@@ -1144,7 +1162,7 @@ class CreateOrderModal extends Component {
             snippetType,
             BidMachinePriceGrid,
             vastTagUrl,
-            os
+            creativeGenerationPolicy
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1182,7 +1200,7 @@ class CreateOrderModal extends Component {
             snippetType,
             BidMachinePriceGrid,
             vastTagUrl,
-            os
+            creativeGenerationPolicy
         };
 
         ModalWindowService.ProgressModal.setProgress([
@@ -1353,8 +1371,6 @@ class CreateOrderModal extends Component {
                 progress: {value: 0}
             }
         ]);
-        console.log("download params")
-        console.log(params)
         progress = this.props.sourceHandler.downloadOrderDataFromSet(
             order,
             params,

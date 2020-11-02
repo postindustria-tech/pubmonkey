@@ -7,7 +7,8 @@ import {
 } from "reactstrap";
 import {
     KEYWORD_PLACEHOLDER,
-    KEYWORD_TEMPLATE_DEFAULT_VALUE
+    KEYWORD_TEMPLATE_DEFAULT_VALUE,
+    CREATIVE_GENERATION_POLICY
 } from "../../constants/common";
 import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
 import {isEmpty} from "../../helpers";
@@ -51,6 +52,7 @@ class OpenXCreateOrder extends CreateOrderForm {
             adServerDomain: "",
             childContentEligibility: "DISALLOWED",
             tooltipChildAllow: false,
+
         },
     };
 
@@ -125,7 +127,7 @@ class OpenXCreateOrder extends CreateOrderForm {
                             ))}
                         </Input>
                     </Col>
-                    <Col className={"col-sm-8"} hidden={this.props.type === "mopub"}>
+                    <Col className={"col-sm-6"} hidden={this.props.type === "mopub"}>
                         <Label className={"mp-label"}>Child-directed ads:</Label>
                         <i className="fa fa-question-circle" id={"Tooltip-child-allow"}/>
                         <Tooltip
@@ -147,6 +149,25 @@ class OpenXCreateOrder extends CreateOrderForm {
                         >
                             <option value={"DISALLOWED"}>{"Do not serve on child-directed requests"}</option>
                             <option value={"ALLOWED"}>{"Allow to serve on child-directed requests"}</option>
+                        </Input>
+                    </Col>
+                    <Col className={"col-sm-6"} hidden={this.props.type === "mopub"}>
+                        <Label className={"mp-label"}>
+                            Creative generation policy
+                        </Label>
+                        <Input
+                            type="select"
+                            name={"creativeGenerationPolicy"}
+                            onChange={this.handleInputChange}
+                            id="creativeGenerationPolicy"
+                            value={this.props.attributes.creativeGenerationPolicy}
+                            className={"mp-form-control"}
+                        >
+                            {Object.keys(CREATIVE_GENERATION_POLICY).map((option, index) => (
+                                <option key={index} value={CREATIVE_GENERATION_POLICY[option]}>
+                                    {CREATIVE_GENERATION_POLICY[option]}
+                                </option>
+                            ))}
                         </Input>
                     </Col>
                     <Col className={"col-sm-12"} >

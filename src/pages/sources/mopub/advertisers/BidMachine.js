@@ -33,17 +33,11 @@ export class BidMachine extends AbstractAdvertiser {
     composerLineItems(orderKey, params) {
         let {
             adunits,
-            step,
-            keywordStep,
             keywordTemplate,
-            rangeFrom,
-            rangeTo,
             lineItemsNaming,
-            granularity,
             customEventClassName,
             customEventData,
             BidMachinePriceGrid,
-            networkClass,
         } = params;
 
         let lineItemInfo = {...this.lineItemInfo},

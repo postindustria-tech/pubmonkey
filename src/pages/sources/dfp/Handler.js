@@ -2,7 +2,7 @@ import Factory from '../../sources/Factory';
 import AbstractHandler from '../../sources/AbstractHandler';
 import {AdvertiserFactory} from "./Factory";
 import {AD_SERVER_DFP, DFP_API_VERSION} from "../../constants/source";
-import {AMAZON_KVP_FORMAT, PRICE_GRID, PREBID_GROUP_ADVERTISERS} from '../../constants/common';
+import {AMAZON_KVP_FORMAT, PRICE_GRID, PREBID_GROUP_ADVERTISERS, CREATIVE_GENERATION_POLICY} from '../../constants/common';
 import {DFP, FileService, HTTPService} from "../../services";
 import Promise from "bluebird";
 import {isEmpty, toDecimal, toInteger, toValidUI, deepClone} from "../../helpers";
@@ -894,74 +894,89 @@ class Handler extends AbstractHandler {
                 lineItemCount: lineItems.length
             });
 
-            const creatives = (await Promise.all(params.adunits.map(async adunit => {
-                const {advertiser} = params
-                const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
-                let [width, height] = creative.format.split("x")
-                let adUnitSizes = []
-                if (PREBID_GROUP_ADVERTISERS.includes(advertiser)){
-                    if(creative.format.indexOf(',') > -1) {
-                        let formats = creative.format.split(', ')
-                        formats.forEach(format => {
-                            let [width, height] = format.replace('v', '').split("x")
-                            adUnitSizes.push({width: width, height: height})
-                        })
-                    } else {
-                        let format = creative.format.replace('v', '').split("x")
-                        width = format[0]
-                        height = format[1]
-                    }
-                }else if(!creative.format){
-                    [width, height] = params.creativeFormat.split("x")
-                }
+            let creatives = []
+            if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[2]) {
                 let data = []
-                if(adUnitSizes.length > 0) {
-                    if(params.snippetType === "VAST") {
-                        adUnitSizes.forEach(element => {
+                data.push(ThirdPartyCreative(
+                    order.advertiserId,
+                    order.name + "_creative",
+                    Size(1, 1, false),
+                    advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                ))
+                creatives = await this.createCreatives(data);
+            } else {
+                creatives = (await Promise.all(params.adunits.map(async adunit => {
+                    const {advertiser} = params
+                    const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
+                    let [width, height] = creative.format.split("x")
+                    let adUnitSizes = []
+                    if (PREBID_GROUP_ADVERTISERS.includes(advertiser)){
+                        if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[0]) {
+                            width = 1
+                            height = 1
+                        } else if(creative.format.indexOf(',') > -1) {
+                            let formats = creative.format.split(', ')
+                            formats.forEach(format => {
+                                let [width, height] = format.replace('v', '').split("x")
+                                adUnitSizes.push({width: width, height: height})
+                            })
+                        } else {
+                            let format = creative.format.replace('v', '').split("x")
+                            width = format[0]
+                            height = format[1]
+                        }
+                    }else if(!creative.format){
+                        [width, height] = params.creativeFormat.split("x")
+                    }
+                    let data = []
+                    if(adUnitSizes.length > 0) {
+                        if(params.snippetType === "VAST") {
+                            adUnitSizes.forEach(element => {
+                                data.push(
+                                    VastPartyCreative(
+                                        order.advertiserId,
+                                        order.name + ". " + creative.name,
+                                        Size(element.width, element.height, false),
+                                        params.vastTagUrl
+                                    )
+                                )
+                            })
+                        } else {
+                            adUnitSizes.forEach(element => {
+                                data.push(
+                                    ThirdPartyCreative(
+                                        order.advertiserId,
+                                        order.name + ". " + creative.name,
+                                        Size(element.width, element.height, false),
+                                        advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
+                                    )
+                                )
+                            })
+                        }
+                    } else {
+                        if(params.snippetType === "VAST") {
                             data.push(
                                 VastPartyCreative(
                                     order.advertiserId,
                                     order.name + ". " + creative.name,
-                                    Size(element.width, element.height, false),
+                                    Size(width, height, false),
                                     params.vastTagUrl
                                 )
                             )
-                        })
-                    } else {
-                        adUnitSizes.forEach(element => {
+                        } else {
                             data.push(
                                 ThirdPartyCreative(
                                     order.advertiserId,
                                     order.name + ". " + creative.name,
-                                    Size(element.width, element.height, false),
+                                    Size(width, height, false),
                                     advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
                                 )
                             )
-                        })
+                        }
                     }
-                } else {
-                    if(params.snippetType === "VAST") {
-                        data.push(
-                            VastPartyCreative(
-                                order.advertiserId,
-                                order.name + ". " + creative.name,
-                                Size(width, height, false),
-                                params.vastTagUrl
-                            )
-                        )
-                    } else {
-                        data.push(
-                            ThirdPartyCreative(
-                                order.advertiserId,
-                                order.name + ". " + creative.name,
-                                Size(width, height, false),
-                                advertiser === 'openx' || advertiser === 'apollo' || advertiser === 'apolloSDK' ? params.creativeSnippet : this.advertiser.getCreativeHtmlData(params)
-                            )
-                        )
-                    }
-                }
-                return await this.createCreatives(data);
-            }))).flat()
+                    return await this.createCreatives(data);
+                }))).flat()
+            }
 
             await this.performOrderAction('running', 'ApproveOrders', order.id);
 
@@ -981,8 +996,8 @@ class Handler extends AbstractHandler {
                 await delay(Math.floor(idx/length)*1000);
                 return this.createLineItems(part)
                 .then(async part => {
-                    for (let index = 0; index < creatives.length; index++) {
-                        const creative = creatives[index]
+                    if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[2]) {
+                        const creative = creatives[0]
 
                         let associations = [];
                         part.map(({id}) => {
@@ -993,6 +1008,20 @@ class Handler extends AbstractHandler {
                             ));
                         });
                         await this.createLineItemCreativeAssociations(associations);
+                    } else {
+                        for (let index = 0; index < creatives.length; index++) {
+                            const creative = creatives[index]
+
+                            let associations = [];
+                            part.map(({id}) => {
+                                associations.push(LineItemCreativeAssociation(
+                                    id,
+                                    creative.id,
+                                    [creative.size]
+                                ));
+                            });
+                            await this.createLineItemCreativeAssociations(associations);
+                        }
                     }
                     return part;
                 })

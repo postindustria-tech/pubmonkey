@@ -1,5 +1,5 @@
 import {CreativePlaceholder, Size, Targeting} from "./dfp/DataTypes";
-import {NETWORK_CLASS_TO_DIMENSION, PREBID_GROUP_ADVERTISERS} from "../constants/common";
+import {CREATIVE_GENERATION_POLICY, NETWORK_CLASS_TO_DIMENSION, PREBID_GROUP_ADVERTISERS} from "../constants/common";
 import {isEmpty} from "../helpers";
 
 export default class AbstractAdvertiser {
@@ -90,7 +90,10 @@ export default class AbstractAdvertiser {
             let expectedCreativesSize = []
             params.adunits.map(adunit => {
                 const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
-                if(creative.format.indexOf(',') > -1) {
+                if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[0] ||
+                    params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[2]) {
+                    expectedCreativesSize.push({width: 1, height: 1})
+                } else if(creative.format.indexOf(',') > -1) {
                     let formats = creative.format.replace('v', '').split(', ')
                     formats.forEach(format => {
                         let [width, height] = format.split("x")
