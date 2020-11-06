@@ -980,6 +980,8 @@ class CreateOrderModal extends Component {
             }
             switch (granularity) {
                 case 'low':
+                    //for bid = 0.00
+                    items++
                     step = rangeFrom = toInteger(0.5);
                     rangeTo = toInteger(5);
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -988,6 +990,8 @@ class CreateOrderModal extends Component {
                     keywords = 1;
                     break;
                 case 'med':
+                    //for bid = 0.00
+                    items++
                     step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -1004,6 +1008,8 @@ class CreateOrderModal extends Component {
                     }
                     break;
                 case 'auto':
+                    //for bid = 0.00
+                    items++
                     // 0.05 ... 5 (0.05)
                     step = rangeFrom = toInteger(0.05);
                     rangeTo = toInteger(5);
