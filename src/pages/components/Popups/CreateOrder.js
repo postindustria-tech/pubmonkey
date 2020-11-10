@@ -282,7 +282,7 @@ class CreateOrderModal extends Component {
                                     value={this.state.advertiser || ''}
                                     className={"mp-form-control"}
                                 >
-                                    {Object.keys(this.props.ADVERTISER_DEFAULT_NAME).map(
+                                    {Object.keys(this.sortAdvertisers(this.props.ADVERTISER_DEFAULT_NAME)).map(
                                         (option, index) => (
                                             <option key={index} value={option}>
                                                 {this.props.ADVERTISER_DEFAULT_NAME[option]}
@@ -1296,6 +1296,16 @@ class CreateOrderModal extends Component {
             return this.props.sourceHandler.getOrderUrl(key);
         }
         return null;
+    }
+
+    sortAdvertisers(advertisers) {
+        const ordered = {};
+        Object.values(advertisers).sort(
+        ).forEach(element => {
+            let key = Object.keys(advertisers).find(key => advertisers[key] === element);
+            ordered[key] = element;
+        });
+        return ordered
     }
 
     @bind
