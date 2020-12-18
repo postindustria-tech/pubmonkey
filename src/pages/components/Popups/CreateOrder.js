@@ -287,7 +287,7 @@ class CreateOrderModal extends Component {
                                     value={this.state.advertiser || ''}
                                     className={"mp-form-control"}
                                 >
-                                    {Object.keys(this.props.ADVERTISER_DEFAULT_NAME).map(
+                                    {Object.keys(this.sortAdvertisers(this.props.ADVERTISER_DEFAULT_NAME)).map(
                                         (option, index) => (
                                             <option key={index} value={option}>
                                                 {this.props.ADVERTISER_DEFAULT_NAME[option]}
@@ -986,6 +986,8 @@ class CreateOrderModal extends Component {
             }
             switch (granularity) {
                 case 'low':
+                    //for bid = 0.00
+                    items++
                     step = rangeFrom = toInteger(0.5);
                     rangeTo = toInteger(5);
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -994,6 +996,8 @@ class CreateOrderModal extends Component {
                     keywords = 1;
                     break;
                 case 'med':
+                    //for bid = 0.00
+                    items++
                     step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -1010,6 +1014,8 @@ class CreateOrderModal extends Component {
                     }
                     break;
                 case 'auto':
+                    //for bid = 0.00
+                    items++
                     // 0.05 ... 5 (0.05)
                     step = rangeFrom = toInteger(0.05);
                     rangeTo = toInteger(5);
@@ -1296,6 +1302,16 @@ class CreateOrderModal extends Component {
             return this.props.sourceHandler.getOrderUrl(key);
         }
         return null;
+    }
+
+    sortAdvertisers(advertisers) {
+        const ordered = {};
+        Object.values(advertisers).sort(
+        ).forEach(element => {
+            let key = Object.keys(advertisers).find(key => advertisers[key] === element);
+            ordered[key] = element;
+        });
+        return ordered
     }
 
     @bind

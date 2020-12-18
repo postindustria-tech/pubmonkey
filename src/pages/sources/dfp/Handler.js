@@ -563,6 +563,8 @@ class Handler extends AbstractHandler {
             keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
             switch (granularity) {
                 case 'low':
+                    bids.push(toInteger(0.00))
+                    keywords.push(keywordTemplate.replace(mask, toDecimal(0.00).toFixed(2)))
                     step = rangeFrom = toInteger(0.5);
                     rangeTo = toInteger(5);
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -574,6 +576,8 @@ class Handler extends AbstractHandler {
                     }
                     break;
                 case 'med':
+                    bids.push(toInteger(0.00))
+                    keywords.push(keywordTemplate.replace(mask, toDecimal(0.00).toFixed(2)))
                     step = rangeFrom = toInteger(0.1);
                     rangeTo = toInteger(20);
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -610,6 +614,8 @@ class Handler extends AbstractHandler {
                     }
                     break;
                 case 'auto':
+                    bids.push(toInteger(0.00))
+                    keywords.push(keywordTemplate.replace(mask, toDecimal(0.00).toFixed(2)))
                     // 0.05 ... 5 (0.05)
                     step = rangeFrom = toInteger(0.05);
                     rangeTo = toInteger(5);
@@ -831,7 +837,11 @@ class Handler extends AbstractHandler {
                     [CustomCriteria(this.customTargetingKeyId, values)]
                 );
 
-                _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
+                if(bidDecimal == 0) {
+                    _lineItemInfo.costPerUnit = Money(0.01, 'USD');
+                } else {
+                    _lineItemInfo.costPerUnit = Money(bidDecimal, 'USD');
+                }
 
                 lineItems = [...lineItems, {
                     orderId: orderKey,

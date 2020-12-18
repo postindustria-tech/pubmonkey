@@ -44,6 +44,7 @@ export class OpenX extends AbstractAdvertiser {
         let bids = [], skip = false;
         switch (granularity) {
             case 'low':
+                bids.push(toDecimal(0.00).toFixed(2));
                 step = rangeFrom = toInteger(0.5);
                 rangeTo = toInteger(5);
                 for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -51,6 +52,7 @@ export class OpenX extends AbstractAdvertiser {
                 }
                 break;
             case 'med':
+                bids.push(toDecimal(0.00).toFixed(2));
                 step = rangeFrom = toInteger(0.1);
                 rangeTo = toInteger(20);
                 for (bid = rangeFrom; bid <= rangeTo; bid += step) {
@@ -87,6 +89,7 @@ export class OpenX extends AbstractAdvertiser {
                 }
                 break;
             case 'auto':
+                bids.push(toDecimal(0.00).toFixed(2));
                 // 0.05 ... 5 (0.05)
                 step = rangeFrom = toInteger(0.05);
                 rangeTo = toInteger(5);
@@ -134,9 +137,11 @@ export class OpenX extends AbstractAdvertiser {
 
         if (!skip) {
             lineItems = bids.map(bid => {
+
                 return {
                     adUnitKeys: adunits,
-                    bid: bid,
+                    //if bid = 0.00 : price = 0.01
+                    bid: bid != 0 ? bid : 0.01,
                     name: lineItemsNaming.replace("{bid}", bid),
                     orderKey: orderKey,
                     keywords: [keywordTemplate.replace(mask, bid)],
