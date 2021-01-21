@@ -1168,7 +1168,8 @@ class CreateOrderModal extends Component {
             snippetType,
             BidMachinePriceGrid,
             vastTagUrl,
-            creativeGenerationPolicy
+            creativeGenerationPolicy,
+            os
         } = this.state;
         let adUnitsParams = this.props.adunits
 
@@ -1206,7 +1207,8 @@ class CreateOrderModal extends Component {
             snippetType,
             BidMachinePriceGrid,
             vastTagUrl,
-            creativeGenerationPolicy
+            creativeGenerationPolicy,
+            os
         };
 
         ModalWindowService.ProgressModal.setProgress([

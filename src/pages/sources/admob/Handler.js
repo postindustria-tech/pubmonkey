@@ -245,6 +245,7 @@ class Handler extends AbstractHandler {
     }
 
     createCreatives(data) {
+        console.log("create creatives")
         return HTTPService.POST(`${WEB_URL}/web-client/api/creatives/create`, data);
     }
 
@@ -258,6 +259,8 @@ class Handler extends AbstractHandler {
     }
 
     createOrder(data, params) {
+        console.log("create order")
+        //console.log("params:"+ params)
 
         let adType = ''
         try {
@@ -375,6 +378,7 @@ class Handler extends AbstractHandler {
     }
 
     createLineItems(data, callback) {
+        console.log("create lineitems")
         return Promise.mapSeries(data.map(this.createLineItem), callback);
     }
 
