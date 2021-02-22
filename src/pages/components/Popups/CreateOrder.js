@@ -1105,9 +1105,9 @@ class CreateOrderModal extends Component {
             }, 0);
         }
 
-        if (this.props.type === AD_SERVER_MOPUB && executor === "create" && lineItemsCount >= 1000) {
-            return ModalWindowService.ErrorPopup.showMessage("Number of line items exceeded");
-        }
+        //if (this.props.type === AD_SERVER_MOPUB && executor === "create" && lineItemsCount >= 1000) {
+            //return ModalWindowService.ErrorPopup.showMessage("Number of line items exceeded");
+        //}
 
         let message = `Will generate:<br/>${items.toFixed(0)} line item(s), ${keywords.toFixed(0)} keyword(s) per line item.`;
 
