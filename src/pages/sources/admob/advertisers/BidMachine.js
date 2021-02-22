@@ -71,7 +71,7 @@ export class BidMachine extends AbstractAdvertiser {
                         "1": [
                             {
                                 "1": "label",
-                                "2": keywordTemplate.replace(mask, bid)
+                                "2": keywordTemplate.replace(mask, bid.toFixed(2))
                             },
                             {
                                 "1": "class_name",
@@ -79,7 +79,7 @@ export class BidMachine extends AbstractAdvertiser {
                             },
                             {
                                 "1": "parameter",
-                                "2": JSON.stringify({"bm_pf":bid.toString()})
+                                "2": JSON.stringify({"bm_pf":bid.toFixed(2).toString()})
                             }
                         ]
                     }
