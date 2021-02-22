@@ -18,7 +18,7 @@ export class BidMachine extends AbstractAdvertiser {
         android: [
             {value: 'com.google.ads.mediation.bidmachine.BidMachineCustomEventBanner', label: 'Banner'},
             {value: 'com.google.ads.mediation.bidmachine.BidMachineCustomEventInterstitial', label: 'Interstitial'},
-            {value: 'com.google.ads.mediation.bidmachine.BidMachineMediationRewardedAdAdapter', label: 'Rewarded Video'},
+            {value: 'com.google.ads.mediation.bidmachine.BidMachineAdapter', label: 'Rewarded Video'},
             {value: 'com.google.ads.mediation.bidmachine.BidMachineCustomEventNative', label: 'Native'}
         ]
     };
