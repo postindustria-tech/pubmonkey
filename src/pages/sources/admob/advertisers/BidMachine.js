@@ -37,7 +37,7 @@ export class BidMachine extends AbstractAdvertiser {
         "11": 1
     };
 
-    composerLineItems(params) {
+    composerLineItems(orderKey, params) {
         let {
             adunits,
             keywordTemplate,
