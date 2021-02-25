@@ -705,7 +705,7 @@ class Handler extends AbstractHandler {
     }
 
     getAdUnitUrl(key) {
-        return `https://app.mopub.com/ad-unit?key=${key}`;
+        return `https://apps.admob.com/v2/apps/${key}/adunits/list`;
     }
 }
 
