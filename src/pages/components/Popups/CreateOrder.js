@@ -1211,7 +1211,7 @@ class CreateOrderModal extends Component {
             creativeGenerationPolicy,
             os
         };
-
+        //console.log(params)
         ModalWindowService.ProgressModal.setProgress([
             {
                 title: "orders:",

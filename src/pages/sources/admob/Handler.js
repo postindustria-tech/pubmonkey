@@ -276,7 +276,7 @@ class Handler extends AbstractHandler {
 
         console.log(data, params);
 
-        const lineItems = this.advertiser.composerLineItems(params);
+        const lineItems = this.advertiser.composerLineItems(data, params);
         console.log(lineItems);
 
         const os = ((os) => {
@@ -636,7 +636,7 @@ class Handler extends AbstractHandler {
     }
 
     async createOrderDataFromSet(order, params, stepCallback) {
-
+        console.log(params)
         return this.createOrder(order, params).then(result => {
             // return result;
 
