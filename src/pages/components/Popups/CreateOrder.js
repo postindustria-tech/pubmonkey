@@ -25,7 +25,7 @@ import {
     PRICE_GRID,
     CREATIVE_GENERATION_POLICY
 } from '../../constants/common';
-import {AD_SERVER_DFP, AD_SERVER_MOPUB, AD_SERVERS} from '../../constants/source';
+import {AD_SERVER_DFP, AD_SERVER_MOPUB,AD_SERVER_ADMOB, AD_SERVERS} from '../../constants/source';
 import adServerActions from "../../../redux/actions/adServer";
 import adServerSelectors from "../../../redux/selectors/adServer";
 import {connect} from "react-redux";
@@ -534,7 +534,7 @@ class CreateOrderModal extends Component {
                         <Button className={"mr-auto"}
                                 onClick={() => this.preOrder("download")}
                                 color="warning"
-                                hidden={this.props.type === AD_SERVER_DFP}>
+                                hidden={this.props.type === AD_SERVER_DFP || this.props.type === AD_SERVER_ADMOB}>
                             Download JSON
                         </Button>
                         <Button onClick={this.close} color="secondary">
