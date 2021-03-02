@@ -589,7 +589,8 @@ class CreateOrderModal extends Component {
             fieldValidationErrors.orderName = "Order name is required!";
             isValid = false;
         }
-        if( this.props.type === AD_SERVER_DFP && this.isOrderNameExist(this.state.orderName)) {
+        if( (this.props.type === AD_SERVER_DFP
+            || this.props.type === AD_SERVER_ADMOB)&& this.isOrderNameExist(this.state.orderName)) {
 
             fieldValidationErrors.orderName = "Order with this name is already exist!";
             isValid = false;
