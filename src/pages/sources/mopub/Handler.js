@@ -287,8 +287,10 @@ class Handler extends AbstractHandler {
 
         // let formData = LineItemModel.createFromJSON(data).toFormData()
         return this.createLineItem(lineItem, orderId).then(result => {
-
-            if (creatives) {
+            console.log("line item key: "+result.key)
+            if (creatives && (data.advertiser === "Amazon Publisher Services (TAM)"
+                              || data.advertiser === "OpenX Apollo"
+                              || data.advertiser === "Prebid.org")) {
                 let lineItemKey = result.key;
 
                 return Promise.mapSeries(
@@ -297,6 +299,7 @@ class Handler extends AbstractHandler {
                          extended,
                          name,
                          adType,
+                         dimensions,
                          format,
                          trackingUrl,
                          images: imageKeys
@@ -305,6 +308,7 @@ class Handler extends AbstractHandler {
                             extended,
                             name,
                             adType,
+                            dimensions,
                             format,
                             trackingUrl,
                             lineItemKey,
