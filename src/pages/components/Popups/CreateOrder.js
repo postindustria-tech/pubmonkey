@@ -44,6 +44,7 @@ let progress = null,
 
 const initialState = {
     title: "Create New Order",
+    orderNameLabel: "Order Name:",
     executor: "create",
     backdrop: true,
     showCreativeFormat: false,
@@ -133,6 +134,13 @@ class CreateOrderModal extends Component {
     };
 
     componentDidMount = () => {
+        if(this.props.type === AD_SERVER_ADMOB) {
+            this.state.title = "Create New Mediation Group"
+            this.state.orderNameLabel = "Mediation Group Name"
+        } else {
+            this.state.title = "Create New Order"
+            this.state.orderNameLabel = "Order Name:"
+        }
         ModalWindowService.onUpdate = () => this.forceUpdate();
         ModalWindowService.ProgressModal.onCancel(this.onCancel);
         window.addEventListener('resize', this.updateDimensions);
@@ -263,7 +271,7 @@ class CreateOrderModal extends Component {
                         <Row>
                             <Col className={classWidth}>
                                 <Label for="orderName" className="mp-label">
-                                    Order Name:
+                                    {this.state.orderNameLabel}
                                 </Label>
                                 <Input
                                     invalid={!isEmpty(this.state.formErrors.orderName)}
@@ -1213,9 +1221,11 @@ class CreateOrderModal extends Component {
             os
         };
         //console.log(params)
+        let title = this.props.type !== AD_SERVER_ADMOB ? "orders" : "mediation group"
+
         ModalWindowService.ProgressModal.setProgress([
             {
-                title: "orders:",
+                title: title,
                 progress: {value: 0}
             },
             {
@@ -1232,7 +1242,7 @@ class CreateOrderModal extends Component {
             ({lineItemCount, lineItemsDone, orderCount, ordersDone}) => {
                 ModalWindowService.ProgressModal.setProgress([
                     {
-                        title: `orders: ${ordersDone}/${orderCount}`,
+                        title: `${title}: ${ordersDone}/${orderCount}`,
                         progress: {value: (ordersDone / orderCount) * 100}
                     },
                     {

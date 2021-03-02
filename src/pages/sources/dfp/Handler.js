@@ -583,8 +583,9 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
-                    }
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );                    }
                     break;
                 case 'high':
                     // step = rangeFrom = toInteger(0.01);
@@ -622,8 +623,9 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
-                    }
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );                    }
                     // 5.1 ... 10 (0.1)
                     step = toInteger(0.1);
                     rangeFrom = toInteger(5.1);
@@ -631,8 +633,9 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
-                    }
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );                    }
                     // 10.5 ... 20 (0.5)
                     step = toInteger(0.5);
                     rangeFrom = toInteger(10.5);
@@ -640,8 +643,9 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
-                    }
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );                    }
                     break;
                 case 'dense':
                     // 0.01 ... 3 (0.01)
@@ -650,8 +654,9 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
-                    }
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );                    }
                     // 3.05 ... 8 (0.05)
                     step = toInteger(0.05);
                     rangeFrom = toInteger(3.05);
@@ -659,8 +664,9 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
-                    }
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );                    }
                     // 8.5 ... 20 (0.5)
                     step = toInteger(0.5);
                     rangeFrom = toInteger(8.5);
@@ -668,8 +674,9 @@ class Handler extends AbstractHandler {
                     for (bid = rangeFrom; bid <= rangeTo; bid += step) {
                         bids.push(bid);
                         const bidDecimal = toDecimal(bid);
-                        keywords.push(bidDecimal.toFixed(2));
-                    }
+                        keywords.push(
+                            keywordTemplate.replace(mask, bidDecimal.toFixed(2))
+                        );                    }
                     break;
             }
         } else if (advertiser === "amazon") {
