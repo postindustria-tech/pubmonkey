@@ -1123,6 +1123,8 @@ class CreateOrderModal extends Component {
 
         if (this.props.type === AD_SERVER_MOPUB && executor === "create" && items + lineItemsCount > 1000) {
             message = `${message}<br/>You will exceed the number of line items available in MoPub, this creation will create only some part of line items out of requested ${items}, would you like to continue?`;
+        } else if(this.props.type === AD_SERVER_ADMOB && advertiser === "bidmachine" && executor === "create" && items  > 50) {
+            message = `${message}<br/>AdMob only supports up to 50 custom events in the mediation group, please note that each price point (line) you enter corresponds to a single custom event.`;
         } else {
             message = `${message}<br/>${items.toFixed(0) > 100 ? 'It will take some time. Are you sure?' : 'Are you sure?'}`;
         }
