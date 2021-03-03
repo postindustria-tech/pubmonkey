@@ -118,6 +118,7 @@ class Handler extends AbstractHandler {
                 return {apps, adunits}
             })
             .then(({apps, adunits}) => {
+                console.log("apps adunits")
                 console.log(apps, adunits);
 
                 return adunits[1].reduce((acc, adunit) => {
@@ -143,8 +144,21 @@ class Handler extends AbstractHandler {
                             format = 'Banner';
                             break;
                         case 1:
+                            if (adunit[18] && adunit[18][2] === "Reward") {
+                                format = 'Rewarded Video';
+                                break;
+                            }
                             format = 'Interstitial';
                             break;
+                        case 3:
+                            format = 'Native';
+                            break;
+                        case 8:
+                            format = 'Rewarded Inerstitial';
+                            break;
+                        default:
+                            console.log("format index")
+                            console.log(adunit[14])
                     }
                     acc.push({
                         key: adunit[1],
@@ -179,6 +193,7 @@ class Handler extends AbstractHandler {
                 return JSON.parse(mglpd.hexDecode());
             })
             .then(groups => {
+                console.log("orders")
                 console.log(groups);
                 return groups['1']['1'].reduce((acc, group) => {
                     if (Number(group['1']) === 0) {
@@ -201,6 +216,15 @@ class Handler extends AbstractHandler {
                         case 1:
                             format = 'Interstitial';
                             break;
+                        case 3:
+                            format = 'Native';
+                            break;
+                        case 5:
+                            format = 'Rewarded Video';
+                            break;
+                        default:
+                            console.log("format index")
+                            console.log(group['4'][2])
                     }
                     acc.push({
                         key: group['1'],
