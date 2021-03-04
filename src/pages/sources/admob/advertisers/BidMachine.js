@@ -65,6 +65,9 @@ export class BidMachine extends AbstractAdvertiser {
 
             const keywords = [];
             adunits.forEach(adunit => {
+                let parameterMask = keywordTemplate.replace(":"+mask, '')
+                let parameter = {}
+                parameter[parameterMask] = bid.toFixed(2).toString()
                 keywords.push({
                     "1": adunit,
                     "2": {
@@ -79,7 +82,7 @@ export class BidMachine extends AbstractAdvertiser {
                             },
                             {
                                 "1": "parameter",
-                                "2": JSON.stringify({"bm_pf":bid.toFixed(2).toString()})
+                                "2": JSON.stringify(parameter)
                             }
                         ]
                     }

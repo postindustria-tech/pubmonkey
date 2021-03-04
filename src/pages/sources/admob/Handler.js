@@ -47,8 +47,6 @@ class Handler extends AbstractHandler {
     }
 
     async isReady() {
-        console.log('admob isReady');
-
         return axios.get(`${WEB_URL}/home`)
             .then(resp => {
 
@@ -118,15 +116,12 @@ class Handler extends AbstractHandler {
                 return {apps, adunits}
             })
             .then(({apps, adunits}) => {
-                console.log("apps adunits")
-                console.log(apps, adunits);
 
                 return adunits[1].reduce((acc, adunit) => {
                     if (adunit[9] === true) {
                         return acc;
                     }
                     const app = apps[1].find(object => object[1] === adunit[2]);
-                    console.log(app);
                     let platform = '';
                     let os = '';
                     switch (app[3]) {
@@ -157,8 +152,7 @@ class Handler extends AbstractHandler {
                             format = 'Rewarded Inerstitial';
                             break;
                         default:
-                            console.log("format index")
-                            console.log(adunit[14])
+
                     }
                     acc.push({
                         key: adunit[1],
@@ -193,8 +187,7 @@ class Handler extends AbstractHandler {
                 return JSON.parse(mglpd.hexDecode());
             })
             .then(groups => {
-                console.log("orders")
-                console.log(groups);
+
                 return groups['1']['1'].reduce((acc, group) => {
                     if (Number(group['1']) === 0) {
                         return acc;
@@ -223,8 +216,7 @@ class Handler extends AbstractHandler {
                             format = 'Rewarded Video';
                             break;
                         default:
-                            console.log("format index")
-                            console.log(group['4'][2])
+
                     }
                     acc.push({
                         key: group['1'],
@@ -283,8 +275,7 @@ class Handler extends AbstractHandler {
     }
 
     createOrder(data, params) {
-        console.log("create order")
-        //console.log("params:"+ params)
+
 
         let adType = ''
         try {
@@ -298,10 +289,10 @@ class Handler extends AbstractHandler {
         }
         params.adType = adType;
 
-        console.log(data, params);
+        //console.log(data, params);
 
         const lineItems = this.advertiser.composerLineItems(data, params);
-        console.log(lineItems);
+        //console.log(lineItems);
 
         const os = ((os) => {
             switch (os) {
@@ -337,7 +328,7 @@ class Handler extends AbstractHandler {
             },
             "4": lineItems
         };
-        console.log(body);
+        //console.log(body);
 
         return axios.get(`https://apps.admob.com/v2/home`)
             .then(resp => {

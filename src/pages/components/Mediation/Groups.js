@@ -84,8 +84,6 @@ class MediationGroups extends Component {
     }
 
     statusInOrdersTable() {
-        console.log("type: "+this.props.type)
-        console.log("login : "+this.state.loggedIn)
         const isLoggedIn = (this.state.loggedIn != null && this.state.loggedIn)
 
         if (!isLoggedIn) {
