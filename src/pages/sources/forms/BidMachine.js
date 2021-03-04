@@ -157,7 +157,7 @@ class BidMachineCreateOrder extends CreateOrderForm {
                     <Col className={"col-sm-4"} hidden={this.props.type === AD_SERVER_DFP}>
                         <Label className={"mp-label"}>Ad Type:</Label>
                         <AdTypeSelect
-                            onChange={this.onChangeAdType}
+                            onChange={this.adTypeHandle}
                             os={this.props.attributes.os}
                             networkClasses={this.props.networkClasses}
                         />
@@ -281,6 +281,13 @@ class BidMachineCreateOrder extends CreateOrderForm {
                 </Row>
             </React.Fragment>
         );
+    }
+
+    adTypeHandle = (event) => {
+        this.onChangeAdType(event)
+        if (this.props.type === AD_SERVER_ADMOB) {
+            this.handleInputChange(event)
+        }
     }
 }
 

@@ -572,6 +572,27 @@ class CreateOrderModal extends Component {
         return false
     }
 
+    udunitsAdmobFilter(format) {
+        const NETWORK_CLASS = {
+            "": [
+                {value: '', label: 'Please select OS'},
+            ],
+            iphone: [
+                {value: 'BidMachineCustomEventBanner', label: 'Banner'},
+                {value: 'BidMachineCustomEventInterstitial', label: 'Interstitial'},
+                {value: 'BidMachineCustomEventRewarded', label: 'Rewarded Video'},
+                {value: 'BidMachineCustomEventNativeAd', label: 'Native'}
+            ],
+            android: [
+                {value: 'com.google.ads.mediation.bidmachine.BidMachineCustomEventBanner', label: 'Banner'},
+                {value: 'com.google.ads.mediation.bidmachine.BidMachineCustomEventInterstitial', label: 'Interstitial'},
+                {value: 'com.google.ads.mediation.bidmachine.BidMachineAdapter', label: 'Rewarded Video'},
+                {value: 'com.google.ads.mediation.bidmachine.BidMachineCustomEventNative', label: 'Native'}
+            ]
+        };
+        this.state.creativeFormat = NETWORK_CLASS[this.state.os].find(object => object.value === format).label
+    }
+
     @bind
     formValidator() {
         let fieldValidationErrors = {
@@ -754,8 +775,11 @@ class CreateOrderModal extends Component {
     @bind
     handleInputChange(event) {
         const {value, name} = event.target;
-        console.log("event name")
-        console.log(name)
+
+        if(name === "adType") {
+            this.udunitsAdmobFilter(value)
+        }
+
         if (['rangeFrom', 'rangeTo', 'amazonStartPrice', 'amazonStep'].includes(name)) {
             if (value !== "" && !ONLY_NUMBERS.test(value)) {
                 return;
@@ -783,6 +807,9 @@ class CreateOrderModal extends Component {
                     networkClass: this.props.networkClasses[value][0],
                     customEventClassName: this.props.networkClasses[value][0].hasOwnProperty('value') ? this.props.networkClasses[value][0].value : ''
                 });
+                if(this.props.type === AD_SERVER_ADMOB) {
+                    this.udunitsAdmobFilter(this.props.networkClasses[value][0].value)
+                }
             }
 
             if (name === "snippetType") {
