@@ -123,7 +123,7 @@ CJ.checkAdMobTab = function(){
     });
 }
 
-CJ.checkAdMobTab()
+//CJ.checkAdMobTab()
 
 chrome.webRequest.onHeadersReceived.addListener(
     ({frameId, tabId}) => {

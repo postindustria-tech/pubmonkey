@@ -19,12 +19,15 @@ CJ.checkAdMobTab = function(){
             return domain === "apps.admob.com";
         });
 
+        let admobSessionUpdatedAt = localStorage.getItem("admobSessionUpdatedAt") || 0;
+
         if (admob.length === 0) {
             chrome.tabs.create({ url: "https://apps.admob.com/v2/home", active: false }, function (tab) {
                 CJ.admobRequest = {
                     frameId: 0,
                     tabId: tab.id
                 };
+                admobSessionUpdatedAt = Date.now();
             });
         } else {
             let tabId = admob[0].id;
@@ -45,11 +48,19 @@ CJ.checkAdMobTab = function(){
                     return;
                 }
 
-                console.log(data);
                 let {name} = data;
 
                 // resolveName(name);
             });
+        }
+
+        // Refresh mopub's tab every 5 minutes for a valid csrf token
+        if ((Number(admobSessionUpdatedAt) + 1000 * 60 * 5) < Date.now()) {
+            admobSessionUpdatedAt = Date.now();
+            localStorage.setItem("admobSessionUpdatedAt", admobSessionUpdatedAt.toString());
+            if (CJ.admobRequest) {
+                chrome.tabs.reload(CJ.admobRequest.tabId);
+            }
         }
 
     });
@@ -91,7 +102,7 @@ chrome.webRequest.onHeadersReceived.addListener(
     {
         urls: [
             "https://apps.admob.com/v2/home",
-            "https://apps.admob.com"
+            //"https://apps.admob.com"
         ]
     }
 );
