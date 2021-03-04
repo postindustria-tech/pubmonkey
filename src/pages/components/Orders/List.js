@@ -333,14 +333,37 @@ class OrdersList extends Component {
             .catch(({data: {errors}}) => {
                 let fields = Object.keys(errors);
                 console.log(errors)
-                ModalWindowService.ErrorPopup.showMessage(
-                    "Import failed. File is damaged or invalid"
-                    // fields.map((field, idx) => (
-                    //     <div key={idx}>
-                    //         <strong>{field}:</strong>&nbsp;{errors[field]}
-                    //     </div>
-                    // ))
-                );
+                //ModalWindowService.ErrorPopup.showMessage(
+                    //"Import failed. File is damaged or invalid"
+                //);
+                let close = true,
+                    trace = true,
+                    errorName = JSON.stringify(error),
+                    errorPopup = false;
+                if (errorName.length) {
+                    errorName = error.name;
+                    if (error.hasOwnProperty('close')) {
+                        close = error.close;
+                    }
+                    if (error.hasOwnProperty('trace')) {
+                        trace = error.trace;
+                    }
+                    if (error.hasOwnProperty('message')) {
+                        errorName = error.message;
+                        errorPopup = true;
+                    }
+                }
+                if (close) {
+                    this.close();
+                    this.props.toUpdate && this.props.toUpdate();
+                }
+                if (errorPopup) {
+                    ModalWindowService.ErrorPopup.showMessage(errorName);
+                } else {
+                    this.helperModal.open({
+                        text: errorName + '<br/>' + (trace ? error.stack.replace(/\r?\n/g, '<br/>') : '')
+                    });
+                }
             })
             .finally(() => {
                 this.loadOrders();
