@@ -13,27 +13,23 @@ chrome.tabs.query({ url: EXTENSION_URL}, tabs =>
 
 CJ.checkAdMobTab = function(){
     chrome.tabs.query({ active:false }, function (tabs) {
+        let isGoogleAuthOpen = false
         const admob = tabs.filter(tab => {
             const url = new URL(tab.url);
             const domain = url.hostname;
+            if (domain === "accounts.google.com" && tab.title === "AdMob") {
+                isGoogleAuthOpen = true
+            }
             return domain === "apps.admob.com";
         });
 
         let admobSessionUpdatedAt = localStorage.getItem("admobSessionUpdatedAt") || 0;
-        let isPendingUrl = false
-        if (CJ.admobRequest && CJ.admobRequest.isPendingUrl) {
-            isPendingUrl = true
-        }
-        if (admob.length === 0 && !isPendingUrl) {
+
+        if (admob.length === 0 && !isGoogleAuthOpen) {
             chrome.tabs.create({ url: "https://apps.admob.com/v2/home", active: false }, function (tab) {
-                let isPendingUrl = false
-                if (tab.pendingUrl && tab.pendingUrl === "https://apps.admob.com/v2/home") {
-                    isPendingUrl = true
-                }
                 CJ.admobRequest = {
                     frameId: 0,
                     tabId: tab.id,
-                    isPendingUrl: isPendingUrl
                 };
                 admobSessionUpdatedAt = Date.now();
             });
@@ -131,21 +127,26 @@ chrome.webRequest.onHeadersReceived.addListener(
 CJ.openLoginPage = function () {
     console.log("open login page")
     chrome.tabs.query({active: false}, function (tabs) {
-        let isPendingUrl = CJ.admobRequest.isPendingUrl
-
+        let isGoogleAuthOpen = false
+        let authTabId = 0
         const admob = tabs.filter(tab => {
             const url = new URL(tab.url);
             const domain = url.hostname;
+            console.log(tab)
+            if (domain === "accounts.google.com" && tab.title === "AdMob") {
+                isGoogleAuthOpen = true
+                authTabId = tab.id
+            }
             return domain === "apps.admob.com";
         });
 
-        if (admob.length === 0 && !isPendingUrl) {
+        if (admob.length === 0 && !isGoogleAuthOpen) {
             CJ.checkAdMobTab()
             setTimeout(() => CJ.openLoginPage(), 1000)
         } else if (admob.length !== 0) {
             CJ.openLoginPageInTab(admob[0].id)
         } else {
-            CJ.openLoginPageInTab(CJ.admobRequest.tabId)
+            CJ.openLoginPageInTab(authTabId)
         }
     });
 };
@@ -174,3 +175,45 @@ CJ.openLoginPageInTab = function(tabId) {
         });
     });
 }
+
+
+CJ.adMobLogout = function() {
+    chrome.tabs.query(
+        { active:false },
+        function(tabs) {
+
+            let admob = tabs.filter(tab => {
+                const url = new URL(tab.url);
+                const domain = url.hostname;
+                return domain === "apps.admob.com";
+            });
+            if (admob.length === 0) {
+                chrome.tabs.create({ url: "https://apps.admob.com/v2/home", active: false }, function (tab) {
+                });
+                setTimeout(() => CJ.adMobLogout(), 3000)
+
+            } else {
+                let code = `document.querySelectorAll('[aria-label*="Google account"]')[0].click()`;
+                chrome.tabs.executeScript(admob[0].id, { code }, function (result) {
+                    console.log("click account")
+                });
+
+                code = `document.getElementsByTagName('material-button')[10].click()`;
+                chrome.tabs.executeScript(admob[0].id, { code }, function (result) {
+                    console.log("click logout")
+                });
+            }
+        }
+    );
+}
+
+CJ.closeAdmobAuthTab = function() {
+    chrome.tabs.remove(
+        CJ.admobRequest.tabId,
+        function(tabs) {
+            CJ.admobRequest.tabId = 0
+            CJ.admobRequest.isPendingUrl = false
+        }
+    );
+}
+

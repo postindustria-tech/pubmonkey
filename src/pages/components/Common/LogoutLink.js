@@ -37,7 +37,7 @@ class LogoutLink extends Component {
         }
 
         if(this.props.type === AD_SERVER_ADMOB){
-            return (<a style={this.props.style} href="#" onClick={this.mopubLogOut}>{this.props.children}</a>)
+            return (<a style={this.props.style} href="#" onClick={this.admobLogout}>{this.props.children}</a>)
         }
 
         return (<React.Fragment></React.Fragment>)
@@ -58,6 +58,14 @@ class LogoutLink extends Component {
             .then(() => {
                 window.location.reload();
             });
+    }
+
+    admobLogout() {
+        window.AdMobAutomation.adMobLogout()
+        function refresh(){
+            window.location.reload();
+        }
+        setTimeout(refresh, 4000)
     }
 
 }
