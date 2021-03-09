@@ -78,7 +78,7 @@ class Handler extends AbstractHandler {
     }
 
     logout() {
-        // return HTTPService.POST(`${WEB_URL}/account/logout/`);
+        return HTTPService.POST(`${WEB_URL}/account/logout/`);
     }
 
     getAdvertiserByName(advertiserName) {

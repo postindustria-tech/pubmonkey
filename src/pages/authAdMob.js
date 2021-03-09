@@ -20,16 +20,24 @@ CJ.checkAdMobTab = function(){
         });
 
         let admobSessionUpdatedAt = localStorage.getItem("admobSessionUpdatedAt") || 0;
-
-        if (admob.length === 0) {
+        let isPendingUrl = false
+        if (CJ.admobRequest && CJ.admobRequest.isPendingUrl) {
+            isPendingUrl = true
+        }
+        if (admob.length === 0 && !isPendingUrl) {
             chrome.tabs.create({ url: "https://apps.admob.com/v2/home", active: false }, function (tab) {
+                let isPendingUrl = false
+                if (tab.pendingUrl && tab.pendingUrl === "https://apps.admob.com/v2/home") {
+                    isPendingUrl = true
+                }
                 CJ.admobRequest = {
                     frameId: 0,
-                    tabId: tab.id
+                    tabId: tab.id,
+                    isPendingUrl: isPendingUrl
                 };
                 admobSessionUpdatedAt = Date.now();
             });
-        } else {
+        } else if (admob.length !== 0) {
             let tabId = admob[0].id;
             let frameId = 0;
 
@@ -121,24 +129,29 @@ chrome.webRequest.onHeadersReceived.addListener(
 );
 
 CJ.openLoginPage = function () {
-
+    console.log("open login page")
     chrome.tabs.query({active: false}, function (tabs) {
+        let isPendingUrl = CJ.admobRequest.isPendingUrl
+
         const admob = tabs.filter(tab => {
             const url = new URL(tab.url);
             const domain = url.hostname;
             return domain === "apps.admob.com";
         });
 
-        if (admob.length === 0) {
+        if (admob.length === 0 && !isPendingUrl) {
             CJ.checkAdMobTab()
             setTimeout(() => CJ.openLoginPage(), 1000)
-        } else {
+        } else if (admob.length !== 0) {
             CJ.openLoginPageInTab(admob[0].id)
+        } else {
+            CJ.openLoginPageInTab(CJ.admobRequest.tabId)
         }
     });
 };
 
 CJ.openLoginPageInTab = function(tabId) {
+    console.log(tabId)
     chrome.tabs.update(tabId, {selected: true}, function () {
         chrome.tabs.onUpdated.addListener(function handler(
             _tabId,
@@ -146,8 +159,8 @@ CJ.openLoginPageInTab = function(tabId) {
         ) {
             if (
                 tabId === _tabId &&
-                status === "loading" &&
-                (url === "https://apps.admob.com" || url === "https://apps.admob.com/")
+                (status === "loading" || status === "Complete") &&
+                (url === "https://apps.admob.com" || url === "https://apps.admob.com/v2/home")
             ) {
                 // chrome.tabs.remove(tabId);
                 chrome.tabs.onUpdated.removeListener(handler);
