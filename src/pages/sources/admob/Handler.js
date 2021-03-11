@@ -112,7 +112,7 @@ class Handler extends AbstractHandler {
                 aupd = aupd[0].match(/'(.*)';/m);
                 aupd = aupd[1];
                 const adunits = JSON.parse(aupd.hexDecode());
-
+                console.log(adunits)
                 return {apps, adunits}
             })
             .then(({apps, adunits}) => {
@@ -328,7 +328,8 @@ class Handler extends AbstractHandler {
             },
             "4": lineItems
         };
-        //console.log(body);
+        console.log("request body :")
+        console.log(body);
 
         return axios.get(`https://apps.admob.com/v2/home`)
             .then(resp => {
@@ -367,6 +368,13 @@ class Handler extends AbstractHandler {
                         console.log('payload: ', payload);
                         console.log('result: ', result);
                         let {ok, data, error} = result;
+
+                        if(!data["1"] && data["2"]) {
+                            console.log("adMob service error")
+                            let message = data[2][1][0][1] ? data[2][1][0][1] : "Fatal error"
+                            error = {errors: [{message: `adMob service error: ${message}`}]}
+                            ok = false
+                        }
                         if (ok) {
                             resolve(data);
                         } else {
@@ -384,9 +392,9 @@ class Handler extends AbstractHandler {
                     })
                 });
             })
-            .catch(error => {
-                console.error(error);
-            });
+            //.catch(error => {
+                //console.error(error);
+            //});
 
 
         // return HTTPService.POST(`${WEB_URL}/web-client/api/orders/create`, data);

@@ -1296,6 +1296,7 @@ class CreateOrderModal extends Component {
                 );
             })
             .catch(error => {
+                console.log("create order error")
                 console.error(error);
                 ModalWindowService.ProgressModal.cancel();
 
