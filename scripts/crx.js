@@ -14,7 +14,7 @@ export function crx(cb) {
 function packCRX() {
     return gulp.src('./build')
         .pipe(packer({
-          privateKey: fs.readFileSync('./build.pem', 'utf8'),
+          privateKey: process.env.PRIVATE_KEY, //fs.readFileSync('./build.pem', 'utf8'),
           filename: FILENAME + '.crx'
         }))
         .pipe(gulp.dest('./build'))
