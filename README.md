@@ -1,22 +1,42 @@
 # Overview
 
-PubMonkey is a Chrome Extension to automate some routine MoPub setup tasks.
+[PubMonkey](https://pubmonkey.postindustria.com/) is a Chrome Extension to automate Header / In-App Bidding Order setup for GAM, MoPub, AdMob ad servers.
 
-Here are a couple YT videos describing the use cases of the product:
+PubMonkey allows to generate orders for: 
+- Prebid Server
+- OpenX Apollo (Hosted Prebid Server)
+- BidMachine
+- Amazon TAM (legacy)
+- PubMatic OpenWrap
+- PubNative HyBid
+- UberMedia ClearBid
+- Smaato Unified Bidding
 
-- https://youtu.be/e4xHosxLgxc
-- https://youtu.be/w_aEzZkYpiU
 
+# Build Infra
 
-# Dev Build Infra
+## Distribution
+You can download the latest version of the extension from Chrome Web Store [here](https://chrome.google.com/webstore/detail/pubmonkey/cjbdhopmleoleednpeaknmmbepfkhaml).
 
-## Build
-To get the crx file, you need to run the following command in the terminal
-```
-$ npm run crx
+Beta versions are available for download from this [S3 bucket](http://pi-pubmonkey-upload.s3-website-us-east-1.amazonaws.com/).
+
+## Dev Build
+
+This command builds a .crx and .zip extension packages and puts them into the `build/` directory:
+```sh
+export PRIVATE_KEY= #your private key file
+npm run crx
 ```
 then you can find the build.crx file in the /build folder
 
 ## Installation
-To install the extension, open [chrome://extensions/](chrome://extensions/) in the chrome browser and drag the crx file into this tab.
+To install the unpacked extension see detailed instructions [here](https://developer.chrome.com/docs/extensions/mv2/getstarted/).  Long story short: open [chrome://extensions/](chrome://extensions/) enable developer mode, unpack the zip and load your extension.  Dragging .zip into that tab sometimes works too. 
 
+
+# User Documentation
+
+https://doc.pubmonkey.postindustria.com/
+
+# Contribution
+
+We are happy to receive any contributions in the form of Pull Requests, Issues or just drop us a line here: pubmonkey@postindustria.com.
