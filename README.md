@@ -24,7 +24,7 @@ Beta versions are available for download from this [S3 bucket](http://pi-pubmonk
 
 This command builds a .crx and .zip extension packages and puts them into the `build/` directory:
 ```sh
-export PRIVATE_KEY= #your private key file
+export PRIVATE_KEY= #your private key
 npm run crx
 ```
 then you can find the build.crx file in the /build folder
