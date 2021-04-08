@@ -1,15 +1,15 @@
 # Overview
 
-[PubMonkey](https://pubmonkey.postindustria.com/) is a Chrome Extension to automate Header / In-App Bidding Order setup for GAM, MoPub, AdMob ad servers.
+[PubMonkey](https://pubmonkey.postindustria.com/) is a Chrome Extension to automate Header / In-App Bidding Order setup in Google Ad Manager, MoPub, AdMob ad servers.
 
 PubMonkey allows to generate orders for: 
-- Prebid Server
-- OpenX Apollo (Hosted Prebid Server)
-- BidMachine
-- Amazon TAM (legacy)
+- [Prebid.org](https://prebid.org/)
+- [OpenX Apollo](https://www.openx.com/prebid/) (Hosted Prebid Server)
+- [BidMachine Bidder](https://bidmachine.io/bidder/) 
 - PubMatic OpenWrap
 - PubNative HyBid
 - UberMedia ClearBid
+- Amazon TAM (legacy approach, see Amazon documentation for their new approach)
 - Smaato Unified Bidding
 
 
