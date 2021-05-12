@@ -201,11 +201,13 @@ export class OpenX extends AbstractAdvertiser {
         }
 
         if (cb) {
+            let createdCreatives = []
             creativeList.forEach(element => {
                     cb(element)
                     .then(result => {
                         console.log("result creative")
                         console.log(result)})
+                        createdCreatives.push(element)
                     .catch(error => {
                         console.log('Create creative error', element, error)
                     });
