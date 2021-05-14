@@ -184,6 +184,19 @@ export class OpenX extends AbstractAdvertiser {
                             name: "Creative ".concat(creativeParams.creativeFormat).concat("("+dimension+")")
                     })
                 })
+            } else if(creativeParams.creativeFormat === "native") {
+                let format = MOPUB_CREATIVE_FORMAT[creativeParams.creativeFormat].type.toLowerCase()
+                creativeList.push({
+                    adType: format,
+                    extended: {
+                        mediaType: "image",
+                        createdWithForm: true
+                    },
+                    format: format,
+                    imageKeys: [],
+                    lineItemKey: lineItemKey,
+                    name: "Creative ".concat(creativeParams.creativeFormat)
+                })
             }
         } else {
             creativeList.push({

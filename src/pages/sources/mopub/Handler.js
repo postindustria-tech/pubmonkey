@@ -291,13 +291,18 @@ class Handler extends AbstractHandler {
                               || advertiser === "OpenX Apollo"
                               || advertiser === "Prebid.org")) {
                 let lineItemKey = result.key;
-
+                console.log("line item key: "+result.key)
+                console.log("advertiser: "+advertiser)
                 return Promise.mapSeries(
                     creatives,
                     (creative, index) => {
-                        let data = creative[index]
-                        data['lineItemKey'] = lineItemKey
-                        this.createCreatives(data)}
+                        if (creative && creative[0]) {
+                            let data = creative[0]
+                            console.log("Creative data: ")
+                            console.log(data)
+                            data['lineItemKey'] = lineItemKey
+                            this.createCreatives(data)}
+                        }
                 ).then(() => result);
             }
 
