@@ -291,18 +291,28 @@ class Handler extends AbstractHandler {
                               || advertiser === "OpenX Apollo"
                               || advertiser === "Prebid.org")) {
                 let lineItemKey = result.key;
-                console.log("line item key: "+result.key)
-                console.log("advertiser: "+advertiser)
+                //console.log("line item key: "+result.key)
+                //console.log("advertiser: "+advertiser)
                 return Promise.mapSeries(
                     creatives,
                     (creative, index) => {
-                        if (creative && creative[0]) {
-                            let data = creative[0]
-                            console.log("Creative data: ")
-                            console.log(data)
-                            data['lineItemKey'] = lineItemKey
-                            this.createCreatives(data)}
+                        //console.log("map with creatives")
+                        //console.log(creatives)
+                        if (creative) {
+                            creative.forEach((item) => {
+                                if (item["adType"]) {
+                                    let data = item
+                                    //console.log("Creative data: ")
+                                    //console.log(data)
+                                    data['lineItemKey'] = lineItemKey
+                                    this.createCreatives(data)
+                                }
+                                if (creative.length >= 5) {
+                                    delay(300)
+                                }
+                            })
                         }
+                    }
                 ).then(() => result);
             }
 
@@ -393,7 +403,20 @@ class Handler extends AbstractHandler {
                             timestamp = Date.now();
 
                             return this.restoreLineItem(lineItem, key, order.advertiser).then(
-                                result => {
+                                async result => {
+
+                                    await delay(Math.floor(lineItemIdx/50)*1000);
+                                    if (lineItemIdx > 0 && lineItemIdx % 50 === 0) {
+                                        let mopubSessionUpdatedAt = Date.now();
+                                        localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+                                        let {tabId, frameId} = window.MopubAutomation.request;
+                                        chrome.tabs.reload(tabId, {}, function () {
+                                            console.log('reloading mopub page');
+                                        });
+                                        await delay(10000);
+                                    }
+                                    //console.log("restore line item")
+                                    //console.log(result)
                                     timestamp = Date.now() - timestamp;
 
                                     step({
