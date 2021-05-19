@@ -153,7 +153,17 @@ class Handler extends AbstractHandler {
     }
 
     createLineItem(data) {
-        return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/create`, data);
+        return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/create`, data).catch(async error => {
+            //reload mopub page & try again
+            let mopubSessionUpdatedAt = Date.now();
+            localStorage.setItem("mopubSessionUpdatedAt", mopubSessionUpdatedAt.toString());
+            let {tabId, frameId} = window.MopubAutomation.request;
+            chrome.tabs.reload(tabId, {}, function () {
+                console.log('reloading mopub page');
+            });
+            await delay(8000);
+            return HTTPService.POST(`${WEB_URL}/web-client/api/line-items/create`, data)
+        }).then(result => result);
     }
 
     updateOrderStatus(status, id) {
@@ -291,31 +301,21 @@ class Handler extends AbstractHandler {
                               || advertiser === "OpenX Apollo"
                               || advertiser === "Prebid.org")) {
                 let lineItemKey = result.key;
-                //console.log("line item key: "+result.key)
-                //console.log("advertiser: "+advertiser)
                 return Promise.mapSeries(
                     creatives,
                     (creative, index) => {
-                        //console.log("map with creatives")
-                        //console.log(creatives)
                         if (creative) {
                             creative.forEach((item) => {
                                 if (item["adType"]) {
                                     let data = item
-                                    //console.log("Creative data: ")
-                                    //console.log(data)
                                     data['lineItemKey'] = lineItemKey
                                     this.createCreatives(data)
-                                }
-                                if (creative.length >= 5) {
-                                    delay(300)
                                 }
                             })
                         }
                     }
                 ).then(() => result);
             }
-
             return result;
         });
     }
