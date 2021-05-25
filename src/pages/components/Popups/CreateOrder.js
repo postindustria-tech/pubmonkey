@@ -995,15 +995,69 @@ class CreateOrderModal extends Component {
     @bind
     preOrder(executor) {
         let {
+            adUnitsSelected: adunits,
             step,
             keywordStep,
+            keywordTemplate,
             rangeFrom,
             rangeTo,
+            orderName,
+            lineItemsNaming,
             advertiser,
+            creativeFormat,
+            creativeSnippet,
+            networkClass,
+            customEventClassName,
+            Ad_ZONE_ID,
+            adServerDomain,
+            advertiserId,
             granularity,
+            customEventData,
+            amazonStartPrice,
+            amazonCSVItems,
+            amazonStep,
             priceGrid,
-            BidMachinePriceGrid
+            priceBand,
+            childContentEligibility,
+            snippetType,
+            BidMachinePriceGrid,
+            vastTagUrl,
+            creativeGenerationPolicy,
+            os
         } = this.state;
+        let adUnitsParams = this.props.adunits
+        let params = {
+            adunits,
+            adUnitsParams,
+            step,
+            keywordStep,
+            keywordTemplate,
+            rangeFrom,
+            rangeTo,
+            lineItemsNaming,
+            advertiser,
+            creativeFormat,
+            creativeSnippet,
+            networkClass,
+            customEventClassName,
+            Ad_ZONE_ID,
+            adServerDomain,
+            customTargetingKeys: this.props.customTargetingKeys,
+            customTargetingValues: this.props.customTargetingValues,
+            granularity,
+            customEventData,
+            amazonStartPrice,
+            amazonCSVItems,
+            amazonStep,
+            priceGrid,
+            priceBand,
+            childContentEligibility,
+            snippetType,
+            BidMachinePriceGrid,
+            vastTagUrl,
+            creativeGenerationPolicy,
+            os
+        };
 
         const formValid = this.formValidator();
         if (!formValid) {
@@ -1148,7 +1202,10 @@ class CreateOrderModal extends Component {
             //return ModalWindowService.ErrorPopup.showMessage("Number of line items exceeded");
         //}
 
-        let message = `Will generate:<br/>${items.toFixed(0)} line item(s), ${keywords.toFixed(0)} keyword(s) per line item.`;
+        let creativesCount = this.props.sourceHandler.getAdUnitsCreativesCount(params)
+        let reused = this.props.type === AD_SERVER_DFP ? 'reused' : ''
+        let message = `Will generate:<br/>${items.toFixed(0)} line item(s), ${keywords.toFixed(0)} keyword(s) per line item.
+                      <br/> Targeting ${creativesCount.adUnits} ad unit(s) with ${creativesCount.creatives} ${reused} creative(s) per line item.`;
 
         if (this.props.type === AD_SERVER_MOPUB && executor === "create" && items + lineItemsCount > 1000) {
             message = `${message}<br/>You will exceed the number of line items available in MoPub, this creation will create only some part of line items out of requested ${items}, would you like to continue?`;

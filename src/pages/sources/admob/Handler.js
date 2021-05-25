@@ -730,6 +730,11 @@ class Handler extends AbstractHandler {
     getAdUnitUrl(key) {
         return `https://apps.admob.com/v2/apps/${key}/adunits/list`;
     }
+
+    getAdUnitsCreativesCount(params) {
+        let creatives = 0
+        return { adUnits: params.adunits.length, creatives: creatives}
+    }
 }
 
 Factory.registerHandler(Handler);

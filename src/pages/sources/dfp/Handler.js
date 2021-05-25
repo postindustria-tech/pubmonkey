@@ -1370,6 +1370,57 @@ class Handler extends AbstractHandler {
     getAdUnitUrl(key) {
         return `https://admanager.google.com/${this.networkCode}#inventory/inventory/adSlotId=${key}`;
     }
+
+    getAdUnitsCreativesCount(params) {
+        let data = 0
+        if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[2]) {
+            data++
+        } else {
+           params.adunits.map(adunit => {
+                const {advertiser} = params
+                const creative = params.adUnitsParams.find(adUnitsParam => adUnitsParam.key == adunit)
+                let [width, height] = creative.format.split("x")
+                let adUnitSizes = []
+                if (PREBID_GROUP_ADVERTISERS.includes(advertiser)){
+                    if(params.creativeGenerationPolicy === CREATIVE_GENERATION_POLICY[0]) {
+                        width = 1
+                        height = 1
+                    } else if(creative.format.indexOf(',') > -1) {
+                        let formats = creative.format.split(', ')
+                        formats.forEach(format => {
+                            let [width, height] = format.replace('v', '').split("x")
+                            adUnitSizes.push({width: width, height: height})
+                        })
+                    } else {
+                        let format = creative.format.replace('v', '').split("x")
+                        width = format[0]
+                        height = format[1]
+                    }
+                }else if(!creative.format){
+                    [width, height] = params.creativeFormat.split("x")
+                }
+                if(adUnitSizes.length > 0) {
+                    if(params.snippetType === "VAST") {
+                        adUnitSizes.forEach(element => {
+                            data++
+                        })
+                    } else {
+                        adUnitSizes.forEach(element => {
+                            data++
+                        })
+                    }
+                } else {
+                    if(params.snippetType === "VAST") {
+                        data++
+                    } else {
+                        data++
+                    }
+                }
+            })
+        }
+        return { adUnits: params.adunits.length, creatives: data}
+    }
+
 }
 
 Factory.registerHandler(Handler);

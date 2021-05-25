@@ -62,4 +62,8 @@ export default class AbstractHandler {
     getOrderUrl(key) {
         return "";
     }
+
+    getAdUnitsCreativesCount() {
+
+    }
 }

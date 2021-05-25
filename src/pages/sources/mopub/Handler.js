@@ -6,7 +6,12 @@ import Promise from "bluebird";
 import {wrapSeries, delay} from "../helpers";
 import {isEmpty, toDecimal, toInteger, toValidUI} from "../../helpers";
 import {AD_SERVER_MOPUB, } from "../../constants/source";
-import {AMAZON_KVP_FORMAT, AMAZON_PRICE_GRID, MOPUB_CREATIVE_FORMAT} from '../../constants/common';
+import {
+    AMAZON_KVP_FORMAT,
+    AMAZON_PRICE_GRID,
+    CREATIVE_GENERATION_POLICY,
+    MOPUB_CREATIVE_FORMAT, PREBID_GROUP_ADVERTISERS
+} from '../../constants/common';
 import axios from "ex-axios";
 
 const WEB_URL = "https://app.mopub.com";
@@ -618,6 +623,19 @@ class Handler extends AbstractHandler {
 
     getAdUnitUrl(key) {
         return `https://app.mopub.com/ad-unit?key=${key}`;
+    }
+
+    getAdUnitsCreativesCount(params) {
+        let creatives = []
+        this.filterAdUnitParams(params).forEach(currentAdUnit => {
+            creatives = this.advertiser.createCreatives(
+                null,
+                params,
+                null,
+                currentAdUnit
+            );
+        })
+        return { adUnits: params.adunits.length, creatives: creatives.length}
     }
 }
 
