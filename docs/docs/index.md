@@ -2,7 +2,7 @@
 
 ## Releases
 
-Current [Live](https://chrome.google.com/webstore/detail/cjbdhopmleoleednpeaknmmbepfkhaml/publish-accepted?authuser=0&hl=en) version is `2.9.0.4`
+Current [Live](https://chrome.google.com/webstore/detail/cjbdhopmleoleednpeaknmmbepfkhaml/publish-accepted?authuser=0&hl=en) version is `2.10.0.18`
 
 Betas are available [here](http://pi-pubmonkey-upload.s3-website-us-east-1.amazonaws.com/).  Please feel free to try and install a beta which might contain the functionality not yet available in a live release.  For instructions on how to install a Chrome extension from a .zip archive see this [doc](install.md)
 
@@ -19,7 +19,7 @@ Please read detailed [release notes](changelog.md)
  	* [Prebid.org](order-actions.md#generate-a-prebid-order) [__GAM__, __MoPub__]
  	* OpenX Apollo [__GAM__, __MoPub__]
  	* OpenX Apollo SDK [__GAM__, __MoPub__]
- 	* BidMachine [__GAM__, __MoPub__] (BidMachine documentation on [GAM integration](https://doc.bidmachine.io/eng/ssp-publisher-integration-documentation/bidmachine-sdk-admanager-appevent-integration), [MoPub integration](https://doc.bidmachine.io/eng/ssp-publisher-integration-documentation/bidmachine-custom-adapters/bidmachine-mopub-custom-network-integration-guide))
+ 	* BidMachine [__GAM__, __MoPub__, __AdMob__] (BidMachine documentation on [GAM integration](https://doc.bidmachine.io/eng/ssp-publisher-integration-documentation/bidmachine-sdk-admanager-appevent-integration), [MoPub integration](https://doc.bidmachine.io/eng/ssp-publisher-integration-documentation/bidmachine-custom-adapters/bidmachine-mopub-custom-network-integration-guide))
  	* [Amazon TAM](order-actions.md#generate-an-amazon-tam-order) [__GAM__, __MoPub__]
  	* Smaato [__MoPub__]
  	* PubMatic [__MoPub__] 
