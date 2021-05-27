@@ -544,13 +544,15 @@ class Handler extends AbstractHandler {
 
         if (!isEmpty(customTargetingKeys)) {
             this.customTargetingKeyId = customTargetingKeys[0];
+            this.customTargetingValues = await this.getCustomTargetingValues(this.customTargetingKeyId)
         } else {
             let newKeys = await this.createCustomTargetingKeys([{
-                name: this.advertiser.customTargetingKey,
-                displayName: this.advertiser.customTargetingKey,
+                name: keywordTemplate.split(":")[0],
+                displayName: keywordTemplate.split(":")[0],
                 type: "FREEFORM"
             }]);
             this.customTargetingKeyId = newKeys[0].id;
+            this.customTargetingValues = await this.getCustomTargetingValues(this.customTargetingKeyId)
         }
 
         const keywordStepDecimalPartLength = (keywordStep + "").replace(/^[-\d]+\./, "").length,
@@ -560,7 +562,8 @@ class Handler extends AbstractHandler {
             keywords = [],
             skip = false;
         if (advertiser === "openx" || advertiser === "apollo" || advertiser === "apolloSDK") {
-            keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
+            let keyMask = keywordTemplate.split(':')[0]
+            keywordTemplate = keywordTemplate.replace((keyMask+':'), '')
             switch (granularity) {
                 case 'low':
                     bids.push(toInteger(0.00))

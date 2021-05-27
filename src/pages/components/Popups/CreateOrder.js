@@ -1276,6 +1276,14 @@ class CreateOrderModal extends Component {
             orderName
         );
 
+        const customTargetingKeys = await this.props.sourceHandler.getCustomTargetingKeys(keywordTemplate.split(':')[0])
+            .then(keys => {
+                keys = keys.map(({id}) => {
+                    return id;
+                });
+                return keys;
+            });
+
         let params = {
             adunits,
             adUnitsParams,
@@ -1292,7 +1300,7 @@ class CreateOrderModal extends Component {
             customEventClassName,
             Ad_ZONE_ID,
             adServerDomain,
-            customTargetingKeys: this.props.customTargetingKeys,
+            customTargetingKeys: customTargetingKeys,
             customTargetingValues: this.props.customTargetingValues,
             granularity,
             customEventData,
