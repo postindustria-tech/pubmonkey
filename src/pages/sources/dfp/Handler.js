@@ -696,7 +696,8 @@ class Handler extends AbstractHandler {
                 startPriceIndex++
             }
         } else if (advertiser === "bidmachine") {
-            keywordTemplate = keywordTemplate.replace((this.advertiser.customTargetingKey+':'), '')
+            let keyMask = keywordTemplate.split(':')[0]
+            keywordTemplate = keywordTemplate.replace((keyMask+':'), '')
             BidMachinePriceGrid.split(/\r?\n/).forEach(element => {
                 var number = parseFloat(element.match(/[\d\.]+/))
                 if (number) {
