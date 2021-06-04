@@ -1276,13 +1276,17 @@ class CreateOrderModal extends Component {
             orderName
         );
 
-        const customTargetingKeys = await this.props.sourceHandler.getCustomTargetingKeys(keywordTemplate.split(':')[0])
-            .then(keys => {
-                keys = keys.map(({id}) => {
-                    return id;
+        let customTargetingKeys = this.props.customTargetingKeys
+
+        if(this.props.type === AD_SERVER_DFP) {
+            customTargetingKeys = await this.props.sourceHandler.getCustomTargetingKeys(keywordTemplate.split(':')[0])
+                .then(keys => {
+                    keys = keys.map(({id}) => {
+                        return id;
+                    });
+                    return keys;
                 });
-                return keys;
-            });
+        }
 
         let params = {
             adunits,
